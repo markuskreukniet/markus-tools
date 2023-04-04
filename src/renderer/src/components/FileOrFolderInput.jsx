@@ -2,8 +2,10 @@ import FileSelector from './FileSelector'
 
 import { createSignal, For } from 'solid-js'
 
+// TODO: do not add duplicate selectedPaths or filePaths
 export default function FileOrFolderInput(props) {
   const [selectedPaths, setSelectedPaths] = createSignal([])
+  const [filePaths, setFilePaths] = createSignal([])
 
   function handleSelectedFile(files) {
     setSelectedPaths([...selectedPaths(), files[0].path])
@@ -17,12 +19,21 @@ export default function FileOrFolderInput(props) {
 
   function handleFilePaths(files) {
     // files is a FileList, not an array, so we can't use .map
-    const filePaths = []
+    const newFilePaths = []
     for (const file of files) {
-      filePaths.push(file.path)
+      newFilePaths.push(file.path)
     }
 
-    props.onChange(filePaths)
+    setFilePaths([...filePaths(), ...newFilePaths])
+  }
+
+  function reset() {
+    setSelectedPaths([])
+    setFilePaths([])
+  }
+
+  function submit() {
+    props.onChange(filePaths())
   }
 
   return (
@@ -30,6 +41,10 @@ export default function FileOrFolderInput(props) {
       <div>
         <FileSelector onChange={handleSelectedFile} />
         <FileSelector onChange={handleSelectedFolder} folder />
+      </div>
+      <div>
+        <button onClick={reset}>reset</button>
+        <button onClick={submit}>submit</button>
       </div>
       <ul>
         <For each={selectedPaths()}>{(path) => <li>{path}</li>}</For>
