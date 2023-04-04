@@ -6,7 +6,7 @@ export default function FileSelector(props) {
   function handleSelectedFileOrFolder(files) {
     // add selected file or folder to the ul
     const pathToAdd = files.length === 1 ? files[0].path : getSelectedFolderPath(files)
-    setSelectedPaths(selectedPaths().push(pathToAdd))
+    setSelectedPaths([...selectedPaths(), pathToAdd])
 
     // convert files to file paths
     // files is a FileList, not an array, so we can't use .map
