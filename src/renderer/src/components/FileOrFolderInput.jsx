@@ -3,6 +3,9 @@ import FileSelector from './FileSelector'
 import { createSignal, For } from 'solid-js'
 
 // TODO: do not add duplicate selectedPaths or filePaths
+// If a selectedPaths is duplicate, don't add its filePaths
+// If a selectedPath is a file part of an already selected folder, don't add that file
+// If a selectedPath is a folder and a file part of that folder is already added, remove the file and add the folder
 export default function FileOrFolderInput(props) {
   const [selectedPaths, setSelectedPaths] = createSignal([])
   const [filePaths, setFilePaths] = createSignal([])
