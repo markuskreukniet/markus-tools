@@ -1,3 +1,4 @@
+import FileSelector from './components/FileSelector'
 import Versions from './components/Versions'
 import logo from './assets/logo.svg'
 
@@ -5,6 +6,8 @@ function App() {
   return (
     <div class="container">
       <Versions />
+
+      <FileSelector onChange={(e) => console.log('e', e)} />
 
       <img class="hero-logo" src={logo} alt="logo" />
       <h2 class="hero-text">You{"'"}ve successfully created an Electron project with Solid</h2>

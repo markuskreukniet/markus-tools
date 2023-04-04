@@ -22,6 +22,7 @@ export default function FileSelector(props) {
     <div>
       <input
         type="file"
+        webkitdirectory={props.folder}
         onClick={
           (e) => (e.target.value = '') /* makes selecting the same file or folder possible */
         }
