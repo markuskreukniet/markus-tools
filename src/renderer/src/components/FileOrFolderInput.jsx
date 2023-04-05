@@ -6,17 +6,28 @@ import { createSignal, For } from 'solid-js'
 // If a selectedPaths is duplicate, don't add its filePaths
 // If a selectedPath is a file part of an already selected folder, don't add that file
 // If a selectedPath is a folder and a file part of that folder is already added, remove the file and add the folder
+
+// Storing a file path is better than storing a file name since we don't have to combine a folder path, and a file name (combining the strings is less efficient)
 export default function FileOrFolderInput(props) {
-  const [selectedPaths, setSelectedPaths] = createSignal([])
+  const [folderFilePathCombinations, setFolderFilePathCombinations] = createSignal([])
   let filePaths = []
 
   function handleSelectedFile(files) {
-    setSelectedPaths([...selectedPaths(), files[0].path])
+    // TODO: make combination with function?
+    const combination = {
+      folderPath: getSelectedFolderPath(files),
+      filePath: files[0].path
+    }
+    setFolderFilePathCombinations([...folderFilePathCombinations(), combination])
     handleFilePaths(files)
   }
 
   function handleSelectedFolder(files) {
-    setSelectedPaths([...selectedPaths(), getSelectedFolderPath(files)])
+    const combination = {
+      folderPath: getSelectedFolderPath(files),
+      filePath: null
+    }
+    setFolderFilePathCombinations([...folderFilePathCombinations(), combination])
     handleFilePaths(files)
   }
 
@@ -28,7 +39,7 @@ export default function FileOrFolderInput(props) {
   }
 
   function reset() {
-    setSelectedPaths([])
+    setFolderFilePathCombinations([])
     filePaths = []
   }
 
@@ -47,7 +58,9 @@ export default function FileOrFolderInput(props) {
         <button onClick={submit}>submit</button>
       </div>
       <ul>
-        <For each={selectedPaths()}>{(path) => <li>{path}</li>}</For>
+        <For each={folderFilePathCombinations()}>
+          {(combination) => <li>{combination.filePath}</li>}
+        </For>
       </ul>
     </div>
   )
