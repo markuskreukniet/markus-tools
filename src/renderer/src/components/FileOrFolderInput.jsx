@@ -8,7 +8,7 @@ import { createSignal, For } from 'solid-js'
 // If a selectedPath is a folder and a file part of that folder is already added, remove the file and add the folder
 export default function FileOrFolderInput(props) {
   const [selectedPaths, setSelectedPaths] = createSignal([])
-  const [filePaths, setFilePaths] = createSignal([])
+  let filePaths = []
 
   function handleSelectedFile(files) {
     setSelectedPaths([...selectedPaths(), files[0].path])
@@ -22,21 +22,18 @@ export default function FileOrFolderInput(props) {
 
   function handleFilePaths(files) {
     // files is a FileList, not an array, so we can't use .map
-    const newFilePaths = []
     for (const file of files) {
-      newFilePaths.push(file.path)
+      filePaths.push(file.path)
     }
-
-    setFilePaths([...filePaths(), ...newFilePaths])
   }
 
   function reset() {
     setSelectedPaths([])
-    setFilePaths([])
+    filePaths = []
   }
 
   function submit() {
-    props.onChange(filePaths())
+    props.onChange(filePaths)
   }
 
   return (
