@@ -13,9 +13,16 @@ export default function FileOrFolderInput(props) {
   let filePaths = []
 
   function handleSelectedFile(files) {
-    const combination = createCombination(files, files[0].path)
-    setFolderFilePathCombinations([...folderFilePathCombinations(), combination])
-    handleFilePaths(files)
+    // TODO: createCombination also calls getSelectedFolderPath
+    if (
+      !folderFilePathCombinations().some(
+        (combination) => combination.folderPath === getSelectedFolderPath(files)
+      )
+    ) {
+      const combination = createCombination(files, files[0].path)
+      setFolderFilePathCombinations([...folderFilePathCombinations(), combination])
+      handleFilePaths(files)
+    }
   }
 
   function handleSelectedFolder(files) {
