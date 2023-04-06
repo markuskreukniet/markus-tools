@@ -214,7 +214,7 @@ h1 {
   margin-bottom: var(--size-1);
 }
 
-h2 {
+h2, ul {
   margin-top: var(--size-1);
 }
 
