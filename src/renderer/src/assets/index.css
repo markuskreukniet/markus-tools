@@ -189,6 +189,27 @@ a:hover {
 }
 
 /* self added */
+:root {
+  /* golden ratio */
+  --g-ratio-p: 1.618;
+  --g-ratio-n: 0.618;
+
+  --size-1: 1rem;
+  --size-1-s: calc(var(--size-1) * var(--g-ratio-n));
+
+  --light-gray: #D3D3D3; /* color: LightGray */
+  --gray: #808080; /* color: Gray */
+
+  --border: solid 1px var(--gray);
+}
+
+button {
+  background-color: var(--light-gray);
+  border: var(--border);
+  padding: var(--size-1-s) var(--size-1);
+  cursor: pointer;
+}
+
 .display-none {
   display: none;
 }
