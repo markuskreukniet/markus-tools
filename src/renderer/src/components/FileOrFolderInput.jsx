@@ -1,44 +1,25 @@
+import { createSignal, For } from 'solid-js'
 import FileSelector from './FileSelector'
 
-import { createSignal, For } from 'solid-js'
-
-// TODO: do not add duplicate selectedPaths or filePaths
-// If a selectedPaths is duplicate, don't add its filePaths
-// If a selectedPath is a file part of an already selected folder, don't add that file
-// If a selectedPath is a folder and a file part of that folder is already added, remove the file and add the folder
-
-// TODO: child folders also have to work
-
-// Storing a file path is better than storing a file name since we don't have to combine a folder path, and a file name (combining the strings is less efficient)
+// TODO:
+// Adding a file could add a duplicate file since there could already be a folder with possible child folders already containing that file.
+// Adding a folder could add a duplicate file since the folder with possible child folders could contain a duplicate file.
 export default function FileOrFolderInput(props) {
-  const [folderFilePathCombinations, setFolderFilePathCombinations] = createSignal([])
+  const [selectedPaths, setSelectedPaths] = createSignal([])
   let filePaths = []
 
   function handleSelectedFile(files) {
-    const folderPath = getSelectedFolderPath(files)
-    if (
-      !folderFilePathCombinations().some(
-        (combination) =>
-          (combination.folderPath === folderPath && combination.filePath === null) ||
-          combination.filePath === files[0].path
-      )
-    ) {
-      const combination = createCombination(folderPath, files[0].path)
-      setFolderFilePathCombinations([...folderFilePathCombinations(), combination])
+    if (!selectedPaths().some((path) => path === files[0].path)) {
+      setSelectedPaths([...selectedPaths(), files[0].path])
       handleFilePaths(files)
     }
   }
 
-  // TODO
   function handleSelectedFolder(files) {
     const folderPath = getSelectedFolderPath(files)
-    if (
-      !folderFilePathCombinations().some(
-        (combination) => combination.folderPath === folderPath && combination.filePath === null
-      )
-    ) {
-      const combination = createCombination(folderPath, null)
-      setFolderFilePathCombinations([...folderFilePathCombinations(), combination])
+
+    if (!selectedPaths().some((path) => path === folderPath)) {
+      setSelectedPaths([...selectedPaths(), folderPath])
       handleFilePaths(files)
     }
   }
@@ -51,7 +32,7 @@ export default function FileOrFolderInput(props) {
   }
 
   function reset() {
-    setFolderFilePathCombinations([])
+    setSelectedPaths([])
     filePaths = []
   }
 
@@ -70,19 +51,10 @@ export default function FileOrFolderInput(props) {
         <button onClick={submit}>submit</button>
       </div>
       <ul>
-        <For each={folderFilePathCombinations()}>
-          {(combination) => <li>{combination.filePath}</li>}
-        </For>
+        <For each={selectedPaths()}>{(path) => <li>{path}</li>}</For>
       </ul>
     </div>
   )
-}
-
-function createCombination(folderPath, filePath) {
-  return {
-    folderPath: folderPath,
-    filePath: filePath
-  }
 }
 
 function getSelectedFolderPath(files) {
