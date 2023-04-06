@@ -7,6 +7,8 @@ import { createSignal, For } from 'solid-js'
 // If a selectedPath is a file part of an already selected folder, don't add that file
 // If a selectedPath is a folder and a file part of that folder is already added, remove the file and add the folder
 
+// TODO: child folders also have to work
+
 // Storing a file path is better than storing a file name since we don't have to combine a folder path, and a file name (combining the strings is less efficient)
 export default function FileOrFolderInput(props) {
   const [folderFilePathCombinations, setFolderFilePathCombinations] = createSignal([])
