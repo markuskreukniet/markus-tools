@@ -10,7 +10,7 @@ export default function DuplicateFiles() {
     <Page title="Duplicate Files Finder">
       <FileOrFolderInput onChange={getDuplicateFiles} />
       <h2>result:</h2>
-      <textarea />
+      <textarea placeholder="Describe yourself here..." />
     </Page>
   )
 }
