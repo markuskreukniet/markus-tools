@@ -3,6 +3,7 @@ import Page from '../Page'
 
 export default function DuplicateFiles() {
   async function getDuplicateFiles(e) {
+    // TODO: add at least two files check
     console.log('e', e)
   }
 
@@ -10,7 +11,7 @@ export default function DuplicateFiles() {
     <Page title="Duplicate Files Finder">
       <FileOrFolderInput onChange={getDuplicateFiles} />
       <h2>result:</h2>
-      <textarea placeholder="Describe yourself here..." />
+      <textarea placeholder="Add at least two files or a folder and press 'submit.'" />
     </Page>
   )
 }
