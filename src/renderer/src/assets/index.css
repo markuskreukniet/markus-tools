@@ -214,6 +214,15 @@ h1 {
   margin-bottom: var(--size-1);
 }
 
+h2 {
+  margin-top: var(--size-1);
+}
+
+textarea {
+  width: 100%;
+  height: calc(var(--size-1) * 13);
+}
+
 .display-flex {
   display: flex;
 }
@@ -228,4 +237,8 @@ h1 {
 
 .not-first-child-margin-left-1 > :not(:first-child) {
   margin-left: var(--size-1);
+}
+
+#max-page-size {
+  max-width: calc(var(--size-1) * 34);
 }

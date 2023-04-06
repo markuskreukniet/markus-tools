@@ -6,7 +6,7 @@ export default function DuplicateFiles() {
     <Page title="Duplicate Files Finder">
       <FileOrFolderInput onChange={(e) => console.log('e', e)} />
       <h2>result:</h2>
-      <textarea rows="8" cols="55" />
+      <textarea />
     </Page>
   )
 }
