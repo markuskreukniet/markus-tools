@@ -210,6 +210,14 @@ button {
   cursor: pointer;
 }
 
+.display-flex {
+  display: flex;
+}
+
 .display-none {
   display: none;
+}
+
+.not-first-child-margin-left-1 > :not(:first-child) {
+  margin-left: var(--size-1);
 }

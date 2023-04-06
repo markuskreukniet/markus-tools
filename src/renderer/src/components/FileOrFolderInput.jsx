@@ -42,13 +42,13 @@ export default function FileOrFolderInput(props) {
 
   return (
     <div>
-      <div>
-        <FileSelector onChange={handleSelectedFile} />
-        <FileSelector onChange={handleSelectedFolder} folder />
-      </div>
-      <div>
+      <div class="display-flex not-first-child-margin-left-1">
         <button onClick={reset}>reset</button>
         <button onClick={submit}>submit</button>
+      </div>
+      <div class="display-flex not-first-child-margin-left-1">
+        <FileSelector onChange={handleSelectedFile} />
+        <FileSelector onChange={handleSelectedFolder} folder />
       </div>
       <ul>
         <For each={selectedPaths()}>{(path) => <li>{path}</li>}</For>
