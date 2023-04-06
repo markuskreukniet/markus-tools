@@ -187,3 +187,8 @@ a:hover {
     width: 100%;
   }
 }
+
+/* self added */
+.display-none {
+  display: none;
+}
