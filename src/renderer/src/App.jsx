@@ -1,4 +1,4 @@
-import FileOrFolderInput from './components/FileOrFolderInput'
+import DuplicateFiles from './components/pages/DuplicateFiles'
 import Versions from './components/Versions'
 import logo from './assets/logo.svg'
 
@@ -7,7 +7,7 @@ function App() {
     <div class="container">
       <Versions />
 
-      <FileOrFolderInput onChange={(e) => console.log('e', e)} />
+      <DuplicateFiles />
 
       <img class="hero-logo" src={logo} alt="logo" />
       <h2 class="hero-text">You{"'"}ve successfully created an Electron project with Solid</h2>
