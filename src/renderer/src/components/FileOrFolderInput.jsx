@@ -42,7 +42,7 @@ export default function FileOrFolderInput(props) {
 
   return (
     <div>
-      <div class="display-flex not-first-child-margin-left-1">
+      <div class="display-flex justify-content-flex-end not-first-child-margin-left-1">
         <button onClick={reset}>reset</button>
         <button onClick={submit}>submit</button>
       </div>
