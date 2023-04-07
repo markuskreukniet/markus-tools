@@ -207,7 +207,6 @@ a:hover {
 
 button {
   background-color: var(--light-gray);
-  border: var(--border);
   padding: var(--size-1-s) var(--size-1);
   cursor: pointer;
 }
@@ -228,6 +227,10 @@ textarea {
   width: calc(100% - var(--size-1-s-2));
   height: calc(calc(var(--size-1) * 13) - var(--size-1-s-2));
   padding: var(--size-1-s);
+}
+
+button, textarea {
+  border: var(--border);
 }
 
 .display-flex {
