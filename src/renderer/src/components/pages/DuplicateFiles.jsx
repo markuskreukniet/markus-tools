@@ -2,10 +2,8 @@ import FileOrFolderInput from '../FileOrFolderInput'
 import Page from '../Page'
 
 export default function DuplicateFiles() {
-  async function getDuplicateFiles(e) {
-    console.log('e', e)
-
-    const duplicateFiles = await window.duplicateFiles.getDuplicateFiles(e)
+  async function getDuplicateFiles(filePaths) {
+    const duplicateFiles = await window.duplicateFiles.getDuplicateFiles(filePaths)
     console.log('duplicateFiles', duplicateFiles)
   }
 

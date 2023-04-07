@@ -1,5 +1,5 @@
-export default async function duplicateFiles(paths) {
-  paths.push('test')
+export default async function duplicateFiles(filePaths) {
+  filePaths.push('test')
 
-  return paths
+  return filePaths
 }
