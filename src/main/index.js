@@ -71,7 +71,9 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 
 // self added with ipcMain import
+// TODO: rename paths and duplicateFiles
+import duplicateFiles from './modules/duplicateFiles'
 async function getDuplicateFiles(e, paths) {
-  return await paths
+  return duplicateFiles(paths)
 }
 ipcMain.handle('getDuplicateFiles', getDuplicateFiles)
