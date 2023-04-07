@@ -3,7 +3,6 @@ import Page from '../Page'
 
 export default function DuplicateFiles() {
   async function getDuplicateFiles(e) {
-    // TODO: add at least two files check
     console.log('e', e)
   }
 

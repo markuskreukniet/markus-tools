@@ -6,12 +6,14 @@ import FileSelector from './FileSelector'
 // Adding a folder could add a duplicate file since the folder with possible child folders could contain a duplicate file.
 export default function FileOrFolderInput(props) {
   const [selectedPaths, setSelectedPaths] = createSignal([])
+  const [isValid, setIsValid] = createSignal(false)
+  const [hasFilePath, setHasFilePath] = createSignal(false)
   let filePaths = []
 
   function handleSelectedFile(files) {
     if (!selectedPaths().some((path) => path === files[0].path)) {
       setSelectedPaths([...selectedPaths(), files[0].path])
-      handleFilePaths(files)
+      setState(files)
     }
   }
 
@@ -20,20 +22,31 @@ export default function FileOrFolderInput(props) {
 
     if (!selectedPaths().some((path) => path === folderPath)) {
       setSelectedPaths([...selectedPaths(), folderPath])
-      handleFilePaths(files)
+      setState(files)
     }
   }
 
-  function handleFilePaths(files) {
+  // TODO: refactor so that it does set the state
+  function setState(files) {
     // files is a FileList, not an array, so we can't use .map
     for (const file of files) {
       filePaths.push(file.path)
+    }
+
+    if (!hasFilePath() && filePaths.length >= 1) {
+      setHasFilePath(true)
+    }
+
+    if (!isValid() && filePaths.length >= 2) {
+      setIsValid(true)
     }
   }
 
   function reset() {
     setSelectedPaths([])
     filePaths = []
+    setIsValid(false)
+    setHasFilePath(false)
   }
 
   function submit() {
@@ -47,8 +60,12 @@ export default function FileOrFolderInput(props) {
         <FileSelector onChange={handleSelectedFolder} folder />
       </div>
       <div class="display-flex justify-content-flex-end not-first-child-margin-left-1">
-        <button onClick={reset}>reset</button>
-        <button onClick={submit}>submit</button>
+        <button onClick={reset} disabled={!hasFilePath()}>
+          reset
+        </button>
+        <button onClick={submit} disabled={!isValid()}>
+          submit
+        </button>
       </div>
       <ul>
         <For each={selectedPaths()}>{(path) => <li>{path}</li>}</For>
