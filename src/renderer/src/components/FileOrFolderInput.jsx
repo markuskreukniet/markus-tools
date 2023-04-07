@@ -2,8 +2,8 @@ import { createSignal, For } from 'solid-js'
 import FileSelector from './FileSelector'
 
 // TODO:
-// Adding a file could add a duplicate file since there could already be a folder with possible child folders already containing that file.
-// Adding a folder could add a duplicate file since the folder with possible child folders could contain a duplicate file.
+// Adding a file could add a duplicate file since there could already be a folder with its whole tree of child folders already containing that file.
+// Adding a folder could add a duplicate file since the folder with its whole tree of child folders could contain a duplicate file.
 
 // Checking child folders of a folder is only possible in the main.
 // An added folder adds all its file paths with its whole tree of child folder file paths.
