@@ -1,18 +1,23 @@
+import { createSignal } from 'solid-js'
 import FileOrFolderInput from '../FileOrFolderInput'
 import Page from '../Page'
 
 export default function DuplicateFiles() {
-  async function getDuplicateFiles(filePaths) {
+  const [duplicateFiles, setDuplicateFiles] = createSignal('')
+
+  async function handleFilePaths(filePaths) {
     const duplicateFiles = await window.duplicateFiles.getDuplicateFiles(filePaths)
-    console.log('duplicateFiles', duplicateFiles)
+    const textareaValue = duplicateFiles !== '' ? duplicateFiles : 'no duplicate files found'
+    setDuplicateFiles(textareaValue)
   }
 
   return (
     <Page title="Duplicate Files Finder">
-      <FileOrFolderInput onChange={getDuplicateFiles} />
+      <FileOrFolderInput onChange={handleFilePaths} />
       <h2>result:</h2>
       <textarea
         readonly
+        value={duplicateFiles()}
         placeholder="Add at least two files or a folder with two files and press 'submit.'"
       />
     </Page>
