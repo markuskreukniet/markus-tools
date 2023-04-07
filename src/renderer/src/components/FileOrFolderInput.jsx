@@ -4,7 +4,10 @@ import FileSelector from './FileSelector'
 // TODO:
 // Adding a file could add a duplicate file since there could already be a folder with possible child folders already containing that file.
 // Adding a folder could add a duplicate file since the folder with possible child folders could contain a duplicate file.
-// Checking child folders of a folder is only possible in the main
+
+// Checking child folders of a folder is only possible in the main.
+// An added folder adds all its file paths with its whole tree of child folder file paths.
+// Therefore, we can use the list of all added file paths to access the file paths of a folder and its whole tree of child folders.
 export default function FileOrFolderInput(props) {
   const [selectedPaths, setSelectedPaths] = createSignal([])
   const [isValid, setIsValid] = createSignal(false)
