@@ -12,8 +12,7 @@ export default function FileOrFolderInput(props) {
 
   function handleSelectedFile(files) {
     if (!selectedPaths().some((path) => path === files[0].path)) {
-      setSelectedPaths([...selectedPaths(), files[0].path])
-      setState(files)
+      setState(files[0].path, files)
     }
   }
 
@@ -21,13 +20,13 @@ export default function FileOrFolderInput(props) {
     const folderPath = getSelectedFolderPath(files)
 
     if (!selectedPaths().some((path) => path === folderPath)) {
-      setSelectedPaths([...selectedPaths(), folderPath])
-      setState(files)
+      setState(folderPath, files)
     }
   }
 
-  // TODO: refactor so that it does set the state
-  function setState(files) {
+  function setState(selectedPath, files) {
+    setSelectedPaths([...selectedPaths(), selectedPath])
+
     // files is a FileList, not an array, so we can't use .map
     for (const file of files) {
       filePaths.push(file.path)
@@ -61,7 +60,7 @@ export default function FileOrFolderInput(props) {
       </div>
       <div class="display-flex justify-content-flex-end not-first-child-margin-left-1">
         <button onClick={resetState} disabled={!hasFilePath()}>
-          resetState
+          reset
         </button>
         <button onClick={submit} disabled={!isValid()}>
           submit
