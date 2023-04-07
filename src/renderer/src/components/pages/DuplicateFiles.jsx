@@ -10,7 +10,10 @@ export default function DuplicateFiles() {
     <Page title="Duplicate Files Finder">
       <FileOrFolderInput onChange={getDuplicateFiles} />
       <h2>result:</h2>
-      <textarea placeholder="Add at least two files or a folder with two files and press 'submit.'" />
+      <textarea
+        readonly
+        placeholder="Add at least two files or a folder with two files and press 'submit.'"
+      />
     </Page>
   )
 }
