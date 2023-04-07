@@ -7,7 +7,7 @@ export default function DuplicateFiles() {
 
   async function handleFilePaths(filePaths) {
     const duplicateFiles = await window.duplicateFiles.getDuplicateFiles(filePaths)
-    const textareaValue = duplicateFiles !== '' ? duplicateFiles : 'no duplicate files found'
+    const textareaValue = duplicateFiles !== '' ? duplicateFiles : 'No duplicate files found'
     setDuplicateFiles(textareaValue)
   }
 
