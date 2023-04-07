@@ -42,11 +42,11 @@ export default function FileOrFolderInput(props) {
     }
   }
 
-  function reset() {
+  function resetState() {
     setSelectedPaths([])
     filePaths = []
-    setIsValid(false)
     setHasFilePath(false)
+    setIsValid(false)
   }
 
   function submit() {
@@ -60,8 +60,8 @@ export default function FileOrFolderInput(props) {
         <FileSelector onChange={handleSelectedFolder} folder />
       </div>
       <div class="display-flex justify-content-flex-end not-first-child-margin-left-1">
-        <button onClick={reset} disabled={!hasFilePath()}>
-          reset
+        <button onClick={resetState} disabled={!hasFilePath()}>
+          resetState
         </button>
         <button onClick={submit} disabled={!isValid()}>
           submit
