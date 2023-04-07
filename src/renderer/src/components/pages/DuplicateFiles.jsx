@@ -4,6 +4,9 @@ import Page from '../Page'
 export default function DuplicateFiles() {
   async function getDuplicateFiles(e) {
     console.log('e', e)
+
+    const duplicateFiles = await window.duplicateFiles.getDuplicateFiles(e)
+    console.log('duplicateFiles', duplicateFiles)
   }
 
   return (

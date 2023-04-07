@@ -1,4 +1,4 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
@@ -18,3 +18,8 @@ if (process.contextIsolated) {
   window.electron = electronAPI
   window.api = api
 }
+
+// self added with ipcRenderer import
+contextBridge.exposeInMainWorld('duplicateFiles', {
+  getDuplicateFiles: (paths) => ipcRenderer.invoke('getDuplicateFiles', paths)
+})
