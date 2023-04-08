@@ -18,7 +18,7 @@ export default function DuplicateFiles() {
       <textarea
         readonly
         value={duplicateFiles()}
-        placeholder="Add at least two files or a folder with two files and press 'submit.' Adding a folder also adds the files of its subfolders (its whole folder tree). The more files a folder has, the more it can take to select the files, which can be noticeable."
+        placeholder="Add at least two files or a folder with two files and press 'submit.' Adding a folder also adds the files of its subfolders (its whole folder tree). The more files a folder has, the more time it can take to add the files, which can be noticeable."
       />
     </Page>
   )
