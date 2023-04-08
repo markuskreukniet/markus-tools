@@ -189,12 +189,14 @@ a:hover {
 }
 
 /* self added */
+/* TODO: colors */
 :root {
   /* golden ratio */
   --g-ratio-p: 1.618;
   --g-ratio-n: 0.618;
 
   --size-1: 1rem;
+  --size-2: calc(var(--size-1) * 2);
   --size-1-s: calc(var(--size-1) * var(--g-ratio-n));
 
   --size-1-s-2: calc(var(--size-1-s) * 2);
@@ -251,4 +253,18 @@ button, textarea {
 
 #max-page-size {
   max-width: calc(var(--size-1) * 34);
+}
+
+#loader {
+  border: var(--size-1-s) solid var(--light-gray);
+  border-top: var(--size-1-s) solid #86a5b1;
+  border-radius: 50%;
+  width: var(--size-2);
+  height: var(--size-2);
+  animation: full-rotate 2s linear infinite;
+}
+
+@keyframes full-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
