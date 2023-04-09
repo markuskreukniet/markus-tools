@@ -1,15 +1,18 @@
+import { createSignal } from 'solid-js'
 import DuplicateFiles from './components/pages/DuplicateFiles'
 import Loader from './components/Loader'
 import Versions from './components/Versions'
 import logo from './assets/logo.svg'
 
 function App() {
+  const [loading, setLoading] = createSignal(false)
+
   return (
     <div class="container">
       <Versions />
 
-      <DuplicateFiles />
-      <Loader />
+      <DuplicateFiles onLoading={(e) => setLoading(e)} />
+      <Loader loading={loading} />
 
       <img class="hero-logo" src={logo} alt="logo" />
       <h2 class="hero-text">You{"'"}ve successfully created an Electron project with Solid</h2>
