@@ -1,4 +1,5 @@
 import DuplicateFiles from './components/pages/DuplicateFiles'
+import Loader from './components/Loader'
 import Versions from './components/Versions'
 import logo from './assets/logo.svg'
 
@@ -8,6 +9,7 @@ function App() {
       <Versions />
 
       <DuplicateFiles />
+      <Loader />
 
       <img class="hero-logo" src={logo} alt="logo" />
       <h2 class="hero-text">You{"'"}ve successfully created an Electron project with Solid</h2>

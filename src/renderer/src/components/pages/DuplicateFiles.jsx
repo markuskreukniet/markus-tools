@@ -2,13 +2,15 @@ import { createSignal } from 'solid-js'
 import FileOrFolderInput from '../FileOrFolderInput'
 import Page from '../Page'
 
-export default function DuplicateFiles() {
+export default function DuplicateFiles(props) {
   const [duplicateFiles, setDuplicateFiles] = createSignal('')
 
   async function handleFilePaths(filePaths) {
+    props.onLoading(true)
     const duplicateFiles = await window.duplicateFiles.getDuplicateFiles(filePaths)
     const textareaValue = duplicateFiles !== '' ? duplicateFiles : 'No duplicate files found'
     setDuplicateFiles(textareaValue)
+    props.onLoading(false)
   }
 
   return (

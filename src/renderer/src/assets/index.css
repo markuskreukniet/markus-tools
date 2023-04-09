@@ -239,7 +239,7 @@ button, textarea {
   display: flex;
 }
 
-.display-none {
+.display-none, .displayNone {
   display: none;
 }
 
