@@ -1,16 +1,19 @@
 import { createSignal } from 'solid-js'
 import DuplicateFiles from './components/pages/DuplicateFiles'
 import Loader from './components/Loader'
+import NavigationBar from './components/NavigationBar'
 import Versions from './components/Versions'
 import logo from './assets/logo.svg'
 
 function App() {
   const [loading, setLoading] = createSignal(false)
+  const NavigationBarItems = ['Duplicate Files']
 
   return (
     <div class="container">
       <Versions />
 
+      <NavigationBar items={NavigationBarItems} />
       <DuplicateFiles onLoading={(e) => setLoading(e)} />
       <Loader loading={loading} />
 
