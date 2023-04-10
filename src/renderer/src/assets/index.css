@@ -233,7 +233,7 @@ textarea {
   padding: var(--size-1-s);
 }
 
-button, textarea {
+button, textarea, #navigation-bar > li {
   border: var(--border);
 }
 
@@ -253,8 +253,14 @@ button, textarea {
   margin-left: var(--size-1);
 }
 
-#max-page-size {
+#page {
+  padding-top: var(--size-2);
   max-width: calc(var(--size-1) * 34);
+}
+
+#navigation-bar > li {
+  display: inline;
+  padding: var(--size-1-s) var(--size-1);
 }
 
 #loader {
