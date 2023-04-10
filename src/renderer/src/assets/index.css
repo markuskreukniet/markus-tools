@@ -209,9 +209,12 @@ a:hover {
   --border: solid 1px var(--gray);
 }
 
+button, #navigation-bar > li {
+  padding: var(--size-1-s) var(--size-1);
+}
+
 button {
   background-color: var(--light-gray);
-  padding: var(--size-1-s) var(--size-1);
   cursor: pointer;
 }
 
@@ -260,7 +263,6 @@ button, textarea, #navigation-bar > li {
 
 #navigation-bar > li {
   display: inline;
-  padding: var(--size-1-s) var(--size-1);
 }
 
 #loader {
