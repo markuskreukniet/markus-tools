@@ -230,13 +230,18 @@ h2 {
   margin-bottom: var(--size-1-s);
 }
 
-textarea {
+textarea, .custom-textarea-placeholder {
   width: calc(100% - var(--size-1-s-2));
   height: calc(calc(var(--size-1) * 13) - var(--size-1-s-2));
   padding: var(--size-1-s);
 }
 
-button, textarea, #navigation-bar > li {
+.custom-textarea-placeholder {
+  color: rgb(0, 0, 0, 0.6);
+  background-color: white;
+}
+
+button, textarea, #navigation-bar > li, .custom-textarea-placeholder {
   border: var(--border);
 }
 
