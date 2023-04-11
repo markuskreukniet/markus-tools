@@ -5,6 +5,7 @@ export default function FileSelector(props) {
   }
 
   // TODO: Cancel event on input type="file": https://stackoverflow.com/questions/34855400/cancel-event-on-input-type-file
+  // We can then show a loader when clicking the input and dismiss the loader on the cancel event.
   return (
     <div>
       <input
