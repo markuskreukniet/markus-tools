@@ -5,6 +5,7 @@ import NavigationBar from './components/NavigationBar'
 import Versions from './components/Versions'
 import logo from './assets/logo.svg'
 
+// TODO: add PageNavigator?
 function App() {
   const [loading, setLoading] = createSignal(false)
   const NavigationBarItems = ['Duplicate Files']

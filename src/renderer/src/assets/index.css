@@ -211,11 +211,11 @@ a:hover {
 
 button, #navigation-bar > li {
   padding: var(--size-1-s) var(--size-1);
+  cursor: pointer;
 }
 
 button {
   background-color: var(--light-gray);
-  cursor: pointer;
 }
 
 h1 {
