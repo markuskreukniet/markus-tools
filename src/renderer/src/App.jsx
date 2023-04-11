@@ -15,7 +15,9 @@ function App() {
       {/* <Versions /> */}
 
       <NavigationBar items={NavigationBarItems} />
-      <DuplicateFiles onLoading={(e) => setLoading(e)} />
+      <div id="page-wrapper">
+        <DuplicateFiles onLoading={(e) => setLoading(e)} />
+      </div>
       <Loader loading={loading} />
 
       {/* <img class="hero-logo" src={logo} alt="logo" />

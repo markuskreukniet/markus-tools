@@ -249,12 +249,16 @@ button, textarea, #navigation-bar > li, .custom-textarea-placeholder {
   border: var(--border);
 }
 
-.display-flex, #navigation-bar {
+.display-flex, #navigation-bar, #page-wrapper {
   display: flex;
 }
 
 .display-none, .displayNone {
   display: none;
+}
+
+#page-wrapper {
+  justify-content: center;
 }
 
 .justify-content-flex-end {
