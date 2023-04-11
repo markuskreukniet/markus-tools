@@ -4,6 +4,7 @@ export default function FileSelector(props) {
     input.click()
   }
 
+  // TODO: Cancel event on input type="file": https://stackoverflow.com/questions/34855400/cancel-event-on-input-type-file
   return (
     <div>
       <input
