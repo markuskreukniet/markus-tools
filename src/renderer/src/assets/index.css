@@ -240,7 +240,7 @@ button, textarea, #navigation-bar > li {
   border: var(--border);
 }
 
-.display-flex {
+.display-flex, #navigation-bar {
   display: flex;
 }
 
@@ -259,10 +259,6 @@ button, textarea, #navigation-bar > li {
 #page {
   padding-top: var(--size-2);
   max-width: calc(var(--size-1) * 34);
-}
-
-#navigation-bar {
-  display: flex;
 }
 
 #loader {
