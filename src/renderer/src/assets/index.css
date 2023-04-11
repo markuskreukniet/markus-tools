@@ -209,6 +209,10 @@ a:hover {
   --border: solid 1px var(--gray);
 }
 
+html {
+  font-size: 16px;
+}
+
 button, #navigation-bar > li {
   padding: var(--size-1-s) var(--size-1);
   cursor: pointer;

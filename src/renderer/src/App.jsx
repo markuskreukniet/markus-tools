@@ -2,8 +2,8 @@ import { createSignal } from 'solid-js'
 import DuplicateFiles from './components/pages/DuplicateFiles'
 import Loader from './components/Loader'
 import NavigationBar from './components/NavigationBar'
-import Versions from './components/Versions'
-import logo from './assets/logo.svg'
+// import Versions from './components/Versions'
+// import logo from './assets/logo.svg'
 
 // TODO: add PageNavigator?
 function App() {
@@ -12,13 +12,13 @@ function App() {
 
   return (
     <div class="container">
-      <Versions />
+      {/* <Versions /> */}
 
       <NavigationBar items={NavigationBarItems} />
       <DuplicateFiles onLoading={(e) => setLoading(e)} />
       <Loader loading={loading} />
 
-      <img class="hero-logo" src={logo} alt="logo" />
+      {/* <img class="hero-logo" src={logo} alt="logo" />
       <h2 class="hero-text">You{"'"}ve successfully created an Electron project with Solid</h2>
       <p class="hero-tagline">
         Please try pressing <code>F12</code> to open the devTool
@@ -145,7 +145,7 @@ function App() {
             </p>
           </article>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }
