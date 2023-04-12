@@ -248,7 +248,7 @@ button, textarea, #navigation-bar > li, .custom-textarea-placeholder {
   display: none;
 }
 
-/* copied from above 'self added' */
+/* moved from above 'self added' */
 .container {
   /* flex: 1; */
   display: flex;
