@@ -276,7 +276,7 @@ button, textarea, #navigation-bar > li, .custom-textarea-placeholder {
 
 #page {
   padding-top: var(--size-1);
-  max-width: calc(var(--size-1) * 34);
+  width: calc(var(--size-1) * 34);
 }
 
 #loader {
