@@ -12,6 +12,7 @@ export default async function duplicateFiles(filePaths) {
     })
   }
 
+  // 1048576 * 100 // 1 MiB = 1048576 bytes
   // const filePartSize = Math.round((1024 * 1024 * 1024) / 10); // Math.round((1 GiB) / 10)
   // can be a faster option, but makes hash of a file part
   // function getHashHexOfFirstFilePart(path, filePartSize) {
