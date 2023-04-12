@@ -37,15 +37,6 @@ a:hover {
   border-bottom: 1px solid;
 }
 
-.container {
-  /* flex: 1; */
-  display: flex;
-  flex-direction: column;
-  /* max-width: 840px; */
-  margin: 0 auto;
-  /* padding: 15px 30px 0 30px; */
-}
-
 .versions {
   margin: 0 auto;
   float: none;
@@ -257,8 +248,15 @@ button, textarea, #navigation-bar > li, .custom-textarea-placeholder {
   display: none;
 }
 
+/* copied from above 'self added' */
 .container {
+  /* flex: 1; */
+  display: flex;
+  flex-direction: column;
+  /* max-width: 840px; */
   max-width: calc(var(--size-1) * 55);
+  margin: 0 auto;
+  /* padding: 15px 30px 0 30px; */
   padding: var(--size-1) var(--size-2);
 }
 
