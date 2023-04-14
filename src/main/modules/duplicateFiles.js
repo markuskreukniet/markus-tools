@@ -37,24 +37,12 @@ export default async function duplicateFiles(filePaths) {
     }
   }
 
-  // return if no duplicates
+  // result
   if (duplicates.length === 0) {
     return ''
+  } else {
+    return duplicatesArrayToResultString(duplicates)
   }
-
-  // result
-  let result = duplicates[0].path
-  for (let i = 1; i < duplicates.length; i++) {
-    let resultPart = `\n${duplicates[i].path}`
-
-    if (duplicates[i].hash !== duplicates[i - 1].hash) {
-      resultPart = `\n${resultPart}`
-    }
-
-    result += resultPart
-  }
-
-  return result
 }
 
 function getHashHex(path) {
@@ -93,4 +81,19 @@ function compare(a, b) {
     return 1
   }
   return 0
+}
+
+function duplicatesArrayToResultString(duplicates) {
+  let result = duplicates[0].path
+  for (let i = 1; i < duplicates.length; i++) {
+    let resultPart = `\n${duplicates[i].path}`
+
+    if (duplicates[i].hash !== duplicates[i - 1].hash) {
+      resultPart = `\n${resultPart}`
+    }
+
+    result += resultPart
+  }
+
+  return result
 }
