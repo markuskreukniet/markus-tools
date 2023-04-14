@@ -2,34 +2,6 @@ const crypto = require('crypto')
 const fs = require('fs')
 
 export default async function duplicateFiles(filePaths) {
-  function getHashHex(path) {
-    return new Promise((resolve, reject) => {
-      const hash = crypto.createHash('sha1') // SHA1 is faster than MD5
-      const stream = fs.createReadStream(path)
-      stream.on('error', (err) => reject(err))
-      stream.on('data', (chunk) => hash.update(chunk))
-      stream.on('end', () => resolve(hash.digest('hex')))
-    })
-  }
-
-  // This option is slower when I test it
-  // 1048576 * 100 // 1 MiB = 1048576 bytes
-  // const filePartSize = Math.round((1024 * 1024 * 1024) / 10); // Math.round((1 GiB) / 10)
-  // can be a faster option, but makes hash of a file part
-  // function getHashHexOfFirstFilePart(path, filePartSize) {
-  //   return new Promise((resolve, reject) => {
-  //     const hash = crypto.createHash("sha1"); // SHA1 is faster than MD5
-  //     const stream = fs.createReadStream(path, {
-  //       highWaterMark: filePartSize,
-  //     });
-  //     stream.on("error", (err) => reject(err));
-  //     stream.on("data", (chunk) => {
-  //       resolve(hash.update(chunk).digest("hex"));
-  //       stream.destroy();
-  //     });
-  //   });
-  // }
-
   // path and size combinations of files
   const pathSizeCombinations = []
   for (const path of filePaths) {
@@ -41,15 +13,6 @@ export default async function duplicateFiles(filePaths) {
   }
 
   // sort combinations
-  function compare(a, b) {
-    if (a.size < b.size) {
-      return -1
-    }
-    if (a.size > b.size) {
-      return 1
-    }
-    return 0
-  }
   pathSizeCombinations.sort(compare)
 
   // duplicates of path and hash combinations
@@ -92,4 +55,42 @@ export default async function duplicateFiles(filePaths) {
   }
 
   return result
+}
+
+function getHashHex(path) {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash('sha1') // SHA1 is faster than MD5
+    const stream = fs.createReadStream(path)
+    stream.on('error', (err) => reject(err))
+    stream.on('data', (chunk) => hash.update(chunk))
+    stream.on('end', () => resolve(hash.digest('hex')))
+  })
+}
+
+// This option is slower when I test it
+// 1048576 * 100 // 1 MiB = 1048576 bytes
+// const filePartSize = Math.round((1024 * 1024 * 1024) / 10); // Math.round((1 GiB) / 10)
+// can be a faster option, but makes hash of a file part
+// function getHashHexOfFirstFilePart(path, filePartSize) {
+//   return new Promise((resolve, reject) => {
+//     const hash = crypto.createHash("sha1"); // SHA1 is faster than MD5
+//     const stream = fs.createReadStream(path, {
+//       highWaterMark: filePartSize,
+//     });
+//     stream.on("error", (err) => reject(err));
+//     stream.on("data", (chunk) => {
+//       resolve(hash.update(chunk).digest("hex"));
+//       stream.destroy();
+//     });
+//   });
+// }
+
+function compare(a, b) {
+  if (a.size < b.size) {
+    return -1
+  }
+  if (a.size > b.size) {
+    return 1
+  }
+  return 0
 }
