@@ -254,6 +254,11 @@ button, textarea, #navigation-bar > li, .custom-textarea-placeholder {
   display: none;
 }
 
+.navigationBarItemActive {
+  color: var(--midnight-blue);
+  background-color: var(--light-steel-blue);
+}
+
 /* moved from above 'self added' */
 .container {
   /* flex: 1; */
