@@ -189,7 +189,7 @@ a:hover {
   --gray: #808080; /* color: Gray */
 
   --light-steel-blue: #B0C4DE; /* color: LightSteelBlue */
-  --midnight-blue: #191970; /* MidnightBlue */
+  --midnight-blue: #191970; /* color: MidnightBlue */
 
   --border: solid 1px var(--gray);
 }
