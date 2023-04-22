@@ -1,11 +1,10 @@
 import { createSignal } from 'solid-js'
 import DuplicateFiles from './components/pages/DuplicateFiles'
 import Loader from './components/Loader'
-import NavigationBar from './components/NavigationBar'
+import PageNavigator from './components/PageNavigator'
 // import Versions from './components/Versions'
 // import logo from './assets/logo.svg'
 
-// TODO: add PageNavigator?
 function App() {
   const [loading, setLoading] = createSignal(false)
   const NavigationBarItems = ['Duplicate Files']
@@ -14,7 +13,7 @@ function App() {
     <div class="container">
       {/* <Versions /> */}
 
-      <NavigationBar items={NavigationBarItems} />
+      <PageNavigator items={NavigationBarItems} />
       <div id="page-wrapper">
         <DuplicateFiles onLoading={(e) => setLoading(e)} />
       </div>
