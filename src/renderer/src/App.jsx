@@ -15,7 +15,7 @@ function App() {
 
       <PageNavigator items={NavigationBarItems} />
       <div id="page-wrapper">
-        <DuplicateFiles onLoading={(e) => setLoading(e)} />
+        <DuplicateFiles onLoading={setLoading} />
       </div>
       <Loader loading={loading} />
 
