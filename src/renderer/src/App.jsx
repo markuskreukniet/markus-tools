@@ -7,16 +7,16 @@ import PageNavigator from './components/PageNavigator'
 
 function App() {
   const [loading, setLoading] = createSignal(false)
-  const NavigationBarItems = ['Duplicate Files']
+  const navigationBarItemPageCombinations = [
+    { navigationBarItem: 'Duplicate Files', page: <DuplicateFiles onLoading={setLoading} /> },
+    { navigationBarItem: 'page 2', page: <div /> }
+  ]
 
   return (
     <div class="container">
       {/* <Versions /> */}
 
-      <PageNavigator items={NavigationBarItems} />
-      <div id="page-wrapper">
-        <DuplicateFiles onLoading={setLoading} />
-      </div>
+      <PageNavigator navigationBarItemPageCombinations={navigationBarItemPageCombinations} />
       <Loader loading={loading} />
 
       {/* <img class="hero-logo" src={logo} alt="logo" />
