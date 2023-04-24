@@ -6,7 +6,7 @@ export default function NavigationBar(props) {
       <For each={props.items()}>
         {(item) => (
           <li
-            onClick={() => console.log('set active css class')}
+            onClick={() => props.onChange(item.name)}
             classList={{ navigationBarItemActive: item.active }}
           >
             {item.name}
