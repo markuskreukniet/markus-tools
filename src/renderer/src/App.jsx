@@ -11,12 +11,16 @@ function App() {
     { navigationBarItem: 'Duplicate Files', page: <DuplicateFiles onLoading={setLoading} /> },
     { navigationBarItem: 'page 2', page: <div /> }
   ]
+  const activeNavigationBarItem = navigationBarItemPageCombinations[0].navigationBarItem
 
   return (
     <div class="container">
       {/* <Versions /> */}
 
-      <PageNavigator navigationBarItemPageCombinations={navigationBarItemPageCombinations} />
+      <PageNavigator
+        navigationBarItemPageCombinations={navigationBarItemPageCombinations}
+        activeNavigationBarItem={activeNavigationBarItem}
+      />
       <Loader loading={loading} />
 
       {/* <img class="hero-logo" src={logo} alt="logo" />
