@@ -3,6 +3,7 @@ import NavigationBar from './NavigationBar'
 
 export default function PageNavigator(props) {
   const [navigationBarItems, setNavigationBarItems] = createSignal([])
+  const [activePage, setActivePage] = createSignal(<></>)
 
   // TODO: check if createEffect works when props.activeNavigationBarItem changes
   createEffect(() => {
@@ -21,10 +22,12 @@ export default function PageNavigator(props) {
     for (let i = 0; i < newNavigationBarItems.length; i++) {
       const navigationBarItem = {
         name: navigationBarItemPageCombinations[i].navigationBarItem,
-        active:
-          navigationBarItemPageCombinations[i].navigationBarItem === activeNavigationBarItem
-            ? true
-            : false
+        active: false
+      }
+      if (navigationBarItemPageCombinations[i].navigationBarItem === activeNavigationBarItem) {
+        navigationBarItem.active = true
+
+        setActivePage(navigationBarItemPageCombinations[i].page)
       }
       newNavigationBarItems[i] = navigationBarItem
     }
@@ -38,7 +41,7 @@ export default function PageNavigator(props) {
   return (
     <div>
       <NavigationBar items={navigationBarItems} onChange={handleChange} />
-      <div id="page-wrapper">{props.navigationBarItemPageCombinations[0].page}</div>
+      <div id="page-wrapper">{activePage()}</div>
     </div>
   )
 }

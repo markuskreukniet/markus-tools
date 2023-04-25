@@ -9,7 +9,7 @@ function App() {
   const [loading, setLoading] = createSignal(false)
   const navigationBarItemPageCombinations = [
     { navigationBarItem: 'Duplicate Files', page: <DuplicateFiles onLoading={setLoading} /> },
-    { navigationBarItem: 'page 2', page: <div /> }
+    { navigationBarItem: 'Lines of Code (LOC)', page: <div /> }
   ]
   const activeNavigationBarItem = navigationBarItemPageCombinations[0].navigationBarItem
 
