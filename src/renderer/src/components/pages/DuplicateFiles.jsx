@@ -16,7 +16,7 @@ export default function DuplicateFiles(props) {
   return (
     <Page title="Duplicate Files Finder">
       <FileOrFolderInput onChange={handleFilePaths} />
-      <h2>result:</h2>
+      <h2>Result:</h2>
 
       <Show
         when={duplicateFiles() !== ''}
