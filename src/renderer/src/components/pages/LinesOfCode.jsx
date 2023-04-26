@@ -13,8 +13,8 @@ export default function LinesOfCode(props) {
 
   return (
     <Page title="Lines of Code (LOC)">
-      <FileOrFolderInput onChange={handleFilePaths} /> {/* duplicate*/}
-      <h2>Result:</h2> {/* duplicate*/}
+      <FileOrFolderInput onChange={handleFilePaths} /> {/* duplicate */}
+      <h2>Result:</h2> {/* duplicate */}
       <p>Lines of code:</p>
     </Page>
   )
