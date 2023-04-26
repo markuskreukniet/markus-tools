@@ -12,7 +12,7 @@ export default function LinesOfCode(props) {
   }
 
   return (
-    <Page title="Lines of Code (LOC)">
+    <Page title={props.title}>
       <FileOrFolderInput onChange={handleFilePaths} /> {/* duplicate */}
       <h2>Result:</h2> {/* duplicate */}
       <p>Lines of code:</p>

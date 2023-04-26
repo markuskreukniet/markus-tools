@@ -1,5 +1,6 @@
 import { createSignal } from 'solid-js'
 import DuplicateFiles from './components/pages/DuplicateFiles'
+import LinesOfCode from './components/pages/LinesOfCode'
 import Loader from './components/Loader'
 import PageNavigator from './components/PageNavigator'
 // import Versions from './components/Versions'
@@ -7,9 +8,17 @@ import PageNavigator from './components/PageNavigator'
 
 function App() {
   const [loading, setLoading] = createSignal(false)
+  const duplicateFilesTitle = 'Duplicate Files'
+  const linesOfCodeTitle = 'Lines of Code (LOC)'
   const navigationBarItemPageCombinations = [
-    { navigationBarItem: 'Duplicate Files', page: <DuplicateFiles onLoading={setLoading} /> },
-    { navigationBarItem: 'Lines of Code (LOC)', page: <div /> }
+    {
+      navigationBarItem: duplicateFilesTitle,
+      page: <DuplicateFiles title={duplicateFilesTitle} onLoading={setLoading} />
+    },
+    {
+      navigationBarItem: linesOfCodeTitle,
+      page: <LinesOfCode title={linesOfCodeTitle} onLoading={setLoading} />
+    }
   ]
   const activeNavigationBarItem = navigationBarItemPageCombinations[0].navigationBarItem
 
