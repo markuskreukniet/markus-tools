@@ -4,7 +4,7 @@ import Page from './Page'
 export default function ResultByFilesPage(props) {
   function handleFilePaths(filePaths) {
     props.onLoading(true)
-    props.handleFilePaths(filePaths)
+    props.handleFilePaths(filePaths) // TODO: Maybe await is needed, which only works in an async function
     props.onLoading(false)
   }
 
