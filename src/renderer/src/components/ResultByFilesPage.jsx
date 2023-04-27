@@ -2,7 +2,7 @@ import FileOrFolderInput from '../FileOrFolderInput'
 import Page from './Page'
 
 export default function ResultByFilesPage(props) {
-  async function handleFilePaths(filePaths) {
+  function handleFilePaths(filePaths) {
     props.onLoading(true)
     props.handleFilePaths(filePaths)
     props.onLoading(false)
