@@ -1,4 +1,4 @@
-import FileOrFolderInput from '../FileOrFolderInput'
+import FileOrFolderInput from './FileOrFolderInput'
 import Page from './Page'
 
 export default function ResultByFilesPage(props) {
