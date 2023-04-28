@@ -1,21 +1,21 @@
-// import { createSignal } from 'solid-js'
-import FileOrFolderInput from '../FileOrFolderInput'
-import Page from '../Page'
+import { createSignal } from 'solid-js'
+import ResultByFilesPage from '../ResultByFilesPage'
 
 export default function LinesOfCode(props) {
-  // const [linesOfCode, setLinesOfCode] = createSignal(0)
+  const [linesOfCode, setLinesOfCode] = createSignal(0)
 
-  async function handleFilePaths(filePaths) {
-    props.onLoading(true) // duplicate
+  async function setState(filePaths) {
     console.log(filePaths)
-    props.onLoading(false) // duplicate
+    setLinesOfCode(0)
   }
 
+  const resultComponent = <p>Lines of code: {linesOfCode()}</p>
+
   return (
-    <Page title={props.title}>
-      <FileOrFolderInput onChange={handleFilePaths} /> {/* duplicate */}
-      <h2>Result:</h2> {/* duplicate */}
-      <p>Lines of code:</p>
-    </Page>
+    <ResultByFilesPage
+      resultComponent={resultComponent}
+      handleFilePaths={setState}
+      onLoading={props.onLoading}
+    />
   )
 }
