@@ -5,8 +5,8 @@ export default function LinesOfCode(props) {
   const [linesOfCode, setLinesOfCode] = createSignal(0)
 
   async function setState(filePaths) {
-    console.log(filePaths)
-    setLinesOfCode(0)
+    const linesOfCode = await window.codeQuality.getLinesOfCode(filePaths)
+    setLinesOfCode(linesOfCode)
   }
 
   const resultComponent = <p>Lines of code: {linesOfCode()}</p>

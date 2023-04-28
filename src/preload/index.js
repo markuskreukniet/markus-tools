@@ -23,3 +23,7 @@ if (process.contextIsolated) {
 contextBridge.exposeInMainWorld('duplicateFiles', {
   getDuplicateFiles: (filePaths) => ipcRenderer.invoke('getDuplicateFiles', filePaths)
 })
+
+contextBridge.exposeInMainWorld('codeQuality', {
+  getLinesOfCode: (filePaths) => ipcRenderer.invoke('getLinesOfCode', filePaths)
+})
