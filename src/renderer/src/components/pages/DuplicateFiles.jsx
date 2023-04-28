@@ -1,40 +1,40 @@
 import { createSignal, Show } from 'solid-js'
-import FileOrFolderInput from '../FileOrFolderInput'
-import Page from '../Page'
+import ResultByFilesPage from '../ResultByFilesPage'
 
 export default function DuplicateFiles(props) {
   const [duplicateFiles, setDuplicateFiles] = createSignal('')
 
-  async function handleFilePaths(filePaths) {
-    props.onLoading(true)
+  async function setState(filePaths) {
     const duplicateFiles = await window.duplicateFiles.getDuplicateFiles(filePaths)
     const textareaValue = duplicateFiles !== '' ? duplicateFiles : 'No duplicate files found'
     setDuplicateFiles(textareaValue)
-    props.onLoading(false)
   }
 
-  return (
-    <Page title={props.title}>
-      <FileOrFolderInput onChange={handleFilePaths} />
-      <h2>Result:</h2>
+  const resultComponent = (
+    <Show
+      when={duplicateFiles() !== ''}
+      fallback={
+        <div class="custom-textarea-placeholder">
+          Add at least two files or a folder with two files and press 'submit.'
+          <br />
+          <br />
+          Adding a folder also adds the files of its subfolders (its whole folder tree).
+          <br />
+          <br />
+          The more files a folder has, the more time it can take to add the files, which can be
+          noticeable. Also, the more files we add, the longer it takes to find duplicate files.
+        </div>
+      }
+    >
+      <textarea readonly value={duplicateFiles()} placeholder="" />
+    </Show>
+  )
 
-      <Show
-        when={duplicateFiles() !== ''}
-        fallback={
-          <div class="custom-textarea-placeholder">
-            Add at least two files or a folder with two files and press 'submit.'
-            <br />
-            <br />
-            Adding a folder also adds the files of its subfolders (its whole folder tree).
-            <br />
-            <br />
-            The more files a folder has, the more time it can take to add the files, which can be
-            noticeable. Also, the more files we add, the longer it takes to find duplicate files.
-          </div>
-        }
-      >
-        <textarea readonly value={duplicateFiles()} placeholder="" />
-      </Show>
-    </Page>
+  return (
+    <ResultByFilesPage
+      resultComponent={resultComponent}
+      handleFilePaths={setState}
+      onLoading={props.onLoading}
+    />
   )
 }
