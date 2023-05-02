@@ -1,4 +1,4 @@
-import { createSignal, For } from 'solid-js'
+import { createEffect, createSignal, For } from 'solid-js'
 import FileSelector from './FileSelector'
 
 // TODO:
@@ -11,10 +11,21 @@ export default function FileOrFolderInput(props) {
   const [isValid, setIsValid] = createSignal(false)
   const [hasFilePath, setHasFilePath] = createSignal(false)
   let filePaths = []
+  let minimumFiles = 0
+
+  // TODO: check if createEffect works when props.minimumFiles changes
+  createEffect(() => {
+    console.log('FileOrFolderInput createEffect')
+
+    if (props.minimumFiles) {
+      minimumFiles = props.minimumFiles
+      setState(null, null, minimumFiles)
+    }
+  })
 
   function handleSelectedFile(files) {
     if (!selectedPaths().some((path) => path === files[0].path)) {
-      setState(files[0].path, files)
+      setState(files[0].path, files, minimumFiles)
     }
   }
 
@@ -22,24 +33,30 @@ export default function FileOrFolderInput(props) {
     const folderPath = getSelectedFolderPath(files)
 
     if (!selectedPaths().some((path) => path === folderPath)) {
-      setState(folderPath, files)
+      setState(folderPath, files, minimumFiles)
     }
   }
 
-  function setState(selectedPath, files) {
-    setSelectedPaths([...selectedPaths(), selectedPath])
-
-    // files is a FileList, not an array, so we can't use .map
-    for (const file of files) {
-      filePaths.push(file.path)
+  function setState(selectedPath, files, minimumFilesToBeValid) {
+    if (selectedPath) {
+      setSelectedPaths([...selectedPaths(), selectedPath])
     }
 
-    if (!hasFilePath() && filePaths.length >= 1) {
-      setHasFilePath(true)
+    if (files) {
+      // files is a FileList, not an array, so we can't use .map
+      for (const file of files) {
+        filePaths.push(file.path)
+      }
+
+      if (!hasFilePath() && filePaths.length >= 1) {
+        setHasFilePath(true)
+      }
     }
 
-    if (!isValid() && filePaths.length >= 2) {
+    if (filePaths.length >= minimumFilesToBeValid) {
       setIsValid(true)
+    } else {
+      setIsValid(false)
     }
   }
 

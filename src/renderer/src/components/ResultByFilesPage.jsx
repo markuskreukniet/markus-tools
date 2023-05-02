@@ -10,7 +10,7 @@ export default function ResultByFilesPage(props) {
 
   return (
     <Page title={props.title}>
-      <FileOrFolderInput onChange={handleFilePaths} />
+      <FileOrFolderInput onChange={handleFilePaths} minimumFiles={props.minimumFiles} />
       <h2>Result:</h2>
       {props.resultComponent}
     </Page>

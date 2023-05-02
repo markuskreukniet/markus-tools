@@ -14,6 +14,7 @@ export default function LinesOfCode(props) {
   return (
     <ResultByFilesPage
       resultComponent={resultComponent}
+      minimumFiles={1}
       handleFilePaths={setState}
       onLoading={props.onLoading}
     />
