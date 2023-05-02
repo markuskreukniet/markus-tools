@@ -13,6 +13,7 @@ export default function FileOrFolderInput(props) {
   let filePaths = []
   let minimumFiles = 0
 
+  // TODO: minimumFiles should not be able to change
   createEffect(() => {
     if (props.minimumFiles) {
       minimumFiles = props.minimumFiles
