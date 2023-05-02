@@ -13,10 +13,7 @@ export default function FileOrFolderInput(props) {
   let filePaths = []
   let minimumFiles = 0
 
-  // TODO: check if createEffect works when props.minimumFiles changes
   createEffect(() => {
-    console.log('FileOrFolderInput createEffect')
-
     if (props.minimumFiles) {
       minimumFiles = props.minimumFiles
       setState(null, null, minimumFiles)

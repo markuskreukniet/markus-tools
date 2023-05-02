@@ -5,10 +5,7 @@ export default function PageNavigator(props) {
   const [navigationBarItems, setNavigationBarItems] = createSignal([])
   const [activePage, setActivePage] = createSignal(<></>)
 
-  // TODO: check if createEffect works when props.activeNavigationBarItem changes
   createEffect(() => {
-    console.log('PageNavigator createEffect')
-
     if (props.activeNavigationBarItem) {
       setState(props.navigationBarItemPageCombinations, props.activeNavigationBarItem)
     } else {
