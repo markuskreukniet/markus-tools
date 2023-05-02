@@ -13,11 +13,9 @@ export default function FileOrFolderInput(props) {
   let filePaths = []
   let minimumFiles = 0
 
-  // TODO: minimumFiles should not be able to change
   createEffect(() => {
     if (props.minimumFiles) {
       minimumFiles = props.minimumFiles
-      setState(null, null, minimumFiles)
     }
   })
 
@@ -36,25 +34,19 @@ export default function FileOrFolderInput(props) {
   }
 
   function setState(selectedPath, files, minimumFilesToBeValid) {
-    if (selectedPath) {
-      setSelectedPaths([...selectedPaths(), selectedPath])
+    setSelectedPaths([...selectedPaths(), selectedPath])
+
+    // files is a FileList, not an array, so we can't use .map
+    for (const file of files) {
+      filePaths.push(file.path)
     }
 
-    if (files) {
-      // files is a FileList, not an array, so we can't use .map
-      for (const file of files) {
-        filePaths.push(file.path)
-      }
-
-      if (!hasFilePath() && filePaths.length >= 1) {
-        setHasFilePath(true)
-      }
+    if (!hasFilePath() && filePaths.length >= 1) {
+      setHasFilePath(true)
     }
 
-    if (filePaths.length >= minimumFilesToBeValid) {
+    if (!isValid() && filePaths.length >= minimumFilesToBeValid) {
       setIsValid(true)
-    } else {
-      setIsValid(false)
     }
   }
 
