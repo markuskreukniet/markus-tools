@@ -1,5 +1,5 @@
 import FileOrFolderInput from './FileOrFolderInput'
-import Page from './Page'
+import ResultPage from './ResultPage'
 
 export default function ResultByFilesPage(props) {
   async function handleFilePaths(filePaths) {
@@ -8,11 +8,15 @@ export default function ResultByFilesPage(props) {
     props.onLoading(false)
   }
 
+  const inputComponent = (
+    <FileOrFolderInput onChange={handleFilePaths} minimumFiles={props.minimumFiles} />
+  )
+
   return (
-    <Page title={props.title}>
-      <FileOrFolderInput onChange={handleFilePaths} minimumFiles={props.minimumFiles} />
-      <h2>Result:</h2>
-      {props.outputComponent}
-    </Page>
+    <ResultPage
+      title={props.title}
+      inputComponent={inputComponent}
+      outputComponent={props.outputComponent}
+    />
   )
 }
