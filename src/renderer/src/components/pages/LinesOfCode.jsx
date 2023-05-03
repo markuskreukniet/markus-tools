@@ -9,11 +9,11 @@ export default function LinesOfCode(props) {
     setLinesOfCode(linesOfCode)
   }
 
-  const resultComponent = <p>Lines of code: {linesOfCode()}</p>
+  const outputComponent = <p>Lines of code: {linesOfCode()}</p>
 
   return (
     <ResultByFilesPage
-      resultComponent={resultComponent}
+      outputComponent={outputComponent}
       minimumFiles={1}
       handleFilePaths={setState}
       onLoading={props.onLoading}

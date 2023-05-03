@@ -10,7 +10,7 @@ export default function DuplicateFiles(props) {
     setDuplicateFiles(textareaValue)
   }
 
-  const resultComponent = (
+  const outputComponent = (
     <Show
       when={duplicateFiles() !== ''}
       fallback={
@@ -32,7 +32,7 @@ export default function DuplicateFiles(props) {
 
   return (
     <ResultByFilesPage
-      resultComponent={resultComponent}
+      outputComponent={outputComponent}
       minimumFiles={2}
       handleFilePaths={setState}
       onLoading={props.onLoading}
