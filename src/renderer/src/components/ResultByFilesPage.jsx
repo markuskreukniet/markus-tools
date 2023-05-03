@@ -2,6 +2,7 @@ import FileOrFolderInput from './FileOrFolderInput'
 import ResultPage from './ResultPage'
 
 export default function ResultByFilesPage(props) {
+  // TODO: move the onLoading to ResultPage
   async function handleFilePaths(filePaths) {
     props.onLoading(true)
     await props.handleFilePaths(filePaths)
