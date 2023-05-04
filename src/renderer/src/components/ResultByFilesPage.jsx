@@ -1,12 +1,12 @@
+import { createSignal } from 'solid-js'
 import FileOrFolderInput from './FileOrFolderInput'
 import ResultPage from './ResultPage'
 
 export default function ResultByFilesPage(props) {
-  // TODO: move the onLoading to ResultPage
-  async function handleFilePaths(filePaths) {
-    props.onLoading(true)
-    await props.handleFilePaths(filePaths)
-    props.onLoading(false)
+  const [getOutput, setGetOutput] = createSignal(function () {})
+
+  function handleFilePaths(filePaths) {
+    setGetOutput(props.handleFilePaths(filePaths))
   }
 
   const inputComponent = (
@@ -18,6 +18,8 @@ export default function ResultByFilesPage(props) {
       title={props.title}
       inputComponent={inputComponent}
       outputComponent={props.outputComponent}
+      getOutput={getOutput}
+      onLoading={props.onLoading}
     />
   )
 }
