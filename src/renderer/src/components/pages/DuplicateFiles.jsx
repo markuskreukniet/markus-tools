@@ -30,6 +30,7 @@ export default function DuplicateFiles(props) {
 
   return (
     <ResultByFilesPage
+      title={props.title}
       outputComponent={outputComponent}
       minimumFiles={2}
       handleFilePaths={setState}

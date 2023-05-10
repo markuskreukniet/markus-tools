@@ -13,6 +13,7 @@ export default function LinesOfCode(props) {
 
   return (
     <ResultByFilesPage
+      title={props.title}
       outputComponent={outputComponent}
       minimumFiles={1}
       handleFilePaths={setState}
