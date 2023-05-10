@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js'
 import ResultByFilesPage from '../ResultByFilesPage'
-import Textarea from '../Textarea' // TODO: rename to TextArea
+import TextArea from '../TextArea'
 
 export default function DuplicateFiles(props) {
   const [duplicateFiles, setDuplicateFiles] = createSignal('')
@@ -25,7 +25,7 @@ export default function DuplicateFiles(props) {
   )
 
   const outputComponent = (
-    <Textarea readOnly textAreaValue={duplicateFiles} placeholderContent={placeholderContent} />
+    <TextArea readOnly textAreaValue={duplicateFiles} placeholderContent={placeholderContent} />
   )
 
   return (
