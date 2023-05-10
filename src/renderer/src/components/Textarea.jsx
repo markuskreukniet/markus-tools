@@ -5,29 +5,27 @@ export default function TextArea(props) {
   const [showTextArea, setShowTextArea] = createSignal(false)
 
   createEffect(() => {
-    setState(props.readOnly, props.textAreaValue())
+    setState(props.textAreaValue())
   })
 
-  function setState(readOnly, textAreaValue) {
-    if (readOnly) {
-      if (textAreaValue === '') {
-        setShowTextArea(false)
-      } else {
-        setShowTextArea(true)
-      }
+  function setState(textAreaValue) {
+    if (textAreaValue === '') {
+      setShowTextArea(false)
+    } else {
+      setShowTextArea(true)
     }
   }
 
   function handleClick() {
-    //
+    setShowTextArea(true)
   }
 
   function handleBlur() {
-    //
+    setState(props.textAreaValue())
   }
 
-  function handleChange() {
-    //
+  function handleChange(e) {
+    props.onChange(e.target.value)
   }
 
   function handleFunctionOrNull(readOnly, handleFunction) {
@@ -47,7 +45,7 @@ export default function TextArea(props) {
       }
     >
       <textarea
-        readonly
+        readonly={props.readOnly}
         value={props.readOnly ? props.textAreaValue() : null}
         // eslint-disable-next-line solid/reactivity
         onChange={handleFunctionOrNull(props.readOnly, handleChange)}

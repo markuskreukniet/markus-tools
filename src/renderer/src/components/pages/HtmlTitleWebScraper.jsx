@@ -8,13 +8,18 @@ export default function HtmlTitleWebScraper(props) {
   const placeholderContent = (
     <>
       <div>
+        content
         <div />
       </div>
     </>
   )
 
   const inputComponent = (
-    <TextArea onChange={setTextAreaValue} placeholderContent={placeholderContent} />
+    <TextArea
+      textAreaValue={textAreaValue}
+      onChange={setTextAreaValue}
+      placeholderContent={placeholderContent}
+    />
   )
 
   const outputComponent = (
