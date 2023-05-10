@@ -1,5 +1,6 @@
-import { createSignal, Show } from 'solid-js'
+import { createSignal } from 'solid-js'
 import ResultByFilesPage from '../ResultByFilesPage'
+import Textarea from '../Textarea' // TODO: rename to TextArea
 
 export default function DuplicateFiles(props) {
   const [duplicateFiles, setDuplicateFiles] = createSignal('')
@@ -10,24 +11,21 @@ export default function DuplicateFiles(props) {
     setDuplicateFiles(textareaValue)
   }
 
+  const placeholderContent = (
+    <>
+      Add at least two files or a folder with two files and press 'submit.'
+      <br />
+      <br />
+      Adding a folder also adds the files of its subfolders (its whole folder tree).
+      <br />
+      <br />
+      The more files a folder has, the more time it can take to add the files, which can be
+      noticeable. Also, the more files we add, the longer it takes to find duplicate files.
+    </>
+  )
+
   const outputComponent = (
-    <Show
-      when={duplicateFiles() !== ''}
-      fallback={
-        <div class="custom-textarea-placeholder">
-          Add at least two files or a folder with two files and press 'submit.'
-          <br />
-          <br />
-          Adding a folder also adds the files of its subfolders (its whole folder tree).
-          <br />
-          <br />
-          The more files a folder has, the more time it can take to add the files, which can be
-          noticeable. Also, the more files we add, the longer it takes to find duplicate files.
-        </div>
-      }
-    >
-      <textarea readonly value={duplicateFiles()} placeholder="" />
-    </Show>
+    <Textarea readOnly textAreaValue={duplicateFiles} placeholderContent={placeholderContent} />
   )
 
   return (
