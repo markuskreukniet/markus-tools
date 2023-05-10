@@ -1,5 +1,6 @@
 import { createSignal } from 'solid-js'
 import DuplicateFiles from './components/pages/DuplicateFiles'
+import HtmlTitleWebScraper from './components/pages/HtmlTitleWebScraper'
 import LinesOfCode from './components/pages/LinesOfCode'
 import Loader from './components/Loader'
 import PageNavigator from './components/PageNavigator'
@@ -10,6 +11,7 @@ function App() {
   const [loading, setLoading] = createSignal(false)
   const duplicateFilesTitle = 'Duplicate Files'
   const linesOfCodeTitle = 'Lines of Code (LOC)'
+  const htmlTitleWebScraper = 'HTML Title Web Scraper'
   const navigationBarItemPageCombinations = [
     {
       navigationBarItem: duplicateFilesTitle,
@@ -18,6 +20,10 @@ function App() {
     {
       navigationBarItem: linesOfCodeTitle,
       page: <LinesOfCode title={linesOfCodeTitle} onLoading={setLoading} />
+    },
+    {
+      navigationBarItem: htmlTitleWebScraper,
+      page: <HtmlTitleWebScraper title={htmlTitleWebScraper} onLoading={setLoading} />
     }
   ]
   const activeNavigationBarItem = navigationBarItemPageCombinations[0].navigationBarItem
