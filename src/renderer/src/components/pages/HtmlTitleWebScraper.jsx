@@ -1,15 +1,26 @@
+import { createSignal } from 'solid-js'
 import ResultPage from '../ResultPage'
+import TextArea from '../TextArea'
 
 export default function HtmlTitleWebScraper(props) {
+  const [textAreaValue, setTextAreaValue] = createSignal('')
+
+  const placeholderContent = (
+    <>
+      <div>
+        <div />
+      </div>
+    </>
+  )
+
   const inputComponent = (
-    <div>
-      <div />
-    </div>
+    <TextArea onChange={setTextAreaValue} placeholderContent={placeholderContent} />
   )
 
   const outputComponent = (
     <div>
       <div />
+      {textAreaValue()}
     </div>
   )
 
