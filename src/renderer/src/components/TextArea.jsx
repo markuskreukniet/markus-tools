@@ -16,8 +16,9 @@ export default function TextArea(props) {
     }
   }
 
-  function handleClick() {
+  function handleClick(e) {
     setShowTextArea(true)
+    document.elementFromPoint(e.clientX, e.clientY).focus()
   }
 
   function handleBlur() {
