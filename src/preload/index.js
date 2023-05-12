@@ -29,5 +29,5 @@ contextBridge.exposeInMainWorld('codeQuality', {
 })
 
 contextBridge.exposeInMainWorld('references', {
-  getReferencesByUrl: (urls) => ipcRenderer.invoke('getReferencesByUrl', urls)
+  getReferencesByUrl: (urlsString) => ipcRenderer.invoke('getReferencesByUrl', urlsString)
 })

@@ -87,7 +87,7 @@ async function getLinesOfCode(e, filePaths) {
 ipcMain.handle('getLinesOfCode', getLinesOfCode)
 
 import referencesByUrl from './modules/referencesByUrl'
-async function getReferencesByUrl(e, urls) {
-  return referencesByUrl(urls)
+async function getReferencesByUrl(e, urlsString) {
+  return referencesByUrl(urlsString)
 }
 ipcMain.handle('getReferencesByUrl', getReferencesByUrl)
