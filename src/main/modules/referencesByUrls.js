@@ -20,8 +20,18 @@ export default async function referencesByUrls(urlsString) {
   //   return acc
   // }, [])
 
-  let testArray = splitWithSeparatorAsPrefixRecursion(urlsString, 'https://', [])
-  console.log('testArray', testArray)
+  urlsString = 'https://lol2.com'
+
+  const httpsSplitted = splitWithSeparatorAsPrefixRecursion(urlsString, 'http://', [])
+
+  //let urls = []
+  //const httpsSplitted = splitWithSeparatorAsPrefixRecursion(urlsString, 'https://', [])
+  console.log('httpsSplitted', httpsSplitted)
+  // for (const element of httpsSplitted) {
+  //   urls = [...urls, ...splitWithSeparatorAsPrefixRecursion(element, 'http://', [])]
+  // }
+
+  // console.log('urls', urls)
 
   return 'testing'
 }
@@ -35,6 +45,7 @@ function splitWithSeparatorAsPrefixRecursion(string, separator, array) {
   if (separatorAndAfterIt.includes(separator, separator.length)) {
     return splitWithSeparatorAsPrefixRecursion(separatorAndAfterIt, separator, array)
   } else {
+    array.push(separatorAndAfterIt)
     return array
   }
 }
