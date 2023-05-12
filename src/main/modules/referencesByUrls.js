@@ -1,4 +1,4 @@
-export default async function referencesByUrl(urlsString) {
+export default async function referencesByUrls(urlsString) {
   console.log('urlsString', urlsString)
   console.log('typeof urlsString', typeof urlsString)
 

@@ -2,7 +2,7 @@ import { createSignal } from 'solid-js'
 import ResultPage from '../ResultPage'
 import TextArea from '../TextArea'
 
-export default function ReferencesByUrl(props) {
+export default function ReferencesByUrls(props) {
   const [textAreaValue, setTextAreaValue] = createSignal('')
   const [isValid, setIsValid] = createSignal('')
   const [references, setReferences] = createSignal('')
@@ -18,7 +18,7 @@ export default function ReferencesByUrl(props) {
   }
 
   async function submit() {
-    const result = await window.references.getReferencesByUrl(textAreaValue())
+    const result = await window.references.getReferencesByUrls(textAreaValue())
     setReferences(result)
   }
 
