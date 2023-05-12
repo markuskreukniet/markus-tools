@@ -18,7 +18,7 @@ export default function ReferencesByUrl(props) {
   }
 
   async function submit() {
-    const result = await window.references.getReferences(textAreaValue())
+    const result = await window.references.getReferencesByUrl(textAreaValue())
     setReferences(result)
   }
 

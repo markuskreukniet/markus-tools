@@ -27,3 +27,7 @@ contextBridge.exposeInMainWorld('duplicateFiles', {
 contextBridge.exposeInMainWorld('codeQuality', {
   getLinesOfCode: (filePaths) => ipcRenderer.invoke('getLinesOfCode', filePaths)
 })
+
+contextBridge.exposeInMainWorld('references', {
+  getReferencesByUrl: (urls) => ipcRenderer.invoke('getReferencesByUrl', urls)
+})
