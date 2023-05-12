@@ -1,7 +1,4 @@
 export default async function referencesByUrls(urlsString) {
-  console.log('urlsString', urlsString)
-  console.log('typeof urlsString', typeof urlsString)
-
   // AI result
   // const urls = urlsString.split(/\s+/).reduce((acc, val) => {
   //   const urlsString = val.split(/https?:\/\//)
@@ -20,11 +17,15 @@ export default async function referencesByUrls(urlsString) {
   //   return acc
   // }, [])
 
+  urlsString = urlsString.replaceAll('\n', '') // should happen when add to urls together with trim?
+
   let urls = []
   const httpsSplitted = splitWithSeparatorAsPrefixRecursion(urlsString, 'https://', [])
   for (const element of httpsSplitted) {
     urls = [...urls, ...splitWithSeparatorAsPrefixRecursion(element, 'http://', [])]
   }
+
+  console.log('urls', urls)
 
   return 'testing'
 }
