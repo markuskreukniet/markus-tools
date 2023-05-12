@@ -2,8 +2,7 @@ import { createSignal } from 'solid-js'
 import ResultPage from '../ResultPage'
 import TextArea from '../TextArea'
 
-// TODO: better naming?
-export default function HtmlTitleWebScraper(props) {
+export default function ReferencesByUrl(props) {
   const [textAreaValue, setTextAreaValue] = createSignal('')
   const [isValid, setIsValid] = createSignal('')
   const [references, setReferences] = createSignal('')
@@ -19,7 +18,6 @@ export default function HtmlTitleWebScraper(props) {
   }
 
   async function submit() {
-    // TODO: better naming?
     const result = await window.references.getReferences(textAreaValue())
     setReferences(result)
   }
