@@ -30,6 +30,7 @@ export default async function referencesByUrls(urlsString) {
   return 'testing'
 }
 
+// TODO: is separator.length correct?
 function splitWithSeparatorAsPrefixRecursion(string, separator, array) {
   const separatorIndex = string.indexOf(separator, separator.length)
   if (separatorIndex === -1) {
