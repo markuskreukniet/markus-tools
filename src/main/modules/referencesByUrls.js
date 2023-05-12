@@ -20,24 +20,22 @@ export default async function referencesByUrls(urlsString) {
   //   return acc
   // }, [])
 
-  urlsString = 'https://lol2.com'
-
-  const httpsSplitted = splitWithSeparatorAsPrefixRecursion(urlsString, 'http://', [])
-
-  //let urls = []
-  //const httpsSplitted = splitWithSeparatorAsPrefixRecursion(urlsString, 'https://', [])
-  console.log('httpsSplitted', httpsSplitted)
-  // for (const element of httpsSplitted) {
-  //   urls = [...urls, ...splitWithSeparatorAsPrefixRecursion(element, 'http://', [])]
-  // }
-
-  // console.log('urls', urls)
+  let urls = []
+  const httpsSplitted = splitWithSeparatorAsPrefixRecursion(urlsString, 'https://', [])
+  for (const element of httpsSplitted) {
+    urls = [...urls, ...splitWithSeparatorAsPrefixRecursion(element, 'http://', [])]
+  }
 
   return 'testing'
 }
 
 function splitWithSeparatorAsPrefixRecursion(string, separator, array) {
   const separatorIndex = string.indexOf(separator, separator.length)
+  if (separatorIndex === -1) {
+    array.push(string)
+    return array
+  }
+
   const beforeSeparator = string.slice(0, separatorIndex)
   const separatorAndAfterIt = string.slice(separatorIndex)
   array.push(beforeSeparator)
