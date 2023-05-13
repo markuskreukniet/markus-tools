@@ -53,7 +53,7 @@ function splitWithSeparatorAsPrefixRecursion(string, separator, array) {
 }
 
 function getUrls(urlsString) {
-  const urls = []
+  let urls = []
   const subStrings = ['http://', 'https://']
 
   while (urlsString.length > subStrings[0].length) {
@@ -62,10 +62,7 @@ function getUrls(urlsString) {
 
     let firstIndex = httpsIndex
     if (httpIndex === -1 && httpsIndex === -1) {
-      if (includesOneOfTheSubstrings(urlsString, subStrings)) {
-        urlsString = removeAllEndOfLineAndTrim(urlsString)
-        urls.push(urlsString)
-      }
+      urls = possiblyUpdateUrls(urlsString, subStrings, urls)
       return urls
     } else if (httpIndex === -1) {
       firstIndex = httpsIndex
@@ -76,12 +73,18 @@ function getUrls(urlsString) {
     }
 
     let beforeIndex = urlsString.slice(0, firstIndex)
-    if (includesOneOfTheSubstrings(beforeIndex, subStrings)) {
-      beforeIndex = removeAllEndOfLineAndTrim(beforeIndex)
-      urls.push(beforeIndex)
-    }
+    urls = possiblyUpdateUrls(beforeIndex, subStrings, urls)
 
     urlsString = urlsString.slice(firstIndex)
+  }
+
+  return urls
+}
+
+function possiblyUpdateUrls(string, subStrings, urls) {
+  if (includesOneOfTheSubstrings(string, subStrings)) {
+    string = removeAllEndOfLineAndTrim(string)
+    urls.push(string)
   }
 
   return urls
