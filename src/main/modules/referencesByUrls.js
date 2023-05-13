@@ -62,7 +62,7 @@ function getUrls(urlsString) {
 
     let firstIndex = httpsIndex
     if (httpIndex === -1 && httpsIndex === -1) {
-      urls = possiblyUpdateUrls(urlsString, subStrings, urls)
+      urls = possiblyAddUrlToUrls(urlsString, subStrings, urls)
       return urls
     } else if (httpIndex === -1) {
       firstIndex = httpsIndex
@@ -73,7 +73,7 @@ function getUrls(urlsString) {
     }
 
     let beforeIndex = urlsString.slice(0, firstIndex)
-    urls = possiblyUpdateUrls(beforeIndex, subStrings, urls)
+    urls = possiblyAddUrlToUrls(beforeIndex, subStrings, urls)
 
     urlsString = urlsString.slice(firstIndex)
   }
@@ -81,7 +81,7 @@ function getUrls(urlsString) {
   return urls
 }
 
-function possiblyUpdateUrls(string, subStrings, urls) {
+function possiblyAddUrlToUrls(string, subStrings, urls) {
   if (includesOneOfTheSubstrings(string, subStrings)) {
     string = removeAllEndOfLineAndTrim(string)
     urls.push(string)
