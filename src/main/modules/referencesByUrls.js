@@ -17,20 +17,22 @@ export default async function referencesByUrls(urlsString) {
   //   return acc
   // }, [])
 
-  urlsString = urlsString.replaceAll('\n', '') // should happen when add to urls together with trim?
+  // urlsString = urlsString.replaceAll('\n', '') // should happen when add to urls together with trim?
 
-  let urls = []
-  const httpsSplitted = splitWithSeparatorAsPrefixRecursion(urlsString, 'https://', [])
-  for (const element of httpsSplitted) {
-    urls = [...urls, ...splitWithSeparatorAsPrefixRecursion(element, 'http://', [])]
-  }
+  // let urls = []
+  // const httpsSplitted = splitWithSeparatorAsPrefixRecursion(urlsString, 'https://', [])
+  // for (const element of httpsSplitted) {
+  //   urls = [...urls, ...splitWithSeparatorAsPrefixRecursion(element, 'http://', [])]
+  // }
+
+  const urls = getUrls(urlsString)
 
   console.log('urls', urls)
 
   return 'testing'
 }
 
-// TODO: is separator.length correct?
+// TODO: is separator.length correct? ja
 function splitWithSeparatorAsPrefixRecursion(string, separator, array) {
   const separatorIndex = string.indexOf(separator, separator.length)
   if (separatorIndex === -1) {
@@ -50,20 +52,52 @@ function splitWithSeparatorAsPrefixRecursion(string, separator, array) {
   }
 }
 
-// does not work
-// function splitWithSeparatorAsPrefix(stringWithSeparator, separator) {
-//   const result = []
+function getUrls(urlsString) {
+  const urls = []
+  const subStrings = ['http://', 'https://']
 
-//   while (stringWithSeparator.includes(separator, separator.length)) {
-//     const separatorIndex = stringWithSeparator.indexOf(separator, separator.length)
-//     const beforeSeparator = stringWithSeparator.slice(0, separatorIndex)
-//     stringWithSeparator = stringWithSeparator.slice(separatorIndex)
-//     result.push(beforeSeparator)
-//   }
+  while (urlsString.length > subStrings[0].length) {
+    const httpIndex = urlsString.indexOf(subStrings[0], subStrings[0].length)
+    const httpsIndex = urlsString.indexOf(subStrings[1], subStrings[1].length)
 
-//   if (result.length === 0) {
-//     result.push(stringWithSeparator)
-//   }
+    let firstIndex = httpsIndex
+    if (httpIndex === -1 && httpsIndex === -1) {
+      if (includesOneOfTheSubstrings(urlsString, subStrings)) {
+        urlsString = removeAllEndOfLineAndTrim(urlsString)
+        urls.push(urlsString)
+      }
+      return urls
+    } else if (httpIndex === -1) {
+      firstIndex = httpsIndex
+    } else if (httpsIndex === -1) {
+      firstIndex = httpIndex
+    } else if (httpIndex < httpsIndex) {
+      firstIndex = httpIndex
+    }
 
-//   return result
-// }
+    let beforeIndex = urlsString.slice(0, firstIndex)
+    if (includesOneOfTheSubstrings(beforeIndex, subStrings)) {
+      beforeIndex = removeAllEndOfLineAndTrim(beforeIndex)
+      urls.push(beforeIndex)
+    }
+
+    urlsString = urlsString.slice(firstIndex)
+  }
+
+  return urls
+}
+
+function includesOneOfTheSubstrings(string, substrings) {
+  for (const substring of substrings) {
+    if (string.includes(substring)) {
+      return true
+    }
+  }
+  return false
+}
+
+function removeAllEndOfLineAndTrim(string) {
+  string = string.replaceAll('\n', '')
+  string = string.trim()
+  return string
+}
