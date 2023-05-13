@@ -49,3 +49,21 @@ function splitWithSeparatorAsPrefixRecursion(string, separator, array) {
     return array
   }
 }
+
+// does not work
+// function splitWithSeparatorAsPrefix(stringWithSeparator, separator) {
+//   const result = []
+
+//   while (stringWithSeparator.includes(separator, separator.length)) {
+//     const separatorIndex = stringWithSeparator.indexOf(separator, separator.length)
+//     const beforeSeparator = stringWithSeparator.slice(0, separatorIndex)
+//     stringWithSeparator = stringWithSeparator.slice(separatorIndex)
+//     result.push(beforeSeparator)
+//   }
+
+//   if (result.length === 0) {
+//     result.push(stringWithSeparator)
+//   }
+
+//   return result
+// }
