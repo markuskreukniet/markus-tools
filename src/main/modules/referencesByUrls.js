@@ -1,23 +1,12 @@
-export default async function referencesByUrls(urlsString) {
-  // AI result
-  // const urls = urlsString.split(/\s+/).reduce((acc, val) => {
-  //   const urlsString = val.split(/https?:\/\//)
-  //   if (urlsString.length > 1) {
-  //     urlsString.forEach((url) => {
-  //       if (url.trim() !== '') {
-  //         acc.push(`https://${url}`)
-  //       }
-  //     })
-  //   } else {
-  //     const url = urlsString[0].trim()
-  //     if (url !== '') {
-  //       acc.push(url)
-  //     }
-  //   }
-  //   return acc
-  // }, [])
+const http = require('http')
+const https = require('https')
 
+export default async function referencesByUrls(urlsString) {
   const urls = getUrls(urlsString)
+  for (const url of urls) {
+    const httpData = await getData(url)
+  }
+
   console.log('urls', urls)
 
   return 'testing'
@@ -54,6 +43,7 @@ function getUrls(urlsString) {
   return urls
 }
 
+// TODO: includesOneOfTheSubstringsAddToUrls and includesOneOfTheSubstrings to one function
 function includesOneOfTheSubstringsAddToUrls(string, subStrings, urls) {
   if (includesOneOfTheSubstrings(string, subStrings)) {
     urls.push(string)
@@ -69,4 +59,27 @@ function includesOneOfTheSubstrings(string, substrings) {
     }
   }
   return false
+}
+
+function getData(url) {
+  const protocol = url.startsWith('https') ? https : http
+
+  return new Promise((resolve, reject) => {
+    protocol
+      .get(url, (resp) => {
+        let data = ''
+
+        resp.on('data', (chunk) => {
+          data += chunk
+        })
+
+        resp.on('end', () => {
+          resolve(data)
+        })
+      })
+      .on('error', (err) => {
+        console.log('Error:', err.message)
+        reject()
+      })
+  })
 }
