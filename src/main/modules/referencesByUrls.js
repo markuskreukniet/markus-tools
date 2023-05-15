@@ -5,6 +5,11 @@ export default async function referencesByUrls(urlsString) {
   const urls = getUrls(urlsString)
   for (const url of urls) {
     const httpData = await getData(url)
+    const tags = findHtmlTags(httpData, 'h1')
+    if (tags?.length === 1) {
+      // https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/
+      const innerHtml = tags[0].replace(/(<([^>]+)>)/gi, '')
+    }
   }
 
   console.log('urls', urls)
@@ -82,4 +87,10 @@ function getData(url) {
         reject()
       })
   })
+}
+
+function findHtmlTags(html, tag) {
+  // TODO: check https://regex101.com/. It gives now an error. Check if regex is correct
+  const regex = new RegExp(`<${tag}[^>]*>(.*?)<\\/${tag}>`, 'gi')
+  return html.match(regex)
 }
