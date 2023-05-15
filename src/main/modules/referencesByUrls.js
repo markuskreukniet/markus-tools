@@ -3,8 +3,10 @@ const https = require('https')
 
 export default async function referencesByUrls(urlsString) {
   const urls = getUrls(urlsString)
-  for (const url of urls) {
-    const httpData = await getData(url)
+  let result = urls.length > 0 ? `(sources: ${urls[0]}` : ''
+
+  for (let i = 1; i < urls.length; i++) {
+    const httpData = await getData(urls[i])
     const tags = findHtmlTags(httpData, 'h1')
     if (tags?.length === 1) {
       // https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/
@@ -12,7 +14,12 @@ export default async function referencesByUrls(urlsString) {
     }
   }
 
+  if (urls.length > 0) {
+    result += ').'
+  }
+
   console.log('urls', urls)
+  console.log('result', result)
 
   return 'testing'
 }
