@@ -25,7 +25,6 @@ async function getReferencePart(url, comma) {
     //
   }
 
-  // TODO: is the ? of tags? needed?
   const tags = httpData !== '' ? findHtmlTags(httpData, 'h1') : []
   if (tags?.length === 1) {
     // https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/
