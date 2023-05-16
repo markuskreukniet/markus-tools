@@ -3,16 +3,16 @@ const https = require('https')
 
 export default async function referencesByUrls(urlsString) {
   const urls = getUrls(urlsString)
-  let result = urls.length > 0 ? getReferencePart(urls[0], false) : ''
+  // let result = urls.length > 0 ? getReferencePart(urls[0], false) : ''
 
-  for (let i = 1; i < urls.length; i++) {
-    result += getReferencePart(urls[i], true)
-  }
+  // for (let i = 1; i < urls.length; i++) {
+  //   result += getReferencePart(urls[i], true)
+  // }
 
-  result = `(sources: ${result}).`
+  // result = `(sources: ${result}).`
 
   console.log('urls', urls)
-  console.log('result', result)
+  // console.log('result', result)
 
   return 'testing'
 }
@@ -61,22 +61,13 @@ function getUrls(urlsString) {
   return urls
 }
 
-// TODO: includesOneOfTheSubstringsAddToUrls and includesOneOfTheSubstrings to one function
-function includesOneOfTheSubstringsAddToUrls(string, subStrings, urls) {
-  if (includesOneOfTheSubstrings(string, subStrings)) {
-    urls.push(string)
-  }
-
-  return urls
-}
-
-function includesOneOfTheSubstrings(string, substrings) {
+function includesOneOfTheSubstringsAddToUrls(string, substrings, urls) {
   for (const substring of substrings) {
     if (string.includes(substring)) {
-      return true
+      urls.push(string)
     }
   }
-  return false
+  return urls
 }
 
 function getData(url) {
