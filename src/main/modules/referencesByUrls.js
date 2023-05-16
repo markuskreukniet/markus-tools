@@ -3,23 +3,30 @@ const https = require('https')
 
 export default async function referencesByUrls(urlsString) {
   const urls = getUrls(urlsString)
-  // let result = urls.length > 0 ? getReferencePart(urls[0], false) : ''
+  let result = urls.length > 0 ? getReferencePart(urls[0], false) : ''
 
-  // for (let i = 1; i < urls.length; i++) {
-  //   result += getReferencePart(urls[i], true)
-  // }
+  for (let i = 1; i < urls.length; i++) {
+    result += getReferencePart(urls[i], true)
+  }
 
-  // result = `(sources: ${result}).`
+  result = `(sources: ${result}).`
 
   console.log('urls', urls)
-  // console.log('result', result)
+  console.log('result', result)
 
   return 'testing'
 }
 
 async function getReferencePart(url, comma) {
-  const httpData = await getData(url)
-  const tags = findHtmlTags(httpData, 'h1')
+  let httpData = ''
+  try {
+    httpData = await getData(url)
+  } catch (error) {
+    //
+  }
+
+  // TODO: is the ? of tags? needed?
+  const tags = httpData !== '' ? findHtmlTags(httpData, 'h1') : []
   if (tags?.length === 1) {
     // https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/
     const innerHtml = tags[0].replace(/(<([^>]+)>)/gi, '')
