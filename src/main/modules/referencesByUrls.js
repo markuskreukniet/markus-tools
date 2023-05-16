@@ -3,15 +3,15 @@ const https = require('https')
 
 export default async function referencesByUrls(urlsString) {
   const urls = getUrls(urlsString)
-  let result = urls.length > 0 ? getReferencePart(urls[0], false) : ''
+  let result = urls.length > 0 ? await getReferencePart(urls[0], false) : ''
 
-  for (let i = 1; i < urls.length; i++) {
-    result += getReferencePart(urls[i], true)
-  }
+  // for (let i = 1; i < urls.length; i++) {
+  //   result += await getReferencePart(urls[i], true)
+  // }
 
   result = `(sources: ${result}).`
 
-  console.log('urls', urls)
+  // console.log('urls', urls)
   console.log('result', result)
 
   return 'testing'
