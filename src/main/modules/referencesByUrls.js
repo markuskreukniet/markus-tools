@@ -1,20 +1,17 @@
 const http = require('http')
 const https = require('https')
 
+// TODO: 'by' part
 export default async function referencesByUrls(urlsString) {
-  const urls = getUrls(urlsString)
+  const protocolStrings = ['http://', 'https://']
+  const urls = getUrls(urlsString, protocolStrings)
   let result = urls.length > 0 ? await getReferencePart(urls[0], false) : ''
 
-  // for (let i = 1; i < urls.length; i++) {
-  //   result += await getReferencePart(urls[i], true)
-  // }
+  for (let i = 1; i < urls.length; i++) {
+    result += await getReferencePart(urls[i], true)
+  }
 
-  result = `(sources: ${result}).`
-
-  // console.log('urls', urls)
-  console.log('result', result)
-
-  return 'testing'
+  return `(sources: ${result}).`
 }
 
 async function getReferencePart(url, comma) {
@@ -29,27 +26,30 @@ async function getReferencePart(url, comma) {
   if (tags?.length === 1) {
     // https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/
     const innerHtml = tags[0].replace(/(<([^>]+)>)/gi, '')
-    let part = `"${innerHtml}" by`
+    let part = `"${innerHtml}" by `
     return comma ? `, ${part}` : part
   } else {
     return ''
   }
 }
 
-function getUrls(urlsString) {
+// function getByPart() {
+//   //
+// }
+
+function getUrls(urlsString, protocolStrings) {
   urlsString = urlsString.replaceAll('\n', '')
   urlsString = urlsString.replaceAll(' ', '')
 
   let urls = []
-  const subStrings = ['http://', 'https://']
 
-  while (urlsString.length > subStrings[0].length) {
-    const httpIndex = urlsString.indexOf(subStrings[0], subStrings[0].length)
-    const httpsIndex = urlsString.indexOf(subStrings[1], subStrings[1].length)
+  while (urlsString.length > protocolStrings[0].length) {
+    const httpIndex = urlsString.indexOf(protocolStrings[0], protocolStrings[0].length)
+    const httpsIndex = urlsString.indexOf(protocolStrings[1], protocolStrings[1].length)
 
     let firstIndex = httpsIndex
     if (httpIndex === -1 && httpsIndex === -1) {
-      urls = includesOneOfTheSubstringsAddToUrls(urlsString, subStrings, urls)
+      urls = includesOneOfTheSubstringsAddToUrls(urlsString, protocolStrings, urls)
       return urls
     } else if (httpIndex === -1) {
       firstIndex = httpsIndex
@@ -60,7 +60,7 @@ function getUrls(urlsString) {
     }
 
     let beforeIndex = urlsString.slice(0, firstIndex)
-    urls = includesOneOfTheSubstringsAddToUrls(beforeIndex, subStrings, urls)
+    urls = includesOneOfTheSubstringsAddToUrls(beforeIndex, protocolStrings, urls)
     urlsString = urlsString.slice(firstIndex)
   }
 
