@@ -1,20 +1,19 @@
 const http = require('http')
 const https = require('https')
 
-// TODO: 'by' part
 export default async function referencesByUrls(urlsString) {
   const protocolStrings = ['http://', 'https://']
   const urls = getUrls(urlsString, protocolStrings)
-  let result = urls.length > 0 ? await getReferencePart(urls[0], false) : ''
+  let result = urls.length > 0 ? await getReferencePart(urls[0], false, protocolStrings) : ''
 
   for (let i = 1; i < urls.length; i++) {
-    result += await getReferencePart(urls[i], true)
+    result += await getReferencePart(urls[i], true, protocolStrings)
   }
 
   return `(sources: ${result}).`
 }
 
-async function getReferencePart(url, comma) {
+async function getReferencePart(url, comma, protocolStrings) {
   let httpData = ''
   try {
     httpData = await getData(url)
@@ -26,16 +25,23 @@ async function getReferencePart(url, comma) {
   if (tags?.length === 1) {
     // https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/
     const innerHtml = tags[0].replace(/(<([^>]+)>)/gi, '')
-    let part = `"${innerHtml}" by `
+    let part = `"${innerHtml}" by ${getByPart(url, protocolStrings)}`
     return comma ? `, ${part}` : part
   } else {
     return ''
   }
 }
 
-// function getByPart() {
-//   //
-// }
+function getByPart(url, protocolStrings) {
+  for (const protocolString of protocolStrings) {
+    if (url.includes(protocolString)) {
+      const endPosition = url.indexOf('/', protocolString.length) - protocolString.length
+      return url.substr(protocolString.length, endPosition)
+    }
+  }
+
+  return ''
+}
 
 function getUrls(urlsString, protocolStrings) {
   urlsString = urlsString.replaceAll('\n', '')
