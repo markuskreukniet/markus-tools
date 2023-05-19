@@ -1,4 +1,5 @@
-import { createEffect, createSignal, For } from 'solid-js'
+import { createSignal, For } from 'solid-js'
+import ActiveByNumberButton from './ActiveByNumberButton'
 import FileSelector from './FileSelector'
 
 // TODO:
@@ -7,23 +8,14 @@ import FileSelector from './FileSelector'
 
 // Checking child folders of a folder is only possible in the main, which is possible by adding such a function in the main.
 
-// TODO: abstraction of buttons? hasFilePath is props.minimumFiles === 1
 export default function FileOrFolderInput(props) {
   const [selectedPaths, setSelectedPaths] = createSignal([])
-  const [isValid, setIsValid] = createSignal(false)
-  const [hasFilePath, setHasFilePath] = createSignal(false)
+  const [numberOfFilePaths, setNumberOfFilePaths] = createSignal(0)
   let filePaths = []
-  let minimumFiles = 0
-
-  createEffect(() => {
-    if (props.minimumFiles) {
-      minimumFiles = props.minimumFiles
-    }
-  })
 
   function handleSelectedFile(files) {
     if (!selectedPaths().some((path) => path === files[0].path)) {
-      setState(files[0].path, files, minimumFiles)
+      setState(files[0].path, files)
     }
   }
 
@@ -31,11 +23,11 @@ export default function FileOrFolderInput(props) {
     const folderPath = getSelectedFolderPath(files)
 
     if (!selectedPaths().some((path) => path === folderPath)) {
-      setState(folderPath, files, minimumFiles)
+      setState(folderPath, files)
     }
   }
 
-  function setState(selectedPath, files, minimumFilesToBeValid) {
+  function setState(selectedPath, files) {
     setSelectedPaths([...selectedPaths(), selectedPath])
 
     // files is a FileList, not an array, so we can't use .map
@@ -43,20 +35,13 @@ export default function FileOrFolderInput(props) {
       filePaths.push(file.path)
     }
 
-    if (!hasFilePath() && filePaths.length >= 1) {
-      setHasFilePath(true)
-    }
-
-    if (!isValid() && filePaths.length >= minimumFilesToBeValid) {
-      setIsValid(true)
-    }
+    setNumberOfFilePaths(filePaths.length)
   }
 
   function resetState() {
     setSelectedPaths([])
     filePaths = []
-    setHasFilePath(false)
-    setIsValid(false)
+    setNumberOfFilePaths(0)
   }
 
   function submit() {
@@ -70,12 +55,18 @@ export default function FileOrFolderInput(props) {
         <FileSelector onChange={handleSelectedFolder} folder />
       </div>
       <div class="display-flex justify-content-flex-end not-first-child-margin-left-1">
-        <button onClick={resetState} disabled={!hasFilePath()}>
-          reset
-        </button>
-        <button onClick={submit} disabled={!isValid()}>
-          submit
-        </button>
+        <ActiveByNumberButton
+          minimumNumber={1}
+          currentNumber={numberOfFilePaths()}
+          onAction={resetState}
+          text="reset"
+        />
+        <ActiveByNumberButton
+          minimumNumber={props.minimumFiles}
+          currentNumber={numberOfFilePaths()}
+          onAction={submit}
+          text="submit"
+        />
       </div>
       <ul>
         <For each={selectedPaths()}>{(path) => <li>{path}</li>}</For>

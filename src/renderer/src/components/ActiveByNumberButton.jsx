@@ -12,7 +12,7 @@ export default function ActiveByNumberButton(props) {
   })
 
   return (
-    <button onClick={() => props.action()} disabled={!active()}>
+    <button onClick={() => props.onAction()} disabled={!active()}>
       {props.text}
     </button>
   )
