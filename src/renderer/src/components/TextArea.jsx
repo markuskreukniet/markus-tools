@@ -1,6 +1,6 @@
 import { createEffect, createSignal, Show } from 'solid-js'
 
-// TODO: eslint-disable-next-line solid/reactivity
+// Since I want an optional 'on events,' I think these lines are needed: eslint-disable-next-line solid/reactivity
 export default function TextArea(props) {
   const [showTextArea, setShowTextArea] = createSignal(false)
 
