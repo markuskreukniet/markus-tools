@@ -232,8 +232,12 @@ h2 {
 
 textarea, .custom-textarea-placeholder {
   width: calc(100% - var(--size-1-s-2));
-  height: calc(calc(var(--size-1) * 13) - var(--size-1-s-2));
+  height: calc(var(--size-1) * 13);
   padding: var(--size-1-s);
+}
+
+.textarea-height-5 {
+  height: calc(var(--size-1) * 5);
 }
 
 .custom-textarea-placeholder {

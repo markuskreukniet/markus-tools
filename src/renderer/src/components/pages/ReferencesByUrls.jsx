@@ -44,12 +44,7 @@ export default function ReferencesByUrls(props) {
     </div>
   )
 
-  const outputComponent = (
-    <div>
-      <div />
-      {references()}
-    </div>
-  )
+  const outputComponent = <textarea readonly value={references()} class="textarea-height-5" />
 
   return (
     <ResultPage
