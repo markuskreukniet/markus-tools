@@ -24,13 +24,12 @@ export default function ReferencesByUrls(props) {
 
   const placeholderContent = (
     <>
-      <div>
-        placeholderContent
-        <div />
-      </div>
+      Add one or more website URls and press 'submit.' We can add URLs with or without spaces and
+      multiple lines since they will get filtered out.
     </>
   )
 
+  // TODO: button with submit is duplicate
   const inputComponent = (
     <div>
       <TextArea
