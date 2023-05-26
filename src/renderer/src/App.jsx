@@ -8,6 +8,7 @@ import PageNavigator from './components/PageNavigator'
 // import logo from './assets/logo.svg'
 
 // TODO: remove some createEffects
+// TODO: remove useless comments
 function App() {
   const [loading, setLoading] = createSignal(false)
   const duplicateFilesTitle = 'Duplicate Files'

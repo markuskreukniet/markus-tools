@@ -1,14 +1,13 @@
 const fs = require('fs')
+import isNotAZeroByteFile from './fileHelper.js'
 
 export default async function groupFilesByDateRange(filePaths) {
   // path and date created combinations of files
   const pathDateCreatedCombinations = []
   for (const path of filePaths) {
     const stats = fs.statSync(path)
-    // Skip zero-byte files and has to be an image file type
-    // TODO: duplicate: stats.size > 0
     if (
-      stats.size > 0 &&
+      isNotAZeroByteFile(stats) &&
       (path.endsWith('jpg') ||
         path.endsWith('jpeg') ||
         path.endsWith('png') ||
@@ -18,7 +17,6 @@ export default async function groupFilesByDateRange(filePaths) {
     }
   }
 
-  // sort combinations
   // TODO: sort duplicate
   pathDateCreatedCombinations.sort(compare)
 }

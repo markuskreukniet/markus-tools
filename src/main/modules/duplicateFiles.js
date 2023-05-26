@@ -1,18 +1,17 @@
 const crypto = require('crypto')
 const fs = require('fs')
+import isNotAZeroByteFile from './fileHelper.js'
 
 export default async function duplicateFiles(filePaths) {
   // path and size combinations of files
   const pathSizeCombinations = []
   for (const path of filePaths) {
     const stats = fs.statSync(path)
-    // skip zero-byte files
-    if (stats.size > 0) {
+    if (isNotAZeroByteFile(stats)) {
       pathSizeCombinations.push({ path: path, size: stats.size })
     }
   }
 
-  // sort combinations
   pathSizeCombinations.sort(compare)
 
   // duplicates of path and hash combinations
