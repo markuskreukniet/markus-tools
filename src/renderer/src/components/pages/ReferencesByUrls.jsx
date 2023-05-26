@@ -29,7 +29,6 @@ export default function ReferencesByUrls(props) {
     </>
   )
 
-  // TODO: button with submit is duplicate
   const inputComponent = (
     <div>
       <TextArea
