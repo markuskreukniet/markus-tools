@@ -3,7 +3,7 @@ import Page from './Page'
 
 export default function ResultPage(props) {
   createEffect(() => {
-    loadGetOutput(props.getOutput)
+    loadGetOutput(props.getOutput).catch(() => {})
   })
 
   async function loadGetOutput(getOutput) {
