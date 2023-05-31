@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js'
-import ResultPage from '../ResultPage'
+import ResultPage from '../page/ResultPage'
 import TextArea from '../TextArea'
 
 export default function ReferencesByUrls(props) {

@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js'
 import FileOrFolderInput from './FileOrFolderInput'
-import ResultPage from './ResultPage'
+import ResultPage from './page/ResultPage'
 
 export default function ResultByFilesPage(props) {
   const [getOutput, setGetOutput] = createSignal(function () {})
