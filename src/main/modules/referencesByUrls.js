@@ -1,5 +1,5 @@
-const http = require('http')
-const https = require('https')
+import http from 'http'
+import https from 'https'
 
 export default async function referencesByUrls(urlsString) {
   const protocolStrings = ['http://', 'https://']
@@ -25,7 +25,7 @@ async function getReferencePart(url, comma, protocolStrings) {
   if (tags?.length === 1) {
     // https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/
     const innerHtml = tags[0].replace(/(<([^>]+)>)/gi, '')
-    let part = `"${innerHtml}" by ${getByPart(url, protocolStrings)}`
+    const part = `"${innerHtml}" by ${getByPart(url, protocolStrings)}`
     return comma ? `, ${part}` : part
   } else {
     return ''
@@ -65,7 +65,7 @@ function getUrls(urlsString, protocolStrings) {
       firstIndex = httpIndex
     }
 
-    let beforeIndex = urlsString.slice(0, firstIndex)
+    const beforeIndex = urlsString.slice(0, firstIndex)
     urls = includesOneOfTheSubstringsAddToUrls(beforeIndex, protocolStrings, urls)
     urlsString = urlsString.slice(firstIndex)
   }
