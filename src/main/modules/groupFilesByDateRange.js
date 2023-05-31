@@ -1,4 +1,4 @@
-const fs = require('fs')
+import fs from 'fs'
 import isNotAZeroByteFile from './fileHelper.js'
 
 // TODO: function looks a lot like duplicateFiles

@@ -1,4 +1,5 @@
-const fs = require('fs')
+import fs from 'fs'
+
 const endOfLine = '\n'
 
 export default async function linesOfCode(filePaths) {
