@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js'
-import ResultByFilesPage from '../ResultByFilesPage'
+import TextResultByFilesPage from '../TextResultByFilesPage'
 
 export default function LinesOfCode(props) {
   const [linesOfCode, setLinesOfCode] = createSignal(0)
@@ -9,12 +9,10 @@ export default function LinesOfCode(props) {
     setLinesOfCode(linesOfCode)
   }
 
-  const outputComponent = <p>Lines of code: {linesOfCode()}</p>
-
   return (
-    <ResultByFilesPage
+    <TextResultByFilesPage
       title={props.title}
-      outputComponent={outputComponent}
+      output={`Lines of code: ${linesOfCode()}`}
       minimumFiles={1}
       handleFilePaths={setState}
       onLoading={props.onLoading}
