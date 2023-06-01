@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js'
-import ResultByFilesPage from '../ResultByFilesPage'
+import ResultByFilesPage from '../page/ResultByFilesPage'
 import TextArea from '../TextArea'
 
 export default function DuplicateFiles(props) {

@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js'
-import TextResultByFilesPage from '../TextResultByFilesPage'
+import TextResultByFilesPage from '../page/TextResultByFilesPage'
 
 export default function LinesOfCode(props) {
   const [linesOfCode, setLinesOfCode] = createSignal(0)
