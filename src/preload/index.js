@@ -31,3 +31,8 @@ contextBridge.exposeInMainWorld('codeQuality', {
 contextBridge.exposeInMainWorld('references', {
   getReferencesByUrls: (urlsString) => ipcRenderer.invoke('getReferencesByUrls', urlsString)
 })
+
+contextBridge.exposeInMainWorld('dateRangeFolder', {
+  moveImagesToDateRangeFolder: (filePaths) =>
+    ipcRenderer.invoke('moveImagesToDateRangeFolder', filePaths)
+})

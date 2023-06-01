@@ -3,6 +3,8 @@ import isNotAZeroByteFile from './fileHelper.js'
 
 // TODO: function looks a lot like duplicateFiles
 export default async function groupFilesByDateRange(filePaths) {
+  return 'test test'
+
   // TODO: also in duplicateFiles and check return type
   if (filePaths.length < 2) {
     return
@@ -19,7 +21,7 @@ export default async function groupFilesByDateRange(filePaths) {
         path.endsWith('png') ||
         path.endsWith('gif'))
     ) {
-      pathDateCreatedCombinations.push({ path: path, dateCreated: stats.birthtime })
+      pathDateCreatedCombinations.push({ path, dateCreated: stats.birthtime })
     }
   }
 
