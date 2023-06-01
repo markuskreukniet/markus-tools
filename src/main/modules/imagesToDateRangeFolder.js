@@ -2,7 +2,7 @@ import fs from 'fs'
 import isNotAZeroByteFile from './fileHelper.js'
 
 // TODO: function looks a lot like duplicateFiles
-export default async function groupFilesByDateRange(filePaths) {
+export default async function imagesToDateRangeFolder(filePaths) {
   return 'test test'
 
   // TODO: also in duplicateFiles and check return type

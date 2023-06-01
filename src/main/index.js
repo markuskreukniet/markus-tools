@@ -92,9 +92,8 @@ async function getReferencesByUrls(e, urlsString) {
 }
 ipcMain.handle('getReferencesByUrls', getReferencesByUrls)
 
-// TODO
-import groupFilesByDateRange from './modules/groupFilesByDateRange'
+import imagesToDateRangeFolder from './modules/imagesToDateRangeFolder'
 async function moveImagesToDateRangeFolder(e, filePaths) {
-  return groupFilesByDateRange(filePaths)
+  return imagesToDateRangeFolder(filePaths)
 }
 ipcMain.handle('moveImagesToDateRangeFolder', moveImagesToDateRangeFolder)
