@@ -1,5 +1,6 @@
 import { createSignal } from 'solid-js'
 import DuplicateFiles from './components/pages/DuplicateFiles'
+import ImagesToDateRangeFolder from './components/pages/ImagesToDateRangeFolder'
 import LinesOfCode from './components/pages/LinesOfCode'
 import ReferencesByUrls from './components/pages/ReferencesByUrls'
 import Loader from './components/Loader'
@@ -14,6 +15,7 @@ function App() {
   const duplicateFilesTitle = 'Duplicate Files'
   const linesOfCodeTitle = 'Lines of Code (LOC)'
   const ReferencesByUrlsTitle = 'References by URLs'
+  const ImagesToDateRangeFolderTitle = 'Images to Date Range Folder'
   const navigationBarItemPageCombinations = [
     {
       navigationBarItem: duplicateFilesTitle,
@@ -26,6 +28,10 @@ function App() {
     {
       navigationBarItem: ReferencesByUrlsTitle,
       page: <ReferencesByUrls title={ReferencesByUrlsTitle} onLoading={setLoading} />
+    },
+    {
+      navigationBarItem: ImagesToDateRangeFolderTitle,
+      page: <ImagesToDateRangeFolder title={ImagesToDateRangeFolderTitle} onLoading={setLoading} />
     }
   ]
   const activeNavigationBarItem = navigationBarItemPageCombinations[0].navigationBarItem
