@@ -73,7 +73,7 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 
 // self added with ipcMain import
-// TODO: rename return functions: duplicateFiles, linesOfCode, referencesByUrls
+// TODO: rename return functions: duplicateFiles, linesOfCode, referencesByUrls, imagesToDateRangeFolder
 import duplicateFiles from './modules/duplicateFiles'
 async function getDuplicateFiles(e, filePaths) {
   return duplicateFiles(filePaths)
