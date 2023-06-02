@@ -3,8 +3,6 @@ import isNotAZeroByteFile from './fileHelper.js'
 
 // TODO: function looks a lot like duplicateFiles
 export default async function imagesToDateRangeFolder(filePaths) {
-  return 'test test'
-
   // TODO: also in duplicateFiles and check return type
   if (filePaths.length < 2) {
     return
@@ -33,10 +31,12 @@ export default async function imagesToDateRangeFolder(filePaths) {
     const combination = pathDateCreatedCombinations[i - 1]
     const combination2 = pathDateCreatedCombinations[i]
 
-    if (isWithinThreeDays(combination.birthtime, combination2.birthtime)) {
-      group.push(pathDateCreatedCombinations[i])
+    if (isWithinThreeDays(combination.dateCreated, combination2.dateCreated)) {
+      group.push(combination2)
     } else {
-      groups.push(group)
+      if (group.length > 0) {
+        groups.push(group)
+      }
       group = []
     }
   }
@@ -46,6 +46,8 @@ export default async function imagesToDateRangeFolder(filePaths) {
   }
 
   console.log('groups', groups)
+
+  return 'test test'
 }
 
 function isWithinThreeDays(date1, date2) {
