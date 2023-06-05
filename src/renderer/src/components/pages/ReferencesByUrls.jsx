@@ -3,6 +3,7 @@ import ResultPage from '../page/ResultPage'
 import TextArea from '../TextArea'
 
 export default function ReferencesByUrls(props) {
+  const [getOutput, setGetOutput] = createSignal(function () {})
   const [textAreaValue, setTextAreaValue] = createSignal('')
   const [isValid, setIsValid] = createSignal('')
   const [references, setReferences] = createSignal('')
@@ -17,7 +18,11 @@ export default function ReferencesByUrls(props) {
     }
   }
 
-  async function submit() {
+  function submit() {
+    setGetOutput(setStateOutputComponent)
+  }
+
+  async function setStateOutputComponent() {
     const result = await window.references.getReferencesByUrls(textAreaValue())
     setReferences(result)
   }
@@ -44,13 +49,12 @@ export default function ReferencesByUrls(props) {
 
   const outputComponent = <textarea readonly value={references()} class="textarea-height-5" />
 
-  // TODO: getOutput
   return (
     <ResultPage
       title={props.title}
       inputComponent={inputComponent}
       outputComponent={outputComponent}
-      getOutput={function () {}}
+      getOutput={getOutput}
       onLoading={props.onLoading}
     />
   )
