@@ -3,11 +3,16 @@ import TextResultPage from '../page/TextResultPage'
 import FileOrFolderInput from '../FileOrFolderInput'
 
 export default function LinesOfCode(props) {
+  const [getOutput, setGetOutput] = createSignal(function () {})
   const [linesOfCode, setLinesOfCode] = createSignal(0)
 
-  async function handleFilePaths(filePaths) {
+  async function setOutput(filePaths) {
     const linesOfCode = await window.codeQuality.getLinesOfCode(filePaths)
     setLinesOfCode(linesOfCode)
+  }
+
+  function handleFilePaths(filePaths) {
+    setGetOutput(setOutput(filePaths))
   }
 
   const inputComponent = <FileOrFolderInput onChange={handleFilePaths} minimumFiles={1} />
@@ -17,8 +22,7 @@ export default function LinesOfCode(props) {
       title={props.title}
       inputComponent={inputComponent}
       output={`Lines of code: ${linesOfCode()}`}
-      minimumFiles={1}
-      handleFilePaths={handleFilePaths}
+      getOutput={getOutput}
       onLoading={props.onLoading}
     />
   )

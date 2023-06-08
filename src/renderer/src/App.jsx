@@ -10,7 +10,6 @@ import PageNavigator from './components/PageNavigator'
 
 // TODO: remove some createEffects
 // TODO: remove useless comments
-// TODO: remove ResultByFilesPage
 function App() {
   const [loading, setLoading] = createSignal(false)
   const duplicateFilesTitle = 'Duplicate Files'

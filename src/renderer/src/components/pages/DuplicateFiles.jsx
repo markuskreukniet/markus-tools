@@ -1,15 +1,23 @@
 import { createSignal } from 'solid-js'
-import ResultByFilesPage from '../page/ResultByFilesPage'
+import ResultPage from '../page/ResultPage'
+import FileOrFolderInput from '../FileOrFolderInput'
 import TextArea from '../TextArea'
 
 export default function DuplicateFiles(props) {
+  const [getOutput, setGetOutput] = createSignal(function () {})
   const [duplicateFiles, setDuplicateFiles] = createSignal('')
 
-  async function setState(filePaths) {
+  async function setStateOutputComponent(filePaths) {
     const duplicateFiles = await window.duplicateFiles.getDuplicateFiles(filePaths)
     const textareaValue = duplicateFiles !== '' ? duplicateFiles : 'No duplicate files found'
     setDuplicateFiles(textareaValue)
   }
+
+  function handleFilePaths(filePaths) {
+    setGetOutput(setStateOutputComponent(filePaths))
+  }
+
+  const inputComponent = <FileOrFolderInput onChange={handleFilePaths} minimumFiles={2} />
 
   const placeholderContent = (
     <>
@@ -29,11 +37,11 @@ export default function DuplicateFiles(props) {
   )
 
   return (
-    <ResultByFilesPage
+    <ResultPage
       title={props.title}
+      inputComponent={inputComponent}
       outputComponent={outputComponent}
-      minimumFiles={2}
-      handleFilePaths={setState}
+      getOutput={getOutput}
       onLoading={props.onLoading}
     />
   )
