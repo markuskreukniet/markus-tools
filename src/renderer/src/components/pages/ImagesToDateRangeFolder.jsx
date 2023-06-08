@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js'
+import TextResultPage from '../page/TextResultPage'
 import FileOrFolderInput from '../FileOrFolderInput'
-import ResultPage from '../page/ResultPage'
 
 export default function ImagesToDateRangeFolder(props) {
   const [status, setStatus] = createSignal('select and submit a folder')
@@ -17,13 +17,12 @@ export default function ImagesToDateRangeFolder(props) {
       <input type="text" placeholder="" />
     </div>
   )
-  const outputComponent = <p>{status()}</p>
 
   return (
-    <ResultPage
+    <TextResultPage
       title={props.title}
       inputComponent={inputComponent}
-      outputComponent={outputComponent}
+      output={status()}
       getOutput={handleFilePaths}
       onLoading={props.onLoading}
     />

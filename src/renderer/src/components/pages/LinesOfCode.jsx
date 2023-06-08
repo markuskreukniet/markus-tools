@@ -1,20 +1,24 @@
 import { createSignal } from 'solid-js'
-import TextResultByFilesPage from '../page/TextResultByFilesPage'
+import TextResultPage from '../page/TextResultPage'
+import FileOrFolderInput from '../FileOrFolderInput'
 
 export default function LinesOfCode(props) {
   const [linesOfCode, setLinesOfCode] = createSignal(0)
 
-  async function setState(filePaths) {
+  async function handleFilePaths(filePaths) {
     const linesOfCode = await window.codeQuality.getLinesOfCode(filePaths)
     setLinesOfCode(linesOfCode)
   }
 
+  const inputComponent = <FileOrFolderInput onChange={handleFilePaths} minimumFiles={1} />
+
   return (
-    <TextResultByFilesPage
+    <TextResultPage
       title={props.title}
+      inputComponent={inputComponent}
       output={`Lines of code: ${linesOfCode()}`}
       minimumFiles={1}
-      handleFilePaths={setState}
+      handleFilePaths={handleFilePaths}
       onLoading={props.onLoading}
     />
   )
