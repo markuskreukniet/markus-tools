@@ -3,6 +3,7 @@ import TextResultPage from '../page/TextResultPage'
 import FileOrFolderInput from '../FileOrFolderInput'
 
 export default function ImagesToDateRangeFolder(props) {
+  let resultPath = ''
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [status, setStatus] = createSignal('')
 
@@ -12,14 +13,14 @@ export default function ImagesToDateRangeFolder(props) {
   }
 
   function handleFilePaths(filePaths) {
-    setGetOutput(setState(filePaths, 'C:\\Users\\shono\\Desktop\\test'))
+    setGetOutput(setState(filePaths, resultPath))
   }
 
   // TODO: placeholder or label?
   const inputComponent = (
     <div>
       <FileOrFolderInput onChange={handleFilePaths} minimumFiles={2} />
-      <input type="text" placeholder="" />
+      <input type="text" placeholder="" onChange={(e) => (resultPath = e.target.value)} />
     </div>
   )
 
