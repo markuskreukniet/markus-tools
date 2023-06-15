@@ -9,7 +9,7 @@ export default async function imagesToDateRangeFolder(filePaths) {
   }
 
   const groups = getDateRangeGroups(filePaths)
-  groupsToFolders(groups, '')
+  groupsToFolders(groups, 'C:\\Users\\shono\\Desktop\\test')
 
   return true
 }
@@ -57,7 +57,48 @@ function isWithinThreeDays(date1, date2) {
   return days <= 3
 }
 
-function groupsToFolders(groups, path) {}
+function groupsToFolders(groups, path) {
+  for (const group of groups) {
+    const oldestDate = formatBirthtime(group[0].dateCreated)
+    const newestDate = formatBirthtime(group[group.length - 1].dateCreated)
+
+    let subFolderPath = `${path}/${oldestDate}`
+    if (oldestDate !== newestDate) {
+      subFolderPath = `${subFolderPath} - ${newestDate}`
+    }
+
+    if (!fs.existsSync(subFolderPath)) {
+      fs.mkdirSync(subFolderPath)
+    }
+
+    for (const combination of group) {
+      const fileName = combination.path.split('\\').pop().split('/').pop()
+
+      fs.copyFile(combination.path, `${subFolderPath}/${fileName}`, (err) => {
+        if (err) {
+          throw err
+        }
+      })
+    }
+  }
+}
+
+function formatBirthtime(birthtime) {
+  const date = new Date(birthtime)
+  const day = date.getDate()
+  // Months are zero-based
+  const month = date.getMonth() + 1
+  const year = date.getFullYear()
+
+  const formattedDay = addPrefix0IfLessThan10(day)
+  const formattedMonth = addPrefix0IfLessThan10(month)
+
+  return `${formattedDay}-${formattedMonth}-${year}`
+}
+
+function addPrefix0IfLessThan10(number) {
+  return number < 10 ? `0${number}` : number
+}
 
 function compare(a, b) {
   if (a.dateCreated < b.dateCreated) {
