@@ -8,7 +8,8 @@ export default function ImagesToDateRangeFolder(props) {
   const [status, setStatus] = createSignal('')
 
   async function setState(filePaths, path) {
-    const status = await window.dateRangeFolder.moveImagesToDateRangeFolder(filePaths, path)
+    const done = await window.dateRangeFolder.moveImagesToDateRangeFolder(filePaths, path)
+    const status = done ? 'done' : 'not done'
     setStatus(status)
   }
 
