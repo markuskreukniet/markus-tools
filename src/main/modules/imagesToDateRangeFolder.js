@@ -34,16 +34,12 @@ export default async function imagesToDateRangeFolder(filePaths) {
     if (isWithinThreeDays(combination.dateCreated, combination2.dateCreated)) {
       group.push(combination2)
     } else {
-      if (group.length > 0) {
-        groups.push(group)
-      }
-      group = []
+      groups.push(group)
+      group = [combination2]
     }
   }
 
-  if (group.length > 0) {
-    groups.push(group)
-  }
+  groups.push(group)
 
   console.log('groups', groups)
 

@@ -3,11 +3,16 @@ import TextResultPage from '../page/TextResultPage'
 import FileOrFolderInput from '../FileOrFolderInput'
 
 export default function ImagesToDateRangeFolder(props) {
-  const [status, setStatus] = createSignal('select and submit a folder')
+  const [getOutput, setGetOutput] = createSignal(function () {})
+  const [status, setStatus] = createSignal('')
 
-  async function handleFilePaths(filePaths) {
+  async function setState(filePaths) {
     const status = await window.dateRangeFolder.moveImagesToDateRangeFolder(filePaths)
     setStatus(status)
+  }
+
+  function handleFilePaths(filePaths) {
+    setGetOutput(setState(filePaths))
   }
 
   // TODO: placeholder or label?
@@ -23,7 +28,7 @@ export default function ImagesToDateRangeFolder(props) {
       title={props.title}
       inputComponent={inputComponent}
       output={status()}
-      getOutput={handleFilePaths}
+      getOutput={getOutput}
       onLoading={props.onLoading}
     />
   )
