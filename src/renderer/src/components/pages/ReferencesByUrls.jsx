@@ -19,7 +19,7 @@ export default function ReferencesByUrls(props) {
   }
 
   function submit() {
-    setGetOutput(setStateOutputComponent)
+    setGetOutput(setStateOutputComponent())
   }
 
   async function setStateOutputComponent() {
