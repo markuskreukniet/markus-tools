@@ -38,7 +38,6 @@ export default async function imagesToDateRangeFolder(filePaths) {
       group = [combination2]
     }
   }
-
   groups.push(group)
 
   console.log('groups', groups)
