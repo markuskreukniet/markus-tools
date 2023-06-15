@@ -2,14 +2,14 @@ import fs from 'fs'
 import isNotAZeroByteFile from './fileHelper.js'
 
 // TODO: function looks a lot like duplicateFiles
-export default async function imagesToDateRangeFolder(filePaths) {
+export default async function imagesToDateRangeFolder(filePaths, path) {
   // TODO: also in duplicateFiles and check return type
   if (filePaths.length < 2) {
     return false
   }
 
   const groups = getDateRangeGroups(filePaths)
-  groupsToFolders(groups, 'C:\\Users\\shono\\Desktop\\test')
+  groupsToFolders(groups, path)
 
   return true
 }

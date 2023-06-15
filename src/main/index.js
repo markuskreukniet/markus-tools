@@ -93,7 +93,7 @@ async function getReferencesByUrls(e, urlsString) {
 ipcMain.handle('getReferencesByUrls', getReferencesByUrls)
 
 import imagesToDateRangeFolder from './modules/imagesToDateRangeFolder'
-async function moveImagesToDateRangeFolder(e, filePaths) {
-  return imagesToDateRangeFolder(filePaths)
+async function moveImagesToDateRangeFolder(e, filePaths, path) {
+  return imagesToDateRangeFolder(filePaths, path)
 }
 ipcMain.handle('moveImagesToDateRangeFolder', moveImagesToDateRangeFolder)

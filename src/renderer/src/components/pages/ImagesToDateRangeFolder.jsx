@@ -6,13 +6,13 @@ export default function ImagesToDateRangeFolder(props) {
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [status, setStatus] = createSignal('')
 
-  async function setState(filePaths) {
-    const status = await window.dateRangeFolder.moveImagesToDateRangeFolder(filePaths)
+  async function setState(filePaths, path) {
+    const status = await window.dateRangeFolder.moveImagesToDateRangeFolder(filePaths, path)
     setStatus(status)
   }
 
   function handleFilePaths(filePaths) {
-    setGetOutput(setState(filePaths))
+    setGetOutput(setState(filePaths, 'C:\\Users\\shono\\Desktop\\test'))
   }
 
   // TODO: placeholder or label?
