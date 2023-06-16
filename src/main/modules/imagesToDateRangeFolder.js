@@ -58,9 +58,14 @@ function isWithinThreeDays(date1, date2) {
 }
 
 function groupsToFolders(groups, path) {
+  // const directories = getSubdirectories(path)
+
   for (const group of groups) {
     const oldestDate = formatBirthtime(group[0].dateCreated)
     const newestDate = formatBirthtime(group[group.length - 1].dateCreated)
+
+    // for (const directory of directories) {
+    // }
 
     let subFolderPath = `${path}/${oldestDate}`
     if (oldestDate !== newestDate) {
@@ -81,6 +86,26 @@ function groupsToFolders(groups, path) {
       })
     }
   }
+}
+
+function getSubdirectories(path) {
+  const subdirectories = []
+
+  try {
+    const files = fs.readdirSync(path)
+
+    files.forEach((file) => {
+      const stats = fs.statSync(`${path}/${file}`)
+
+      if (stats.isDirectory()) {
+        subdirectories.push(file)
+      }
+    })
+  } catch (error) {
+    console.error('Error occurred while reading the folder:', error)
+  }
+
+  return subdirectories
 }
 
 function formatBirthtime(birthtime) {
