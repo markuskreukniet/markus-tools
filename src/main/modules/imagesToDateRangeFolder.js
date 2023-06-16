@@ -88,6 +88,33 @@ function groupsToFolders(groups, path) {
   }
 }
 
+function isBetweenDate(firstDate, secondDate, thirdDate) {
+  const firstParts = firstDate.split('-')
+  const secondParts = secondDate.split('-')
+  const thirdParts = thirdDate.split('-')
+
+  const firstDay = parseInt(firstParts[0], 10)
+  // Months are zero-based
+  const firstMonth = parseInt(firstParts[1], 10) - 1
+  const firstYear = parseInt(firstParts[2], 10)
+
+  const secondDay = parseInt(secondParts[0], 10)
+  // Months are zero-based
+  const secondMonth = parseInt(secondParts[1], 10) - 1
+  const secondYear = parseInt(secondParts[2], 10)
+
+  const thirdDay = parseInt(thirdParts[0], 10)
+  // Months are zero-based
+  const thirdMonth = parseInt(thirdParts[1], 10) - 1
+  const thirdYear = parseInt(thirdParts[2], 10)
+
+  const newFirstDate = new Date(firstYear, firstMonth, firstDay)
+  const newSecondDate = new Date(secondYear, secondMonth, secondDay)
+  const newThirdDate = new Date(thirdYear, thirdMonth, thirdDay)
+
+  return newThirdDate > newFirstDate && newThirdDate < newSecondDate
+}
+
 function isValidDateFormat(dateString) {
   const dateParts = dateString.split('-')
 
