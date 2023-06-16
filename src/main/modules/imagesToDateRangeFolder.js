@@ -88,6 +88,29 @@ function groupsToFolders(groups, path) {
   }
 }
 
+function isValidDateFormat(dateString) {
+  const dateParts = dateString.split('-')
+
+  if (dateParts.length !== 3) {
+    return false
+  }
+
+  const day = parseInt(dateParts[0], 10)
+  const month = parseInt(dateParts[1], 10)
+  const year = parseInt(dateParts[2], 10)
+
+  return !(
+    isNaN(day) ||
+    isNaN(month) ||
+    isNaN(year) ||
+    day < 1 ||
+    day > 31 ||
+    month < 1 ||
+    month > 12 ||
+    year < 0
+  )
+}
+
 function getSubdirectories(path) {
   const subdirectories = []
 
