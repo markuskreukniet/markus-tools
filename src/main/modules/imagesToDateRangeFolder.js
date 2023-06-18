@@ -57,14 +57,33 @@ function isWithinThreeDays(date1, date2) {
   return days <= 3
 }
 
+function getDirectoryDates(directories) {
+  const result = []
+  const separator = ' - '
+
+  for (const directory of directories) {
+    if (directory.includes(separator)) {
+      const directoryParts = directory.split(separator)
+      if (directoryParts[0] && directoryParts[1]) {
+        result.push([...directoryParts])
+      } else if (isValidDateFormat(directory)) {
+        result.push([directory])
+      }
+    }
+  }
+
+  return result
+}
+
 function groupsToFolders(groups, path) {
-  // const directories = getSubdirectories(path)
+  const directories = getSubdirectories(path)
+  const directoryDates = getDirectoryDates(directories)
 
   for (const group of groups) {
     const oldestDate = formatBirthtime(group[0].dateCreated)
     const newestDate = formatBirthtime(group[group.length - 1].dateCreated)
 
-    // for (const directory of directories) {
+    // for (const dates of directoryDates) {
     // }
 
     let subFolderPath = `${path}/${oldestDate}`
