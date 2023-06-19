@@ -78,6 +78,30 @@ function getDirectoryDates(directories) {
   return result
 }
 
+function setOldestDate(oldestDate, dates) {
+  let result = oldestDate
+
+  for (let i = dates.length - 1; i >= 0; i--) {
+    if (dates[i] < result && isWithinThreeDays(dates[i], result)) {
+      result = dates[i]
+    }
+  }
+
+  return result
+}
+
+function setNewestDate(newestDate, dates) {
+  let result = newestDate
+
+  for (const date of dates) {
+    if (date > result && isWithinThreeDays(date, result)) {
+      result = date
+    }
+  }
+
+  return result
+}
+
 function groupsToFolders(groups, path) {
   const directories = getSubdirectories(path)
   const directoryDates = getDirectoryDates(directories)
@@ -87,6 +111,8 @@ function groupsToFolders(groups, path) {
     const newestDate = formatBirthtime(group[group.length - 1].dateCreated)
 
     // for (const dates of directoryDates) {
+    //   oldestDate = setOldestDate(oldestDate, dates)
+    //   newestDate = setNewestDate(oldestDate, dates)
     // }
 
     let subFolderPath = `${path}/${oldestDate}`
