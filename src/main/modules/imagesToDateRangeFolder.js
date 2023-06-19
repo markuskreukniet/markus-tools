@@ -57,7 +57,11 @@ function isWithinThreeDays(date1, date2) {
   return days <= 3
 }
 
-function getDirectoryDates(directories) {
+function toCombination(directory, dates) {
+  return { directory: directory, dates: [...dates] }
+}
+
+function addDirectoryDates(directories) {
   const result = []
   const separator = ' - '
 
@@ -67,11 +71,13 @@ function getDirectoryDates(directories) {
       if (isValidDateFormat(directoryParts[0]) && isValidDateFormat(directoryParts[1])) {
         const date1 = formattedDateToDate(directoryParts[0])
         const date2 = formattedDateToDate(directoryParts[1])
-        result.push([date1, date2])
+        const combination = toCombination(directory, [date1, date2])
+        result.push(combination)
       }
     } else if (isValidDateFormat(directory)) {
       const date = formattedDateToDate(directory)
-      result.push([date])
+      const combination = toCombination(directory, [date])
+      result.push(combination)
     }
   }
 
@@ -112,7 +118,7 @@ function getSubFolderPath(path, oldestDate, newestDate) {
 
 function groupsToFolders(groups, path) {
   const directories = getSubdirectories(path)
-  const directoryDates = getDirectoryDates(directories)
+  const directoryCombinations = addDirectoryDates(directories)
 
   for (const group of groups) {
     let oldestDate = formatBirthtime(group[0].dateCreated)
@@ -120,9 +126,9 @@ function groupsToFolders(groups, path) {
 
     let subFolderPathFiles = getSubFolderPath(path, oldestDate, newestDate)
 
-    for (const dates of directoryDates) {
-      oldestDate = setOldestDate(oldestDate, dates)
-      newestDate = setNewestDate(oldestDate, dates)
+    for (const combination of directoryCombinations) {
+      oldestDate = setOldestDate(oldestDate, combination.dates)
+      newestDate = setNewestDate(oldestDate, combination.dates)
     }
 
     let subFolderPathFilesAndFolder = getSubFolderPath(path, oldestDate, newestDate)
