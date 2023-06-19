@@ -102,32 +102,39 @@ function setNewestDate(newestDate, dates) {
   return result
 }
 
+function getSubFolderPath(path, oldestDate, newestDate) {
+  let subFolderPathFiles = `${path}/${oldestDate}`
+  if (oldestDate !== newestDate) {
+    subFolderPathFiles = `${subFolderPathFiles} - ${newestDate}`
+  }
+  return subFolderPathFiles
+}
+
 function groupsToFolders(groups, path) {
   const directories = getSubdirectories(path)
   const directoryDates = getDirectoryDates(directories)
 
   for (const group of groups) {
-    const oldestDate = formatBirthtime(group[0].dateCreated)
-    const newestDate = formatBirthtime(group[group.length - 1].dateCreated)
+    let oldestDate = formatBirthtime(group[0].dateCreated)
+    let newestDate = formatBirthtime(group[group.length - 1].dateCreated)
 
-    // for (const dates of directoryDates) {
-    //   oldestDate = setOldestDate(oldestDate, dates)
-    //   newestDate = setNewestDate(oldestDate, dates)
-    // }
+    let subFolderPathFiles = getSubFolderPath(path, oldestDate, newestDate)
 
-    let subFolderPath = `${path}/${oldestDate}`
-    if (oldestDate !== newestDate) {
-      subFolderPath = `${subFolderPath} - ${newestDate}`
+    for (const dates of directoryDates) {
+      oldestDate = setOldestDate(oldestDate, dates)
+      newestDate = setNewestDate(oldestDate, dates)
     }
 
-    if (!fs.existsSync(subFolderPath)) {
-      fs.mkdirSync(subFolderPath)
+    let subFolderPathFilesAndFolder = getSubFolderPath(path, oldestDate, newestDate)
+
+    if (!fs.existsSync(subFolderPathFiles)) {
+      fs.mkdirSync(subFolderPathFiles)
     }
 
     for (const combination of group) {
       const fileName = combination.path.split('\\').pop().split('/').pop()
 
-      fs.copyFile(combination.path, `${subFolderPath}/${fileName}`, (err) => {
+      fs.copyFile(combination.path, `${subFolderPathFiles}/${fileName}`, (err) => {
         if (err) {
           throw err
         }
