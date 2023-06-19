@@ -64,11 +64,11 @@ function getDirectoryDates(directories) {
   for (const directory of directories) {
     if (directory.includes(separator)) {
       const directoryParts = directory.split(separator)
-      if (directoryParts[0] && directoryParts[1]) {
+      if (isValidDateFormat(directoryParts[0]) && isValidDateFormat(directoryParts[1])) {
         result.push([...directoryParts])
-      } else if (isValidDateFormat(directory)) {
-        result.push([directory])
       }
+    } else if (isValidDateFormat(directory)) {
+      result.push([directory])
     }
   }
 
