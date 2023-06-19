@@ -65,10 +65,13 @@ function getDirectoryDates(directories) {
     if (directory.includes(separator)) {
       const directoryParts = directory.split(separator)
       if (isValidDateFormat(directoryParts[0]) && isValidDateFormat(directoryParts[1])) {
-        result.push([...directoryParts])
+        const date1 = formattedDateToDate(directoryParts[0])
+        const date2 = formattedDateToDate(directoryParts[1])
+        result.push([date1, date2])
       }
     } else if (isValidDateFormat(directory)) {
-      result.push([directory])
+      const date = formattedDateToDate(directory)
+      result.push([date])
     }
   }
 
@@ -108,29 +111,22 @@ function groupsToFolders(groups, path) {
 }
 
 function isBetweenDate(firstDate, secondDate, thirdDate) {
-  // Months are zero-based, therefore - 1
-
-  const firstParts = firstDate.split('-')
-  const secondParts = secondDate.split('-')
-  const thirdParts = thirdDate.split('-')
-
-  const firstDay = parseInt(firstParts[0], 10)
-  const firstMonth = parseInt(firstParts[1], 10) - 1
-  const firstYear = parseInt(firstParts[2], 10)
-
-  const secondDay = parseInt(secondParts[0], 10)
-  const secondMonth = parseInt(secondParts[1], 10) - 1
-  const secondYear = parseInt(secondParts[2], 10)
-
-  const thirdDay = parseInt(thirdParts[0], 10)
-  const thirdMonth = parseInt(thirdParts[1], 10) - 1
-  const thirdYear = parseInt(thirdParts[2], 10)
-
-  const newFirstDate = new Date(firstYear, firstMonth, firstDay)
-  const newSecondDate = new Date(secondYear, secondMonth, secondDay)
-  const newThirdDate = new Date(thirdYear, thirdMonth, thirdDay)
+  const newFirstDate = formattedDateToDate(firstDate)
+  const newSecondDate = formattedDateToDate(secondDate)
+  const newThirdDate = formattedDateToDate(thirdDate)
 
   return newThirdDate > newFirstDate && newThirdDate < newSecondDate
+}
+
+function formattedDateToDate(formattedDate) {
+  const formattedDateParts = formattedDate.split('-')
+
+  const day = parseInt(formattedDateParts[0], 10)
+  // Months are zero-based, therefore - 1
+  const month = parseInt(formattedDateParts[1], 10) - 1
+  const year = parseInt(formattedDateParts[2], 10)
+
+  return new Date(year, month, day)
 }
 
 function isValidDateFormat(dateString) {
