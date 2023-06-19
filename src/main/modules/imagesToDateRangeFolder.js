@@ -8,10 +8,36 @@ export default async function imagesToDateRangeFolder(filePaths, path) {
     return false
   }
 
-  const groups = getDateRangeGroups(filePaths)
+  let groups = getDateRangeGroups(filePaths)
+  // const combinations = getDirectoryDatesCombinations(path)
+  // groups = combineDateRangeGroupsAndDirectoryDatesCombinationsToDateRangeGroups(
+  //   groups,
+  //   combinations
+  // )
   groupsToFolders(groups, path)
 
   return true
+}
+
+function combineDateRangeGroupsAndDirectoryDatesCombinationsToDateRangeGroups(
+  groups,
+  combinations
+) {
+  for (const group of groups) {
+    for (let i = 0; i < group.length; i++) {
+      for (const combination of combinations) {
+        // date is same or within 3 days
+        for (const date of combination.dates) {
+          if (group[i].dateCreated === date) {
+            const filePaths = getFilePaths()
+            group.splice(i, 0, filePaths)
+          }
+        }
+      }
+    }
+  }
+
+  return groups
 }
 
 function getDateRangeGroups(filePaths) {
@@ -61,7 +87,7 @@ function toCombination(directory, dates) {
   return { directory: directory, dates: [...dates] }
 }
 
-function addDirectoryDates(directories) {
+function getDirectoryDatesCombinations(directories) {
   const result = []
   const separator = ' - '
 
@@ -117,30 +143,25 @@ function getSubFolderPath(path, oldestDate, newestDate) {
 }
 
 function groupsToFolders(groups, path) {
-  const directories = getSubdirectories(path)
-  const directoryCombinations = addDirectoryDates(directories)
+  // const directories = getSubdirectories(path)
 
   for (const group of groups) {
-    let oldestDate = formatBirthtime(group[0].dateCreated)
-    let newestDate = formatBirthtime(group[group.length - 1].dateCreated)
+    const oldestDate = formatBirthtime(group[0].dateCreated)
+    const newestDate = formatBirthtime(group[group.length - 1].dateCreated)
 
-    let subFolderPathFiles = getSubFolderPath(path, oldestDate, newestDate)
+    // for (const directory of directories) {
+    // }
 
-    for (const combination of directoryCombinations) {
-      oldestDate = setOldestDate(oldestDate, combination.dates)
-      newestDate = setNewestDate(oldestDate, combination.dates)
+    let subFolderPath = `${path}/${oldestDate}`
+    if (oldestDate !== newestDate) {
+      subFolderPath = `${subFolderPath} - ${newestDate}`
     }
-
-    let subFolderPathFilesAndFolder = getSubFolderPath(path, oldestDate, newestDate)
-
-    if (!fs.existsSync(subFolderPathFiles)) {
-      fs.mkdirSync(subFolderPathFiles)
+    if (!fs.existsSync(subFolderPath)) {
+      fs.mkdirSync(subFolderPath)
     }
-
     for (const combination of group) {
       const fileName = combination.path.split('\\').pop().split('/').pop()
-
-      fs.copyFile(combination.path, `${subFolderPathFiles}/${fileName}`, (err) => {
+      fs.copyFile(combination.path, `${subFolderPath}/${fileName}`, (err) => {
         if (err) {
           throw err
         }
@@ -191,6 +212,31 @@ function isValidDateFormat(dateString) {
   )
 }
 
+function combinePathAndFile(path, file) {
+  return `${path}/${file}`
+}
+
+function getFilePaths(path) {
+  const filePaths = []
+
+  try {
+    const files = fs.readdirSync(path)
+
+    files.forEach((file) => {
+      const filePath = combinePathAndFile(path, file)
+      const stats = fs.statSync(filePath)
+
+      if (stats.isFile()) {
+        filePaths.push(filePath)
+      }
+    })
+  } catch (error) {
+    console.error('Error occurred while reading the folder:', error)
+  }
+
+  return filePaths
+}
+
 function getSubdirectories(path) {
   const subdirectories = []
 
@@ -198,7 +244,8 @@ function getSubdirectories(path) {
     const files = fs.readdirSync(path)
 
     files.forEach((file) => {
-      const stats = fs.statSync(`${path}/${file}`)
+      const filePath = combinePathAndFile(path, file)
+      const stats = fs.statSync(filePath)
 
       if (stats.isDirectory()) {
         subdirectories.push(file)
