@@ -8,13 +8,9 @@ export default async function imagesToDateRangeFolder(filePaths, path) {
     return false
   }
 
-  console.log('filePaths', filePaths)
-
   const directoryPaths = getSubdirectoryPaths(path)
-  console.log('directoryPaths', directoryPaths)
   const directoryFilePaths = getSubdirectoryFilePaths(directoryPaths)
-  console.log('directoryFilePaths', directoryFilePaths)
-  //filePaths.push(directoryFilePaths)
+  filePaths.push(...directoryFilePaths)
   const groups = getDateRangeGroups(filePaths)
   groupsToFolders(groups, path)
 
