@@ -56,7 +56,7 @@ function getDateRangeGroups(filePaths) {
         path.endsWith('png') ||
         path.endsWith('gif'))
     ) {
-      pathDateCreatedCombinations.push({ path, dateCreated: stats.birthtime })
+      pathDateCreatedCombinations.push({ path, dateCreated: stats.mtime })
     }
   }
 
@@ -89,8 +89,8 @@ function isWithinThreeDays(date1, date2) {
 
 function groupsToFolders(groups, path) {
   for (const group of groups) {
-    const oldestDate = formatBirthtime(group[0].dateCreated)
-    const newestDate = formatBirthtime(group[group.length - 1].dateCreated)
+    const oldestDate = formatTime(group[0].dateCreated)
+    const newestDate = formatTime(group[group.length - 1].dateCreated)
 
     let subFolderPath = `${path}/${oldestDate}`
     if (oldestDate !== newestDate) {
@@ -179,8 +179,8 @@ function getSubdirectoryPaths(path) {
   return paths
 }
 
-function formatBirthtime(birthtime) {
-  const date = new Date(birthtime)
+function formatTime(time) {
+  const date = new Date(time)
   const day = date.getDate()
   // Months are zero-based
   const month = date.getMonth() + 1
