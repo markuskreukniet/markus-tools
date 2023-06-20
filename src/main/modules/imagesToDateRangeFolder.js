@@ -55,7 +55,8 @@ function getDateRangeGroups(filePaths) {
       (path.endsWith('jpg') ||
         path.endsWith('jpeg') ||
         path.endsWith('png') ||
-        path.endsWith('gif'))
+        path.endsWith('gif') ||
+        path.endsWith('webp'))
     ) {
       pathDateCreatedCombinations.push({ path, dateCreated: stats.mtime })
     }
