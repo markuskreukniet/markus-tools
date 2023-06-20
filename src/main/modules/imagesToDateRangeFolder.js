@@ -118,9 +118,9 @@ function isValidDateFormat(dateString) {
     return false
   }
 
-  const day = parseInt(dateParts[0], 10)
+  const year = parseInt(dateParts[0], 10)
   const month = parseInt(dateParts[1], 10)
-  const year = parseInt(dateParts[2], 10)
+  const day = parseInt(dateParts[2], 10)
 
   return !(
     isNaN(day) ||
@@ -190,7 +190,7 @@ function formatTime(time) {
   const formattedDay = addPrefix0IfLessThan10(day)
   const formattedMonth = addPrefix0IfLessThan10(month)
 
-  return `${formattedDay}-${formattedMonth}-${year}`
+  return `${year}-${formattedMonth}-${formattedDay}`
 }
 
 function addPrefix0IfLessThan10(number) {
