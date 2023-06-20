@@ -8,38 +8,40 @@ export default async function imagesToDateRangeFolder(filePaths, path) {
     return false
   }
 
-  const paths = getSubdirectoryPaths(path)
-  const combinations = getDirectoryDatesCombinations(paths)
+  const directoryPaths = getSubdirectoryPaths(path)
+  const directoryFilePaths = getSubdirectoryFilePaths(directoryPaths)
+  filePaths.push(directoryFilePaths)
   const groups = getDateRangeGroups(filePaths)
-
-  // groups = combineDateRangeGroupsAndDirectoryDatesCombinationsToDateRangeGroups(
-  //   groups,
-  //   combinations
-  // )
   groupsToFolders(groups, path)
 
   return true
 }
 
-function combineDateRangeGroupsAndDirectoryDatesCombinationsToDateRangeGroups(
-  groups,
-  combinations
-) {
-  for (const group of groups) {
-    for (let i = 0; i < group.length; i++) {
-      for (const combination of combinations) {
-        // date is same or within 3 days
-        for (const date of combination.dates) {
-          if (group[i].dateCreated === date) {
-            const filePaths = getFilePaths()
-            group.splice(i, 0, filePaths)
-          }
-        }
+function getSubdirectoryFilePaths(paths) {
+  let result = []
+  const separator = ' - '
+
+  for (const path of paths) {
+    const pathParts = path.split('/')
+    const lastPathPart = pathParts[pathParts.length - 1]
+
+    if (lastPathPart.includes(separator)) {
+      const directoryParts = lastPathPart.split(separator)
+      if (isValidDateFormat(directoryParts[0]) && isValidDateFormat(directoryParts[1])) {
+        result = addFilePaths(result, path)
       }
+    } else if (isValidDateFormat(lastPathPart)) {
+      result = addFilePaths(result, path)
     }
   }
 
-  return groups
+  return result
+}
+
+function addFilePaths(result, path) {
+  const filePaths = getFilePaths(path)
+  result.push(filePaths)
+  return result
 }
 
 function getDateRangeGroups(filePaths) {
@@ -85,74 +87,10 @@ function isWithinThreeDays(date1, date2) {
   return days <= 3
 }
 
-function toCombination(directory, dates) {
-  return { directory: directory, dates: [...dates] }
-}
-
-function getDirectoryDatesCombinations(directories) {
-  const result = []
-  const separator = ' - '
-
-  for (const directory of directories) {
-    if (directory.includes(separator)) {
-      const directoryParts = directory.split(separator)
-      if (isValidDateFormat(directoryParts[0]) && isValidDateFormat(directoryParts[1])) {
-        const date1 = formattedDateToDate(directoryParts[0])
-        const date2 = formattedDateToDate(directoryParts[1])
-        const combination = toCombination(directory, [date1, date2])
-        result.push(combination)
-      }
-    } else if (isValidDateFormat(directory)) {
-      const date = formattedDateToDate(directory)
-      const combination = toCombination(directory, [date])
-      result.push(combination)
-    }
-  }
-
-  return result
-}
-
-function setOldestDate(oldestDate, dates) {
-  let result = oldestDate
-
-  for (let i = dates.length - 1; i >= 0; i--) {
-    if (dates[i] < result && isWithinThreeDays(dates[i], result)) {
-      result = dates[i]
-    }
-  }
-
-  return result
-}
-
-function setNewestDate(newestDate, dates) {
-  let result = newestDate
-
-  for (const date of dates) {
-    if (date > result && isWithinThreeDays(date, result)) {
-      result = date
-    }
-  }
-
-  return result
-}
-
-function getSubFolderPath(path, oldestDate, newestDate) {
-  let subFolderPathFiles = `${path}/${oldestDate}`
-  if (oldestDate !== newestDate) {
-    subFolderPathFiles = `${subFolderPathFiles} - ${newestDate}`
-  }
-  return subFolderPathFiles
-}
-
 function groupsToFolders(groups, path) {
-  // const directories = getSubdirectories(path)
-
   for (const group of groups) {
     const oldestDate = formatBirthtime(group[0].dateCreated)
     const newestDate = formatBirthtime(group[group.length - 1].dateCreated)
-
-    // for (const directory of directories) {
-    // }
 
     let subFolderPath = `${path}/${oldestDate}`
     if (oldestDate !== newestDate) {
@@ -170,25 +108,6 @@ function groupsToFolders(groups, path) {
       })
     }
   }
-}
-
-function isBetweenDate(firstDate, secondDate, thirdDate) {
-  const newFirstDate = formattedDateToDate(firstDate)
-  const newSecondDate = formattedDateToDate(secondDate)
-  const newThirdDate = formattedDateToDate(thirdDate)
-
-  return newThirdDate > newFirstDate && newThirdDate < newSecondDate
-}
-
-function formattedDateToDate(formattedDate) {
-  const formattedDateParts = formattedDate.split('-')
-
-  const day = parseInt(formattedDateParts[0], 10)
-  // Months are zero-based, therefore - 1
-  const month = parseInt(formattedDateParts[1], 10) - 1
-  const year = parseInt(formattedDateParts[2], 10)
-
-  return new Date(year, month, day)
 }
 
 function isValidDateFormat(dateString) {
@@ -246,7 +165,7 @@ function getSubdirectoryPaths(path) {
     const files = fs.readdirSync(path)
 
     files.forEach((file) => {
-      const filePath = `${path}/${file}`
+      const filePath = combinePathAndFile(path, file)
       const stats = fs.statSync(filePath)
 
       if (stats.isDirectory()) {
