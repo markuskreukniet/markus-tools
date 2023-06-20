@@ -8,8 +8,10 @@ export default async function imagesToDateRangeFolder(filePaths, path) {
     return false
   }
 
-  let groups = getDateRangeGroups(filePaths)
-  // const combinations = getDirectoryDatesCombinations(path)
+  const paths = getSubdirectoryPaths(path)
+  const combinations = getDirectoryDatesCombinations(paths)
+  const groups = getDateRangeGroups(filePaths)
+
   // groups = combineDateRangeGroupsAndDirectoryDatesCombinationsToDateRangeGroups(
   //   groups,
   //   combinations
@@ -237,25 +239,25 @@ function getFilePaths(path) {
   return filePaths
 }
 
-function getSubdirectories(path) {
-  const subdirectories = []
+function getSubdirectoryPaths(path) {
+  const paths = []
 
   try {
     const files = fs.readdirSync(path)
 
     files.forEach((file) => {
-      const filePath = combinePathAndFile(path, file)
+      const filePath = `${path}/${file}`
       const stats = fs.statSync(filePath)
 
       if (stats.isDirectory()) {
-        subdirectories.push(file)
+        paths.push(filePath)
       }
     })
   } catch (error) {
     console.error('Error occurred while reading the folder:', error)
   }
 
-  return subdirectories
+  return paths
 }
 
 function formatBirthtime(birthtime) {
