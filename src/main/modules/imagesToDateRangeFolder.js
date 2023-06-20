@@ -8,9 +8,13 @@ export default async function imagesToDateRangeFolder(filePaths, path) {
     return false
   }
 
+  console.log('filePaths', filePaths)
+
   const directoryPaths = getSubdirectoryPaths(path)
+  console.log('directoryPaths', directoryPaths)
   const directoryFilePaths = getSubdirectoryFilePaths(directoryPaths)
-  filePaths.push(directoryFilePaths)
+  console.log('directoryFilePaths', directoryFilePaths)
+  //filePaths.push(directoryFilePaths)
   const groups = getDateRangeGroups(filePaths)
   groupsToFolders(groups, path)
 
@@ -134,7 +138,7 @@ function isValidDateFormat(dateString) {
 }
 
 function combinePathAndFile(path, file) {
-  return `${path}/${file}`
+  return `${path}\\${file}`
 }
 
 function getFilePaths(path) {
