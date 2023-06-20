@@ -13,6 +13,7 @@ export default async function imagesToDateRangeFolder(filePaths, path) {
   filePaths.push(...directoryFilePaths)
   const groups = getDateRangeGroups(filePaths)
   groupsToFolders(groups, path)
+  // TODO: move files instead of copy and remove empty folders
 
   return true
 }
