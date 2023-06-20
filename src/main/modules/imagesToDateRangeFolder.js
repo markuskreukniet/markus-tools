@@ -26,7 +26,7 @@ function getSubdirectoryFilePaths(paths) {
   const separator = ' - '
 
   for (const path of paths) {
-    const pathParts = path.split('/')
+    const pathParts = path.split('\\')
     const lastPathPart = pathParts[pathParts.length - 1]
 
     if (lastPathPart.includes(separator)) {
@@ -44,7 +44,7 @@ function getSubdirectoryFilePaths(paths) {
 
 function addFilePaths(result, path) {
   const filePaths = getFilePaths(path)
-  result.push(filePaths)
+  result.push(...filePaths)
   return result
 }
 
