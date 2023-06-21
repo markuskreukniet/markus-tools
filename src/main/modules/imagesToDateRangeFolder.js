@@ -3,11 +3,6 @@ import isNotAZeroByteFile from './fileHelper.js'
 
 // TODO: function looks a lot like duplicateFiles
 export default async function imagesToDateRangeFolder(filePaths, path) {
-  // TODO: also in duplicateFiles and check return type
-  if (filePaths.length < 2) {
-    return false
-  }
-
   const directoryPaths = getSubdirectoryPaths(path)
   const directoryFilePaths = getSubdirectoryFilePaths(directoryPaths)
   filePaths.push(...directoryFilePaths)
