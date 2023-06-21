@@ -17,7 +17,7 @@ export default function ImagesToDateRangeFolder(props) {
     setGetOutput(setState(filePaths, resultPath))
   }
 
-  // TODO: placeholder or label?
+  // TODO: placeholder or label? TODO: minimumFiles should be 0 so it can only sort the files in destination path?
   const inputComponent = (
     <div>
       <FileOrFolderInput onChange={handleFilePaths} minimumFiles={2} />
