@@ -50,13 +50,14 @@ function getDateRangeGroups(filePaths) {
   const pathDateCreatedCombinations = []
   for (const path of filePaths) {
     const stats = fs.statSync(path)
+    const lowerCasePath = path.toLowerCase()
     if (
       isNotAZeroByteFile(stats) &&
-      (path.endsWith('jpg') ||
-        path.endsWith('jpeg') ||
-        path.endsWith('png') ||
-        path.endsWith('gif') ||
-        path.endsWith('webp'))
+      (lowerCasePath.endsWith('jpg') ||
+        lowerCasePath.endsWith('jpeg') ||
+        lowerCasePath.endsWith('png') ||
+        lowerCasePath.endsWith('gif') ||
+        lowerCasePath.endsWith('webp'))
     ) {
       pathDateCreatedCombinations.push({ path, dateCreated: stats.mtime })
     }
