@@ -13,7 +13,7 @@ export default async function openFileDialog(selectFolder) {
       ? getFilePathResult([], resultStatus.ok)
       : getFilePathResult(result.filePaths, resultStatus.ok)
   } catch (error) {
-    return getFilePathResult([], resultStatus.errorUserAction)
+    return getFilePathResult([], resultStatus.errorSystem)
   }
 }
 
@@ -23,5 +23,5 @@ function getFilePathResult(filePaths, status) {
 
 const resultStatus = Object.freeze({
   ok: Symbol('ok'),
-  errorUserAction: Symbol('errorUserAction')
+  errorSystem: Symbol('errorSystem')
 })
