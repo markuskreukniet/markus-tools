@@ -11,9 +11,11 @@ export default async function openFileDialog(selectFolder) {
       properties,
       filters
     })
-    return result.canceled ? getFilePathResult([], 'ok') : getFilePathResult(result.filePaths, 'ok')
+    return result.canceled
+      ? getFilePathResult([], resultStatus.ok)
+      : getFilePathResult(result.filePaths, resultStatus.ok)
   } catch (error) {
-    return getFilePathResult([], 'errorSystem')
+    return getFilePathResult([], resultStatus.errorSystem)
   }
 }
 
@@ -21,7 +23,8 @@ function getFilePathResult(filePaths, status) {
   return { result: filePaths, status }
 }
 
-// const resultStatus = Object.freeze({
-//   ok: Symbol('ok'),
-//   errorSystem: Symbol('errorSystem')
-// })
+// We can't use symbols across the Electron IPC (inter-process communication) boundary
+const resultStatus = Object.freeze({
+  ok: 'ok',
+  errorSystem: 'errorSystem'
+})
