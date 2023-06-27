@@ -36,3 +36,7 @@ contextBridge.exposeInMainWorld('dateRangeFolder', {
   moveImagesToDateRangeFolder: (filePaths, path) =>
     ipcRenderer.invoke('moveImagesToDateRangeFolder', filePaths, path)
 })
+
+contextBridge.exposeInMainWorld('dialog', {
+  openFileDialogBE: (selectFolder) => ipcRenderer.invoke('openFileDialogBE', selectFolder)
+})

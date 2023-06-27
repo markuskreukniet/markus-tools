@@ -17,11 +17,17 @@ export default function ImagesToDateRangeFolder(props) {
     setGetOutput(setState(filePaths, resultPath))
   }
 
+  async function test() {
+    const done = await window.dialog.openFileDialogBE(true)
+    console.log('done', done)
+  }
+
   // TODO: placeholder or label? TODO: minimumFiles should be 0 so it can only sort the files in destination path?
   const inputComponent = (
     <div>
       <FileOrFolderInput onChange={handleFilePaths} minimumFiles={2} />
       <input type="text" placeholder="" onChange={(e) => (resultPath = e.target.value)} />
+      <button onClick={() => test()}>test</button>
     </div>
   )
 

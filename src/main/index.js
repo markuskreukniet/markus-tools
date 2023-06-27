@@ -97,3 +97,9 @@ async function moveImagesToDateRangeFolder(e, filePaths, path) {
   return imagesToDateRangeFolder(filePaths, path)
 }
 ipcMain.handle('moveImagesToDateRangeFolder', moveImagesToDateRangeFolder)
+
+import openFileDialog from './modules/openFileDialog'
+async function openFileDialogBE(e, selectFolder) {
+  return openFileDialog(selectFolder)
+}
+ipcMain.handle('openFileDialogBE', openFileDialogBE)
