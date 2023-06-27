@@ -1,9 +1,7 @@
-import dialog from 'electron'
+import { dialog } from 'electron'
 
 export default async function openFileDialog(selectFolder) {
   console.log('selectFolder', selectFolder)
-
-  return 'test lol asdf'
 
   const properties = [selectFolder ? 'openDirectory' : 'openFile']
   const filters = selectFolder ? [{ name: 'All Files', extensions: ['*'] }] : []
@@ -13,11 +11,9 @@ export default async function openFileDialog(selectFolder) {
       properties,
       filters
     })
-    return result.canceled
-      ? getFilePathResult([], resultStatus.ok)
-      : getFilePathResult(result.filePaths, resultStatus.ok)
+    return result.canceled ? getFilePathResult([], 'ok') : getFilePathResult(result.filePaths, 'ok')
   } catch (error) {
-    return getFilePathResult([], resultStatus.errorSystem)
+    return getFilePathResult([], 'errorSystem')
   }
 }
 
@@ -25,7 +21,7 @@ function getFilePathResult(filePaths, status) {
   return { result: filePaths, status }
 }
 
-const resultStatus = Object.freeze({
-  ok: Symbol('ok'),
-  errorSystem: Symbol('errorSystem')
-})
+// const resultStatus = Object.freeze({
+//   ok: Symbol('ok'),
+//   errorSystem: Symbol('errorSystem')
+// })
