@@ -1,8 +1,6 @@
 import { dialog } from 'electron'
 
 export default async function openFileDialog(selectFolder) {
-  console.log('selectFolder', selectFolder)
-
   const properties = [selectFolder ? 'openDirectory' : 'openFile']
   const filters = selectFolder ? [{ name: 'All Files', extensions: ['*'] }] : []
 
