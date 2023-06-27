@@ -1,4 +1,5 @@
 import { dialog } from 'electron'
+import resultStatus from '../../preload/constants/resultStatus'
 
 export default async function openFileDialog(selectFolder) {
   const properties = [selectFolder ? 'openDirectory' : 'openFile']
@@ -20,9 +21,3 @@ export default async function openFileDialog(selectFolder) {
 function getFilePathResult(filePaths, status) {
   return { result: filePaths, status }
 }
-
-// We can't use symbols across the Electron IPC (inter-process communication) boundary
-const resultStatus = Object.freeze({
-  ok: 'ok',
-  errorSystem: 'errorSystem'
-})
