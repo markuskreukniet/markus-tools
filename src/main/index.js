@@ -73,7 +73,7 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 
 // self added with ipcMain import
-// TODO: rename return functions: duplicateFiles, linesOfCode, referencesByUrls, imagesToDateRangeFolder
+// TODO: rename return functions: duplicateFiles, linesOfCode, referencesByUrls
 import duplicateFiles from './modules/duplicateFiles'
 async function getDuplicateFiles(e, filePaths) {
   return duplicateFiles(filePaths)
@@ -93,10 +93,10 @@ async function getReferencesByUrls(e, urlsString) {
 ipcMain.handle('getReferencesByUrls', getReferencesByUrls)
 
 import imagesToDateRangeFolder from './modules/imagesToDateRangeFolder'
-async function moveImagesToDateRangeFolder(e, filePaths, path) {
+async function imagesToDateRangeFolderBE(e, filePaths, path) {
   return imagesToDateRangeFolder(filePaths, path)
 }
-ipcMain.handle('moveImagesToDateRangeFolder', moveImagesToDateRangeFolder)
+ipcMain.handle('imagesToDateRangeFolderBE', imagesToDateRangeFolderBE)
 
 import openFileDialog from './modules/openFileDialog'
 async function openFileDialogBE(e, selectFolder) {

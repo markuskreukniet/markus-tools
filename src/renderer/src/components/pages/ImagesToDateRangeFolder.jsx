@@ -3,13 +3,13 @@ import TextResultPage from '../page/TextResultPage'
 import FileOrFolderInput from '../FileOrFolderInput'
 import { resultStatus } from '../../../../preload/modules/resultStatus'
 
-export default function ImagesToDateRangeFolder(props) {
+export default function imagesToDateRangeFolder(props) {
   let resultPath = ''
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [status, setStatus] = createSignal('')
 
   async function setState(filePaths, path) {
-    const done = await window.dateRangeFolder.moveImagesToDateRangeFolder(filePaths, path)
+    const done = await window.dateRangeFolder.imagesToDateRangeFolderBE(filePaths, path)
     const status = done ? 'done' : 'not done'
     setStatus(status)
   }
