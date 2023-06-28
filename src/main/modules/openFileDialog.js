@@ -1,5 +1,5 @@
 import { dialog } from 'electron'
-import resultStatus from '../../preload/constants/resultStatus'
+import resultStatus from '../../preload/modules/resultStatus'
 
 export default async function openFileDialog(selectFolder) {
   const properties = [selectFolder ? 'openDirectory' : 'openFile']

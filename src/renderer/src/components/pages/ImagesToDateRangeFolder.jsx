@@ -1,6 +1,7 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
 import FileOrFolderInput from '../FileOrFolderInput'
+import resultStatus from '../../../../preload/modules/resultStatus'
 
 export default function ImagesToDateRangeFolder(props) {
   let resultPath = ''
@@ -19,7 +20,12 @@ export default function ImagesToDateRangeFolder(props) {
 
   async function test() {
     const done = await window.dialog.openFileDialogBE(true)
-    console.log('done', done)
+
+    if (done.status === resultStatus.ok) {
+      console.log('done', done)
+    } else {
+      console.log('not done')
+    }
   }
 
   // TODO: placeholder or label? TODO: minimumFiles should be 0 so it can only sort the files in destination path?
