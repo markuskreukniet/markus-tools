@@ -1,5 +1,5 @@
 import { dialog } from 'electron'
-import resultStatus from '../../preload/modules/resultStatus'
+import { resultStatus, getResultStatusCombination } from '../../preload/modules/resultStatus'
 
 export default async function openFileDialog(selectFolder) {
   const properties = [selectFolder ? 'openDirectory' : 'openFile']
@@ -11,13 +11,9 @@ export default async function openFileDialog(selectFolder) {
       filters
     })
     return result.canceled
-      ? getFilePathResult([], resultStatus.ok)
-      : getFilePathResult(result.filePaths, resultStatus.ok)
+      ? getResultStatusCombination([], resultStatus.ok)
+      : getResultStatusCombination(result.filePaths, resultStatus.ok)
   } catch (error) {
-    return getFilePathResult([], resultStatus.errorSystem)
+    return getResultStatusCombination([], resultStatus.errorSystem)
   }
-}
-
-function getFilePathResult(filePaths, status) {
-  return { result: filePaths, status }
 }
