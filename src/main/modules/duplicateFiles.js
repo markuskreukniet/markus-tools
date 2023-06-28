@@ -10,10 +10,13 @@ export default async function duplicateFiles(filePaths) {
         const stats = await fs.promises.stat(path)
         if (isNotAZeroByteFile(stats)) {
           return { path, size: stats.size }
+        } else {
+          return undefined
         }
       } catch (error) {
-        // TODO:
+        // TODO: error and null
         console.error(error)
+        return null
       }
     })
   )
