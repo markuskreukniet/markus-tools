@@ -8,6 +8,7 @@ export default async function duplicateFiles(filePaths) {
     filePaths.map(async (path) => {
       try {
         const stats = await fs.promises.stat(path)
+        // TODO: when getting all files from folder, it should be already isNotAZeroByteFile
         if (isNotAZeroByteFile(stats)) {
           return { path, size: stats.size }
         } else {
