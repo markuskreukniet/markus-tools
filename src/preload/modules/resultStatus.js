@@ -4,6 +4,6 @@ export const resultStatus = Object.freeze({
   errorSystem: 'errorSystem'
 })
 
-export function getResultStatusCombination(filePaths, status) {
-  return { result: filePaths, status }
+export function toResultObject(result, status, message) {
+  return { result: result ? result : null, status, message: message ? message : '' }
 }

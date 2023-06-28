@@ -1,16 +1,21 @@
 import fs from 'fs'
 import isNotAZeroByteFile from './fileHelper.js'
+import { resultStatus, toResultObject } from '../../preload/modules/resultStatus'
 
 // TODO: function looks a lot like duplicateFiles
 export default async function imagesToDateRangeFolder(filePaths, path) {
-  const directoryPaths = getSubdirectoryPaths(path)
-  const directoryFilePaths = getSubdirectoryFilePaths(directoryPaths)
-  filePaths.push(...directoryFilePaths)
-  const groups = getDateRangeGroups(filePaths)
-  groupsToFolders(groups, path)
-  // TODO: remove empty folders
+  try {
+    const directoryPaths = getSubdirectoryPaths(path)
+    const directoryFilePaths = getSubdirectoryFilePaths(directoryPaths)
+    filePaths.push(...directoryFilePaths)
+    const groups = getDateRangeGroups(filePaths)
+    groupsToFolders(groups, path)
+    // TODO: remove empty folders
 
-  return true
+    return toResultObject(null, resultStatus.ok)
+  } catch (error) {
+    return toResultObject(null, resultStatus.errorSystem, error.message)
+  }
 }
 
 function getSubdirectoryFilePaths(paths) {
