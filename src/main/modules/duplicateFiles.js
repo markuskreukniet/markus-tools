@@ -4,13 +4,19 @@ import isNotAZeroByteFile from './fileHelper.js'
 
 export default async function duplicateFiles(filePaths) {
   // path and size combinations of files
-  const pathSizeCombinations = []
-  for (const path of filePaths) {
-    const stats = fs.statSync(path)
-    if (isNotAZeroByteFile(stats)) {
-      pathSizeCombinations.push({ path: path, size: stats.size })
-    }
-  }
+  const pathSizeCombinations = await Promise.all(
+    filePaths.map(async (path) => {
+      try {
+        const stats = await fs.promises.stat(path)
+        if (isNotAZeroByteFile(stats)) {
+          return { path, size: stats.size }
+        }
+      } catch (error) {
+        // TODO:
+        console.error(error)
+      }
+    })
+  )
 
   pathSizeCombinations.sort(compare)
 
