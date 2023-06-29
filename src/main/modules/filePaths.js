@@ -14,18 +14,16 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
       const files = await fs.promises.readdir(currentPath)
 
       const statsPromises = files.map((file) => {
-        const filePath = combinePathAndFile(currentPath, file)
+        const filePath = toFilePath(currentPath, file)
         return fs.promises.stat(filePath)
       })
 
       const stats = await Promise.all(statsPromises)
 
       for (let i = 0; i < files.length; i++) {
-        const file = files[i]
-        const filePath = combinePathAndFile(currentPath, file)
-        const fileStats = stats[i]
+        const filePath = toFilePath(currentPath, files[i])
 
-        if (fileStats.isDirectory()) {
+        if (stats[i].isDirectory()) {
           stack.push(filePath)
         } else {
           filePaths.push(filePath)
@@ -39,7 +37,7 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
   return filePaths
 }
 
-function combinePathAndFile(path, file) {
+function toFilePath(path, file) {
   return `${path}\\${file}`
 }
 
