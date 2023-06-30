@@ -28,7 +28,7 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
           stack.push(filePath)
         }
 
-        if (shouldAddFilePath(isDirectory, typeFilePaths, stats.size)) {
+        if (shouldAddFilePath(typeFilePaths, typeFileType, filePath, isDirectory, stats.size)) {
           filePaths.push(filePath)
         }
       }
@@ -40,7 +40,18 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
   return filePaths
 }
 
-function shouldAddFilePath(isDirectory, typeFilePaths, size) {
+function shouldAddFilePath(typeFilePaths, typeFileType, filePath, isDirectory, size) {
+  let fileTypeCheck = true
+  if (typeFileType === fileType.image && !isDirectory) {
+    const lowerCaseFilePath = filePath.toLowerCase()
+    fileTypeCheck =
+      lowerCaseFilePath.endsWith('jpg') ||
+      lowerCaseFilePath.endsWith('jpeg') ||
+      lowerCaseFilePath.endsWith('png') ||
+      lowerCaseFilePath.endsWith('gif') ||
+      lowerCaseFilePath.endsWith('webp')
+  }
+
   const directoryCheck = typeFilePaths === filePathsType.directories && !isDirectory ? false : true
   const zeroByteCheck =
     (typeFilePaths === filePathsType.filesWithoutZeroByteFiles ||
@@ -49,7 +60,7 @@ function shouldAddFilePath(isDirectory, typeFilePaths, size) {
       ? false
       : true
 
-  return directoryCheck && zeroByteCheck
+  return fileTypeCheck && directoryCheck && zeroByteCheck
 }
 
 function toFilePath(path, file) {
