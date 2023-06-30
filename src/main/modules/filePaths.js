@@ -23,9 +23,12 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
       for (let i = 0; i < files.length; i++) {
         const filePath = toFilePath(currentPath, files[i])
 
-        if (stats[i].isDirectory()) {
+        const isDirectory = stats[i].isDirectory()
+        if (isDirectory) {
           stack.push(filePath)
-        } else {
+        }
+
+        if (shouldAddFilePath(isDirectory, typeFilePaths, stats.size)) {
           filePaths.push(filePath)
         }
       }
@@ -35,6 +38,18 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
   }
 
   return filePaths
+}
+
+function shouldAddFilePath(isDirectory, typeFilePaths, size) {
+  const directoryCheck = typeFilePaths === filePathsType.directories && !isDirectory ? false : true
+  const zeroByteCheck =
+    (typeFilePaths === filePathsType.filesWithoutZeroByteFiles ||
+      typeFilePaths === filePathsType.filesAndDirectoriesWithoutZeroByteFiles) &&
+    size === 0
+      ? false
+      : true
+
+  return directoryCheck && zeroByteCheck
 }
 
 function toFilePath(path, file) {
@@ -49,6 +64,7 @@ export default function isNotAZeroByteFile(stats) {
 const filePathsType = Object.freeze({
   files: 'ok',
   filesWithoutZeroByteFiles: 'errorSystem',
+  filesAndDirectories: '',
   filesAndDirectoriesWithoutZeroByteFiles: '',
   directories: ''
 })
