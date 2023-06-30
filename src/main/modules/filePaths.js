@@ -24,10 +24,9 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
         const filePath = toFilePath(currentPath, files[i])
 
         const isDirectory = stats[i].isDirectory()
-        if (isDirectory) {
+        if (directoryTree && isDirectory) {
           stack.push(filePath)
         }
-
         if (shouldAddFilePath(typeFilePaths, typeFileType, filePath, isDirectory, stats.size)) {
           filePaths.push(filePath)
         }
@@ -73,14 +72,14 @@ export default function isNotAZeroByteFile(stats) {
 
 // We can't use symbols across the Electron IPC (inter-process communication) boundary
 const filePathsType = Object.freeze({
-  files: 'ok',
-  filesWithoutZeroByteFiles: 'errorSystem',
-  filesAndDirectories: '',
-  filesAndDirectoriesWithoutZeroByteFiles: '',
-  directories: ''
+  files: 'files',
+  filesWithoutZeroByteFiles: 'filesWithoutZeroByteFiles',
+  filesAndDirectories: 'filesAndDirectories',
+  filesAndDirectoriesWithoutZeroByteFiles: 'filesAndDirectoriesWithoutZeroByteFiles',
+  directories: 'directories'
 })
 
 const fileType = Object.freeze({
-  all: 'ok',
-  image: 'errorSystem'
+  all: 'all',
+  image: 'image'
 })
