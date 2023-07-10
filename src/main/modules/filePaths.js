@@ -1,8 +1,10 @@
 import fs from 'fs'
+import { inputError } from '../../preload/modules/errors'
+import { resultStatus, toResultObject } from '../../preload/modules/resultStatus'
 
 export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, typeFileType) {
   if (typeFilePaths === filePathsType.directories && typeFileType !== fileType.all) {
-    return []
+    return toResultObject([], resultStatus.errorSystem, inputError.wrongFunctionArguments)
   }
 
   const filePaths = []
@@ -14,8 +16,7 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
       const files = await fs.promises.readdir(currentPath)
 
       const statsPromises = files.map((file) => {
-        const filePath = toFilePath(currentPath, file)
-        return fs.promises.stat(filePath)
+        return fs.promises.stat(toFilePath(currentPath, file))
       })
 
       const stats = await Promise.all(statsPromises)
@@ -31,12 +32,12 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
           filePaths.push(filePath)
         }
       }
-    } catch (err) {
-      console.error(err)
+    } catch (error) {
+      return toResultObject([], resultStatus.errorSystem, error)
     }
   }
 
-  return filePaths
+  return toResultObject(filePaths, resultStatus.ok)
 }
 
 function shouldAddFilePath(typeFilePaths, typeFileType, filePath, isDirectory, size) {
