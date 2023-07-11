@@ -1,5 +1,6 @@
 import fs from 'fs'
 import { inputError } from '../../preload/modules/errors'
+import { filePathsType, fileType } from '../../preload/modules/files'
 import { resultStatus, toResultObject } from '../../preload/modules/resultStatus'
 
 export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, typeFileType) {
@@ -76,17 +77,3 @@ function toFilePath(path, file) {
 export default function isNotAZeroByteFile(stats) {
   return stats.size > 0
 }
-
-// We can't use symbols across the Electron IPC (inter-process communication) boundary
-const filePathsType = Object.freeze({
-  files: 'files',
-  filesWithoutZeroByteFiles: 'filesWithoutZeroByteFiles',
-  filesAndDirectories: 'filesAndDirectories',
-  filesAndDirectoriesWithoutZeroByteFiles: 'filesAndDirectoriesWithoutZeroByteFiles',
-  directories: 'directories'
-})
-
-const fileType = Object.freeze({
-  all: 'all',
-  image: 'image'
-})
