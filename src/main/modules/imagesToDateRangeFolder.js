@@ -1,10 +1,14 @@
 import fs from 'fs'
-import isNotAZeroByteFile from './filePaths.js'
+import isNotAZeroByteFile, { getDirectoryFilePaths } from './filePaths.js'
+import { filePathsType } from '../../preload/modules/files'
 import { resultStatus, toResultObject } from '../../preload/modules/resultStatus'
 
 // TODO: function looks a lot like duplicateFiles
 export default async function imagesToDateRangeFolder(filePaths, path) {
   try {
+    const test = await getDirectoryFilePaths(path, false, filePathsType.directories)
+    console.log('test', test)
+
     const directoryPaths = getSubdirectoryPaths(path)
     const directoryFilePaths = getSubdirectoryFilePaths(directoryPaths)
     filePaths.push(...directoryFilePaths)

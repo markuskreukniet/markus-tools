@@ -3,8 +3,12 @@ import { inputError } from '../../preload/modules/errors'
 import { filePathsType, fileType } from '../../preload/modules/files'
 import { resultStatus, toResultObject } from '../../preload/modules/resultStatus'
 
-export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, typeFileType) {
-  if (typeFilePaths === filePathsType.directories && typeFileType !== fileType.all) {
+export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, typeFile) {
+  if (!typeFile) {
+    typeFile = fileType.all
+  }
+
+  if (typeFilePaths === filePathsType.directories && typeFile !== fileType.all) {
     return toResultObject([], resultStatus.errorSystem, inputError.wrongFunctionArguments)
   }
 
@@ -29,7 +33,7 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
         if (directoryTree && isDirectory) {
           stack.push(filePath)
         }
-        if (shouldAddFilePath(typeFilePaths, typeFileType, filePath, isDirectory, stats.size)) {
+        if (shouldAddFilePath(typeFilePaths, typeFile, filePath, isDirectory, stats.size)) {
           filePaths.push(filePath)
         }
       }
@@ -41,9 +45,9 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
   return toResultObject(filePaths, resultStatus.ok)
 }
 
-function shouldAddFilePath(typeFilePaths, typeFileType, filePath, isDirectory, size) {
+function shouldAddFilePath(typeFilePaths, typeFile, filePath, isDirectory, size) {
   let fileTypeCheck = true
-  if (typeFileType === fileType.image && !isDirectory) {
+  if (typeFile === fileType.image && !isDirectory) {
     fileTypeCheck = isImageFilePath(filePath)
   }
 
