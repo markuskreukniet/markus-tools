@@ -5,12 +5,19 @@ import { resultStatus, toResultObject } from '../../preload/modules/resultStatus
 
 // TODO: function looks a lot like duplicateFiles
 export default async function imagesToDateRangeFolder(filePaths, path) {
+  // TODO: remove the try catch?
   try {
-    const test = await getDirectoryFilePaths(path, false, filePathsType.directories)
-    console.log('test', test)
+    const directoryFilePathsResult = await getDirectoryFilePaths(
+      path,
+      false,
+      filePathsType.directories
+    )
 
-    const directoryPaths = getSubdirectoryPaths(path)
-    const directoryFilePaths = getSubdirectoryFilePaths(directoryPaths)
+    if (directoryFilePathsResult.status !== resultStatus.ok) {
+      return toResultObject(null, directoryFilePathsResult.status, directoryFilePathsResult.message)
+    }
+
+    const directoryFilePaths = getSubdirectoryFilePaths(directoryFilePathsResult.result)
     filePaths.push(...directoryFilePaths)
     const groups = getDateRangeGroups(filePaths)
     groupsToFolders(groups, path)
