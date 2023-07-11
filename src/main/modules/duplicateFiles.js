@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import fs from 'fs'
-import isNotAZeroByteFile from './fileHelper.js'
+import isNotAZeroByteFile from './filePaths.js'
 
 export default async function duplicateFiles(filePaths) {
   // path and size combinations of files

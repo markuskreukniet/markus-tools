@@ -1,5 +1,5 @@
 import fs from 'fs'
-import isNotAZeroByteFile from './fileHelper.js'
+import isNotAZeroByteFile from './filePaths.js'
 import { resultStatus, toResultObject } from '../../preload/modules/resultStatus'
 
 // TODO: function looks a lot like duplicateFiles
