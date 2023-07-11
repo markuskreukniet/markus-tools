@@ -33,7 +33,7 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
         }
       }
     } catch (error) {
-      return toResultObject([], resultStatus.errorSystem, error)
+      return toResultObject([], resultStatus.errorSystem, error.message)
     }
   }
 
@@ -43,13 +43,7 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
 function shouldAddFilePath(typeFilePaths, typeFileType, filePath, isDirectory, size) {
   let fileTypeCheck = true
   if (typeFileType === fileType.image && !isDirectory) {
-    const lowerCaseFilePath = filePath.toLowerCase()
-    fileTypeCheck =
-      lowerCaseFilePath.endsWith('jpg') ||
-      lowerCaseFilePath.endsWith('jpeg') ||
-      lowerCaseFilePath.endsWith('png') ||
-      lowerCaseFilePath.endsWith('gif') ||
-      lowerCaseFilePath.endsWith('webp')
+    fileTypeCheck = isImageFilePath(filePath)
   }
 
   const directoryCheck = typeFilePaths === filePathsType.directories && !isDirectory ? false : true
@@ -63,10 +57,22 @@ function shouldAddFilePath(typeFilePaths, typeFileType, filePath, isDirectory, s
   return fileTypeCheck && directoryCheck && zeroByteCheck
 }
 
+function isImageFilePath(filePath) {
+  const lowerCaseFilePath = filePath.toLowerCase()
+  return (
+    lowerCaseFilePath.endsWith('jpg') ||
+    lowerCaseFilePath.endsWith('jpeg') ||
+    lowerCaseFilePath.endsWith('png') ||
+    lowerCaseFilePath.endsWith('gif') ||
+    lowerCaseFilePath.endsWith('webp')
+  )
+}
+
 function toFilePath(path, file) {
   return `${path}\\${file}`
 }
 
+// TODO: remove export
 export default function isNotAZeroByteFile(stats) {
   return stats.size > 0
 }
