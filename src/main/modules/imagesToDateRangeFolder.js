@@ -17,8 +17,8 @@ export default async function imagesToDateRangeFolder(filePaths, path) {
       return toResultObject(null, directoryFilePathsResult.status, directoryFilePathsResult.message)
     }
 
-    const directoryFilePaths = getSubdirectoryFilePaths(directoryFilePathsResult.result)
-    filePaths.push(...directoryFilePaths)
+    const dateDirectoryFilePaths = getDateSubdirectoryFilePaths(directoryFilePathsResult.result)
+    filePaths.push(...dateDirectoryFilePaths)
     const groups = getDateRangeGroups(filePaths)
     groupsToFolders(groups, path)
     // TODO: remove empty folders
@@ -29,7 +29,7 @@ export default async function imagesToDateRangeFolder(filePaths, path) {
   }
 }
 
-function getSubdirectoryFilePaths(paths) {
+function getDateSubdirectoryFilePaths(paths) {
   let result = []
   const separator = ' - '
 
@@ -171,27 +171,6 @@ function getFilePaths(path) {
   }
 
   return filePaths
-}
-
-function getSubdirectoryPaths(path) {
-  const paths = []
-
-  try {
-    const files = fs.readdirSync(path)
-
-    files.forEach((file) => {
-      const filePath = combinePathAndFile(path, file)
-      const stats = fs.statSync(filePath)
-
-      if (stats.isDirectory()) {
-        paths.push(filePath)
-      }
-    })
-  } catch (error) {
-    console.error('Error occurred while reading the folder:', error)
-  }
-
-  return paths
 }
 
 function formatTime(time) {
