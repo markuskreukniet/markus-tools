@@ -51,7 +51,6 @@ function shouldAddFilePath(typeFilePaths, typeFile, filePath, isDirectory, size)
     fileTypeCheck = isImageFilePath(filePath)
   }
 
-  const directoryCheck = typeFilePaths === filePathsType.directories && !isDirectory ? false : true
   const zeroByteCheck =
     (typeFilePaths === filePathsType.filesWithoutZeroByteFiles ||
       typeFilePaths === filePathsType.filesAndDirectoriesWithoutZeroByteFiles) &&
@@ -59,7 +58,22 @@ function shouldAddFilePath(typeFilePaths, typeFile, filePath, isDirectory, size)
       ? false
       : true
 
-  return fileTypeCheck && directoryCheck && zeroByteCheck
+  return fileTypeCheck && calculateDirectoryCheck(typeFilePaths, isDirectory) && zeroByteCheck
+}
+
+function calculateDirectoryCheck(typeFilePaths, isDirectory) {
+  const isDirectoryCheck =
+    (typeFilePaths === filePathsType.directories ||
+      typeFilePaths === filePathsType.filesAndDirectories ||
+      typeFilePaths === filePathsType.filesAndDirectoriesWithoutZeroByteFiles) &&
+    isDirectory
+
+  const isNotDirectoryCheck =
+    (typeFilePaths === filePathsType.files ||
+      typeFilePaths === filePathsType.filesWithoutZeroByteFiles) &&
+    !isDirectory
+
+  return isDirectoryCheck || isNotDirectoryCheck
 }
 
 function isImageFilePath(filePath) {
