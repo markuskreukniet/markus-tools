@@ -46,10 +46,10 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
 }
 
 function shouldAddFilePath(typeFilePaths, typeFile, filePath, isDirectory, size) {
-  let fileTypeCheck = true
-  if (typeFile === fileType.image && !isDirectory) {
-    fileTypeCheck = isImageFilePath(filePath)
-  }
+  const fileTypeCheck =
+    isDirectory ||
+    typeFile === fileType.all ||
+    (typeFile === fileType.image && isImageFilePath(filePath))
 
   const zeroByteCheck =
     (typeFilePaths === filePathsType.filesWithoutZeroByteFiles ||
