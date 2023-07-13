@@ -20,3 +20,7 @@ export function toResultObjectWithNullResultByResultObject(resultObject) {
 export function isResultObjectOk(resultObject) {
   return resultObject.status === resultStatus.ok
 }
+
+export function isResultObjectPartiallyOk(resultObject) {
+  return resultObject.status === resultStatus.partiallyOk
+}
