@@ -1,32 +1,68 @@
 import fs from 'fs'
 import isNotAZeroByteFile, { getDirectoryFilePaths } from './filePaths.js'
-import { filePathsType } from '../../preload/modules/files'
+import { filePathsType, fileType } from '../../preload/modules/files'
 import { resultStatus, toResultObject } from '../../preload/modules/resultStatus'
 
 // TODO: function looks a lot like duplicateFiles
-export default async function imagesToDateRangeFolder(filePaths, path) {
-  const directoryFilePathsResult = await getDirectoryFilePaths(
-    path,
+// TODO: rename resultStatus file
+export default async function imagesToDateRangeFolder(filePaths, outputPath) {
+  const inputPath = getSelectedFolderPath(filePaths)
+
+  const imageFilePathsTreeResultObject = await getDirectoryFilePaths(
+    inputPath,
+    true,
+    filePathsType.filesWithoutZeroByteFiles,
+    fileType.image
+  )
+  const directoryFilePathsResultObject = await getDirectoryFilePaths(
+    outputPath,
     false,
     filePathsType.directories
   )
 
-  if (directoryFilePathsResult.status !== resultStatus.ok) {
-    return toResultObject(null, directoryFilePathsResult.status, directoryFilePathsResult.message)
+  if (directoryFilePathsResultObject.status !== resultStatus.ok) {
+    return toResultObject(
+      null,
+      directoryFilePathsResultObject.status,
+      directoryFilePathsResultObject.message
+    )
   }
 
-  const dateDirectoryFilePaths = getDateSubdirectoryFilePaths(directoryFilePathsResult.result)
-  filePaths.push(...dateDirectoryFilePaths)
+  const dateDirectoryFilePaths = getDateSubdirectoryFilePaths(directoryFilePathsResultObject.result)
+  imageFilePathsTreeResultObject.result.push(...dateDirectoryFilePaths)
 
   try {
-    const groups = getDateRangeGroups(filePaths)
-    groupsToFolders(groups, path)
+    const groups = getDateRangeGroups(imageFilePathsTreeResultObject.result)
+    groupsToFolders(groups, outputPath)
     // TODO: remove empty folders
 
     return toResultObject(null, resultStatus.ok)
   } catch (error) {
     return toResultObject(null, resultStatus.errorSystem, error.message)
   }
+}
+
+// TODO: remove function
+function getSelectedFolderPath(files) {
+  const firstFolderPath = getFolderPath(files[0])
+  const lastFolderPath = getFolderPath(files[files.length - 1])
+
+  let prefix = ''
+
+  for (let i = 0; i < firstFolderPath.length; i++) {
+    if (firstFolderPath[i] === lastFolderPath[i]) {
+      prefix += firstFolderPath[i]
+    } else {
+      break
+    }
+  }
+
+  return prefix
+}
+
+// TODO: remove function
+function getFolderPath(file) {
+  return file.replace(`\\${file}`, '')
 }
 
 function getDateSubdirectoryFilePaths(paths) {
