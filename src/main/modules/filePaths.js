@@ -1,7 +1,11 @@
 import fs from 'fs'
 import { inputError } from '../../preload/modules/errors'
 import { filePathsType, fileType } from '../../preload/modules/files'
-import { resultStatus, toResultObject } from '../../preload/modules/resultStatus'
+import {
+  resultStatus,
+  toResultObject,
+  toResultObjectWithNullResult
+} from '../../preload/modules/resultStatus'
 
 export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, typeFile) {
   if (!typeFile) {
@@ -96,7 +100,10 @@ export default function isNotAZeroByteFile(stats) {
   return stats.size > 0
 }
 
-async function removeEmptyDirectories(filePaths) {
+export async function removeEmptyDirectories(filePaths) {
+  let errorCount = 0
+  let errorMessage = ''
+
   const filePathPromises = filePaths.map(async (path) => {
     try {
       const files = await fs.promises.readdir(path)
@@ -104,12 +111,19 @@ async function removeEmptyDirectories(filePaths) {
         fs.promises.rmdir(path)
       }
     } catch (error) {
-      // TODO
+      errorCount++
+      errorMessage = `${errorMessage}\n${error.message}`
     }
   })
   await Promise.all(filePathPromises)
 
-  return true // TODO
+  if (errorCount === 0) {
+    return toResultObjectWithNullResult(resultStatus.ok)
+  } else if (errorCount > 0 && errorCount < filePaths.length) {
+    return toResultObjectWithNullResult(resultStatus.partiallyOk, errorMessage)
+  } else {
+    return toResultObjectWithNullResult(resultStatus.errorSystem, errorMessage)
+  }
 }
 
 // TODO: change fs import to promises

@@ -4,7 +4,7 @@ import { filePathsType, fileType } from '../../preload/modules/files'
 import {
   isResultObjectOk,
   resultStatus,
-  toResultObject,
+  toResultObjectWithNullResult,
   toResultObjectWithNullResultByResultObject
 } from '../../preload/modules/resultStatus'
 
@@ -40,9 +40,9 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     groupsToFolders(groups, outputPath)
     // TODO: remove empty folders
 
-    return toResultObject(null, resultStatus.ok)
+    return toResultObjectWithNullResult(resultStatus.ok)
   } catch (error) {
-    return toResultObject(null, resultStatus.errorSystem, error.message)
+    return toResultObjectWithNullResult(resultStatus.errorSystem, error.message)
   }
 }
 
