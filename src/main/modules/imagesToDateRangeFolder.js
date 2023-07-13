@@ -1,7 +1,12 @@
 import fs from 'fs'
-import isNotAZeroByteFile, { getDirectoryFilePaths } from './filePaths.js'
+import { getDirectoryFilePaths } from './filePaths.js'
 import { filePathsType, fileType } from '../../preload/modules/files'
-import { resultStatus, toResultObject } from '../../preload/modules/resultStatus'
+import {
+  isResultObjectOk,
+  resultStatus,
+  toResultObject,
+  toResultObjectWithNullResultByResultObject
+} from '../../preload/modules/resultStatus'
 
 // TODO: function looks a lot like duplicateFiles
 // TODO: rename resultStatus file
@@ -14,18 +19,17 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     filePathsType.filesWithoutZeroByteFiles,
     fileType.image
   )
+  if (!isResultObjectOk(imageFilePathsTreeResultObject)) {
+    return toResultObjectWithNullResultByResultObject(imageFilePathsTreeResultObject)
+  }
+
   const directoryFilePathsResultObject = await getDirectoryFilePaths(
     outputPath,
     false,
     filePathsType.directories
   )
-
-  if (directoryFilePathsResultObject.status !== resultStatus.ok) {
-    return toResultObject(
-      null,
-      directoryFilePathsResultObject.status,
-      directoryFilePathsResultObject.message
-    )
+  if (!isResultObjectOk(directoryFilePathsResultObject)) {
+    return toResultObjectWithNullResultByResultObject(directoryFilePathsResultObject)
   }
 
   const dateDirectoryFilePaths = getDateSubdirectoryFilePaths(directoryFilePathsResultObject.result)
@@ -97,17 +101,7 @@ function getDateRangeGroups(filePaths) {
   const pathDateCreatedCombinations = []
   for (const path of filePaths) {
     const stats = fs.statSync(path)
-    const lowerCasePath = path.toLowerCase()
-    if (
-      isNotAZeroByteFile(stats) &&
-      (lowerCasePath.endsWith('jpg') ||
-        lowerCasePath.endsWith('jpeg') ||
-        lowerCasePath.endsWith('png') ||
-        lowerCasePath.endsWith('gif') ||
-        lowerCasePath.endsWith('webp'))
-    ) {
-      pathDateCreatedCombinations.push({ path, dateCreated: stats.mtime })
-    }
+    pathDateCreatedCombinations.push({ path, dateCreated: stats.mtime })
   }
 
   pathDateCreatedCombinations.sort(compare)
