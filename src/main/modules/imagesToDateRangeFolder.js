@@ -33,8 +33,6 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     return toResultObjectWithNullResultByResultObject(directoryFilePathsResultObject)
   }
 
-  console.log('directoryFilePathsResultObject.result', directoryFilePathsResultObject.result)
-
   const dateDirectoryFilePaths = getDateSubdirectoryFilePaths(directoryFilePathsResultObject.result)
   imageFilePathsTreeResultObject.result.push(...dateDirectoryFilePaths)
 
