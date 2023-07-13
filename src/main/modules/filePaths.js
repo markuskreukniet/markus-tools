@@ -27,7 +27,6 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
       const statsPromises = files.map((file) => {
         return fs.promises.stat(toFilePath(currentPath, file))
       })
-
       const stats = await Promise.all(statsPromises)
 
       for (let i = 0; i < files.length; i++) {
@@ -104,7 +103,8 @@ export async function removeEmptyDirectories(filePaths) {
   let errorCount = 0
   let errorMessage = ''
 
-  const filePathPromises = filePaths.map(async (path) => {
+  // Both awaits are needed, therefore, a 'await Promise.all' solution is useless.
+  for (const path of filePaths) {
     try {
       const files = await fs.promises.readdir(path)
       if (files.length === 0) {
@@ -114,8 +114,7 @@ export async function removeEmptyDirectories(filePaths) {
       errorCount++
       errorMessage = `${errorMessage}\n${error.message}`
     }
-  })
-  await Promise.all(filePathPromises)
+  }
 
   if (errorCount === 0) {
     return toResultObjectWithNullResult(resultStatus.ok)
