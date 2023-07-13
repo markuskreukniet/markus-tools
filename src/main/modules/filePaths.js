@@ -101,7 +101,7 @@ async function removeEmptyDirectories(filePaths) {
     try {
       const files = await fs.promises.readdir(path)
       if (files.length === 0) {
-        await fs.promises.rmdir(path)
+        fs.promises.rmdir(path)
       }
     } catch (error) {
       // TODO
