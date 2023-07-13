@@ -38,12 +38,12 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   try {
     const groups = getDateRangeGroups(imageFilePathsTreeResultObject.result)
     groupsToFolders(groups, outputPath)
-    // TODO: remove empty folders
-
-    return toResultObjectWithNullResult(resultStatus.ok)
   } catch (error) {
     return toResultObjectWithNullResult(resultStatus.errorSystem, error.message)
   }
+
+  // TODO: remove empty folders
+  return toResultObjectWithNullResult(resultStatus.ok)
 }
 
 // TODO: remove function
