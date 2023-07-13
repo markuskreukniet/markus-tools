@@ -95,3 +95,21 @@ function toFilePath(path, file) {
 export default function isNotAZeroByteFile(stats) {
   return stats.size > 0
 }
+
+async function removeEmptyDirectories(filePaths) {
+  const filePathPromises = filePaths.map(async (path) => {
+    try {
+      const files = await fs.promises.readdir(path)
+      if (files.length === 0) {
+        await fs.promises.rmdir(path)
+      }
+    } catch (error) {
+      // TODO
+    }
+  })
+  await Promise.all(filePathPromises)
+
+  return true // TODO
+}
+
+// TODO: change fs import to promises
