@@ -111,9 +111,7 @@ function getDateSubdirectoryFilePaths(paths) {
 }
 
 function addFilePaths(result, path) {
-  const filePaths = getFilePaths(path)
-  result.push(...filePaths)
-  return result
+  return [...result, ...getFilePaths(path)]
 }
 
 function getDateRangeGroups(filePaths) {
