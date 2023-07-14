@@ -1,4 +1,5 @@
 import fs from 'fs'
+import path from 'path'
 import { inputError } from '../../preload/modules/errors'
 import { filePathsType, fileType } from '../../preload/modules/files'
 import {
@@ -7,7 +8,8 @@ import {
   toResultObjectWithNullResult
 } from '../../preload/modules/resultStatus'
 
-export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, typeFile) {
+// TODO: change fs import to promises
+export async function getDirectoryFilePaths(directoryPath, directoryTree, typeFilePaths, typeFile) {
   if (!typeFile) {
     typeFile = fileType.all
   }
@@ -17,7 +19,7 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
   }
 
   const filePaths = []
-  const stack = [path]
+  const stack = [directoryPath]
   while (stack.length > 0) {
     const currentPath = stack.pop()
 
@@ -25,12 +27,12 @@ export async function getDirectoryFilePaths(path, directoryTree, typeFilePaths, 
       const files = await fs.promises.readdir(currentPath)
 
       const statsPromises = files.map((file) => {
-        return fs.promises.stat(toFilePath(currentPath, file))
+        return fs.promises.stat(path.join(currentPath, file))
       })
       const stats = await Promise.all(statsPromises)
 
       for (let i = 0; i < files.length; i++) {
-        const filePath = toFilePath(currentPath, files[i])
+        const filePath = path.join(currentPath, files[i])
 
         const isDirectory = stats[i].isDirectory()
         if (directoryTree && isDirectory) {
@@ -90,11 +92,6 @@ function isImageFilePath(filePath) {
   )
 }
 
-// TODO: use path.join(directoryPath, fileName);
-function toFilePath(path, file) {
-  return `${path}\\${file}`
-}
-
 // TODO: remove export
 export default function isNotAZeroByteFile(stats) {
   return stats.size > 0
@@ -105,11 +102,11 @@ export async function removeEmptyDirectories(filePaths) {
   let errorMessage = ''
 
   // Both awaits are needed, therefore, a 'await Promise.all' solution is useless.
-  for (const path of filePaths) {
+  for (const filePath of filePaths) {
     try {
-      const files = await fs.promises.readdir(path)
+      const files = await fs.promises.readdir(filePath)
       if (files.length === 0) {
-        await fs.promises.rmdir(path)
+        await fs.promises.rmdir(filePath)
       }
     } catch (error) {
       errorCount++
@@ -127,12 +124,9 @@ export async function removeEmptyDirectories(filePaths) {
 }
 
 export function getDistinctDirectoryPaths(filePaths) {
-  const directoryPaths = filePaths.map((filePath) => require('path').dirname(filePath))
+  const directoryPaths = filePaths.map((filePath) => path.dirname(filePath))
   const sortedDirectoryPaths = directoryPaths.sort()
   return sortedDirectoryPaths.filter(
     (sortedDirectoryPath, index) => sortedDirectoryPath !== sortedDirectoryPaths[index - 1]
   )
 }
-
-// TODO: change fs import to promises
-// TODO: import path and use it
