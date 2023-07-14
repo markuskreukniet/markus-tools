@@ -33,11 +33,11 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     return toResultObjectWithNullResultByResultObject(directoryFilePathsResultObject)
   }
 
-  const dateDirectoryFilePaths = getDateSubdirectoryFilePaths(directoryFilePathsResultObject.result)
-  imageFilePathsTreeResultObject.result.push(...dateDirectoryFilePaths)
-
   try {
-    const groups = getDateRangeGroups(imageFilePathsTreeResultObject.result)
+    const groups = getDateRangeGroups([
+      ...imageFilePathsTreeResultObject.result,
+      ...getDateSubdirectoryFilePaths(directoryFilePathsResultObject.result)
+    ])
     groupsToFolders(groups, outputPath)
   } catch (error) {
     return toResultObjectWithNullResult(resultStatus.errorSystem, error.message)

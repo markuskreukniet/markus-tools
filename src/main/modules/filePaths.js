@@ -26,10 +26,11 @@ export async function getDirectoryFilePaths(directoryPath, directoryTree, typeFi
     try {
       const files = await fs.promises.readdir(currentPath)
 
-      const statsPromises = files.map((file) => {
-        return fs.promises.stat(path.join(currentPath, file))
-      })
-      const stats = await Promise.all(statsPromises)
+      const stats = await Promise.all(
+        files.map((file) => {
+          return fs.promises.stat(path.join(currentPath, file))
+        })
+      )
 
       for (let i = 0; i < files.length; i++) {
         const filePath = path.join(currentPath, files[i])
