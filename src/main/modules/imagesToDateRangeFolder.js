@@ -1,5 +1,9 @@
 import fs from 'fs'
-import { getDirectoryFilePaths, removeEmptyDirectories } from './filePaths.js'
+import {
+  getDirectoryFilePaths,
+  getDistinctDirectoryPaths,
+  removeEmptyDirectories
+} from './filePaths.js'
 import { filePathsType, fileType } from '../../preload/modules/files'
 import {
   isResultObjectOk,
@@ -43,10 +47,10 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     return toResultObjectWithNullResult(resultStatus.errorSystem, error.message)
   }
 
-  // TODO: remove all empty folders (it does now only remove date folders in output folder)
-  const removeEmptyDirectoriesResultObject = await removeEmptyDirectories(
-    directoryFilePathsResultObject.result
-  )
+  const removeEmptyDirectoriesResultObject = await removeEmptyDirectories([
+    ...getDistinctDirectoryPaths(imageFilePathsTreeResultObject.result),
+    ...directoryFilePathsResultObject.result
+  ])
   if (isResultObjectOk(removeEmptyDirectoriesResultObject)) {
     return toResultObjectWithNullResult(resultStatus.ok)
   } else if (isResultObjectPartiallyOk(removeEmptyDirectoriesResultObject)) {
