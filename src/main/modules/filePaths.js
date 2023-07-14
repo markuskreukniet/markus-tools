@@ -90,6 +90,7 @@ function isImageFilePath(filePath) {
   )
 }
 
+// TODO: use path.join(directoryPath, fileName);
 function toFilePath(path, file) {
   return `${path}\\${file}`
 }
@@ -125,4 +126,13 @@ export async function removeEmptyDirectories(filePaths) {
   }
 }
 
+export function getDistinctDirectoryPaths(filePaths) {
+  const directoryPaths = filePaths.map((filePath) => require('path').dirname(filePath))
+  const sortedDirectoryPaths = directoryPaths.sort()
+  return sortedDirectoryPaths.filter(
+    (sortedDirectoryPath, index) => sortedDirectoryPath !== sortedDirectoryPaths[index - 1]
+  )
+}
+
 // TODO: change fs import to promises
+// TODO: import path and use it
