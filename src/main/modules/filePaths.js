@@ -145,9 +145,9 @@ async function filePathExists(filePath) {
 }
 
 async function makeDirectoryIfItDoesNotExists(filePath) {
-  const filePathExistsResultObject = await filePathExists(filePath)
+  const filePathExistsRO = await filePathExists(filePath)
 
-  if (isResultObjectOk(filePathExistsResultObject)) {
+  if (isResultObjectOk(filePathExistsRO)) {
     try {
       await fs.promises.mkdir(filePath)
       return toResultObjectWithNullResultAndResultStatusOk()
@@ -155,6 +155,6 @@ async function makeDirectoryIfItDoesNotExists(filePath) {
       return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
     }
   } else {
-    return filePathExistsResultObject
+    return filePathExistsRO
   }
 }
