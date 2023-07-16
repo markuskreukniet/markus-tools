@@ -3,12 +3,16 @@ import path from 'path'
 import { inputError } from '../../preload/modules/errors'
 import { filePathsType, fileType } from '../../preload/modules/files'
 import {
+  isResultObjectOk,
   resultStatus,
   toResultObject,
-  toResultObjectWithNullResult
+  toResultObjectWithNullResultAndResultStatusErrorSystem,
+  toResultObjectWithNullResultAndResultStatusOk,
+  toResultObjectWithNullResultAndResultStatusPartiallyOk
 } from '../../preload/modules/resultStatus'
 
 // TODO: change fs import to promises
+// TODO: check for good error handling whole app
 export async function getDirectoryFilePaths(directoryPath, directoryTree, typeFilePaths, typeFile) {
   if (!typeFile) {
     typeFile = fileType.all
@@ -116,11 +120,11 @@ export async function removeEmptyDirectories(filePaths) {
   }
 
   if (errorCount === 0) {
-    return toResultObjectWithNullResult(resultStatus.ok)
+    return toResultObjectWithNullResultAndResultStatusOk()
   } else if (errorCount > 0 && errorCount < filePaths.length) {
-    return toResultObjectWithNullResult(resultStatus.partiallyOk, errorMessage)
+    return toResultObjectWithNullResultAndResultStatusPartiallyOk(errorMessage)
   } else {
-    return toResultObjectWithNullResult(resultStatus.errorSystem, errorMessage)
+    return toResultObjectWithNullResultAndResultStatusErrorSystem(errorMessage)
   }
 }
 
@@ -130,4 +134,27 @@ export function getDistinctDirectoryPaths(filePaths) {
   return sortedDirectoryPaths.filter(
     (sortedDirectoryPath, index) => sortedDirectoryPath !== sortedDirectoryPaths[index - 1]
   )
+}
+
+async function filePathExists(filePath) {
+  try {
+    return toResultObject(await fs.promises.access(filePath, fs.constants.F_OK), resultStatus.ok)
+  } catch (error) {
+    return toResultObject(false, resultStatus.errorSystem, error.message)
+  }
+}
+
+async function makeDirectoryIfItDoesNotExists(filePath) {
+  const filePathExistsResultObject = await filePathExists(filePath)
+
+  if (isResultObjectOk(filePathExistsResultObject)) {
+    try {
+      await fs.promises.mkdir(filePath)
+      return toResultObjectWithNullResultAndResultStatusOk()
+    } catch (error) {
+      return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
+    }
+  } else {
+    return filePathExistsResultObject
+  }
 }

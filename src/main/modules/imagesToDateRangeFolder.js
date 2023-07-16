@@ -10,6 +10,7 @@ import {
   isResultObjectPartiallyOk,
   resultStatus,
   toResultObjectWithNullResult,
+  toResultObjectWithNullResultAndResultStatusOk,
   toResultObjectWithNullResultByResultObject
 } from '../../preload/modules/resultStatus'
 
@@ -53,7 +54,7 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     ...directoryFilePathsResultObject.result
   ])
   if (isResultObjectOk(removeEmptyDirectoriesResultObject)) {
-    return toResultObjectWithNullResult(resultStatus.ok)
+    return toResultObjectWithNullResultAndResultStatusOk()
   } else if (isResultObjectPartiallyOk(removeEmptyDirectoriesResultObject)) {
     return toResultObjectWithNullResult(
       resultStatus.partiallyOk,
