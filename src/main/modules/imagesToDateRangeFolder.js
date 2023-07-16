@@ -15,6 +15,7 @@ import {
 
 // TODO: function looks a lot like duplicateFiles
 // TODO: rename resultStatus file
+// TODO: check if has access to input en output directory
 export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   const inputPath = getSelectedFolderPath(filePaths)
 
