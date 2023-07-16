@@ -20,6 +20,8 @@ import {
 export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   const inputPath = getSelectedFolderPath(filePaths)
 
+  // TODO: does not work anymore
+  // TODO: ResultObject rename to RO
   const imageFilePathsTreeResultObject = await getDirectoryFilePaths(
     inputPath,
     true,
@@ -46,6 +48,7 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     ])
     groupsToFolders(groups, outputPath)
   } catch (error) {
+    // TODO: use abstraction and also on other places?
     return toResultObjectWithNullResult(resultStatus.errorSystem, error.message)
   }
 
