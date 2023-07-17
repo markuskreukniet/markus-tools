@@ -43,7 +43,7 @@ export async function getDirectoryFilePaths(directoryPath, directoryTree, typeFi
         if (directoryTree && isDirectory) {
           stack.push(filePath)
         }
-        if (shouldAddFilePath(typeFilePaths, typeFile, filePath, isDirectory, stats.size)) {
+        if (shouldAddFilePath(typeFilePaths, typeFile, filePath, isDirectory, stats[i].size)) {
           filePaths.push(filePath)
         }
       }
