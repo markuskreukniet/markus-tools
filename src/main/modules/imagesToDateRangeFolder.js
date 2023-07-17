@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import {
-  getDirectoryBaseName,
+  getBaseName,
   getDirectoryFilePaths,
   getDistinctDirectoryPaths,
   removeEmptyDirectories
@@ -88,7 +88,7 @@ function getDateSubdirectoryFilePaths(paths) {
   const separator = ' - '
 
   for (const path of paths) {
-    const baseName = getDirectoryBaseName(path)
+    const baseName = getBaseName(path)
 
     if (baseName.includes(separator)) {
       const directoryParts = baseName.split(separator)
@@ -155,7 +155,7 @@ function groupsToFolders(groups, path) {
       fs.mkdirSync(subFolderPath)
     }
     for (const combination of group) {
-      const fileName = combination.path.split('\\').pop().split('/').pop()
+      const fileName = getBaseName(combination.path)
       const destinationPath = combinePathAndFile(subFolderPath, fileName)
       fs.rename(combination.path, destinationPath, (err) => {
         if (err) {

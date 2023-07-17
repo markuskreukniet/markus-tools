@@ -128,7 +128,7 @@ export async function removeEmptyDirectories(filePaths) {
   }
 }
 
-export function getDirectoryBaseName(filePath) {
+export function getBaseName(filePath) {
   return path.basename(filePath)
 }
 
@@ -148,7 +148,7 @@ async function filePathExists(filePath) {
   }
 }
 
-async function makeDirectoryIfItDoesNotExists(filePath) {
+export async function makeDirectoryIfItDoesNotExists(filePath) {
   const filePathExistsRO = await filePathExists(filePath)
 
   if (isResultObjectOk(filePathExistsRO)) {
