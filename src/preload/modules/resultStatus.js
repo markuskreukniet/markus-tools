@@ -11,10 +11,6 @@ export function toResultObject(result, status, message) {
 }
 
 // TODO: remove
-export function toResultObjectWithNullResult(status, message) {
-  return toResultObject(null, status, message)
-}
-
 export function toResultObjectWithNullResultAndResultStatusOk(message) {
   return toResultObject(null, resultStatus.ok, message)
 }

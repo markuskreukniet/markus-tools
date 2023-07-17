@@ -11,9 +11,9 @@ import { filePathsType, fileType } from '../../preload/modules/files'
 import {
   isResultObjectOk,
   isResultObjectPartiallyOk,
-  resultStatus,
-  toResultObjectWithNullResult,
+  toResultObjectWithNullResultAndResultStatusErrorSystem,
   toResultObjectWithNullResultAndResultStatusOk,
+  toResultObjectWithNullResultAndResultStatusPartiallyOk,
   toResultObjectWithNullResultByResultObject
 } from '../../preload/modules/resultStatus'
 
@@ -50,7 +50,7 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     await groupsToFolders(groups, outputPath)
   } catch (error) {
     // TODO: use abstraction and also on other places?
-    return toResultObjectWithNullResult(resultStatus.errorSystem, error.message)
+    return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
 
   const removeEmptyDirectoriesRO = await removeEmptyDirectories([
@@ -60,9 +60,9 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   if (isResultObjectOk(removeEmptyDirectoriesRO)) {
     return toResultObjectWithNullResultAndResultStatusOk()
   } else if (isResultObjectPartiallyOk(removeEmptyDirectoriesRO)) {
-    return toResultObjectWithNullResult(resultStatus.partiallyOk, removeEmptyDirectoriesRO.message)
+    return toResultObjectWithNullResultAndResultStatusPartiallyOk(removeEmptyDirectoriesRO.message)
   } else {
-    return toResultObjectWithNullResult(resultStatus.errorSystem, removeEmptyDirectoriesRO.message)
+    return toResultObjectWithNullResultAndResultStatusErrorSystem(removeEmptyDirectoriesRO.message)
   }
 }
 
