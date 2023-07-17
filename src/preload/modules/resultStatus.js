@@ -31,6 +31,10 @@ export function toResultObjectWithNullResultByResultObject(resultObject) {
   return toResultObject(null, resultObject.status, resultObject.message)
 }
 
+export function toResultObjectWithResultStatusOk(result, message) {
+  return toResultObject(result, resultStatus.ok, message)
+}
+
 // isResultObject
 export function isResultObjectOk(resultObject) {
   return resultObject.status === resultStatus.ok

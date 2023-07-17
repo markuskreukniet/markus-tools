@@ -3,12 +3,12 @@ import path from 'path'
 import { inputError } from '../../preload/modules/errors'
 import { filePathsType, fileType } from '../../preload/modules/files'
 import {
-  isResultObjectOk,
   resultStatus,
   toResultObject,
   toResultObjectWithNullResultAndResultStatusErrorSystem,
   toResultObjectWithNullResultAndResultStatusOk,
-  toResultObjectWithNullResultAndResultStatusPartiallyOk
+  toResultObjectWithNullResultAndResultStatusPartiallyOk,
+  toResultObjectWithResultStatusOk
 } from '../../preload/modules/resultStatus'
 
 // TODO: change fs import to promises
@@ -142,16 +142,15 @@ export function getDistinctDirectoryPaths(filePaths) {
 
 async function filePathExists(filePath) {
   try {
-    return toResultObject(await fs.promises.access(filePath, fs.constants.F_OK), resultStatus.ok)
-  } catch (error) {
-    return toResultObject(false, resultStatus.errorSystem, error.message)
+    await fs.promises.access(filePath, fs.constants.F_OK)
+    return toResultObjectWithResultStatusOk(true)
+  } catch {
+    return toResultObjectWithResultStatusOk(false)
   }
 }
 
 export async function makeDirectoryIfItDoesNotExists(filePath) {
-  const filePathExistsRO = await filePathExists(filePath)
-
-  if (isResultObjectOk(filePathExistsRO)) {
+  if (await filePathExists(filePath)) {
     try {
       await fs.promises.mkdir(filePath)
       return toResultObjectWithNullResultAndResultStatusOk()
@@ -159,6 +158,6 @@ export async function makeDirectoryIfItDoesNotExists(filePath) {
       return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
     }
   } else {
-    return filePathExistsRO
+    return false
   }
 }
