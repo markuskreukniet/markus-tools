@@ -149,7 +149,7 @@ async function filePathExists(filePath) {
   }
 }
 
-export async function makeDirectoryIfItDoesNotExists(filePath) {
+export async function makeDirectoryIfNotExists(filePath) {
   if (await filePathExists(filePath)) {
     try {
       await fs.promises.mkdir(filePath)

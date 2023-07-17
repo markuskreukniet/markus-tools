@@ -4,7 +4,7 @@ import {
   getBaseName,
   getDirectoryFilePaths,
   getDistinctDirectoryPaths,
-  makeDirectoryIfItDoesNotExists,
+  makeDirectoryIfNotExists,
   removeEmptyDirectories
 } from './filePaths.js'
 import { filePathsType, fileType } from '../../preload/modules/files'
@@ -153,8 +153,7 @@ async function groupsToFolders(groups, path) {
       subFolderPath = `${subFolderPath} - ${newestDate}`
     }
     // TODO: error handling
-    // TODO: rename makeDirectoryIfItDoesNotExists
-    const a = await makeDirectoryIfItDoesNotExists(subFolderPath)
+    const makeDirectoryIfNotExistsRO = await makeDirectoryIfNotExists(subFolderPath)
     for (const combination of group) {
       const fileName = getBaseName(combination.path)
       const destinationPath = combinePathAndFile(subFolderPath, fileName)
