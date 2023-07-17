@@ -1,4 +1,5 @@
 import fs from 'fs'
+import path from 'path'
 import {
   getDirectoryFilePaths,
   getDistinctDirectoryPaths,
@@ -73,8 +74,8 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
 
 // TODO: remove function
 function getSelectedFolderPath(files) {
-  const firstFolderPath = getFolderPath(files[0])
-  const lastFolderPath = getFolderPath(files[files.length - 1])
+  const firstFolderPath = path.dirname(files[0])
+  const lastFolderPath = path.dirname(files[files.length - 1])
 
   let prefix = ''
 
@@ -87,11 +88,6 @@ function getSelectedFolderPath(files) {
   }
 
   return prefix
-}
-
-// TODO: remove function
-function getFolderPath(file) {
-  return file.replace(`\\${file}`, '')
 }
 
 function getDateSubdirectoryFilePaths(paths) {
