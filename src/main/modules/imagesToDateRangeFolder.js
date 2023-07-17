@@ -21,31 +21,29 @@ import {
 export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   const inputPath = getSelectedFolderPath(filePaths)
 
-  // TODO: does not work anymore
-  // TODO: ResultObject rename to RO
-  const imageFilePathsTreeResultObject = await getDirectoryFilePaths(
+  const imageFilePathsTreeRO = await getDirectoryFilePaths(
     inputPath,
     true,
     filePathsType.filesWithoutZeroByteFiles,
     fileType.image
   )
-  if (!isResultObjectOk(imageFilePathsTreeResultObject)) {
-    return toResultObjectWithNullResultByResultObject(imageFilePathsTreeResultObject)
+  if (!isResultObjectOk(imageFilePathsTreeRO)) {
+    return toResultObjectWithNullResultByResultObject(imageFilePathsTreeRO)
   }
 
-  const directoryFilePathsResultObject = await getDirectoryFilePaths(
+  const directoryFilePathsRO = await getDirectoryFilePaths(
     outputPath,
     false,
     filePathsType.directories
   )
-  if (!isResultObjectOk(directoryFilePathsResultObject)) {
-    return toResultObjectWithNullResultByResultObject(directoryFilePathsResultObject)
+  if (!isResultObjectOk(directoryFilePathsRO)) {
+    return toResultObjectWithNullResultByResultObject(directoryFilePathsRO)
   }
 
   try {
     const groups = getDateRangeGroups([
-      ...imageFilePathsTreeResultObject.result,
-      ...getDateSubdirectoryFilePaths(directoryFilePathsResultObject.result)
+      ...imageFilePathsTreeRO.result,
+      ...getDateSubdirectoryFilePaths(directoryFilePathsRO.result)
     ])
     groupsToFolders(groups, outputPath)
   } catch (error) {
@@ -53,22 +51,16 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     return toResultObjectWithNullResult(resultStatus.errorSystem, error.message)
   }
 
-  const removeEmptyDirectoriesResultObject = await removeEmptyDirectories([
-    ...getDistinctDirectoryPaths(imageFilePathsTreeResultObject.result),
-    ...directoryFilePathsResultObject.result
+  const removeEmptyDirectoriesRO = await removeEmptyDirectories([
+    ...getDistinctDirectoryPaths(imageFilePathsTreeRO.result),
+    ...directoryFilePathsRO.result
   ])
-  if (isResultObjectOk(removeEmptyDirectoriesResultObject)) {
+  if (isResultObjectOk(removeEmptyDirectoriesRO)) {
     return toResultObjectWithNullResultAndResultStatusOk()
-  } else if (isResultObjectPartiallyOk(removeEmptyDirectoriesResultObject)) {
-    return toResultObjectWithNullResult(
-      resultStatus.partiallyOk,
-      removeEmptyDirectoriesResultObject.message
-    )
+  } else if (isResultObjectPartiallyOk(removeEmptyDirectoriesRO)) {
+    return toResultObjectWithNullResult(resultStatus.partiallyOk, removeEmptyDirectoriesRO.message)
   } else {
-    return toResultObjectWithNullResult(
-      resultStatus.errorSystem,
-      removeEmptyDirectoriesResultObject.message
-    )
+    return toResultObjectWithNullResult(resultStatus.errorSystem, removeEmptyDirectoriesRO.message)
   }
 }
 
