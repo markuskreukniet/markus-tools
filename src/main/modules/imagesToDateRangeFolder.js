@@ -51,7 +51,6 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     ])
     await groupsToFolders(groups, outputPath)
   } catch (error) {
-    // TODO: use abstraction and also on other places?
     return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
 
