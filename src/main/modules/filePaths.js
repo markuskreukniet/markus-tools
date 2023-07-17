@@ -1,4 +1,4 @@
-import fs from 'fs'
+import { constants, promises } from 'fs'
 import path from 'path'
 import { inputError } from '../../preload/modules/errors'
 import { filePathsType, fileType } from '../../preload/modules/files'
@@ -11,8 +11,6 @@ import {
   toResultObjectWithResultStatusOk
 } from '../../preload/modules/resultStatus'
 
-// TODO: change fs import to promises
-// TODO: check for good error handling whole app, probably everything with fs.promises?
 export async function getDirectoryFilePaths(directoryPath, directoryTree, typeFilePaths, typeFile) {
   if (!typeFile) {
     typeFile = fileType.all
@@ -28,11 +26,11 @@ export async function getDirectoryFilePaths(directoryPath, directoryTree, typeFi
     const currentPath = stack.pop()
 
     try {
-      const files = await fs.promises.readdir(currentPath)
+      const files = await promises.readdir(currentPath)
 
       const stats = await Promise.all(
         files.map((file) => {
-          return fs.promises.stat(combinePathParts(currentPath, file))
+          return promises.stat(combinePathParts(currentPath, file))
         })
       )
 
@@ -109,9 +107,9 @@ export async function removeEmptyDirectories(filePaths) {
   // Both awaits are needed, therefore, a 'await Promise.all' solution is useless.
   for (const filePath of filePaths) {
     try {
-      const files = await fs.promises.readdir(filePath)
+      const files = await promises.readdir(filePath)
       if (files.length === 0) {
-        await fs.promises.rmdir(filePath)
+        await promises.rmdir(filePath)
       }
     } catch (error) {
       errorCount++
@@ -146,7 +144,7 @@ export function getDistinctDirectoryPaths(filePaths) {
 
 async function filePathExists(filePath) {
   try {
-    await fs.promises.access(filePath, fs.constants.F_OK)
+    await promises.access(filePath, constants.F_OK)
     return toResultObjectWithResultStatusOk(true)
   } catch {
     return toResultObjectWithResultStatusOk(false)
@@ -156,7 +154,7 @@ async function filePathExists(filePath) {
 export async function makeDirectoryIfNotExists(filePath) {
   if (await filePathExists(filePath)) {
     try {
-      await fs.promises.mkdir(filePath)
+      await promises.mkdir(filePath)
       return toResultObjectWithNullResultAndResultStatusOk()
     } catch (error) {
       return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)

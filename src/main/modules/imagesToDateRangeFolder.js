@@ -18,6 +18,7 @@ import {
   toResultObjectWithNullResultByResultObject
 } from '../../preload/modules/resultStatus'
 
+// TODO: check for good error handling whole app
 // TODO: function looks a lot like duplicateFiles
 // TODO: rename resultStatus file
 // TODO: check if has access to input en output directory
