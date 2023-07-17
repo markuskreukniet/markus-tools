@@ -12,7 +12,7 @@ import {
 } from '../../preload/modules/resultStatus'
 
 // TODO: change fs import to promises
-// TODO: check for good error handling whole app
+// TODO: check for good error handling whole app, probably everything with fs.promises?
 export async function getDirectoryFilePaths(directoryPath, directoryTree, typeFilePaths, typeFile) {
   if (!typeFile) {
     typeFile = fileType.all
