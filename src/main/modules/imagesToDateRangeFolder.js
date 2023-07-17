@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import {
+  combinePathParts,
   getBaseName,
   getDirectoryFilePaths,
   getDistinctDirectoryPaths,
@@ -156,7 +157,7 @@ async function groupsToFolders(groups, path) {
     const makeDirectoryIfNotExistsRO = await makeDirectoryIfNotExists(subFolderPath)
     for (const combination of group) {
       const fileName = getBaseName(combination.path)
-      const destinationPath = combinePathAndFile(subFolderPath, fileName)
+      const destinationPath = combinePathParts(subFolderPath, fileName)
       fs.rename(combination.path, destinationPath, (err) => {
         if (err) {
           throw err
@@ -189,10 +190,6 @@ function isValidDateFormat(dateString) {
   )
 }
 
-function combinePathAndFile(path, file) {
-  return `${path}\\${file}`
-}
-
 function getFilePaths(path) {
   const filePaths = []
 
@@ -200,7 +197,7 @@ function getFilePaths(path) {
     const files = fs.readdirSync(path)
 
     files.forEach((file) => {
-      const filePath = combinePathAndFile(path, file)
+      const filePath = combinePathParts(path, file)
       const stats = fs.statSync(filePath)
 
       if (stats.isFile()) {

@@ -32,12 +32,12 @@ export async function getDirectoryFilePaths(directoryPath, directoryTree, typeFi
 
       const stats = await Promise.all(
         files.map((file) => {
-          return fs.promises.stat(path.join(currentPath, file))
+          return fs.promises.stat(combinePathParts(currentPath, file))
         })
       )
 
       for (let i = 0; i < files.length; i++) {
-        const filePath = path.join(currentPath, files[i])
+        const filePath = combinePathParts(currentPath, files[i])
 
         const isDirectory = stats[i].isDirectory()
         if (directoryTree && isDirectory) {
@@ -130,6 +130,10 @@ export async function removeEmptyDirectories(filePaths) {
 
 export function getBaseName(filePath) {
   return path.basename(filePath)
+}
+
+export function combinePathParts(filePath1, filePath2) {
+  return path.join(filePath1, filePath2)
 }
 
 export function getDistinctDirectoryPaths(filePaths) {
