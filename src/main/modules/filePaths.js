@@ -128,6 +128,10 @@ export async function removeEmptyDirectories(filePaths) {
   }
 }
 
+export function getDirectoryBaseName(filePath) {
+  return path.basename(filePath)
+}
+
 export function getDistinctDirectoryPaths(filePaths) {
   const directoryPaths = filePaths.map((filePath) => path.dirname(filePath))
   const sortedDirectoryPaths = directoryPaths.sort()

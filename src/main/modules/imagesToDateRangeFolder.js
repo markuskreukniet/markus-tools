@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import {
+  getDirectoryBaseName,
   getDirectoryFilePaths,
   getDistinctDirectoryPaths,
   removeEmptyDirectories
@@ -87,15 +88,14 @@ function getDateSubdirectoryFilePaths(paths) {
   const separator = ' - '
 
   for (const path of paths) {
-    const pathParts = path.split('\\')
-    const lastPathPart = pathParts[pathParts.length - 1]
+    const baseName = getDirectoryBaseName(path)
 
-    if (lastPathPart.includes(separator)) {
-      const directoryParts = lastPathPart.split(separator)
+    if (baseName.includes(separator)) {
+      const directoryParts = baseName.split(separator)
       if (isValidDateFormat(directoryParts[0]) && isValidDateFormat(directoryParts[1])) {
         result = addFilePaths(result, path)
       }
-    } else if (isValidDateFormat(lastPathPart)) {
+    } else if (isValidDateFormat(baseName)) {
       result = addFilePaths(result, path)
     }
   }
