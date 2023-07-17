@@ -150,7 +150,7 @@ async function groupsToFolders(groups, path) {
     const oldestDate = formatTime(group[0].dateCreated)
     const newestDate = formatTime(group[group.length - 1].dateCreated)
 
-    let subFolderPath = `${path}/${oldestDate}`
+    let subFolderPath = combinePathParts(path, oldestDate)
     if (oldestDate !== newestDate) {
       subFolderPath = `${subFolderPath} - ${newestDate}`
     }
