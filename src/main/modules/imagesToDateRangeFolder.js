@@ -4,6 +4,7 @@ import {
   getBaseName,
   getDirectoryFilePaths,
   getDistinctDirectoryPaths,
+  makeDirectoryIfItDoesNotExists,
   removeEmptyDirectories
 } from './filePaths.js'
 import { filePathsType, fileType } from '../../preload/modules/files'
@@ -46,7 +47,7 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
       ...imageFilePathsTreeRO.result,
       ...getDateSubdirectoryFilePaths(directoryFilePathsRO.result)
     ])
-    groupsToFolders(groups, outputPath)
+    await groupsToFolders(groups, outputPath)
   } catch (error) {
     // TODO: use abstraction and also on other places?
     return toResultObjectWithNullResult(resultStatus.errorSystem, error.message)
@@ -142,7 +143,7 @@ function isWithinThreeDays(date1, date2) {
   return days <= 3
 }
 
-function groupsToFolders(groups, path) {
+async function groupsToFolders(groups, path) {
   for (const group of groups) {
     const oldestDate = formatTime(group[0].dateCreated)
     const newestDate = formatTime(group[group.length - 1].dateCreated)
@@ -151,9 +152,9 @@ function groupsToFolders(groups, path) {
     if (oldestDate !== newestDate) {
       subFolderPath = `${subFolderPath} - ${newestDate}`
     }
-    if (!fs.existsSync(subFolderPath)) {
-      fs.mkdirSync(subFolderPath)
-    }
+    // TODO: error handling
+    // TODO: rename makeDirectoryIfItDoesNotExists
+    const a = await makeDirectoryIfItDoesNotExists(subFolderPath)
     for (const combination of group) {
       const fileName = getBaseName(combination.path)
       const destinationPath = combinePathAndFile(subFolderPath, fileName)
