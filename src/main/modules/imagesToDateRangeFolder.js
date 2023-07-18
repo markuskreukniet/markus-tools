@@ -85,6 +85,27 @@ function getSelectedFolderPath(files) {
   return prefix
 }
 
+function getDateSubdirectoryFileObjects(fileObjects) {
+  let result = []
+  const separator = ' - '
+
+  for (const fileObject of fileObjects) {
+    const baseName = getBaseName(fileObject.path)
+
+    if (baseName.includes(separator)) {
+      const directoryParts = baseName.split(separator)
+      if (isValidDateFormat(directoryParts[0]) && isValidDateFormat(directoryParts[1])) {
+        result = addFileObjects(result, fileObject.path)
+      }
+    } else if (isValidDateFormat(baseName)) {
+      result = addFileObjects(result, fileObject.path)
+    }
+  }
+
+  return result
+}
+
+// TODO: remove
 function getDateSubdirectoryFilePaths(paths) {
   let result = []
   const separator = ' - '
@@ -103,6 +124,11 @@ function getDateSubdirectoryFilePaths(paths) {
   }
 
   return result
+}
+
+function addFileObjects(result, fileObjectPath) {
+  // TODO
+  return [...result, ...getFileObjects(fileObjectPath)]
 }
 
 function addFilePaths(result, path) {
