@@ -109,6 +109,29 @@ function addFilePaths(result, path) {
   return [...result, ...getFilePaths(path)]
 }
 
+// TODO: rename
+function getDateRangeGroupsNew(fileObjects) {
+  fileObjects.sort(compare)
+
+  const groups = []
+  let group = [fileObjects[0]]
+  for (let i = 1; i < fileObjects.length; i++) {
+    const fileObject = fileObjects[i - 1]
+    const fileObject2 = fileObjects[i]
+
+    if (isWithinThreeDays(fileObject.dateCreated, fileObject2.dateCreated)) {
+      group.push(fileObject2)
+    } else {
+      groups.push(group)
+      group = [fileObject2]
+    }
+  }
+  groups.push(group)
+
+  return groups
+}
+
+// TODO: remove
 function getDateRangeGroups(filePaths) {
   // path and date created combinations of files
   const pathDateCreatedCombinations = []
