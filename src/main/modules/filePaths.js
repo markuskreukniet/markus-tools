@@ -5,6 +5,7 @@ import { filePathsType, fileType } from '../../preload/modules/files'
 import {
   resultStatus,
   toResultObject,
+  toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem,
   toResultObjectWithNullResultAndResultStatusErrorSystem,
   toResultObjectWithNullResultAndResultStatusOk,
   toResultObjectWithNullResultAndResultStatusPartiallyOk,
@@ -17,7 +18,9 @@ export async function getDirectoryFilePaths(directoryPath, directoryTree, typeFi
   }
 
   if (typeFilePaths === filePathsType.directories && typeFile !== fileType.all) {
-    return toResultObject([], resultStatus.errorSystem, inputError.wrongFunctionArguments)
+    return toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem(
+      inputError.wrongFunctionArguments
+    )
   }
 
   const filePaths = []
@@ -46,7 +49,7 @@ export async function getDirectoryFilePaths(directoryPath, directoryTree, typeFi
         }
       }
     } catch (error) {
-      return toResultObject([], resultStatus.errorSystem, error.message)
+      return toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem(error.message)
     }
   }
 

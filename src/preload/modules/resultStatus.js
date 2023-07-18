@@ -10,7 +10,7 @@ export function toResultObject(result, status, message) {
   return { result, status, message: message ? message : '' }
 }
 
-// TODO: remove
+// toResultObjectWithNullResultAndResultStatus
 export function toResultObjectWithNullResultAndResultStatusOk(message) {
   return toResultObject(null, resultStatus.ok, message)
 }
@@ -23,12 +23,35 @@ export function toResultObjectWithNullResultAndResultStatusPartiallyOk(message) 
   return toResultObject(null, resultStatus.partiallyOk, message)
 }
 
+// toResultObjectWithNullResultByResultObject
 export function toResultObjectWithNullResultByResultObject(resultObject) {
   return toResultObject(null, resultObject.status, resultObject.message)
 }
 
+// toResultObjectWithResultStatus
 export function toResultObjectWithResultStatusOk(result, message) {
   return toResultObject(result, resultStatus.ok, message)
+}
+
+export function toResultObjectWithResultStatusErrorSystem(result, message) {
+  return toResultObject(result, resultStatus.errorSystem, message)
+}
+
+export function toResultObjectWithResultStatusPartiallyOk(result, message) {
+  return toResultObject(result, resultStatus.partiallyOk, message)
+}
+
+// toResultObjectWithEmptyArrayResult
+export function toResultObjectWithEmptyArrayResultAndResultStatusOk(message) {
+  return toResultObject([], resultStatus.ok, message)
+}
+
+export function toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem(message) {
+  return toResultObject([], resultStatus.errorSystem, message)
+}
+
+export function toResultObjectWithEmptyArrayResultAndResultStatusPartiallyOk(message) {
+  return toResultObject([], resultStatus.partiallyOk, message)
 }
 
 // isResultObject
