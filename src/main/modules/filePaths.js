@@ -12,6 +12,53 @@ import {
   toResultObjectWithResultStatusOk
 } from '../../preload/modules/resultStatus'
 
+// new
+export async function getDirectoryObjects(directoryPath, directoryTree, typeFilePaths, typeFile) {
+  if (!typeFile) {
+    typeFile = fileType.all
+  }
+
+  if (typeFilePaths === filePathsType.directories && typeFile !== fileType.all) {
+    return toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem(
+      inputError.wrongFunctionArguments
+    )
+  }
+
+  const objects = []
+  const stack = [directoryPath]
+  while (stack.length > 0) {
+    const currentPath = stack.pop()
+
+    try {
+      const files = await promises.readdir(currentPath)
+
+      const stats = await Promise.all(
+        files.map((file) => {
+          return promises.stat(combinePathParts(currentPath, file))
+        })
+      )
+
+      for (let i = 0; i < files.length; i++) {
+        const filePath = combinePathParts(currentPath, files[i])
+
+        const isDirectory = stats[i].isDirectory()
+        if (directoryTree && isDirectory) {
+          stack.push(filePath)
+        }
+        if (shouldAddFilePath(typeFilePaths, typeFile, filePath, isDirectory, stats[i].size)) {
+          // TODO: dateCreated or dateModified?
+          objects.push({ path: filePath, dateCreated: stats[i].mtime, size: stats[i].size })
+        }
+      }
+    } catch (error) {
+      return toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem(error.message)
+    }
+  }
+
+  return toResultObject(objects, resultStatus.ok)
+}
+
+// old
 export async function getDirectoryFilePaths(directoryPath, directoryTree, typeFilePaths, typeFile) {
   if (!typeFile) {
     typeFile = fileType.all
@@ -56,6 +103,7 @@ export async function getDirectoryFilePaths(directoryPath, directoryTree, typeFi
   return toResultObject(filePaths, resultStatus.ok)
 }
 
+// TODO: rename shouldAddObject
 function shouldAddFilePath(typeFilePaths, typeFile, filePath, isDirectory, size) {
   const fileTypeCheck =
     isDirectory ||
