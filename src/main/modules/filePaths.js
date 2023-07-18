@@ -63,6 +63,7 @@ export async function getDirectoryFileObjects(
   return toResultObject(fileObjects, resultStatus.ok)
 }
 
+// TODO: maybe function is useless since objects might not be needed
 // rename removeEmptyDirectoriesNew to removeEmptyDirectories
 export async function removeEmptyDirectoriesNew(fileObjects) {
   let errorCount = 0
@@ -88,6 +89,25 @@ export async function removeEmptyDirectoriesNew(fileObjects) {
   } else {
     return toResultObjectWithNullResultAndResultStatusErrorSystem(errorMessage)
   }
+}
+
+export function getDistinctDirectoryFileObjects(fileObjects) {
+  const sortedDirectoryFileObjects = fileObjects
+    .map((fileObject) => path.dirname(fileObject.path))
+    .sort(compare)
+  return sortedDirectoryFileObjects.filter(
+    (fileObject, index) => fileObject.path !== sortedDirectoryFileObjects[index - 1].path
+  )
+}
+
+function compare(a, b) {
+  if (a.path < b.path) {
+    return -1
+  }
+  if (a.path > b.path) {
+    return 1
+  }
+  return 0
 }
 
 // old
