@@ -13,7 +13,12 @@ import {
 } from '../../preload/modules/resultStatus'
 
 // new
-export async function getDirectoryObjects(directoryPath, directoryTree, typeFilePaths, typeFile) {
+export async function getDirectoryFileObjects(
+  directoryPath,
+  directoryTree,
+  typeFilePaths,
+  typeFile
+) {
   if (!typeFile) {
     typeFile = fileType.all
   }
@@ -24,7 +29,7 @@ export async function getDirectoryObjects(directoryPath, directoryTree, typeFile
     )
   }
 
-  const objects = []
+  const fileObjects = []
   const stack = [directoryPath]
   while (stack.length > 0) {
     const currentPath = stack.pop()
@@ -47,7 +52,7 @@ export async function getDirectoryObjects(directoryPath, directoryTree, typeFile
         }
         if (shouldAddFilePath(typeFilePaths, typeFile, filePath, isDirectory, stats[i].size)) {
           // TODO: dateCreated or dateModified?
-          objects.push({ path: filePath, dateCreated: stats[i].mtime, size: stats[i].size })
+          fileObjects.push({ path: filePath, dateCreated: stats[i].mtime, size: stats[i].size })
         }
       }
     } catch (error) {
@@ -55,7 +60,34 @@ export async function getDirectoryObjects(directoryPath, directoryTree, typeFile
     }
   }
 
-  return toResultObject(objects, resultStatus.ok)
+  return toResultObject(fileObjects, resultStatus.ok)
+}
+
+// rename removeEmptyDirectoriesNew to removeEmptyDirectories
+export async function removeEmptyDirectoriesNew(fileObjects) {
+  let errorCount = 0
+  let errorMessage = ''
+
+  // Both awaits are needed, therefore, a 'await Promise.all' solution is useless.
+  for (const fileObject of fileObjects) {
+    try {
+      const files = await promises.readdir(fileObject.path)
+      if (files.length === 0) {
+        await promises.rmdir(fileObject.path)
+      }
+    } catch (error) {
+      errorCount++
+      errorMessage = `${errorMessage}\n${error.message}`
+    }
+  }
+
+  if (errorCount === 0) {
+    return toResultObjectWithNullResultAndResultStatusOk()
+  } else if (errorCount > 0 && errorCount < fileObjects.length) {
+    return toResultObjectWithNullResultAndResultStatusPartiallyOk(errorMessage)
+  } else {
+    return toResultObjectWithNullResultAndResultStatusErrorSystem(errorMessage)
+  }
 }
 
 // old
