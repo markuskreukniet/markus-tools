@@ -49,7 +49,7 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
       ...imageFilePathsTreeRO.result,
       ...getDateSubdirectoryFileObjects(directoryFilePathsRO.result)
     ])
-    await groupsToFolders(groups, outputPath)
+    await groupsToDirectories(groups, outputPath)
   } catch (error) {
     return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
@@ -137,7 +137,7 @@ function isWithinThreeDays(date1, date2) {
   return days <= 3
 }
 
-async function groupsToFolders(groups, path) {
+async function groupsToDirectories(groups, path) {
   for (const group of groups) {
     const oldestDate = formatTime(group[0].dateCreated)
     const newestDate = formatTime(group[group.length - 1].dateCreated)
