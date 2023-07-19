@@ -6,7 +6,7 @@ import {
   getDirectoryFileObjects,
   getDistinctDirectoryFileObjects,
   makeDirectoryIfNotExists,
-  removeEmptyDirectoriesNew
+  removeEmptyDirectories
 } from './filePaths.js'
 import { filePathsType, fileType } from '../../preload/modules/files'
 import {
@@ -45,7 +45,7 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   }
 
   try {
-    const groups = getDateRangeGroupsNew([
+    const groups = getDateRangeGroups([
       ...imageFilePathsTreeRO.result,
       ...getDateSubdirectoryFileObjects(directoryFilePathsRO.result)
     ])
@@ -54,7 +54,7 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
 
-  const removeEmptyDirectoriesRO = await removeEmptyDirectoriesNew([
+  const removeEmptyDirectoriesRO = await removeEmptyDirectories([
     ...getDistinctDirectoryFileObjects(imageFilePathsTreeRO.result),
     ...directoryFilePathsRO.result
   ])
@@ -109,8 +109,7 @@ function addFileObjects(result, fileObjectPath) {
   return [...result, ...getFileObjects(fileObjectPath)]
 }
 
-// TODO: rename
-function getDateRangeGroupsNew(fileObjects) {
+function getDateRangeGroups(fileObjects) {
   fileObjects.sort(compare)
 
   const groups = []

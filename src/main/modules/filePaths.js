@@ -49,7 +49,7 @@ export async function getDirectoryFileObjects(
         if (directoryTree && isDirectory) {
           stack.push(filePath)
         }
-        if (shouldAddFilePath(typeFilePaths, typeFile, filePath, isDirectory, stats[i].size)) {
+        if (shouldAddFileObject(typeFilePaths, typeFile, filePath, isDirectory, stats[i].size)) {
           // TODO: dateCreated or dateModified?
           fileObjects.push({ path: filePath, dateCreated: stats[i].mtime, size: stats[i].size })
         }
@@ -63,8 +63,7 @@ export async function getDirectoryFileObjects(
 }
 
 // TODO: maybe function is useless since objects might not be needed
-// rename removeEmptyDirectoriesNew to removeEmptyDirectories
-export async function removeEmptyDirectoriesNew(fileObjects) {
+export async function removeEmptyDirectories(fileObjects) {
   let errorCount = 0
   let errorMessage = ''
 
@@ -111,8 +110,7 @@ function compare(a, b) {
   return 0
 }
 
-// TODO: rename shouldAddObject
-function shouldAddFilePath(typeFilePaths, typeFile, filePath, isDirectory, size) {
+function shouldAddFileObject(typeFilePaths, typeFile, filePath, isDirectory, size) {
   const fileTypeCheck =
     isDirectory ||
     typeFile === fileType.all ||
