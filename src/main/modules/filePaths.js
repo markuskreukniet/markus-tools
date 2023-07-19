@@ -112,51 +112,6 @@ function compare(a, b) {
   return 0
 }
 
-// old
-export async function getDirectoryFilePaths(directoryPath, directoryTree, typeFilePaths, typeFile) {
-  if (!typeFile) {
-    typeFile = fileType.all
-  }
-
-  if (typeFilePaths === filePathsType.directories && typeFile !== fileType.all) {
-    return toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem(
-      inputError.wrongFunctionArguments
-    )
-  }
-
-  const filePaths = []
-  const stack = [directoryPath]
-  while (stack.length > 0) {
-    const currentPath = stack.pop()
-
-    try {
-      const files = await promises.readdir(currentPath)
-
-      const stats = await Promise.all(
-        files.map((file) => {
-          return promises.stat(combinePathParts(currentPath, file))
-        })
-      )
-
-      for (let i = 0; i < files.length; i++) {
-        const filePath = combinePathParts(currentPath, files[i])
-
-        const isDirectory = stats[i].isDirectory()
-        if (directoryTree && isDirectory) {
-          stack.push(filePath)
-        }
-        if (shouldAddFilePath(typeFilePaths, typeFile, filePath, isDirectory, stats[i].size)) {
-          filePaths.push(filePath)
-        }
-      }
-    } catch (error) {
-      return toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem(error.message)
-    }
-  }
-
-  return toResultObject(filePaths, resultStatus.ok)
-}
-
 // TODO: rename shouldAddObject
 function shouldAddFilePath(typeFilePaths, typeFile, filePath, isDirectory, size) {
   const fileTypeCheck =
@@ -205,46 +160,12 @@ export default function isNotAZeroByteFile(stats) {
   return stats.size > 0
 }
 
-export async function removeEmptyDirectories(filePaths) {
-  let errorCount = 0
-  let errorMessage = ''
-
-  // Both awaits are needed, therefore, a 'await Promise.all' solution is useless.
-  for (const filePath of filePaths) {
-    try {
-      const files = await promises.readdir(filePath)
-      if (files.length === 0) {
-        await promises.rmdir(filePath)
-      }
-    } catch (error) {
-      errorCount++
-      errorMessage = `${errorMessage}\n${error.message}`
-    }
-  }
-
-  if (errorCount === 0) {
-    return toResultObjectWithNullResultAndResultStatusOk()
-  } else if (errorCount > 0 && errorCount < filePaths.length) {
-    return toResultObjectWithNullResultAndResultStatusPartiallyOk(errorMessage)
-  } else {
-    return toResultObjectWithNullResultAndResultStatusErrorSystem(errorMessage)
-  }
-}
-
 export function getBaseName(filePath) {
   return path.basename(filePath)
 }
 
 export function combinePathParts(filePath1, filePath2) {
   return path.join(filePath1, filePath2)
-}
-
-export function getDistinctDirectoryPaths(filePaths) {
-  const directoryPaths = filePaths.map((filePath) => path.dirname(filePath))
-  const sortedDirectoryPaths = directoryPaths.sort()
-  return sortedDirectoryPaths.filter(
-    (sortedDirectoryPath, index) => sortedDirectoryPath !== sortedDirectoryPaths[index - 1]
-  )
 }
 
 async function filePathExists(filePath) {

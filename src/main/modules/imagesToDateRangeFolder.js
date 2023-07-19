@@ -105,34 +105,8 @@ function getDateSubdirectoryFileObjects(fileObjects) {
   return result
 }
 
-// TODO: remove
-function getDateSubdirectoryFilePaths(paths) {
-  let result = []
-  const separator = ' - '
-
-  for (const path of paths) {
-    const baseName = getBaseName(path)
-
-    if (baseName.includes(separator)) {
-      const directoryParts = baseName.split(separator)
-      if (isValidDateFormat(directoryParts[0]) && isValidDateFormat(directoryParts[1])) {
-        result = addFilePaths(result, path)
-      }
-    } else if (isValidDateFormat(baseName)) {
-      result = addFilePaths(result, path)
-    }
-  }
-
-  return result
-}
-
 function addFileObjects(result, fileObjectPath) {
-  // TODO
   return [...result, ...getFileObjects(fileObjectPath)]
-}
-
-function addFilePaths(result, path) {
-  return [...result, ...getFilePaths(path)]
 }
 
 // TODO: rename
@@ -150,35 +124,6 @@ function getDateRangeGroupsNew(fileObjects) {
     } else {
       groups.push(group)
       group = [fileObject2]
-    }
-  }
-  groups.push(group)
-
-  return groups
-}
-
-// TODO: remove
-function getDateRangeGroups(filePaths) {
-  // path and date created combinations of files
-  const pathDateCreatedCombinations = []
-  for (const path of filePaths) {
-    const stats = fs.statSync(path)
-    pathDateCreatedCombinations.push({ path, dateCreated: stats.mtime })
-  }
-
-  pathDateCreatedCombinations.sort(compare)
-
-  const groups = []
-  let group = [pathDateCreatedCombinations[0]]
-  for (let i = 1; i < pathDateCreatedCombinations.length; i++) {
-    const combination = pathDateCreatedCombinations[i - 1]
-    const combination2 = pathDateCreatedCombinations[i]
-
-    if (isWithinThreeDays(combination.dateCreated, combination2.dateCreated)) {
-      group.push(combination2)
-    } else {
-      groups.push(group)
-      group = [combination2]
     }
   }
   groups.push(group)
@@ -260,27 +205,6 @@ function getFileObjects(filePath) {
   }
 
   return fileObjects
-}
-
-function getFilePaths(path) {
-  const filePaths = []
-
-  try {
-    const files = fs.readdirSync(path)
-
-    files.forEach((file) => {
-      const filePath = combinePathParts(path, file)
-      const stats = fs.statSync(filePath)
-
-      if (stats.isFile()) {
-        filePaths.push(filePath)
-      }
-    })
-  } catch (error) {
-    console.error('Error occurred while reading the folder:', error)
-  }
-
-  return filePaths
 }
 
 function formatTime(time) {
