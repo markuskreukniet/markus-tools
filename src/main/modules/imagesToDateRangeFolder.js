@@ -239,6 +239,29 @@ function isValidDateFormat(dateString) {
   )
 }
 
+// TODO: use filePaths.js?
+function getFileObjects(filePath) {
+  const fileObjects = []
+
+  try {
+    const files = fs.readdirSync(filePath)
+
+    files.forEach((file) => {
+      const combinedFilePath = combinePathParts(filePath, file)
+      const stats = fs.statSync(combinedFilePath)
+
+      if (stats.isFile()) {
+        // TODO: dateCreated and size correct?
+        fileObjects.push({ path: combinedFilePath, dateCreated: 0, size: 0 })
+      }
+    })
+  } catch (error) {
+    console.error('Error occurred while reading the folder:', error)
+  }
+
+  return fileObjects
+}
+
 function getFilePaths(path) {
   const filePaths = []
 
