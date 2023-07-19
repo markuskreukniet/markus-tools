@@ -19,7 +19,6 @@ import {
 } from '../../preload/modules/resultStatus'
 
 // TODO: check for good error handling whole app
-// TODO: function looks a lot like duplicateFiles
 // TODO: rename resultStatus file
 // TODO: check if has access to input en output directory
 export default async function imagesToDateRangeFolder(filePaths, outputPath) {
@@ -35,7 +34,7 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     return toResultObjectWithNullResultByResultObject(imageFileObjectsTreeRO)
   }
 
-  // TODO: should be directories with files?
+  // TODO: should be directories with files, or one files and one with directories?
   const directoryFileObjectsRO = await getDirectoryFileObjects(
     outputPath,
     false,
