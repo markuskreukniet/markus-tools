@@ -12,7 +12,6 @@ import {
   toResultObjectWithResultStatusOk
 } from '../../preload/modules/resultStatus'
 
-// new
 export async function getDirectoryFileObjects(
   directoryPath,
   directoryTree,
