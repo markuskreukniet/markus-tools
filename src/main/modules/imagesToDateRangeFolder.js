@@ -24,6 +24,7 @@ import {
 export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   const inputPath = getSelectedFolderPath(filePaths)
 
+  // TODO: rename to something with input
   const imageFileObjectsTreeRO = await getDirectoryFileObjects(
     inputPath,
     true,
@@ -35,6 +36,27 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   }
 
   // TODO: should be directories with files, or one files and one with directories?
+  const outputDirectoryImageFileObjectsRO = await getDirectoryFileObjects(
+    outputPath,
+    false,
+    filePathsType.filesWithoutZeroByteFiles,
+    fileType.image
+  )
+  if (!isResultObjectOk(outputDirectoryImageFileObjectsRO)) {
+    return toResultObjectWithNullResultByResultObject(outputDirectoryImageFileObjectsRO)
+  }
+
+  try {
+    const groups = getDateRangeGroups([
+      ...imageFileObjectsTreeRO.result,
+      ...getDateSubdirectoryFileObjects(outputDirectoryImageFileObjectsRO.result)
+    ])
+    await groupsToDirectories(groups, outputPath)
+  } catch (error) {
+    return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
+  }
+
+  // TODO: should be called earlier, now it also adds the already created directories
   const directoryFileObjectsRO = await getDirectoryFileObjects(
     outputPath,
     false,
@@ -42,16 +64,6 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   )
   if (!isResultObjectOk(directoryFileObjectsRO)) {
     return toResultObjectWithNullResultByResultObject(directoryFileObjectsRO)
-  }
-
-  try {
-    const groups = getDateRangeGroups([
-      ...imageFileObjectsTreeRO.result,
-      ...getDateSubdirectoryFileObjects(directoryFileObjectsRO.result)
-    ])
-    await groupsToDirectories(groups, outputPath)
-  } catch (error) {
-    return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
 
   const removeEmptyDirectoriesRO = await removeEmptyDirectories([
@@ -86,7 +98,7 @@ function getSelectedFolderPath(files) {
 }
 
 function getDateSubdirectoryFileObjects(fileObjects) {
-  let result = []
+  const result = []
   const separator = ' - '
 
   for (const fileObject of fileObjects) {
@@ -95,18 +107,14 @@ function getDateSubdirectoryFileObjects(fileObjects) {
     if (baseName.includes(separator)) {
       const directoryParts = baseName.split(separator)
       if (isValidDateFormat(directoryParts[0]) && isValidDateFormat(directoryParts[1])) {
-        result = addFileObjects(result, fileObject.path)
+        result.push(fileObject)
       }
     } else if (isValidDateFormat(baseName)) {
-      result = addFileObjects(result, fileObject.path)
+      result.push(fileObject)
     }
   }
 
   return result
-}
-
-function addFileObjects(result, fileObjectPath) {
-  return [...result, ...getFileObjects(fileObjectPath)]
 }
 
 function getDateRangeGroups(fileObjects) {
@@ -182,29 +190,6 @@ function isValidDateFormat(dateString) {
     month > 12 ||
     year < 0
   )
-}
-
-// TODO: use filePaths.js?
-function getFileObjects(filePath) {
-  const fileObjects = []
-
-  try {
-    const files = fs.readdirSync(filePath)
-
-    files.forEach((file) => {
-      const combinedFilePath = combinePathParts(filePath, file)
-      const stats = fs.statSync(combinedFilePath)
-
-      if (stats.isFile()) {
-        // TODO: dateCreated and size correct?
-        fileObjects.push({ path: combinedFilePath, dateCreated: 0, size: 0 })
-      }
-    })
-  } catch (error) {
-    console.error('Error occurred while reading the folder:', error)
-  }
-
-  return fileObjects
 }
 
 function formatTime(time) {
