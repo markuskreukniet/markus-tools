@@ -25,29 +25,30 @@ import {
 export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   const inputPath = getSelectedFolderPath(filePaths)
 
-  const imageFilePathsTreeRO = await getDirectoryFileObjects(
+  const imageFileObjectsTreeRO = await getDirectoryFileObjects(
     inputPath,
     true,
     filePathsType.filesWithoutZeroByteFiles,
     fileType.image
   )
-  if (!isResultObjectOk(imageFilePathsTreeRO)) {
-    return toResultObjectWithNullResultByResultObject(imageFilePathsTreeRO)
+  if (!isResultObjectOk(imageFileObjectsTreeRO)) {
+    return toResultObjectWithNullResultByResultObject(imageFileObjectsTreeRO)
   }
 
-  const directoryFilePathsRO = await getDirectoryFileObjects(
+  // TODO: should be directories with files?
+  const directoryFileObjectsRO = await getDirectoryFileObjects(
     outputPath,
     false,
     filePathsType.directories
   )
-  if (!isResultObjectOk(directoryFilePathsRO)) {
-    return toResultObjectWithNullResultByResultObject(directoryFilePathsRO)
+  if (!isResultObjectOk(directoryFileObjectsRO)) {
+    return toResultObjectWithNullResultByResultObject(directoryFileObjectsRO)
   }
 
   try {
     const groups = getDateRangeGroups([
-      ...imageFilePathsTreeRO.result,
-      ...getDateSubdirectoryFileObjects(directoryFilePathsRO.result)
+      ...imageFileObjectsTreeRO.result,
+      ...getDateSubdirectoryFileObjects(directoryFileObjectsRO.result)
     ])
     await groupsToDirectories(groups, outputPath)
   } catch (error) {
@@ -55,8 +56,8 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   }
 
   const removeEmptyDirectoriesRO = await removeEmptyDirectories([
-    ...getDistinctDirectoryFileObjects(imageFilePathsTreeRO.result),
-    ...directoryFilePathsRO.result
+    ...getDistinctDirectoryFileObjects(imageFileObjectsTreeRO.result),
+    ...directoryFileObjectsRO.result
   ])
   if (isResultObjectOk(removeEmptyDirectoriesRO)) {
     return toResultObjectWithNullResultAndResultStatusOk()
@@ -110,6 +111,7 @@ function addFileObjects(result, fileObjectPath) {
 }
 
 function getDateRangeGroups(fileObjects) {
+  // TODO: it might be possible to remove a sort since getDistinctDirectoryFileObjects has also a sort
   fileObjects.sort(compare)
 
   const groups = []
