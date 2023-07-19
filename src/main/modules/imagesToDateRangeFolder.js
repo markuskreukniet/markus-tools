@@ -21,6 +21,7 @@ import {
 // TODO: check for good error handling whole app
 // TODO: rename resultStatus file
 // TODO: check if has access to input en output directory
+// TODO: remove fs and path import
 export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   const inputPath = getSelectedFolderPath(filePaths)
 
