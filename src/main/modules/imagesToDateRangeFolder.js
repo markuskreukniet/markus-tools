@@ -35,7 +35,6 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     return toResultObjectWithNullResultByResultObject(imageFileObjectsTreeRO)
   }
 
-  // TODO: should be directories with files, or one files and one with directories?
   const outputDirectoryImageFileObjectsRO = await getDirectoryFileObjects(
     outputPath,
     false,
