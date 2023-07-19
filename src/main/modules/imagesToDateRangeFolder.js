@@ -3,10 +3,10 @@ import path from 'path'
 import {
   combinePathParts,
   getBaseName,
-  getDirectoryFilePaths,
-  getDistinctDirectoryPaths,
+  getDirectoryFileObjects,
+  getDistinctDirectoryFileObjects,
   makeDirectoryIfNotExists,
-  removeEmptyDirectories
+  removeEmptyDirectoriesNew
 } from './filePaths.js'
 import { filePathsType, fileType } from '../../preload/modules/files'
 import {
@@ -25,7 +25,7 @@ import {
 export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   const inputPath = getSelectedFolderPath(filePaths)
 
-  const imageFilePathsTreeRO = await getDirectoryFilePaths(
+  const imageFilePathsTreeRO = await getDirectoryFileObjects(
     inputPath,
     true,
     filePathsType.filesWithoutZeroByteFiles,
@@ -35,7 +35,7 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     return toResultObjectWithNullResultByResultObject(imageFilePathsTreeRO)
   }
 
-  const directoryFilePathsRO = await getDirectoryFilePaths(
+  const directoryFilePathsRO = await getDirectoryFileObjects(
     outputPath,
     false,
     filePathsType.directories
@@ -45,17 +45,17 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   }
 
   try {
-    const groups = getDateRangeGroups([
+    const groups = getDateRangeGroupsNew([
       ...imageFilePathsTreeRO.result,
-      ...getDateSubdirectoryFilePaths(directoryFilePathsRO.result)
+      ...getDateSubdirectoryFileObjects(directoryFilePathsRO.result)
     ])
     await groupsToFolders(groups, outputPath)
   } catch (error) {
     return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
 
-  const removeEmptyDirectoriesRO = await removeEmptyDirectories([
-    ...getDistinctDirectoryPaths(imageFilePathsTreeRO.result),
+  const removeEmptyDirectoriesRO = await removeEmptyDirectoriesNew([
+    ...getDistinctDirectoryFileObjects(imageFilePathsTreeRO.result),
     ...directoryFilePathsRO.result
   ])
   if (isResultObjectOk(removeEmptyDirectoriesRO)) {

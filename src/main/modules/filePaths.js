@@ -92,11 +92,13 @@ export async function removeEmptyDirectoriesNew(fileObjects) {
 }
 
 export function getDistinctDirectoryFileObjects(fileObjects) {
-  const sortedDirectoryFileObjects = fileObjects
-    .map((fileObject) => path.dirname(fileObject.path))
-    .sort(compare)
-  return sortedDirectoryFileObjects.filter(
-    (fileObject, index) => fileObject.path !== sortedDirectoryFileObjects[index - 1].path
+  for (const fileObject of fileObjects) {
+    fileObject.path = path.dirname(fileObject.path)
+  }
+  fileObjects.sort(compare)
+  // TODO: dirty index === 0?
+  return fileObjects.filter(
+    (fileObject, index) => index === 0 || fileObject.path !== fileObjects[index - 1].path
   )
 }
 
