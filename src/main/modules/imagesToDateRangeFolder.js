@@ -57,7 +57,7 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
 
-  // TODO: should be called earlier, now it also adds the already created directories
+  // TODO: should be before groupsToDirectories since groupsToDirectories adds directories that getDirectoryFileObjects reads
   const directoryFileObjectsRO = await getDirectoryFileObjects(
     outputPath,
     false,
