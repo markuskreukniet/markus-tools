@@ -118,6 +118,7 @@ function getDateSubdirectoryFileObjects(fileObjects) {
   return result
 }
 
+// TODO: a group should not be an array, but object with an start date, end date, and an array
 function getDateRangeGroups(fileObjects) {
   // TODO: it might be possible to remove a sort since getDistinctDirectoryFileObjects has also a sort
   fileObjects.sort(compare)
