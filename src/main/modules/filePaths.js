@@ -117,11 +117,13 @@ function shouldAddFileObject(typeFilePaths, typeFile, filePath, isDirectory, siz
     (typeFile === fileType.image && isImageFilePath(filePath))
 
   const zeroByteCheck =
-    (typeFilePaths === filePathsType.filesWithoutZeroByteFiles ||
+    isDirectory ||
+    typeFilePaths === filePathsType.files ||
+    typeFilePaths === filePathsType.directories ||
+    typeFilePaths === filePathsType.filesAndDirectories ||
+    ((typeFilePaths === filePathsType.filesWithoutZeroByteFiles ||
       typeFilePaths === filePathsType.filesAndDirectoriesWithoutZeroByteFiles) &&
-    size === 0
-      ? false
-      : true
+      size > 0)
 
   return fileTypeCheck && calculateDirectoryCheck(typeFilePaths, isDirectory) && zeroByteCheck
 }
