@@ -46,6 +46,16 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     return toResultObjectWithNullResultByResultObject(outputDirectoryImageFileObjectsRO)
   }
 
+  // should be before groupsToDirectories since groupsToDirectories adds directories that getDirectoryFileObjects reads
+  const directoryFileObjectsRO = await getDirectoryFileObjects(
+    outputPath,
+    false,
+    filePathsType.directories
+  )
+  if (!isResultObjectOk(directoryFileObjectsRO)) {
+    return toResultObjectWithNullResultByResultObject(directoryFileObjectsRO)
+  }
+
   const groups = getDateRangeGroups([
     ...imageFileObjectsTreeRO.result,
     ...getDateSubdirectoryFileObjects(outputDirectoryImageFileObjectsRO.result)
@@ -55,16 +65,6 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     await groupsToDirectories(groups, outputPath)
   } catch (error) {
     return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
-  }
-
-  // TODO: should be before groupsToDirectories since groupsToDirectories adds directories that getDirectoryFileObjects reads
-  const directoryFileObjectsRO = await getDirectoryFileObjects(
-    outputPath,
-    false,
-    filePathsType.directories
-  )
-  if (!isResultObjectOk(directoryFileObjectsRO)) {
-    return toResultObjectWithNullResultByResultObject(directoryFileObjectsRO)
   }
 
   const removeEmptyDirectoriesRO = await removeEmptyDirectories([
