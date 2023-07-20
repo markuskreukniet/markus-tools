@@ -46,11 +46,12 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     return toResultObjectWithNullResultByResultObject(outputDirectoryImageFileObjectsRO)
   }
 
+  const groups = getDateRangeGroups([
+    ...imageFileObjectsTreeRO.result,
+    ...getDateSubdirectoryFileObjects(outputDirectoryImageFileObjectsRO.result)
+  ])
+
   try {
-    const groups = getDateRangeGroups([
-      ...imageFileObjectsTreeRO.result,
-      ...getDateSubdirectoryFileObjects(outputDirectoryImageFileObjectsRO.result)
-    ])
     await groupsToDirectories(groups, outputPath)
   } catch (error) {
     return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
