@@ -49,9 +49,15 @@ export async function getDirectoryFileObjects(
         if (directoryTree && isDirectory) {
           stack.push(filePath)
         }
+        // TODO: remove this comment if isDirectory should be part of the object
         if (shouldAddFileObject(typeFilePaths, typeFile, filePath, isDirectory, stats[i].size)) {
           // TODO: dateCreated or dateModified?
-          fileObjects.push({ path: filePath, dateCreated: stats[i].mtime, size: stats[i].size })
+          fileObjects.push({
+            path: filePath,
+            isDirectory,
+            dateCreated: stats[i].mtime,
+            size: stats[i].size
+          })
         }
       }
     } catch (error) {
