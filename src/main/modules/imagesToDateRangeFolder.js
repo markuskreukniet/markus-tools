@@ -18,13 +18,6 @@ import {
   toResultObjectWithNullResultByResultObject
 } from '../../preload/modules/resultStatus'
 
-// How it should work:
-// Get all files input, get all files output, get all directories input, and get all directories output
-// combine all the results of these gets to groups
-// groups to directories in the output directory
-// remove the empty directories from the gets
-//
-
 // TODO: check for good error handling whole app
 // TODO: rename resultStatus file
 // TODO: check if has access to input en output directory
@@ -83,8 +76,12 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
 
+  // the array can have duplicate directories
+  // TODO: duplicates might be the problem
   const removeEmptyDirectoriesRO = await removeEmptyDirectories([
     ...getDistinctDirectoryFileObjects(inputImageFileObjectsTreeRO.result),
+    // ...getDistinctDirectoryFileObjects(outputImageFileObjectsRO.result),
+    // ...inputDirectoryFileObjectsTreeRO.result,
     ...outputDirectoryFileObjectsRO.result
   ])
   if (isResultObjectOk(removeEmptyDirectoriesRO)) {
@@ -134,7 +131,6 @@ function getDateSubdirectoryFileObjects(fileObjects) {
   return result
 }
 
-// TODO: a group should not be an array, but object with an start date, end date, and an array
 function getDateRangeGroups(fileObjects) {
   // TODO: it might be possible to remove a sort since getDistinctDirectoryFileObjects has also a sort
   fileObjects.sort(compare)
@@ -164,6 +160,7 @@ function isWithinThreeDays(date1, date2) {
   return days <= 3
 }
 
+// TODO: the only function left to check/fix
 async function groupsToDirectories(groups, path) {
   for (const group of groups) {
     const oldestDate = formatTime(group[0].dateCreated)
