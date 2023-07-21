@@ -70,11 +70,8 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     ...getDateSubdirectoryFileObjects(outputImageFileObjectsRO.result)
   ])
 
-  try {
-    await groupsToDirectories(groups, outputPath)
-  } catch (error) {
-    return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
-  }
+  // TODO: error handling
+  await groupsToDirectories(groups, outputPath)
 
   // the array can have duplicate directories
   // TODO: duplicates might be the problem
