@@ -18,6 +18,13 @@ import {
   toResultObjectWithNullResultByResultObject
 } from '../../preload/modules/resultStatus'
 
+// How it should work:
+// Get all files input, get all files output, get all directories input, and get all directories output
+// combine all the results of these gets to groups
+// groups to directories in the output directory
+// remove the empty directories from the gets
+//
+
 // TODO: check for good error handling whole app
 // TODO: rename resultStatus file
 // TODO: check if has access to input en output directory
