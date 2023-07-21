@@ -1,4 +1,3 @@
-import fs from 'fs'
 import path from 'path'
 import {
   combinePathParts,
@@ -6,6 +5,7 @@ import {
   getDirectoryFileObjects,
   getDistinctDirectoryFileObjects,
   makeDirectoryIfNotExists,
+  moveFile,
   removeEmptyDirectories
 } from './filePaths.js'
 import { filePathsType, fileType } from '../../preload/modules/files'
@@ -21,7 +21,7 @@ import {
 // TODO: check for good error handling whole app
 // TODO: rename resultStatus file
 // TODO: check if has access to input en output directory
-// TODO: remove fs and path import
+// TODO: remove path import
 export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   const inputPath = getSelectedFolderPath(filePaths)
 
@@ -160,7 +160,7 @@ function isWithinThreeDays(date1, date2) {
   return days <= 3
 }
 
-// TODO: the only function left to check/fix
+// TODO: the only function left to check/fix, also naming in this function
 async function groupsToDirectories(groups, path) {
   for (const group of groups) {
     const oldestDate = formatTime(group[0].dateCreated)
@@ -173,13 +173,11 @@ async function groupsToDirectories(groups, path) {
     // TODO: error handling
     const makeDirectoryIfNotExistsRO = await makeDirectoryIfNotExists(subFolderPath)
     for (const combination of group) {
-      const fileName = getBaseName(combination.path)
-      const destinationPath = combinePathParts(subFolderPath, fileName)
-      fs.rename(combination.path, destinationPath, (err) => {
-        if (err) {
-          throw err
-        }
-      })
+      // TODO: error handling
+      const moveFileRO = moveFile(
+        combination.path,
+        combinePathParts(subFolderPath, getBaseName(combination.path))
+      )
     }
   }
 }

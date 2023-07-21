@@ -192,3 +192,12 @@ export async function makeDirectoryIfNotExists(filePath) {
     return false
   }
 }
+
+export async function moveFile(sourcePath, destinationPath) {
+  try {
+    await promises.rename(sourcePath, destinationPath)
+    return toResultObjectWithNullResultAndResultStatusOk()
+  } catch (error) {
+    return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
+  }
+}
