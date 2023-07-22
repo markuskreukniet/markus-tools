@@ -4,15 +4,14 @@ export const inputError = Object.freeze({
   couldNotReadOrRemoveADirectory: 'Could not read or remove a directory'
 })
 
-export function ErrorTracker() {
-  const that = this
-  let errorCount = 0
-  let errorMessage = ''
-
-  this.concatErrorMessageOnNewLineAndIncrementErrorCount = function (errorMessage) {
-    that.errorCount++
-    that.errorMessage = `${that.errorMessage}\n${errorMessage}`
+export class ErrorTracker {
+  constructor() {
+    this.errorCount = 0
+    this.errorMessage = ''
   }
 
-  // TODO: getInstance() needed?
+  concatErrorMessageOnNewLineAndIncrementErrorCount(errorMessage) {
+    this.errorCount++
+    this.errorMessage = `${this.errorMessage}\n${errorMessage}`
+  }
 }
