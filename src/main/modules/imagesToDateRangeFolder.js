@@ -146,6 +146,10 @@ function isWithinThreeDays(date1, date2) {
 
 // TODO: the only function left to check/fix, also naming in this function
 async function groupsToDirectories(groups, path) {
+  // TODO: same as removeEmptyDirectories
+  let errorCount = 0
+  let errorMessage = ''
+
   for (const group of groups) {
     const oldestDate = formatTime(group[0].dateCreated)
     const newestDate = formatTime(group[group.length - 1].dateCreated)

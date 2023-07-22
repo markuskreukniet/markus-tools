@@ -84,6 +84,7 @@ export async function getDirectoryImageFileObjectsWithoutZeroByteOnes(
 
 // TODO: maybe function is useless since objects might not be needed
 export async function removeEmptyDirectories(fileObjects) {
+  // TODO: error object with update function?
   let errorCount = 0
   let errorMessage = ''
 
