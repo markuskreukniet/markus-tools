@@ -84,12 +84,7 @@ export async function getDirectoryImageFileObjectsWithoutZeroByteOnes(
 
 // TODO: maybe function is useless since objects might not be needed
 export async function removeEmptyDirectories(fileObjects) {
-  // TODO: use it
   const errorTracker = new ErrorTracker()
-
-  // TODO: error object with update function?
-  let errorCount = 0
-  let errorMessage = ''
 
   // Both awaits are needed, therefore, a 'await Promise.all' solution is useless.
   for (const fileObject of fileObjects) {
@@ -99,17 +94,17 @@ export async function removeEmptyDirectories(fileObjects) {
         await promises.rmdir(fileObject.path)
       }
     } catch (error) {
-      errorCount++
-      errorMessage = `${errorMessage}\n${error.message}`
+      errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(error.message)
     }
   }
 
-  if (errorCount === 0) {
+  // TODO: make a function of these checks?
+  if (errorTracker.errorCount === 0) {
     return toResultObjectWithNullResultAndResultStatusOk()
-  } else if (errorCount > 0 && errorCount < fileObjects.length) {
-    return toResultObjectWithNullResultAndResultStatusPartiallyOk(errorMessage)
+  } else if (errorTracker.errorCount > 0 && errorTracker.errorCount < fileObjects.length) {
+    return toResultObjectWithNullResultAndResultStatusPartiallyOk(errorTracker.errorMessage)
   } else {
-    return toResultObjectWithNullResultAndResultStatusErrorSystem(errorMessage)
+    return toResultObjectWithNullResultAndResultStatusErrorSystem(errorTracker.errorMessage)
   }
 }
 
