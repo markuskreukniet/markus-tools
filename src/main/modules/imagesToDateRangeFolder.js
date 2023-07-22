@@ -2,13 +2,13 @@ import path from 'path'
 import {
   combinePathParts,
   getBaseName,
-  getDirectoryFileObjects,
+  getDirectoryDirectoryFileObjects,
+  getDirectoryImageFileObjectsWithoutZeroByteOnes,
   getDistinctDirectoryFileObjects,
   makeDirectoryIfNotExists,
   moveFile,
   removeEmptyDirectories
 } from './filePaths.js'
-import { filePathsType, fileType } from '../../preload/modules/files'
 import {
   isResultObjectOk,
   isResultObjectPartiallyOk,
@@ -25,42 +25,29 @@ import {
 export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   const inputPath = getSelectedFolderPath(filePaths)
 
-  // TODO: make abstractions
-  const inputImageFileObjectsTreeRO = await getDirectoryFileObjects(
+  const inputImageFileObjectsTreeRO = await getDirectoryImageFileObjectsWithoutZeroByteOnes(
     inputPath,
-    true,
-    filePathsType.filesWithoutZeroByteFiles,
-    fileType.image
+    true
   )
   if (!isResultObjectOk(inputImageFileObjectsTreeRO)) {
     return toResultObjectWithNullResultByResultObject(inputImageFileObjectsTreeRO)
   }
 
-  const outputImageFileObjectsRO = await getDirectoryFileObjects(
+  const outputImageFileObjectsRO = await getDirectoryImageFileObjectsWithoutZeroByteOnes(
     outputPath,
-    false,
-    filePathsType.filesWithoutZeroByteFiles,
-    fileType.image
+    false
   )
   if (!isResultObjectOk(outputImageFileObjectsRO)) {
     return toResultObjectWithNullResultByResultObject(outputImageFileObjectsRO)
   }
 
   // TODO: use inputDirectoryFileObjectsTreeRO
-  const inputDirectoryFileObjectsTreeRO = await getDirectoryFileObjects(
-    inputPath,
-    true,
-    filePathsType.directories
-  )
+  const inputDirectoryFileObjectsTreeRO = await getDirectoryDirectoryFileObjects(inputPath, true)
   if (!isResultObjectOk(inputDirectoryFileObjectsTreeRO)) {
     return toResultObjectWithNullResultByResultObject(inputDirectoryFileObjectsTreeRO)
   }
 
-  const outputDirectoryFileObjectsRO = await getDirectoryFileObjects(
-    outputPath,
-    false,
-    filePathsType.directories
-  )
+  const outputDirectoryFileObjectsRO = await getDirectoryDirectoryFileObjects(outputPath, false)
   if (!isResultObjectOk(outputDirectoryFileObjectsRO)) {
     return toResultObjectWithNullResultByResultObject(outputDirectoryFileObjectsRO)
   }

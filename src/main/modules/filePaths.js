@@ -66,6 +66,22 @@ export async function getDirectoryFileObjects(
   return toResultObject(fileObjects, resultStatus.ok)
 }
 
+export async function getDirectoryDirectoryFileObjects(directoryPath, directoryTree) {
+  return getDirectoryFileObjects(directoryPath, directoryTree, filePathsType.directories)
+}
+
+export async function getDirectoryImageFileObjectsWithoutZeroByteOnes(
+  directoryPath,
+  directoryTree
+) {
+  return getDirectoryFileObjects(
+    directoryPath,
+    directoryTree,
+    filePathsType.filesWithoutZeroByteFiles,
+    fileType.image
+  )
+}
+
 // TODO: maybe function is useless since objects might not be needed
 export async function removeEmptyDirectories(fileObjects) {
   let errorCount = 0
