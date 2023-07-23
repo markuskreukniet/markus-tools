@@ -98,14 +98,7 @@ export async function removeEmptyDirectories(fileObjects) {
     }
   }
 
-  // TODO: make a function of these checks?
-  if (errorTracker.errorCount === 0) {
-    return toResultObjectWithNullResultAndResultStatusOk()
-  } else if (errorTracker.errorCount > 0 && errorTracker.errorCount < fileObjects.length) {
-    return toResultObjectWithNullResultAndResultStatusPartiallyOk(errorTracker.errorMessage)
-  } else {
-    return toResultObjectWithNullResultAndResultStatusErrorSystem(errorTracker.errorMessage)
-  }
+  return errorTracker.toResultObjectWithNullResult(fileObjects.length)
 }
 
 export function getDistinctDirectoryFileObjects(fileObjects) {

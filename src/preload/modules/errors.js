@@ -1,4 +1,8 @@
-import { resultStatus } from '../../preload/modules/resultStatus'
+import {
+  toResultObjectWithNullResultAndResultStatusErrorSystem,
+  toResultObjectWithNullResultAndResultStatusOk,
+  toResultObjectWithNullResultAndResultStatusPartiallyOk
+} from '../../preload/modules/resultStatus'
 
 // We can't use symbols across the Electron IPC (inter-process communication) boundary
 export const inputError = Object.freeze({
@@ -16,14 +20,13 @@ export class ErrorTracker {
     this.errorMessage = `${this.errorMessage}\n${errorMessage}`
   }
 
-  // TODO: use it
-  calculateResultStatus(maxPossibleErrors) {
+  toResultObjectWithNullResult(maxPossibleErrors) {
     if (this.errorCount === 0) {
-      return resultStatus.ok
+      return toResultObjectWithNullResultAndResultStatusOk()
     } else if (this.errorCount > 0 && this.errorCount < maxPossibleErrors) {
-      return resultStatus.partiallyOk
+      return toResultObjectWithNullResultAndResultStatusPartiallyOk(this.errorMessage)
     } else {
-      return resultStatus.errorSystem
+      return toResultObjectWithNullResultAndResultStatusErrorSystem(this.errorMessage)
     }
   }
 }
