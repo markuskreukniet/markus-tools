@@ -162,20 +162,20 @@ async function groupsToDirectories(groups, path) {
     }
 
     const makeDirectoryIfNotExistsRO = await makeDirectoryIfNotExists(subFolderPath)
-    if (!isResultObjectOk(makeDirectoryIfNotExistsRO)) {
+    if (isResultObjectOk(makeDirectoryIfNotExistsRO)) {
+      for (const combination of group) {
+        const moveFileRO = moveFile(
+          combination.path,
+          combinePathParts(subFolderPath, getBaseName(combination.path))
+        )
+        if (!isResultObjectOk(moveFileRO)) {
+          errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(moveFileRO.message)
+        }
+      }
+    } else {
       errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(
         makeDirectoryIfNotExistsRO.message
       )
-    }
-
-    for (const combination of group) {
-      const moveFileRO = moveFile(
-        combination.path,
-        combinePathParts(subFolderPath, getBaseName(combination.path))
-      )
-      if (!isResultObjectOk(moveFileRO)) {
-        errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(moveFileRO.message)
-      }
     }
   }
 

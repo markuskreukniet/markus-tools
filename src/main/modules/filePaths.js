@@ -191,13 +191,11 @@ export async function makeDirectoryIfNotExists(filePath) {
   if (await filePathExists(filePath)) {
     try {
       await promises.mkdir(filePath)
-      return toResultObjectWithNullResultAndResultStatusOk()
     } catch (error) {
       return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
     }
-  } else {
-    return false
   }
+  return toResultObjectWithNullResultAndResultStatusOk()
 }
 
 export async function moveFile(sourcePath, destinationPath) {
