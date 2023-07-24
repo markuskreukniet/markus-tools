@@ -1,4 +1,5 @@
 import path from 'path'
+import { ErrorTracker } from '../../preload/modules/errors'
 import {
   combinePathParts,
   getBaseName,
@@ -146,11 +147,12 @@ function isWithinThreeDays(date1, date2) {
 
 // TODO: the only function left to check/fix, also naming in this function
 async function groupsToDirectories(groups, path) {
-  // TODO: same as removeEmptyDirectories
-  let errorCount = 0
-  let errorMessage = ''
+  const errorTracker = new ErrorTracker()
+  let maxPossibleErrors = 0
 
   for (const group of groups) {
+    maxPossibleErrors = maxPossibleErrors + group.length
+
     const oldestDate = formatTime(group[0].dateCreated)
     const newestDate = formatTime(group[group.length - 1].dateCreated)
 
@@ -158,16 +160,26 @@ async function groupsToDirectories(groups, path) {
     if (oldestDate !== newestDate) {
       subFolderPath = `${subFolderPath} - ${newestDate}`
     }
-    // TODO: error handling
+
     const makeDirectoryIfNotExistsRO = await makeDirectoryIfNotExists(subFolderPath)
+    if (!isResultObjectOk(makeDirectoryIfNotExistsRO)) {
+      errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(
+        makeDirectoryIfNotExistsRO.message
+      )
+    }
+
     for (const combination of group) {
-      // TODO: error handling
       const moveFileRO = moveFile(
         combination.path,
         combinePathParts(subFolderPath, getBaseName(combination.path))
       )
+      if (!isResultObjectOk(moveFileRO)) {
+        errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(moveFileRO.message)
+      }
     }
   }
+
+  return errorTracker.toResultObjectWithNullResult(maxPossibleErrors)
 }
 
 function isValidDateFormat(dateString) {

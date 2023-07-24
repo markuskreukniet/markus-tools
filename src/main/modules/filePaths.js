@@ -8,7 +8,6 @@ import {
   toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem,
   toResultObjectWithNullResultAndResultStatusErrorSystem,
   toResultObjectWithNullResultAndResultStatusOk,
-  toResultObjectWithNullResultAndResultStatusPartiallyOk,
   toResultObjectWithResultStatusOk
 } from '../../preload/modules/resultStatus'
 
