@@ -164,16 +164,18 @@ async function groupsToDirectories(groups, outputPath) {
 
     const makeDirectoryIfNotExistsRO = await makeDirectoryIfNotExists(subFolderPath)
     if (isResultObjectOk(makeDirectoryIfNotExistsRO)) {
-      for (const fileObject of group) {
-        // TODO: promise all?
-        const moveFileRO = await moveFile(
-          fileObject.path,
-          combinePathParts(subFolderPath, getBaseName(fileObject.path))
-        )
-        if (!isResultObjectOk(moveFileRO)) {
-          errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(moveFileRO.message)
-        }
-      }
+      await Promise.all(
+        group.map(async (fileObject) => {
+          const moveFileRO = await moveFile(
+            fileObject.path,
+            combinePathParts(subFolderPath, getBaseName(fileObject.path))
+          )
+
+          if (!isResultObjectOk(moveFileRO)) {
+            errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(moveFileRO.message)
+          }
+        })
+      )
     } else {
       errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(
         makeDirectoryIfNotExistsRO.message
