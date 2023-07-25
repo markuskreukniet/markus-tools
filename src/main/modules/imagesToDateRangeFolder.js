@@ -58,8 +58,10 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
     ...getDateSubdirectoryFileObjects(outputImageFileObjectsRO.result)
   ])
 
-  // TODO: error handling
-  await groupsToDirectories(groups, outputPath)
+  const groupsToDirectoriesRO = await groupsToDirectories(groups, outputPath)
+  if (!isResultObjectOk(groupsToDirectoriesRO)) {
+    return toResultObjectWithNullResultByResultObject(groupsToDirectoriesRO)
+  }
 
   // the array can have duplicate directories
   // TODO: duplicates might be the problem
@@ -164,7 +166,8 @@ async function groupsToDirectories(groups, path) {
     const makeDirectoryIfNotExistsRO = await makeDirectoryIfNotExists(subFolderPath)
     if (isResultObjectOk(makeDirectoryIfNotExistsRO)) {
       for (const combination of group) {
-        const moveFileRO = moveFile(
+        // TODO: promise all?
+        const moveFileRO = await moveFile(
           combination.path,
           combinePathParts(subFolderPath, getBaseName(combination.path))
         )
