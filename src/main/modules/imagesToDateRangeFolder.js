@@ -147,8 +147,7 @@ function isWithinThreeDays(date1, date2) {
   return days <= 3
 }
 
-// TODO: the only function left to check/fix, also naming in this function
-async function groupsToDirectories(groups, path) {
+async function groupsToDirectories(groups, outputPath) {
   const errorTracker = new ErrorTracker()
   let maxPossibleErrors = 0
 
@@ -158,18 +157,18 @@ async function groupsToDirectories(groups, path) {
     const oldestDate = formatTime(group[0].dateCreated)
     const newestDate = formatTime(group[group.length - 1].dateCreated)
 
-    let subFolderPath = combinePathParts(path, oldestDate)
+    let subFolderPath = combinePathParts(outputPath, oldestDate)
     if (oldestDate !== newestDate) {
       subFolderPath = `${subFolderPath} - ${newestDate}`
     }
 
     const makeDirectoryIfNotExistsRO = await makeDirectoryIfNotExists(subFolderPath)
     if (isResultObjectOk(makeDirectoryIfNotExistsRO)) {
-      for (const combination of group) {
+      for (const fileObject of group) {
         // TODO: promise all?
         const moveFileRO = await moveFile(
-          combination.path,
-          combinePathParts(subFolderPath, getBaseName(combination.path))
+          fileObject.path,
+          combinePathParts(subFolderPath, getBaseName(fileObject.path))
         )
         if (!isResultObjectOk(moveFileRO)) {
           errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(moveFileRO.message)
