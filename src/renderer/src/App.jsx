@@ -8,6 +8,7 @@ import PageNavigator from './components/PageNavigator'
 // import Versions from './components/Versions'
 // import logo from './assets/logo.svg'
 
+// TODO: check for good error handling whole app
 // TODO: remove some createEffects
 // TODO: remove useless comments
 // TODO: rename folder to directory
