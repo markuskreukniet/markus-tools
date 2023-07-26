@@ -24,6 +24,15 @@ import {
 export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   const inputPath = getSelectedFolderPath(filePaths)
 
+  // TODO: use these booleans
+  const useDirectoriesTreeInput = true
+  const removeUsedEmptyDateDirectoriesInput = false
+  const removeFoundEmptyDateDirectoriesInput = false
+  const removeFoundEmptyDateDirectoriesTreeInput = false
+
+  const removeFoundEmptyDateDirectoriesOutput = false
+  const removeFoundEmptyDateDirectoriesTreeOutput = false
+
   const inputImageFileObjectsTreeRO = await getDirectoryImageFileObjectsWithoutZeroByteOnes(
     inputPath,
     true
