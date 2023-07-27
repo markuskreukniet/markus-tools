@@ -69,6 +69,15 @@ export async function getDirectoryDirectoryFileObjects(directoryPath, directoryT
   return getDirectoryFileObjects(directoryPath, directoryTree, filePathsType.directories)
 }
 
+export async function getDirectoryFileObjectsWithoutZeroByteOnes(directoryPath, directoryTree) {
+  return getDirectoryFileObjects(
+    directoryPath,
+    directoryTree,
+    filePathsType.filesWithoutZeroByteFiles,
+    fileType.all
+  )
+}
+
 export async function getDirectoryImageFileObjectsWithoutZeroByteOnes(
   directoryPath,
   directoryTree
@@ -165,11 +174,6 @@ function isImageFilePath(filePath) {
     lowerCaseFilePath.endsWith('gif') ||
     lowerCaseFilePath.endsWith('webp')
   )
-}
-
-// TODO: remove export
-export default function isNotAZeroByteFile(stats) {
-  return stats.size > 0
 }
 
 export function getBaseName(filePath) {

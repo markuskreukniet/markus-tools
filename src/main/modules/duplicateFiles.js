@@ -1,46 +1,35 @@
 import crypto from 'crypto'
 import fs from 'fs'
-import isNotAZeroByteFile from './filePaths.js'
+import path from 'path'
+import { getDirectoryFileObjectsWithoutZeroByteOnes } from './filePaths.js'
 
+// TODO: remove path and fs import
 export default async function duplicateFiles(filePaths) {
-  // path and size combinations of files
-  const pathSizeCombinations = await Promise.all(
-    filePaths.map(async (path) => {
-      try {
-        const stats = await fs.promises.stat(path)
-        // TODO: when getting all files from folder, it should be already isNotAZeroByteFile
-        if (isNotAZeroByteFile(stats)) {
-          return { path, size: stats.size }
-        } else {
-          return undefined
-        }
-      } catch (error) {
-        // TODO: error and null
-        console.error(error)
-        return null
-      }
-    })
-  )
+  const inputPath = getSelectedFolderPath(filePaths)
 
-  pathSizeCombinations.sort(compare)
+  // TODO: error handling // TODO: tree optional
+  const fileObjectsTreeRO = await getDirectoryFileObjectsWithoutZeroByteOnes(inputPath, true)
+  const fileObjects = fileObjectsTreeRO.result
+
+  fileObjects.sort(compare)
 
   // duplicates of path and hash combinations
   const duplicates = []
   let lastPushedIndex = -1
 
-  for (let i = 1; i < pathSizeCombinations.length; i++) {
-    const combination = pathSizeCombinations[i - 1]
-    const combination2 = pathSizeCombinations[i]
+  for (let i = 1; i < fileObjects.length; i++) {
+    const fileObject = fileObjects[i - 1]
+    const fileObject2 = fileObjects[i]
 
-    if (combination.size === combination2.size) {
-      const hashHex = await getHashHex(combination.path)
-      const hashHex2 = await getHashHex(combination2.path)
+    if (fileObject.size === fileObject2.size) {
+      const hashHex = await getHashHex(fileObject.path)
+      const hashHex2 = await getHashHex(fileObject2.path)
 
       if (hashHex === hashHex2) {
         if (lastPushedIndex !== i - 1) {
-          duplicates.push({ path: combination.path, hash: hashHex })
+          duplicates.push({ path: fileObject.path, hash: hashHex })
         }
-        duplicates.push({ path: combination2.path, hash: hashHex2 })
+        duplicates.push({ path: fileObject2.path, hash: hashHex2 })
         lastPushedIndex = i
       }
     }
@@ -52,6 +41,24 @@ export default async function duplicateFiles(filePaths) {
   } else {
     return duplicatesArrayToResultString(duplicates)
   }
+}
+
+// TODO: remove function
+function getSelectedFolderPath(files) {
+  const firstFolderPath = path.dirname(files[0])
+  const lastFolderPath = path.dirname(files[files.length - 1])
+
+  let prefix = ''
+
+  for (let i = 0; i < firstFolderPath.length; i++) {
+    if (firstFolderPath[i] === lastFolderPath[i]) {
+      prefix += firstFolderPath[i]
+    } else {
+      break
+    }
+  }
+
+  return prefix
 }
 
 function getHashHex(path) {
