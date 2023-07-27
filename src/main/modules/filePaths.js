@@ -100,10 +100,12 @@ export async function removeEmptyDirectories(fileObjects) {
   return errorTracker.toResultObjectWithNullResult(fileObjects.length)
 }
 
+// could create reference problems when using these fileObjects after using this function
 export function getDistinctDirectoryFileObjects(fileObjects) {
   for (const fileObject of fileObjects) {
     fileObject.path = path.dirname(fileObject.path)
   }
+  // TODO: maybe sorting is unnecessary since all files are read in a directory before going to the next directory.
   fileObjects.sort(compare)
   // TODO: dirty index === 0?
   return fileObjects.filter(

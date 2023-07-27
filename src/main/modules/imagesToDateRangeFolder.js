@@ -126,7 +126,6 @@ function getDateSubdirectoryFileObjects(fileObjects) {
 }
 
 function getDateRangeGroups(fileObjects) {
-  // TODO: it might be possible to remove a sort since getDistinctDirectoryFileObjects has also a sort
   fileObjects.sort(compare)
 
   const groups = []
