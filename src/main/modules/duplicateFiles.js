@@ -5,6 +5,7 @@ import { getDirectoryFileObjectsWithoutZeroByteOnes } from './filePaths.js'
 
 // TODO: remove path and fs import
 export default async function duplicateFiles(filePaths) {
+  // TODO: might not work now
   const inputPath = getSelectedFolderPath(filePaths)
 
   // TODO: error handling // TODO: tree optional
