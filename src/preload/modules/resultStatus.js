@@ -41,7 +41,7 @@ export function toResultObjectWithResultStatusPartiallyOk(result, message) {
   return toResultObject(result, resultStatus.partiallyOk, message)
 }
 
-// toResultObjectWithEmptyArrayResult
+// toResultObjectWithEmptyArrayResultAndResult
 export function toResultObjectWithEmptyArrayResultAndResultStatusOk(message) {
   return toResultObject([], resultStatus.ok, message)
 }
