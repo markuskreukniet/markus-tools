@@ -1,4 +1,3 @@
-import path from 'path'
 import { ErrorTracker } from '../../preload/modules/errors'
 import {
   combinePathParts,
@@ -22,7 +21,8 @@ import {
 // TODO: rename resultStatus file
 // TODO: remove path import
 export default async function imagesToDateRangeFolder(filePaths, outputPath) {
-  const inputPath = getSelectedFolderPath(filePaths)
+  // TODO
+  const inputPath = filePaths[0]
 
   // TODO: use these booleans
   const useDirectoriesTreeInput = true
@@ -85,24 +85,6 @@ export default async function imagesToDateRangeFolder(filePaths, outputPath) {
   } else {
     return toResultObjectWithNullResultAndResultStatusErrorSystem(removeEmptyDirectoriesRO.message)
   }
-}
-
-// TODO: remove function
-function getSelectedFolderPath(files) {
-  const firstFolderPath = path.dirname(files[0])
-  const lastFolderPath = path.dirname(files[files.length - 1])
-
-  let prefix = ''
-
-  for (let i = 0; i < firstFolderPath.length; i++) {
-    if (firstFolderPath[i] === lastFolderPath[i]) {
-      prefix += firstFolderPath[i]
-    } else {
-      break
-    }
-  }
-
-  return prefix
 }
 
 function getDateSubdirectoryFileObjects(fileObjects) {

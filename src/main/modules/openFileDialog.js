@@ -1,13 +1,12 @@
 import { dialog } from 'electron'
 import {
-  toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem,
-  toResultObjectWithEmptyArrayResultAndResultStatusOk,
+  toResultObjectWithResultStatusErrorSystem,
   toResultObjectWithResultStatusOk
 } from '../../preload/modules/resultStatus'
 
-export default async function openFileDialog(selectFolder) {
-  const properties = [selectFolder ? 'openDirectory' : 'openFile', 'multiSelections']
-  const filters = selectFolder ? [{ name: 'All Files', extensions: ['*'] }] : []
+export default async function openFileDialog(selectDirectory) {
+  const properties = [selectDirectory ? 'openDirectory' : 'openFile']
+  const filters = selectDirectory ? [{ name: 'All Files', extensions: ['*'] }] : []
 
   try {
     const result = await dialog.showOpenDialog({
@@ -15,9 +14,9 @@ export default async function openFileDialog(selectFolder) {
       filters
     })
     return result.canceled
-      ? toResultObjectWithEmptyArrayResultAndResultStatusOk()
-      : toResultObjectWithResultStatusOk(result.filePaths)
+      ? toResultObjectWithResultStatusOk('')
+      : toResultObjectWithResultStatusOk(result.filePaths[0])
   } catch (error) {
-    return toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem(error.message)
+    return toResultObjectWithResultStatusErrorSystem('', error.message)
   }
 }
