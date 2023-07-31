@@ -4,7 +4,7 @@ import FileOrFolderInput from '../FileOrFolderInput'
 import { resultStatus } from '../../../../preload/modules/resultStatus'
 
 export default function imagesToDateRangeFolder(props) {
-  let resultPath = ''
+  let outputFilePath = ''
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [status, setStatus] = createSignal('')
 
@@ -15,26 +15,16 @@ export default function imagesToDateRangeFolder(props) {
   }
 
   function handleFilePaths(filePaths) {
-    setGetOutput(setState(filePaths, resultPath))
-  }
-
-  async function test() {
-    const done = await window.dialog.openFileDialogBE(true)
-
-    if (done.status === resultStatus.ok) {
-      console.log('done', done)
-    } else {
-      console.log('not done')
-    }
+    setGetOutput(setState(filePaths, outputFilePath))
   }
 
   // TODO: placeholder or label? TODO: minimumFiles should be 0 so it can only sort the files in destination path?
   // TODO: minimumFiles is useless in FileOrFolderInput?
+  // TODO: outputFilePath
   const inputComponent = (
     <div>
       <FileOrFolderInput onChange={handleFilePaths} minimumFiles={1} />
-      <input type="text" placeholder="" onChange={(e) => (resultPath = e.target.value)} />
-      <button onClick={() => test()}>test</button>
+      <input type="text" placeholder="" onChange={(e) => (outputFilePath = e.target.value)} />
     </div>
   )
 

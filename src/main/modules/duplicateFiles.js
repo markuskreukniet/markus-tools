@@ -64,7 +64,8 @@ function getSelectedFolderPath(files) {
 
 function getHashHex(path) {
   return new Promise((resolve, reject) => {
-    const hash = crypto.createHash('sha1') // SHA1 is faster than MD5
+    // SHA1 is faster than MD5
+    const hash = crypto.createHash('sha1')
     const stream = fs.createReadStream(path)
     stream.on('error', (err) => reject(err))
     stream.on('data', (chunk) => hash.update(chunk))
