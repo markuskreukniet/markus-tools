@@ -1,7 +1,7 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
 import FileOrFolderInput from '../FileOrFolderInput'
-import { resultStatus } from '../../../../preload/modules/resultStatus'
+import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
 
 export default function imagesToDateRangeFolder(props) {
   let outputFilePath = ''
@@ -9,10 +9,13 @@ export default function imagesToDateRangeFolder(props) {
   const [status, setStatus] = createSignal('')
 
   async function setState(filePaths, path) {
-    // TODO: error handling
-    const result = await window.dateRangeFolder.imagesToDateRangeFolderBE(filePaths, path)
-    const status = result.status === resultStatus.ok ? 'done' : 'not done'
-    setStatus(status)
+    const imagesToDateRangeFolderRO = await window.dateRangeFolder.imagesToDateRangeFolderBE(
+      filePaths,
+      path
+    )
+    setStatus(
+      isResultObjectOk(imagesToDateRangeFolderRO) ? 'done' : imagesToDateRangeFolderRO.message
+    )
   }
 
   function handleFilePaths(filePaths) {
