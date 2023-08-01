@@ -26,6 +26,7 @@ export default function imagesToDateRangeFolder(props) {
   // TODO: minimumFiles is useless in FileOrFolderInput?
   // TODO: outputFilePath
   // TODO: submit should not always be part of FileOrFolderInput
+  // TODO: should not select a file, but a combination a filepath and filetype (folder or file), which is possible since we have a select folder and select file button
   const inputComponent = (
     <div>
       <FileOrFolderInput onChange={handleFilePaths} minimumFiles={1} />
