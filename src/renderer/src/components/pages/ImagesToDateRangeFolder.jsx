@@ -1,6 +1,7 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
 import FileOrFolderInput from '../FileOrFolderInput'
+import FilePathSelector from '../FilePathSelector'
 import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
 
 export default function imagesToDateRangeFolder(props) {
@@ -18,8 +19,20 @@ export default function imagesToDateRangeFolder(props) {
     )
   }
 
-  function handleFilePaths(filePaths) {
-    setGetOutput(setState(filePaths, outputFilePath))
+  function handleInputFilePathsRO(resultObject) {
+    if (isResultObjectOk(resultObject)) {
+      setGetOutput(setState(resultObject.result, outputFilePath))
+    } else {
+      // TODO
+    }
+  }
+
+  function handleOutputDirectoryRO(resultObject) {
+    if (isResultObjectOk(resultObject)) {
+      outputFilePath = resultObject.result
+    } else {
+      // TODO
+    }
   }
 
   // TODO: placeholder or label? TODO: minimumFiles should be 0 so it can only sort the files in destination path?
@@ -29,8 +42,8 @@ export default function imagesToDateRangeFolder(props) {
   // TODO: should not select a file, but a combination a filepath and filetype (folder or file), which is possible since we have a select folder and select file button
   const inputComponent = (
     <div>
-      <FileOrFolderInput onChange={handleFilePaths} minimumFiles={1} />
-      <input type="text" placeholder="" onChange={(e) => (outputFilePath = e.target.value)} />
+      <FileOrFolderInput onChange={handleInputFilePathsRO} minimumFiles={1} />
+      <FilePathSelector onChange={handleOutputDirectoryRO} directory />
     </div>
   )
 

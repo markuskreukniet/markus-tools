@@ -1,6 +1,10 @@
 import { createSignal, For } from 'solid-js'
 import ActiveByNumberButton from './ActiveByNumberButton'
 import FilePathSelector from './FilePathSelector'
+import {
+  isResultObjectOk,
+  toResultObjectWithResultStatusOk
+} from '../../../preload/modules/resultStatus'
 
 // TODO:
 // Adding a file could add a duplicate file since there could already be a folder with its whole tree of child folders already containing that file.
@@ -12,10 +16,17 @@ export default function FileOrFolderInput(props) {
   const [selectedFilePaths, setSelectedFilePaths] = createSignal([])
   const [numberOfFilePaths, setNumberOfFilePaths] = createSignal(0)
 
-  function setState(newFilePath) {
-    if (newFilePath !== '' && !selectedFilePaths().some((filePath) => filePath === newFilePath)) {
-      setSelectedFilePaths([...selectedFilePaths(), newFilePath])
-      setNumberOfFilePaths(selectedFilePaths().length)
+  function setState(resultObject) {
+    if (isResultObjectOk(resultObject)) {
+      if (
+        resultObject.result !== '' &&
+        !selectedFilePaths().some((filePath) => filePath === resultObject.result)
+      ) {
+        setSelectedFilePaths([...selectedFilePaths(), resultObject.result])
+        setNumberOfFilePaths(selectedFilePaths().length)
+      }
+    } else {
+      // TODO:
     }
   }
 
@@ -25,7 +36,7 @@ export default function FileOrFolderInput(props) {
   }
 
   function submit() {
-    props.onChange(selectedFilePaths())
+    props.onChange(toResultObjectWithResultStatusOk(selectedFilePaths()))
   }
 
   return (
