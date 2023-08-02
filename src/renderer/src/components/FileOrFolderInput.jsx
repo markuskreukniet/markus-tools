@@ -26,7 +26,7 @@ export default function FileOrFolderInput(props) {
         setNumberOfFilePaths(selectedFilePaths().length)
       }
     } else {
-      // TODO:
+      props.onChange(resultObject)
     }
   }
 
