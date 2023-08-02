@@ -35,7 +35,7 @@ export default function imagesToDateRangeFolder(props) {
     }
   }
 
-  // TODO: placeholder or label? TODO: minimumFiles should be 0 so it can only sort the files in destination path?
+  // TODO: minimumFiles should be 0 so it can only sort the files in destination path?
   // TODO: minimumFiles is useless in FileOrFolderInput?
   // TODO: submit should not always be part of FileOrFolderInput
   // TODO: should not select a file, but a combination a filepath and filetype (folder or file), which is possible since we have a select folder and select file button
