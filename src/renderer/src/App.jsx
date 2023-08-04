@@ -12,6 +12,8 @@ import PageNavigator from './components/PageNavigator'
 // TODO: remove some createEffects
 // TODO: remove useless comments
 // TODO: rename folder to directory
+// TODO: rename files.js to filePath.js
+// TODO: rename openFileDialog to openFilePathDialog.js with functions
 // TODO: imagesToDateRangeFolder check input and output folder is not the same or a child
 function App() {
   const [loading, setLoading] = createSignal(false)

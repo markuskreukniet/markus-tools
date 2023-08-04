@@ -31,7 +31,7 @@ export default function imagesToDateRangeFolder(props) {
     if (isResultObjectOk(resultObject)) {
       outputFilePath = resultObject.result
     } else {
-      // TODO
+      setStatus(resultObject.message)
     }
   }
 

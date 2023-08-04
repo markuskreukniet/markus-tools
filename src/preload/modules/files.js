@@ -7,6 +7,11 @@ export const filePathsType = Object.freeze({
   directories: 'directories'
 })
 
+export const filePathType = Object.freeze({
+  file: 'file',
+  directory: 'directory'
+})
+
 export const fileType = Object.freeze({
   all: 'all',
   image: 'image'
