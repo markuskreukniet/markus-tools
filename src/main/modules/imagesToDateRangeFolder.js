@@ -36,8 +36,6 @@ export default async function imagesToDateRangeFolder(filePathObjects, outputPat
     if (filePathObject.filePathType === filePathType.file) {
       // TODO:
     } else {
-      console.log('filePathObject', filePathObject)
-
       const inputImageFileObjectsTreeRO = await getDirectoryImageFileObjectsWithoutZeroByteOnes(
         filePathObject.value,
         useDirectoriesTreeInput
