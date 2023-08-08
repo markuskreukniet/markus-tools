@@ -13,17 +13,19 @@ import {
 // Checking child folders of a folder is only possible in the main, which is possible by adding such a function in the main.
 
 export default function FileOrFolderInput(props) {
-  const [selectedFilePaths, setSelectedFilePaths] = createSignal([])
-  const [numberOfFilePaths, setNumberOfFilePaths] = createSignal(0)
+  const [selectedFilePathObjects, setSelectedFilePathObjects] = createSignal([])
+  const [numberOfFilePathObjects, setNumberOfFilePathObjects] = createSignal(0)
 
   function setState(resultObject) {
     if (isResultObjectOk(resultObject)) {
       if (
-        resultObject.result !== '' &&
-        !selectedFilePaths().some((filePath) => filePath === resultObject.result)
+        resultObject.result.value !== '' &&
+        !selectedFilePathObjects().some(
+          (filePathObject) => filePathObject.value === resultObject.result.value
+        )
       ) {
-        setSelectedFilePaths([...selectedFilePaths(), resultObject.result])
-        setNumberOfFilePaths(selectedFilePaths().length)
+        setSelectedFilePathObjects([...selectedFilePathObjects(), resultObject.result])
+        setNumberOfFilePathObjects(selectedFilePathObjects().length)
       }
     } else {
       props.onChange(resultObject)
@@ -31,12 +33,12 @@ export default function FileOrFolderInput(props) {
   }
 
   function resetState() {
-    setSelectedFilePaths([])
-    setNumberOfFilePaths(0)
+    setSelectedFilePathObjects([])
+    setNumberOfFilePathObjects(0)
   }
 
   function submit() {
-    props.onChange(toResultObjectWithResultStatusOk(selectedFilePaths()))
+    props.onChange(toResultObjectWithResultStatusOk(selectedFilePathObjects()))
   }
 
   return (
@@ -48,19 +50,21 @@ export default function FileOrFolderInput(props) {
       <div class="display-flex justify-content-flex-end not-first-child-margin-left-1">
         <ActiveByNumberButton
           minimumNumber={1}
-          currentNumber={numberOfFilePaths()}
+          currentNumber={numberOfFilePathObjects()}
           onAction={resetState}
           text="reset"
         />
         <ActiveByNumberButton
           minimumNumber={props.minimumFiles}
-          currentNumber={numberOfFilePaths()}
+          currentNumber={numberOfFilePathObjects()}
           onAction={submit}
           text="submit"
         />
       </div>
       <ul>
-        <For each={selectedFilePaths()}>{(filePath) => <li>{filePath}</li>}</For>
+        <For each={selectedFilePathObjects()}>
+          {(filePathObject) => <li>{filePathObject.value}</li>}
+        </For>
       </ul>
     </div>
   )
