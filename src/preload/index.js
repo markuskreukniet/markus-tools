@@ -33,8 +33,8 @@ contextBridge.exposeInMainWorld('references', {
 })
 
 contextBridge.exposeInMainWorld('dateRangeFolder', {
-  imagesToDateRangeFolderBE: (filePaths, path) =>
-    ipcRenderer.invoke('imagesToDateRangeFolderBE', filePaths, path)
+  imagesToDateRangeFolderBE: (filePathObjects, path) =>
+    ipcRenderer.invoke('imagesToDateRangeFolderBE', filePathObjects, path)
 })
 
 contextBridge.exposeInMainWorld('dialog', {
