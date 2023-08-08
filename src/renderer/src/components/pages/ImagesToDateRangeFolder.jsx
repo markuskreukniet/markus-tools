@@ -10,13 +10,8 @@ export default function imagesToDateRangeFolder(props) {
   const [status, setStatus] = createSignal('')
 
   async function setState(filePathObjects, path) {
-    // TODO: imagesToDateRangeFolderBE should use filePathObjects
-    const filePaths = filePathObjects.map((filePathObject) => {
-      return filePathObject.value
-    })
-
     const imagesToDateRangeFolderRO = await window.dateRangeFolder.imagesToDateRangeFolderBE(
-      filePaths,
+      filePathObjects,
       path
     )
     setStatus(
