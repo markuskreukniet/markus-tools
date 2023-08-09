@@ -11,6 +11,20 @@ import {
   toResultObjectWithResultStatusOk
 } from '../../preload/modules/resultStatus'
 
+export async function getFileObject(filePath) {
+  try {
+    const stat = await promises.stat(filePath)
+    // TODO: dateCreated or dateModified?
+    return {
+      path: filePath,
+      dateCreated: stat.mtime,
+      size: stat.size
+    }
+  } catch (error) {
+    return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
+  }
+}
+
 export async function getDirectoryFileObjects(
   directoryPath,
   directoryTree,
@@ -35,6 +49,7 @@ export async function getDirectoryFileObjects(
     try {
       const files = await promises.readdir(currentPath)
 
+      // TODO: is two loops with Promise.all more efficient than 1 loop?
       const stats = await Promise.all(
         files.map((file) => {
           return promises.stat(combinePathParts(currentPath, file))
