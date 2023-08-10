@@ -5,6 +5,7 @@ import {
   getDirectoryDirectoryFileObjects,
   getDirectoryImageFileObjectsWithoutZeroByteOnes,
   getDistinctDirectoryFileObjects,
+  getFileObject,
   makeDirectoryIfNotExists,
   moveFile,
   removeEmptyDirectories
@@ -34,7 +35,14 @@ export default async function imagesToDateRangeFolder(filePathObjects, outputPat
   const inputImageFileObjects = []
   for (const filePathObject of filePathObjects) {
     if (filePathObject.filePathType === filePathType.file) {
-      // TODO:
+      // TODO: should be getImageFileObject? probably not, only image selection should happen in dialog
+      const inputFileObjectTreeRO = await getFileObject(filePathObject.value)
+      if (isResultObjectOk(inputFileObjectTreeRO)) {
+        inputImageFileObjects.push(inputFileObjectTreeRO.result)
+      } else {
+        // TODO: PartiallyOk
+        return toResultObjectWithNullResultByResultObject(inputFileObjectTreeRO)
+      }
     } else {
       const inputImageFileObjectsTreeRO = await getDirectoryImageFileObjectsWithoutZeroByteOnes(
         filePathObject.value,

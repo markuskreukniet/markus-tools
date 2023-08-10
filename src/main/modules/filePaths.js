@@ -11,15 +11,23 @@ import {
   toResultObjectWithResultStatusOk
 } from '../../preload/modules/resultStatus'
 
+export async function filePathObjectsToFileObjects(filePathObjects, useDirectoriesTreeInput) {
+  //
+  const inputImageFileObjects = []
+  for (const filePathObject of filePathObjects) {
+  }
+  //
+}
+
 export async function getFileObject(filePath) {
   try {
     const stat = await promises.stat(filePath)
     // TODO: dateCreated or dateModified?
-    return {
+    return toResultObjectWithResultStatusOk({
       path: filePath,
       dateCreated: stat.mtime,
       size: stat.size
-    }
+    })
   } catch (error) {
     return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
