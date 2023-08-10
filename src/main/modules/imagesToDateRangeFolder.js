@@ -125,6 +125,11 @@ function getDateSubdirectoryFileObjects(fileObjects) {
 }
 
 function getDateRangeGroups(fileObjects) {
+  // it should not return [[undefined]] when fileObjects is []
+  if (fileObjects.length === 0) {
+    return []
+  }
+
   fileObjects.sort(compare)
 
   const groups = []
