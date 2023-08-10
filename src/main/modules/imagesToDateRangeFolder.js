@@ -22,6 +22,7 @@ import {
 
 // TODO: rename resultStatus file
 // TODO: remove path import
+// TODO: bug when input directory has no images
 export default async function imagesToDateRangeFolder(filePathObjects, outputPath) {
   // TODO: use these booleans
   const useDirectoriesTreeInput = true
