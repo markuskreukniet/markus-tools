@@ -45,6 +45,7 @@ export async function filePathObjectsToFileObjects(filePathObjects, useDirectori
   return errorTracker.createResultObject(inputImageFileObjects.length, inputImageFileObjects)
 }
 
+// TODO: remove export
 export async function getFileObject(filePath) {
   try {
     const stat = await promises.stat(filePath)
@@ -59,6 +60,7 @@ export async function getFileObject(filePath) {
   }
 }
 
+// TODO: remove export, also others maybe
 export async function getDirectoryFileObjects(
   directoryPath,
   directoryTree,
