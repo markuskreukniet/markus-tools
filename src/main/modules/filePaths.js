@@ -1,8 +1,9 @@
 import { constants, promises } from 'fs'
 import path from 'path'
 import { ErrorTracker, inputError } from '../../preload/modules/errors'
-import { filePathsType, fileType } from '../../preload/modules/files'
+import { filePathsType, filePathType, fileType } from '../../preload/modules/files'
 import {
+  isResultObjectOk,
   resultStatus,
   toResultObject,
   toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem,
@@ -12,11 +13,36 @@ import {
 } from '../../preload/modules/resultStatus'
 
 export async function filePathObjectsToFileObjects(filePathObjects, useDirectoriesTreeInput) {
-  //
+  const errorTracker = new ErrorTracker()
+
   const inputImageFileObjects = []
   for (const filePathObject of filePathObjects) {
+    if (filePathObject.filePathType === filePathType.file) {
+      // TODO: should be getImageFileObject? probably not, only image selection should happen in dialog
+      const inputFileObjectTreeRO = await getFileObject(filePathObject.value)
+      if (isResultObjectOk(inputFileObjectTreeRO)) {
+        inputImageFileObjects.push(inputFileObjectTreeRO.result)
+      } else {
+        errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(
+          inputFileObjectTreeRO.message
+        )
+      }
+    } else {
+      const inputImageFileObjectsTreeRO = await getDirectoryImageFileObjectsWithoutZeroByteOnes(
+        filePathObject.value,
+        useDirectoriesTreeInput
+      )
+      if (isResultObjectOk(inputImageFileObjectsTreeRO)) {
+        inputImageFileObjects.push(...inputImageFileObjectsTreeRO.result)
+      } else {
+        errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(
+          inputImageFileObjectsTreeRO.message
+        )
+      }
+    }
   }
-  //
+
+  return errorTracker.createResultObject(inputImageFileObjects.length, inputImageFileObjects)
 }
 
 export async function getFileObject(filePath) {
@@ -129,7 +155,7 @@ export async function removeEmptyDirectories(fileObjects) {
     }
   }
 
-  return errorTracker.toResultObjectWithNullResult(fileObjects.length)
+  return errorTracker.createResultObject(fileObjects.length)
 }
 
 // could create reference problems when using these fileObjects after using this function

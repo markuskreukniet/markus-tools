@@ -1,16 +1,15 @@
 import { ErrorTracker } from '../../preload/modules/errors'
 import {
   combinePathParts,
+  filePathObjectsToFileObjects,
   getBaseName,
   getDirectoryDirectoryFileObjects,
   getDirectoryImageFileObjectsWithoutZeroByteOnes,
   getDistinctDirectoryFileObjects,
-  getFileObject,
   makeDirectoryIfNotExists,
   moveFile,
   removeEmptyDirectories
 } from './filePaths.js'
-import { filePathType } from '../../preload/modules/files'
 import {
   isResultObjectOk,
   isResultObjectPartiallyOk,
@@ -33,29 +32,12 @@ export default async function imagesToDateRangeFolder(filePathObjects, outputPat
   const removeFoundEmptyDateDirectoriesOutput = false
   const removeFoundEmptyDateDirectoriesTreeOutput = false
 
-  const inputImageFileObjects = []
-  for (const filePathObject of filePathObjects) {
-    if (filePathObject.filePathType === filePathType.file) {
-      // TODO: should be getImageFileObject? probably not, only image selection should happen in dialog
-      const inputFileObjectTreeRO = await getFileObject(filePathObject.value)
-      if (isResultObjectOk(inputFileObjectTreeRO)) {
-        inputImageFileObjects.push(inputFileObjectTreeRO.result)
-      } else {
-        // TODO: PartiallyOk
-        return toResultObjectWithNullResultByResultObject(inputFileObjectTreeRO)
-      }
-    } else {
-      const inputImageFileObjectsTreeRO = await getDirectoryImageFileObjectsWithoutZeroByteOnes(
-        filePathObject.value,
-        useDirectoriesTreeInput
-      )
-      if (isResultObjectOk(inputImageFileObjectsTreeRO)) {
-        inputImageFileObjects.push(...inputImageFileObjectsTreeRO.result)
-      } else {
-        // TODO: PartiallyOk
-        return toResultObjectWithNullResultByResultObject(inputImageFileObjectsTreeRO)
-      }
-    }
+  const filePathObjectsToFileObjectsRO = await filePathObjectsToFileObjects(
+    filePathObjects,
+    useDirectoriesTreeInput
+  )
+  if (!isResultObjectOk(filePathObjectsToFileObjectsRO)) {
+    return toResultObjectWithNullResultByResultObject(filePathObjectsToFileObjectsRO)
   }
 
   const outputImageFileObjectsRO = await getDirectoryImageFileObjectsWithoutZeroByteOnes(
@@ -78,7 +60,7 @@ export default async function imagesToDateRangeFolder(filePathObjects, outputPat
   }
 
   const groups = getDateRangeGroups([
-    ...inputImageFileObjects,
+    ...filePathObjectsToFileObjectsRO.result,
     ...getDateSubdirectoryFileObjects(outputImageFileObjectsRO.result)
   ])
 
@@ -90,7 +72,7 @@ export default async function imagesToDateRangeFolder(filePathObjects, outputPat
   // the array can have duplicate directories
   // TODO: duplicates might be the problem
   const removeEmptyDirectoriesRO = await removeEmptyDirectories([
-    ...getDistinctDirectoryFileObjects(inputImageFileObjects),
+    ...getDistinctDirectoryFileObjects(filePathObjectsToFileObjectsRO.result),
     // ...getDistinctDirectoryFileObjects(outputImageFileObjectsRO.result),
     // ...inputDirectoryFileObjectsTreeRO.result,
     ...outputDirectoryFileObjectsRO.result
@@ -193,7 +175,7 @@ async function groupsToDirectories(groups, outputPath) {
     }
   }
 
-  return errorTracker.toResultObjectWithNullResult(maxPossibleErrors)
+  return errorTracker.createResultObject(maxPossibleErrors)
 }
 
 function isValidDateFormat(dateString) {
