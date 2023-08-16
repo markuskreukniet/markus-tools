@@ -17,36 +17,33 @@ export async function filePathObjectsToFileObjects(filePathObjects, useDirectori
 
   const inputImageFileObjects = []
   for (const filePathObject of filePathObjects) {
+    let inputRO = null
+
     if (filePathObject.filePathType === filePathType.file) {
       // TODO: should be getImageFileObject? probably not, only image selection should happen in dialog
-      const inputFileObjectTreeRO = await getFileObject(filePathObject.value)
-      if (isResultObjectOk(inputFileObjectTreeRO)) {
-        inputImageFileObjects.push(inputFileObjectTreeRO.result)
-      } else {
-        errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(
-          inputFileObjectTreeRO.message
-        )
-      }
+      inputRO = await getFileObject(filePathObject.value)
     } else {
-      const inputImageFileObjectsTreeRO = await getDirectoryImageFileObjectsWithoutZeroByteOnes(
+      inputRO = await getDirectoryImageFileObjectsWithoutZeroByteOnes(
         filePathObject.value,
         useDirectoriesTreeInput
       )
-      if (isResultObjectOk(inputImageFileObjectsTreeRO)) {
-        inputImageFileObjects.push(...inputImageFileObjectsTreeRO.result)
+    }
+
+    if (isResultObjectOk(inputRO)) {
+      if (Array.isArray(inputRO.result)) {
+        inputImageFileObjects.push(...inputRO.result)
       } else {
-        errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(
-          inputImageFileObjectsTreeRO.message
-        )
+        inputImageFileObjects.push(inputRO.result)
       }
+    } else {
+      errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(inputRO.message)
     }
   }
 
   return errorTracker.createResultObject(inputImageFileObjects.length, inputImageFileObjects)
 }
 
-// TODO: remove export
-export async function getFileObject(filePath) {
+async function getFileObject(filePath) {
   try {
     const stat = await promises.stat(filePath)
     // TODO: dateCreated or dateModified?
