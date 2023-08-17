@@ -171,10 +171,13 @@ export function getDistinctDirectoryFileObjects(fileObjects) {
   }
   // TODO: maybe sorting is unnecessary since all files are read in a directory before going to the next directory.
   fileObjects.sort(compare)
-  // TODO: dirty index === 0?
-  return fileObjects.filter(
-    (fileObject, index) => index === 0 || fileObject.path !== fileObjects[index - 1].path
-  )
+
+  let previousPath = ''
+  return fileObjects.filter((fileObject) => {
+    const isUnique = fileObject.path !== previousPath
+    previousPath = fileObject.path
+    return isUnique
+  })
 }
 
 function compare(a, b) {
