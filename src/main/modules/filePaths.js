@@ -21,7 +21,7 @@ export async function filePathObjectsToFileObjects(filePathObjects, useDirectori
 
     if (filePathObject.filePathType === filePathType.file) {
       // TODO: should be getImageFileObject? probably not, only image selection should happen in dialog
-      inputRO = await getFileObject(filePathObject.value)
+      inputRO = await getFileObject(filePathObject.value, false)
     } else {
       inputRO = await getDirectoryImageFileObjectsWithoutZeroByteOnes(
         filePathObject.value,
@@ -43,7 +43,6 @@ export async function filePathObjectsToFileObjects(filePathObjects, useDirectori
   return errorTracker.createResultObject(inputImageFileObjects.length, inputImageFileObjects)
 }
 
-// TODO: use isDirectory param
 async function getFileObject(filePath, isDirectory) {
   try {
     const stat = await promises.stat(filePath)

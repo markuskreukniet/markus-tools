@@ -7,7 +7,7 @@ export const resultStatus = Object.freeze({
 
 // toResultObject
 export function toResultObject(result, status, message) {
-  return { result, status, message: message ? message : '' }
+  return { result, status, message: message || '' }
 }
 
 // toResultObjectWithNullResultAndResultStatus
