@@ -230,6 +230,7 @@ function isImageFilePath(filePath) {
     lowerCaseFilePath.endsWith('jpeg') ||
     lowerCaseFilePath.endsWith('png') ||
     lowerCaseFilePath.endsWith('gif') ||
+    lowerCaseFilePath.endsWith('bmp') ||
     lowerCaseFilePath.endsWith('webp')
   )
 }
