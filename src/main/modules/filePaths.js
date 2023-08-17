@@ -43,20 +43,24 @@ export async function filePathObjectsToFileObjects(filePathObjects, useDirectori
   return errorTracker.createResultObject(inputImageFileObjects.length, inputImageFileObjects)
 }
 
-async function getFileObject(filePath) {
+// TODO: use isDirectory param
+async function getFileObject(filePath, isDirectory) {
   try {
     const stat = await promises.stat(filePath)
     // TODO: dateCreated or dateModified?
     return toResultObjectWithResultStatusOk({
       path: filePath,
       dateCreated: stat.mtime,
-      size: stat.size
+      size: stat.size,
+      isDirectory: isDirectory || stat.isDirectory()
     })
   } catch (error) {
     return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
 }
 
+// A 'Promise.all' solution for getting all the filePath stats of a folder results in an O(n2) solution.
+// Also, with that solution, we can't use the getFileObject function efficiently since that function also gets filePath stats.
 // TODO: remove export, also others maybe
 export async function getDirectoryFileObjects(
   directoryPath,
@@ -75,38 +79,42 @@ export async function getDirectoryFileObjects(
   }
 
   const fileObjects = []
+
   const stack = [directoryPath]
   while (stack.length > 0) {
     const currentPath = stack.pop()
 
+    let files = []
     try {
-      const files = await promises.readdir(currentPath)
-
-      // TODO: is two loops with Promise.all more efficient than 1 loop?
-      const stats = await Promise.all(
-        files.map((file) => {
-          return promises.stat(combinePathParts(currentPath, file))
-        })
-      )
-
-      for (let i = 0; i < files.length; i++) {
-        const filePath = combinePathParts(currentPath, files[i])
-
-        const isDirectory = stats[i].isDirectory()
-        if (directoryTree && isDirectory) {
-          stack.push(filePath)
-        }
-        if (shouldAddFileObject(typeFilePaths, typeFile, filePath, isDirectory, stats[i].size)) {
-          // TODO: dateCreated or dateModified?
-          fileObjects.push({
-            path: filePath,
-            dateCreated: stats[i].mtime,
-            size: stats[i].size
-          })
-        }
-      }
+      files = await promises.readdir(currentPath)
     } catch (error) {
+      // TODO: partially ok?
       return toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem(error.message)
+    }
+
+    for (const file of files) {
+      const filePath = combinePathParts(currentPath, file)
+      const fileObjectRO = await getFileObject(filePath)
+      // TODO: partially ok?
+      if (!isResultObjectOk(fileObjectRO)) {
+        return toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem(fileObjectRO.message)
+      }
+
+      if (directoryTree && fileObjectRO.result.isDirectory) {
+        stack.push(filePath)
+      }
+
+      if (
+        shouldAddFileObject(
+          typeFilePaths,
+          typeFile,
+          filePath,
+          fileObjectRO.result.isDirectory,
+          fileObjectRO.result.size
+        )
+      ) {
+        fileObjects.push(fileObjectRO.result)
+      }
     }
   }
 
