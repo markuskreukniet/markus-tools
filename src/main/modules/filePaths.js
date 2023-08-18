@@ -164,7 +164,7 @@ export async function removeEmptyDirectories(fileObjects) {
   return errorTracker.createResultObject(fileObjects.length)
 }
 
-// could create reference problems when using these fileObjects after using this function
+// TODO: check if true: could create reference problems when using these fileObjects after using this function
 export function getDistinctDirectoryFileObjects(fileObjects) {
   for (const fileObject of fileObjects) {
     fileObject.path = path.dirname(fileObject.path)
@@ -224,15 +224,8 @@ function calculateDirectoryCheck(typeFilePaths, isDirectory) {
 }
 
 function isImageFilePath(filePath) {
-  const lowerCaseFilePath = filePath.toLowerCase()
-  return (
-    lowerCaseFilePath.endsWith('jpg') ||
-    lowerCaseFilePath.endsWith('jpeg') ||
-    lowerCaseFilePath.endsWith('png') ||
-    lowerCaseFilePath.endsWith('gif') ||
-    lowerCaseFilePath.endsWith('bmp') ||
-    lowerCaseFilePath.endsWith('webp')
-  )
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']
+  return imageExtensions.includes(filePath.toLowerCase().slice(filePath.lastIndexOf('.')))
 }
 
 export function getBaseName(filePath) {
