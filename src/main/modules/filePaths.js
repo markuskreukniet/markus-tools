@@ -151,13 +151,19 @@ export async function removeEmptyDirectories(fileObjects) {
 
   // Both awaits are needed, therefore, a 'await Promise.all' solution is useless.
   for (const fileObject of fileObjects) {
-    try {
-      const files = await promises.readdir(fileObject.path)
-      if (files.length === 0) {
-        await promises.rmdir(fileObject.path)
+    const readFilesFromDirectoryRO = await readFilesFromDirectory(fileObject.path)
+    if (isResultObjectOk(readFilesFromDirectoryRO)) {
+      try {
+        if (readFilesFromDirectoryRO.result.length === 0) {
+          await promises.rmdir(fileObject.path)
+        }
+      } catch (error) {
+        errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(error.message)
       }
-    } catch (error) {
-      errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(error.message)
+    } else {
+      errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(
+        readFilesFromDirectoryRO.message
+      )
     }
   }
 
