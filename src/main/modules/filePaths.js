@@ -77,46 +77,47 @@ export async function getDirectoryFileObjects(
     )
   }
 
+  const errorTracker = new ErrorTracker()
   const fileObjects = []
 
   const stack = [directoryPath]
   while (stack.length > 0) {
     const currentPath = stack.pop()
 
-    let files = []
-    try {
-      files = await promises.readdir(currentPath)
-    } catch (error) {
-      // TODO: partially ok?
-      return toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem(error.message)
-    }
+    const readFilesFromDirectoryRO = await readFilesFromDirectory(currentPath)
+    if (isResultObjectOk(readFilesFromDirectoryRO)) {
+      for (const file of readFilesFromDirectoryRO.result) {
+        const filePath = combinePathParts(currentPath, file)
+        const fileObjectRO = await getFileObject(filePath)
+        if (isResultObjectOk(fileObjectRO)) {
+          if (directoryTree && fileObjectRO.result.isDirectory) {
+            stack.push(filePath)
+          }
 
-    for (const file of files) {
-      const filePath = combinePathParts(currentPath, file)
-      const fileObjectRO = await getFileObject(filePath)
-      // TODO: partially ok?
-      if (!isResultObjectOk(fileObjectRO)) {
-        return toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem(fileObjectRO.message)
+          if (
+            shouldAddFileObject(
+              typeFilePaths,
+              typeFile,
+              filePath,
+              fileObjectRO.result.isDirectory,
+              fileObjectRO.result.size
+            )
+          ) {
+            fileObjects.push(fileObjectRO.result)
+          }
+        } else {
+          errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(fileObjectRO.message)
+        }
       }
-
-      if (directoryTree && fileObjectRO.result.isDirectory) {
-        stack.push(filePath)
-      }
-
-      if (
-        shouldAddFileObject(
-          typeFilePaths,
-          typeFile,
-          filePath,
-          fileObjectRO.result.isDirectory,
-          fileObjectRO.result.size
-        )
-      ) {
-        fileObjects.push(fileObjectRO.result)
-      }
+    } else {
+      errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(
+        readFilesFromDirectoryRO.message
+      )
     }
   }
 
+  // errorTracker.createResultObject(inputImageFileObjects.length, inputImageFileObjects)
+  // TODO use error tracker
   return toResultObject(fileObjects, resultStatus.ok)
 }
 
