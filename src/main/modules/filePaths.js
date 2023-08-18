@@ -245,6 +245,15 @@ async function filePathExists(filePath) {
   }
 }
 
+// TODO: use it
+async function readFilesFromDirectory(filePath) {
+  try {
+    return toResultObjectWithResultStatusOk(await promises.readdir(filePath))
+  } catch (error) {
+    return toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem(error.message)
+  }
+}
+
 export async function makeDirectoryIfNotExists(filePath) {
   if (await filePathExists(filePath)) {
     try {
