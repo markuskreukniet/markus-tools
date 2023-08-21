@@ -252,7 +252,6 @@ async function filePathExists(filePath) {
   }
 }
 
-// TODO: use it
 async function readFilesFromDirectory(filePath) {
   try {
     return toResultObjectWithResultStatusOk(await promises.readdir(filePath))
