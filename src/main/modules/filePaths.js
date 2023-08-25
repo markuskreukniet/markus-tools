@@ -40,7 +40,9 @@ export async function filePathObjectsToFileObjects(filePathObjects, useDirectori
     }
   }
 
-  return errorTracker.createResultObject(inputImageFileObjects.length, inputImageFileObjects)
+  // TODO: inputImageFileObjects.length is not the correct?
+  errorTracker.addNumberOfPossibleErrors(inputImageFileObjects.length)
+  return errorTracker.createResultObject(inputImageFileObjects)
 }
 
 async function getFileObject(filePath, isDirectory) {
@@ -148,7 +150,7 @@ export async function getDirectoryImageFileObjectsWithoutZeroByteOnes(
 
 // TODO: maybe function is useless since objects might not be needed
 export async function removeEmptyDirectories(fileObjects) {
-  const errorTracker = new ErrorTracker()
+  const errorTracker = new ErrorTracker(fileObjects.length)
 
   // Both awaits are needed, therefore, a 'await Promise.all' solution is useless.
   for (const fileObject of fileObjects) {
@@ -168,7 +170,7 @@ export async function removeEmptyDirectories(fileObjects) {
     }
   }
 
-  return errorTracker.createResultObject(fileObjects.length)
+  return errorTracker.createResultObject()
 }
 
 // TODO: check if true: could create reference problems when using these fileObjects after using this function

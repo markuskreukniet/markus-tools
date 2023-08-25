@@ -144,10 +144,9 @@ function isWithinThreeDays(date1, date2) {
 
 async function groupsToDirectories(groups, outputPath) {
   const errorTracker = new ErrorTracker()
-  let maxPossibleErrors = 0
 
   for (const group of groups) {
-    maxPossibleErrors = maxPossibleErrors + group.length
+    errorTracker.addNumberOfPossibleErrors(group.length)
 
     const oldestDate = formatTime(group[0].dateCreated)
     const newestDate = formatTime(group[group.length - 1].dateCreated)
@@ -178,7 +177,7 @@ async function groupsToDirectories(groups, outputPath) {
     }
   }
 
-  return errorTracker.createResultObject(maxPossibleErrors)
+  return errorTracker.createResultObject()
 }
 
 function isValidDateFormat(dateString) {

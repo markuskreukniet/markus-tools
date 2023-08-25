@@ -12,9 +12,14 @@ export const inputError = Object.freeze({
 })
 
 export class ErrorTracker {
-  constructor() {
+  constructor(maxPossibleErrors) {
     this.errorCount = 0
     this.errorMessage = ''
+    this.maxPossibleErrors = maxPossibleErrors || 0
+  }
+
+  addNumberOfPossibleErrors(numberOfPossibleErrors) {
+    this.maxPossibleErrors = this.maxPossibleErrors + numberOfPossibleErrors
   }
 
   concatErrorMessageOnNewLineAndIncrementErrorCount(errorMessage) {
@@ -22,21 +27,17 @@ export class ErrorTracker {
     this.errorMessage = `${this.errorMessage}\n${errorMessage}`
   }
 
-  createResultObject(maxPossibleErrors, result) {
+  createResultObject(result) {
     if (this.errorCount === 0) {
       return result
         ? toResultObjectWithResultStatusOk(result)
         : toResultObjectWithNullResultAndResultStatusOk()
-    } else if (this.errorCount > 0 && this.errorCount < maxPossibleErrors) {
+    } else if (this.errorCount > 0 && this.errorCount < this.maxPossibleErrors) {
       return result
         ? toResultObjectWithResultStatusPartiallyOk(result, this.errorMessage)
         : toResultObjectWithNullResultAndResultStatusPartiallyOk(this.errorMessage)
     } else {
       return toResultObjectWithNullResultAndResultStatusErrorSystem(this.errorMessage)
     }
-  }
-
-  isPartiallyOk(maxPossibleErrors) {
-    return this.errorCount > 0 && this.errorCount < maxPossibleErrors
   }
 }
