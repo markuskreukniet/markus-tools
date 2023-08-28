@@ -13,7 +13,7 @@ import {
 } from '../../preload/modules/resultStatus'
 
 export async function filePathObjectsToFileObjects(filePathObjects, useDirectoriesTreeInput) {
-  const errorTracker = new ErrorTracker()
+  const errorTracker = new ErrorTracker(filePathObjects.length)
 
   const inputImageFileObjects = []
   for (const filePathObject of filePathObjects) {
@@ -40,8 +40,6 @@ export async function filePathObjectsToFileObjects(filePathObjects, useDirectori
     }
   }
 
-  // TODO: inputImageFileObjects.length is not the correct?
-  errorTracker.addNumberOfPossibleErrors(inputImageFileObjects.length)
   return errorTracker.createResultObject(inputImageFileObjects)
 }
 
@@ -84,10 +82,13 @@ export async function getDirectoryFileObjects(
 
   const stack = [directoryPath]
   while (stack.length > 0) {
-    const currentPath = stack.pop()
+    errorTracker.addNumberOfPossibleErrors(1)
 
+    const currentPath = stack.pop()
     const readFilesFromDirectoryRO = await readFilesFromDirectory(currentPath)
     if (isResultObjectOk(readFilesFromDirectoryRO)) {
+      errorTracker.addNumberOfPossibleErrors(readFilesFromDirectoryRO.result.length)
+
       for (const file of readFilesFromDirectoryRO.result) {
         const filePath = combinePathParts(currentPath, file)
         const fileObjectRO = await getFileObject(filePath)
@@ -118,9 +119,7 @@ export async function getDirectoryFileObjects(
     }
   }
 
-  // errorTracker.createResultObject(inputImageFileObjects.length, inputImageFileObjects)
-  // TODO use error tracker
-  return toResultObject(fileObjects, resultStatus.ok)
+  return errorTracker.createResultObject(fileObjects)
 }
 
 export async function getDirectoryDirectoryFileObjects(directoryPath, directoryTree) {
