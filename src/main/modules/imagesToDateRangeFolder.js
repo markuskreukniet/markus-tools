@@ -20,8 +20,6 @@ import {
 } from '../../preload/modules/resultStatus'
 
 // TODO: rename resultStatus file
-// TODO: remove path import
-// TODO: bug when input directory has no images
 export default async function imagesToDateRangeFolder(
   filePathObjects,
   outputPath,
