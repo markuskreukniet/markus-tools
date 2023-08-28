@@ -4,8 +4,6 @@ import { ErrorTracker, inputError } from '../../preload/modules/errors'
 import { filePathsType, filePathType, fileType } from '../../preload/modules/files'
 import {
   isResultObjectOk,
-  resultStatus,
-  toResultObject,
   toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem,
   toResultObjectWithNullResultAndResultStatusErrorSystem,
   toResultObjectWithNullResultAndResultStatusOk,
