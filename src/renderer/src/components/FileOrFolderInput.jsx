@@ -1,4 +1,4 @@
-import { createSignal, For } from 'solid-js'
+import { createSignal, For, Show } from 'solid-js'
 import ActiveByNumberButton from './ActiveByNumberButton'
 import FilePathSelector from './FilePathSelector'
 import {
@@ -18,18 +18,32 @@ export default function FileOrFolderInput(props) {
 
   function setState(resultObject) {
     if (isResultObjectOk(resultObject)) {
-      if (
-        resultObject.result.value !== '' &&
-        !selectedFilePathObjects().some(
-          (filePathObject) => filePathObject.value === resultObject.result.value
-        )
-      ) {
-        setSelectedFilePathObjects([...selectedFilePathObjects(), resultObject.result])
+      if (resultObject.result.value !== '') {
+        if (props.maxOneInput) {
+          setSelectedFilePathObjects([resultObject.result])
+        } else if (
+          !selectedFilePathObjects().some(
+            (filePathObject) => filePathObject.value === resultObject.result.value
+          )
+        ) {
+          setSelectedFilePathObjects([...selectedFilePathObjects(), resultObject.result])
+        } else {
+          return
+        }
         setNumberOfFilePathObjects(selectedFilePathObjects().length)
       }
     } else {
       props.onChange(resultObject)
     }
+  }
+
+  // TODO: should work with enum
+  function showFilePathSelector(type) {
+    return (
+      !props.filePathSelectionType ||
+      props.filePathSelectionType === 'both' ||
+      props.filePathSelectionType === type
+    )
   }
 
   function resetState() {
@@ -44,8 +58,12 @@ export default function FileOrFolderInput(props) {
   return (
     <div>
       <div class="display-flex not-first-child-margin-left-1">
-        <FilePathSelector onChange={setState} />
-        <FilePathSelector onChange={setState} directory />
+        <Show when={showFilePathSelector('file')}>
+          <FilePathSelector onChange={setState} />
+        </Show>
+        <Show when={showFilePathSelector('directory')}>
+          <FilePathSelector onChange={setState} directory />
+        </Show>
       </div>
       <div class="display-flex justify-content-flex-end not-first-child-margin-left-1">
         <ActiveByNumberButton
