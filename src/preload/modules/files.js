@@ -16,3 +16,9 @@ export const fileType = Object.freeze({
   all: 'all',
   image: 'image'
 })
+
+export const filePathSelectionType = Object.freeze({
+  both: 'both',
+  file: 'file',
+  directory: 'directory'
+})

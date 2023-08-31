@@ -1,6 +1,7 @@
 import { createSignal, For, Show } from 'solid-js'
 import ActiveByNumberButton from './ActiveByNumberButton'
 import FilePathSelector from './FilePathSelector'
+import { filePathSelectionType } from '../../../preload/modules/files'
 import {
   isResultObjectOk,
   toResultObjectWithResultStatusOk
@@ -37,11 +38,10 @@ export default function FileOrFolderInput(props) {
     }
   }
 
-  // TODO: should work with enum
   function showFilePathSelector(type) {
     return (
       !props.filePathSelectionType ||
-      props.filePathSelectionType === 'both' ||
+      props.filePathSelectionType === filePathSelectionType.both ||
       props.filePathSelectionType === type
     )
   }
@@ -58,10 +58,10 @@ export default function FileOrFolderInput(props) {
   return (
     <div>
       <div class="display-flex not-first-child-margin-left-1">
-        <Show when={showFilePathSelector('file')}>
+        <Show when={showFilePathSelector(filePathSelectionType.file)}>
           <FilePathSelector onChange={setState} />
         </Show>
-        <Show when={showFilePathSelector('directory')}>
+        <Show when={showFilePathSelector(filePathSelectionType.directory)}>
           <FilePathSelector onChange={setState} directory />
         </Show>
       </div>
