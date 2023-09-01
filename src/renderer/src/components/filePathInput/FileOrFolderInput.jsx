@@ -1,11 +1,11 @@
 import { createSignal, For, Show } from 'solid-js'
-import ActiveByNumberButton from './ActiveByNumberButton'
+import ActiveByNumberButton from '../ActiveByNumberButton'
 import FilePathSelector from './FilePathSelector'
-import { filePathSelectionType } from '../../../preload/modules/files'
+import { filePathSelectionType } from '../../../../preload/modules/files'
 import {
   isResultObjectOk,
   toResultObjectWithResultStatusOk
-} from '../../../preload/modules/resultStatus'
+} from '../../../../preload/modules/resultStatus'
 
 // TODO:
 // Adding a file could add a duplicate file since there could already be a folder with its whole tree of child folders already containing that file.

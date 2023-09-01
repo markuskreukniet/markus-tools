@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js'
 import ResultPage from '../page/ResultPage'
-import SubmittableFileOrFolderInput from '../SubmittableFileOrFolderInput'
+import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFolderInput'
 import TextArea from '../TextArea'
 
 export default function DuplicateFiles(props) {

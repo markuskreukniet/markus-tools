@@ -1,11 +1,11 @@
 import { createSignal, For, Show } from 'solid-js'
-import ActiveByNumberButton from './ActiveByNumberButton'
-import FilePathSelector from './filePathInput/FilePathSelector'
-import { filePathSelectionType } from '../../../preload/modules/files'
+import ActiveByNumberButton from '../ActiveByNumberButton'
+import FilePathSelector from './FilePathSelector'
+import { filePathSelectionType } from '../../../../preload/modules/files'
 import {
   isResultObjectOk,
   toResultObjectWithResultStatusOk
-} from '../../../preload/modules/resultStatus'
+} from '../../../../preload/modules/resultStatus'
 
 // TODO: also files to folder FilePathInput in components
 export default function SubmittableFileOrFolderInput(props) {

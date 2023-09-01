@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
-import SubmittableFileOrFolderInput from '../SubmittableFileOrFolderInput'
+import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFolderInput'
 
 export default function LinesOfCode(props) {
   const [getOutput, setGetOutput] = createSignal(function () {})

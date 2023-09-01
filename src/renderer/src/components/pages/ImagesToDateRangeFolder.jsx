@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
-import SubmittableFileOrFolderInput from '../SubmittableFileOrFolderInput'
+import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFolderInput'
 import FilePathSelector from '../filePathInput/FilePathSelector'
 import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
 
