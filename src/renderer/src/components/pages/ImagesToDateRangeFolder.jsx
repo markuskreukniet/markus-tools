@@ -1,7 +1,7 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
 import SubmittableFileOrFolderInput from '../SubmittableFileOrFolderInput'
-import FilePathSelector from '../FilePathSelector'
+import FilePathSelector from '../filePathInput/FilePathSelector'
 import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
 
 export default function imagesToDateRangeFolder(props) {

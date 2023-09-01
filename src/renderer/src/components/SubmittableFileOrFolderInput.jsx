@@ -1,6 +1,6 @@
 import { createSignal, For, Show } from 'solid-js'
 import ActiveByNumberButton from './ActiveByNumberButton'
-import FilePathSelector from './FilePathSelector'
+import FilePathSelector from './filePathInput/FilePathSelector'
 import { filePathSelectionType } from '../../../preload/modules/files'
 import {
   isResultObjectOk,

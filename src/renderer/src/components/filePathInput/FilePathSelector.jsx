@@ -1,8 +1,8 @@
-import { filePathType } from '../../../preload/modules/files'
+import { filePathType } from '../../../../preload/modules/files'
 import {
   isResultObjectOk,
   toResultObjectWithResultStatusOk
-} from '../../../preload/modules/resultStatus'
+} from '../../../../preload/modules/resultStatus'
 
 export default function FilePathSelector(props) {
   async function clickInput() {
