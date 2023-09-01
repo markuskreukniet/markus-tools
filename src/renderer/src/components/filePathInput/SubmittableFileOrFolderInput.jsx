@@ -7,7 +7,6 @@ import {
   toResultObjectWithResultStatusOk
 } from '../../../../preload/modules/resultStatus'
 
-// TODO: also files to folder FilePathInput in components
 export default function SubmittableFileOrFolderInput(props) {
   const [selectedFilePathObjects, setSelectedFilePathObjects] = createSignal([])
   const [numberOfFilePathObjects, setNumberOfFilePathObjects] = createSignal(0)
