@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
-import FileOrFolderInput from '../FileOrFolderInput'
+import SubmittableFileOrFolderInput from '../SubmittableFileOrFolderInput'
 
 export default function LinesOfCode(props) {
   const [getOutput, setGetOutput] = createSignal(function () {})
@@ -15,7 +15,9 @@ export default function LinesOfCode(props) {
     setGetOutput(setOutput(filePaths))
   }
 
-  const inputComponent = <FileOrFolderInput onChange={handleFilePaths} minimumFiles={1} />
+  const inputComponent = (
+    <SubmittableFileOrFolderInput onChange={handleFilePaths} minimumFiles={1} />
+  )
 
   return (
     <TextResultPage

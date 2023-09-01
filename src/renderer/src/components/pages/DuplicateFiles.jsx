@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js'
 import ResultPage from '../page/ResultPage'
-import FileOrFolderInput from '../FileOrFolderInput'
+import SubmittableFileOrFolderInput from '../SubmittableFileOrFolderInput'
 import TextArea from '../TextArea'
 
 export default function DuplicateFiles(props) {
@@ -17,7 +17,9 @@ export default function DuplicateFiles(props) {
     setGetOutput(setStateOutputComponent(filePaths))
   }
 
-  const inputComponent = <FileOrFolderInput onChange={handleFilePaths} minimumFiles={2} />
+  const inputComponent = (
+    <SubmittableFileOrFolderInput onChange={handleFilePaths} minimumFiles={2} />
+  )
 
   const placeholderContent = (
     <>

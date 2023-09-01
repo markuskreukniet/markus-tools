@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
-import FileOrFolderInput from '../FileOrFolderInput'
+import SubmittableFileOrFolderInput from '../SubmittableFileOrFolderInput'
 import FilePathSelector from '../FilePathSelector'
 import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
 
@@ -45,7 +45,7 @@ export default function imagesToDateRangeFolder(props) {
   // TODO: should not select a file, but a combination a filepath and filetype (folder or file), which is possible since we have a select folder and select file button
   const inputComponent = (
     <div>
-      <FileOrFolderInput onChange={handleInputFilePathsRO} minimumFiles={1} />
+      <SubmittableFileOrFolderInput onChange={handleInputFilePathsRO} minimumFiles={1} />
       <FilePathSelector onChange={handleOutputDirectoryRO} directory />
     </div>
   )
