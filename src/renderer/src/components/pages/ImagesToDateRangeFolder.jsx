@@ -1,10 +1,12 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
+import ActiveByNumberButton from '../ActiveByNumberButton'
 import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFolderInput'
 import FilePathSelector from '../filePathInput/FilePathSelector'
 import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
 
 export default function imagesToDateRangeFolder(props) {
+  let inputFilePathObjects = []
   let outputFilePath = ''
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [status, setStatus] = createSignal('')
@@ -23,11 +25,12 @@ export default function imagesToDateRangeFolder(props) {
     )
   }
 
+  // TODO: handleInputFilePathsRO and handleOutputDirectoryRO are almost the same
   function handleInputFilePathsRO(resultObject) {
     if (isResultObjectOk(resultObject)) {
-      setGetOutput(setState(resultObject.result, outputFilePath))
+      inputFilePathObjects = resultObject.result
     } else {
-      // TODO
+      setStatus(resultObject.message)
     }
   }
 
@@ -39,14 +42,19 @@ export default function imagesToDateRangeFolder(props) {
     }
   }
 
+  function submit() {
+    setGetOutput(setState(inputFilePathObjects, outputFilePath))
+  }
+
   // TODO: minimumFiles should be 0 so it can only sort the files in destination path?
   // TODO: minimumFiles is useless in FileOrFolderInput?
   // TODO: submit should not always be part of FileOrFolderInput
-  // TODO: should not select a file, but a combination a filepath and filetype (folder or file), which is possible since we have a select folder and select file button
+  // TODO: should not be ActiveByNumberButton and not be SubmittableFileOrFolderInput
   const inputComponent = (
     <div>
       <SubmittableFileOrFolderInput onChange={handleInputFilePathsRO} minimumFiles={1} />
       <FilePathSelector onChange={handleOutputDirectoryRO} directory />
+      <ActiveByNumberButton minimumNumber={1} currentNumber={1} onAction={submit} text="submit" />
     </div>
   )
 
