@@ -25,7 +25,9 @@ export default function imagesToDateRangeFolder(props) {
     )
   }
 
-  // TODO: handleInputFilePathsRO and handleOutputDirectoryRO are almost the same
+  // We could extract similar code of the functions handleInputFilePathsRO and handleOutputDirectoryRO, for example, to the function handleRO.
+  // With this extraction, handleInputFilePathsRO and handleOutputDirectoryRO call both handleRO.
+  // However, this extraction hurts the performance and results in more code.
   function handleInputFilePathsRO(resultObject) {
     if (isResultObjectOk(resultObject)) {
       inputFilePathObjects = resultObject.result
