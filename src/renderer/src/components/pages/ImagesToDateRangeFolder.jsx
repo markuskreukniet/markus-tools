@@ -1,8 +1,9 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
 import ActiveByNumberButton from '../ActiveByNumberButton'
+import FileOrFolderInput from '../filePathInput/FileOrFolderInput'
+import { filePathSelectionType } from '../../../../preload/modules/files'
 import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFolderInput'
-import FilePathSelector from '../filePathInput/FilePathSelector'
 import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
 
 export default function imagesToDateRangeFolder(props) {
@@ -38,7 +39,7 @@ export default function imagesToDateRangeFolder(props) {
 
   function handleOutputDirectoryRO(resultObject) {
     if (isResultObjectOk(resultObject)) {
-      outputFilePath = resultObject.result.value
+      outputFilePath = resultObject.result[0].value
     } else {
       setStatus(resultObject.message)
     }
@@ -55,7 +56,11 @@ export default function imagesToDateRangeFolder(props) {
   const inputComponent = (
     <div>
       <SubmittableFileOrFolderInput onChange={handleInputFilePathsRO} minimumFiles={1} />
-      <FilePathSelector onChange={handleOutputDirectoryRO} directory />
+      <FileOrFolderInput
+        onChange={handleOutputDirectoryRO}
+        filePathSelectionType={filePathSelectionType.directory}
+        maxOneInput
+      />
       <ActiveByNumberButton minimumNumber={1} currentNumber={1} onAction={submit} text="submit" />
     </div>
   )
