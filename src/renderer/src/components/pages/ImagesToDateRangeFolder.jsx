@@ -39,6 +39,7 @@ export default function imagesToDateRangeFolder(props) {
 
   function handleOutputDirectoryRO(resultObject) {
     if (isResultObjectOk(resultObject)) {
+      // TODO: should not return an array when maxOneInput?
       outputFilePath = resultObject.result[0].value
     } else {
       setStatus(resultObject.message)
