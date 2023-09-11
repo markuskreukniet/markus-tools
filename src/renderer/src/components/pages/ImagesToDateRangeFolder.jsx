@@ -3,7 +3,6 @@ import TextResultPage from '../page/TextResultPage'
 import ActiveByNumberButton from '../ActiveByNumberButton'
 import FileOrFolderInput from '../filePathInput/FileOrFolderInput'
 import { filePathSelectionType } from '../../../../preload/modules/files'
-import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFolderInput'
 import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
 
 export default function imagesToDateRangeFolder(props) {
