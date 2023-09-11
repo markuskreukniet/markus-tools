@@ -1,16 +1,18 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
-import ActiveByNumberButton from '../ActiveByNumberButton'
 import FileOrFolderInput from '../filePathInput/FileOrFolderInput'
 import { filePathSelectionType } from '../../../../preload/modules/files'
 import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
+import ToggleSubmitButton from '../ToggleSubmitButton'
 
 export default function imagesToDateRangeFolder(props) {
   let inputFilePathObjects = []
   let outputFilePath = ''
   const [getOutput, setGetOutput] = createSignal(function () {})
+  const [hasValidInput, setHasValidInput] = createSignal(false)
   const [status, setStatus] = createSignal('')
 
+  // TODO: setState is bad naming
   async function setState(filePathObjects, path) {
     // TODO: should come from GUI
     const useDirectoriesTreeInput = true
@@ -25,12 +27,21 @@ export default function imagesToDateRangeFolder(props) {
     )
   }
 
+  function validateInput() {
+    if (inputFilePathObjects.length > 0 && outputFilePath !== '') {
+      setHasValidInput(true)
+    } else {
+      setHasValidInput(false)
+    }
+  }
+
   // We could extract similar code of the functions handleInputFilePathsRO and handleOutputDirectoryRO, for example, to the function handleRO.
   // With this extraction, handleInputFilePathsRO and handleOutputDirectoryRO call both handleRO.
   // However, this extraction hurts the performance and results in more code.
   function handleInputFilePathsRO(resultObject) {
     if (isResultObjectOk(resultObject)) {
       inputFilePathObjects = resultObject.result
+      validateInput()
     } else {
       setStatus(resultObject.message)
     }
@@ -40,6 +51,7 @@ export default function imagesToDateRangeFolder(props) {
     if (isResultObjectOk(resultObject)) {
       // TODO: should not return an array when maxOneInput?
       outputFilePath = resultObject.result[0].value
+      validateInput()
     } else {
       setStatus(resultObject.message)
     }
@@ -51,8 +63,6 @@ export default function imagesToDateRangeFolder(props) {
 
   // TODO: minimumFiles should be 0 so it can only sort the files in destination path?
   // TODO: minimumFiles is useless in FileOrFolderInput?
-  // TODO: submit should not always be part of FileOrFolderInput
-  // TODO: should not be ActiveByNumberButton
   const inputComponent = (
     <div>
       <FileOrFolderInput onChange={handleInputFilePathsRO} />
@@ -61,7 +71,7 @@ export default function imagesToDateRangeFolder(props) {
         filePathSelectionType={filePathSelectionType.directory}
         maxOneInput
       />
-      <ActiveByNumberButton minimumNumber={1} currentNumber={1} onAction={submit} text="submit" />
+      <ToggleSubmitButton active={hasValidInput()} onAction={submit} />
     </div>
   )
 

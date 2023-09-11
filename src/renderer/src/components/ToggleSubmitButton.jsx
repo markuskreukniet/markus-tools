@@ -1,11 +1,10 @@
 import { createEffect, createSignal } from 'solid-js'
 
-// TODO: remove this component?
-export default function ActiveByNumberButton(props) {
+export default function ToggleSubmitButton(props) {
   const [active, setActive] = createSignal(false)
 
   createEffect(() => {
-    if (props.currentNumber >= props.minimumNumber) {
+    if (props.active) {
       setActive(true)
     } else {
       setActive(false)
@@ -14,7 +13,7 @@ export default function ActiveByNumberButton(props) {
 
   return (
     <button onClick={() => props.onAction()} disabled={!active()}>
-      {props.text}
+      submit
     </button>
   )
 }
