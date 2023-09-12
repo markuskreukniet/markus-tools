@@ -12,8 +12,7 @@ export default function imagesToDateRangeFolder(props) {
   const [hasValidInput, setHasValidInput] = createSignal(false)
   const [status, setStatus] = createSignal('')
 
-  // TODO: setState is bad naming
-  async function setState(filePathObjects, path) {
+  async function processInputToOutput(filePathObjects, path) {
     // TODO: should come from GUI
     const useDirectoriesTreeInput = true
 
@@ -58,7 +57,7 @@ export default function imagesToDateRangeFolder(props) {
   }
 
   function submit() {
-    setGetOutput(setState(inputFilePathObjects, outputFilePath))
+    setGetOutput(processInputToOutput(inputFilePathObjects, outputFilePath))
   }
 
   const inputComponent = (
