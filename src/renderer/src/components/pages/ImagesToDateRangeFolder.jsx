@@ -1,9 +1,9 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
+import ActivatableSubmitButton from '../ActivatableSubmitButton'
 import FileOrFolderInput from '../filePathInput/FileOrFolderInput'
 import { filePathSelectionType } from '../../../../preload/modules/files'
 import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
-import ToggleSubmitButton from '../ToggleSubmitButton'
 
 export default function imagesToDateRangeFolder(props) {
   let inputFilePathObjects = []
@@ -71,7 +71,7 @@ export default function imagesToDateRangeFolder(props) {
         filePathSelectionType={filePathSelectionType.directory}
         maxOneInput
       />
-      <ToggleSubmitButton active={hasValidInput()} onAction={submit} />
+      <ActivatableSubmitButton active={hasValidInput()} onAction={submit} />
     </div>
   )
 

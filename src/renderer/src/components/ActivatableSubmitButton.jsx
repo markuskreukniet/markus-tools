@@ -1,6 +1,6 @@
 import { createEffect, createSignal } from 'solid-js'
 
-export default function ToggleSubmitButton(props) {
+export default function ActivatableSubmitButton(props) {
   const [active, setActive] = createSignal(false)
 
   createEffect(() => {
