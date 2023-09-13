@@ -48,7 +48,8 @@ export default function imagesToDateRangeFolder(props) {
 
   function handleOutputDirectoryRO(resultObject) {
     if (isResultObjectOk(resultObject)) {
-      // TODO: should not return an array when maxOneInput?
+      // The result should not be an array.
+      // We should use a strategy pattern for a clean solution, which results in more code and a performance loss.
       outputFilePath = resultObject.result[0].value
       validateInput()
     } else {
