@@ -1,6 +1,7 @@
 import { createEffect, createSignal } from 'solid-js'
 
 // TODO: remove this component?
+// step 1 is to give FileOrFolderInput onHasFilePathObject, and use that in SubmittableFileOrFolderInput
 export default function ActiveByNumberButton(props) {
   const [active, setActive] = createSignal(false)
 
