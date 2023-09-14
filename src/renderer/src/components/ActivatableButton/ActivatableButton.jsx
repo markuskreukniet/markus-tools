@@ -1,6 +1,6 @@
 import { createEffect, createSignal } from 'solid-js'
 
-export default function ActivatableSubmitButton(props) {
+export default function ActivatableButton(props) {
   const [active, setActive] = createSignal(false)
 
   createEffect(() => {
@@ -13,7 +13,7 @@ export default function ActivatableSubmitButton(props) {
 
   return (
     <button onClick={() => props.onAction()} disabled={!active()}>
-      submit
+      {props.text}
     </button>
   )
 }
