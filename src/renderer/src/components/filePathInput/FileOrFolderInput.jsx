@@ -47,7 +47,12 @@ export default function FileOrFolderInput(props) {
   function handleChange(resultObject) {
     if (isResultObjectOk(resultObject)) {
       setState(resultObject.result)
-      props.onChange(toResultObjectWithResultStatusOk(selectedFilePathObjects()))
+      props.onChange(
+        toResultObjectWithResultStatusOk({
+          selectedFilePathObjects: selectedFilePathObjects(),
+          hasFilePathObject: selectedFilePathObjects().length > 0
+        })
+      )
     } else {
       props.onChange(resultObject)
     }

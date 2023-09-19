@@ -39,7 +39,7 @@ export default function imagesToDateRangeFolder(props) {
   // However, this extraction hurts the performance and results in more code.
   function handleInputFilePathsRO(resultObject) {
     if (isResultObjectOk(resultObject)) {
-      inputFilePathObjects = resultObject.result
+      inputFilePathObjects = resultObject.result.selectedFilePathObjects
       validateInput()
     } else {
       setStatus(resultObject.message)
@@ -48,9 +48,9 @@ export default function imagesToDateRangeFolder(props) {
 
   function handleOutputDirectoryRO(resultObject) {
     if (isResultObjectOk(resultObject)) {
-      // The result should not be an array.
+      // The result should not have an array.
       // We could use a strategy pattern for a clean solution, resulting in more code and a performance loss.
-      outputFilePath = resultObject.result[0].value
+      outputFilePath = resultObject.result.selectedFilePathObjects[0].value
       validateInput()
     } else {
       setStatus(resultObject.message)

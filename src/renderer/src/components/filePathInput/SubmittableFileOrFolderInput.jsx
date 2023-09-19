@@ -12,7 +12,7 @@ export default function SubmittableFileOrFolderInput(props) {
 
   function setState(resultObject) {
     if (isResultObjectOk(resultObject)) {
-      selectedFilePathObjects = resultObject.result
+      selectedFilePathObjects = resultObject.result.selectedFilePathObjects
       setNumberOfFilePathObjects(selectedFilePathObjects.length)
     } else {
       props.onChange(resultObject)
