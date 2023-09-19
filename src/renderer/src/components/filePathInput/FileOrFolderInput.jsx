@@ -1,5 +1,5 @@
 import { createSignal, For, Show } from 'solid-js'
-import ActiveByNumberButton from '../ActiveByNumberButton'
+import ActivatableButton from '../activatableButton/ActivatableButton'
 import FilePathSelector from './FilePathSelector'
 import { filePathSelectionType } from '../../../../preload/modules/files'
 import {
@@ -14,7 +14,7 @@ import {
 
 export default function FileOrFolderInput(props) {
   const [selectedFilePathObjects, setSelectedFilePathObjects] = createSignal([])
-  const [numberOfFilePathObjects, setNumberOfFilePathObjects] = createSignal(0)
+  const [hasFilePathObject, setHasFilePathObject] = createSignal(false)
 
   function setState(result) {
     if (result.value !== '') {
@@ -27,7 +27,7 @@ export default function FileOrFolderInput(props) {
       } else {
         return
       }
-      setNumberOfFilePathObjects(selectedFilePathObjects().length)
+      setHasFilePathObject(selectedFilePathObjects().length > 0)
     }
   }
 
@@ -41,7 +41,7 @@ export default function FileOrFolderInput(props) {
 
   function resetState() {
     setSelectedFilePathObjects([])
-    setNumberOfFilePathObjects(0)
+    setHasFilePathObject(false)
   }
 
   function handleChange(resultObject) {
@@ -50,7 +50,7 @@ export default function FileOrFolderInput(props) {
       props.onChange(
         toResultObjectWithResultStatusOk({
           selectedFilePathObjects: selectedFilePathObjects(),
-          hasFilePathObject: selectedFilePathObjects().length > 0
+          hasFilePathObject: hasFilePathObject()
         })
       )
     } else {
@@ -69,12 +69,7 @@ export default function FileOrFolderInput(props) {
         </Show>
       </div>
       <div class="display-flex justify-content-flex-end not-first-child-margin-left-1">
-        <ActiveByNumberButton
-          minimumNumber={1}
-          currentNumber={numberOfFilePathObjects()}
-          onAction={resetState}
-          text="reset"
-        />
+        <ActivatableButton text="reset" active={hasFilePathObject()} onAction={resetState} />
         {props.submitButton}
       </div>
       <ul>

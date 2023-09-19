@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js'
-import ActiveByNumberButton from '../ActiveByNumberButton'
+import ActivatableSubmitButton from '../activatableButton/ActivatableSubmitButton'
 import FileOrFolderInput from './FileOrFolderInput'
 import {
   isResultObjectOk,
@@ -8,12 +8,12 @@ import {
 
 export default function SubmittableFileOrFolderInput(props) {
   let selectedFilePathObjects = []
-  const [numberOfFilePathObjects, setNumberOfFilePathObjects] = createSignal(0)
+  const [buttonActive, setButtonActive] = createSignal(false)
 
   function setState(resultObject) {
     if (isResultObjectOk(resultObject)) {
       selectedFilePathObjects = resultObject.result.selectedFilePathObjects
-      setNumberOfFilePathObjects(selectedFilePathObjects.length)
+      setButtonActive(resultObject.result.hasFilePathObject)
     } else {
       props.onChange(resultObject)
     }
@@ -23,14 +23,7 @@ export default function SubmittableFileOrFolderInput(props) {
     props.onChange(toResultObjectWithResultStatusOk(selectedFilePathObjects))
   }
 
-  const submitButton = (
-    <ActiveByNumberButton
-      minimumNumber={props.minimumFiles}
-      currentNumber={numberOfFilePathObjects()}
-      onAction={submit}
-      text="submit"
-    />
-  )
+  const submitButton = <ActivatableSubmitButton active={buttonActive()} onAction={submit} />
 
   return <FileOrFolderInput onChange={setState} submitButton={submitButton} />
 }
