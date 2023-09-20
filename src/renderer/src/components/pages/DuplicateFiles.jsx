@@ -1,24 +1,30 @@
 import { createSignal } from 'solid-js'
 import ResultPage from '../page/ResultPage'
+import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
 import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFolderInput'
 import TextArea from '../TextArea'
 
 export default function DuplicateFiles(props) {
   const [getOutput, setGetOutput] = createSignal(function () {})
-  const [duplicateFiles, setDuplicateFiles] = createSignal('')
+  const [result, setResult] = createSignal('')
 
-  async function setStateOutputComponent(filePaths) {
-    const duplicateFiles = await window.duplicateFiles.getDuplicateFiles(filePaths)
+  async function setStateOutputComponent(filePathObjects) {
+    const duplicateFiles = await window.duplicateFiles.getDuplicateFiles(filePathObjects)
     const textareaValue = duplicateFiles !== '' ? duplicateFiles : 'No duplicate files found'
-    setDuplicateFiles(textareaValue)
+    setResult(textareaValue)
   }
 
-  function handleFilePaths(filePaths) {
-    setGetOutput(setStateOutputComponent(filePaths))
+  // TODO: looks a lot like imagesToDateRangeFolder handleInputFilePathsRO
+  function handleFilePathsRO(resultObject) {
+    if (isResultObjectOk(resultObject)) {
+      setGetOutput(setStateOutputComponent(resultObject.result))
+    } else {
+      setResult(resultObject.message)
+    }
   }
 
   const inputComponent = (
-    <SubmittableFileOrFolderInput onChange={handleFilePaths} minimumFiles={2} />
+    <SubmittableFileOrFolderInput onChange={handleFilePathsRO} minimumFiles={2} />
   )
 
   const placeholderContent = (
@@ -34,8 +40,9 @@ export default function DuplicateFiles(props) {
     </>
   )
 
+  // TODO: should be result()?
   const outputComponent = (
-    <TextArea readOnly textAreaValue={duplicateFiles} placeholderContent={placeholderContent} />
+    <TextArea readOnly textAreaValue={result} placeholderContent={placeholderContent} />
   )
 
   return (
