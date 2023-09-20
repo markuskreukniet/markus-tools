@@ -1,17 +1,21 @@
 import crypto from 'crypto'
 import fs from 'fs'
-import path from 'path'
-import { getDirectoryFileObjectsWithoutZeroByteOnes } from './filePaths.js'
+import { filePathObjectsToFileObjects } from './filePaths.js'
+import {
+  isResultObjectOk,
+  toResultObjectWithNullResultByResultObject
+} from '../../preload/modules/resultStatus'
 
-// TODO: remove path and fs import
-export default async function duplicateFiles(filePaths) {
-  // TODO: might not work now
-  const inputPath = getSelectedFolderPath(filePaths)
+// TODO: has many similarities with imagesToDateRangeFolder.js
+// TODO: remove fs import
+export default async function duplicateFiles(filePathObjects) {
+  // TODO: tree optional
+  const filePathObjectsToFileObjectsRO = await filePathObjectsToFileObjects(filePathObjects, true)
+  if (!isResultObjectOk(filePathObjectsToFileObjectsRO)) {
+    return toResultObjectWithNullResultByResultObject(filePathObjectsToFileObjectsRO)
+  }
 
-  // TODO: error handling // TODO: tree optional
-  const fileObjectsTreeRO = await getDirectoryFileObjectsWithoutZeroByteOnes(inputPath, true)
-  const fileObjects = fileObjectsTreeRO.result
-
+  const fileObjects = filePathObjectsToFileObjectsRO.result
   fileObjects.sort(compare)
 
   // duplicates of path and hash combinations
@@ -44,24 +48,7 @@ export default async function duplicateFiles(filePaths) {
   }
 }
 
-// TODO: remove function
-function getSelectedFolderPath(files) {
-  const firstFolderPath = path.dirname(files[0])
-  const lastFolderPath = path.dirname(files[files.length - 1])
-
-  let prefix = ''
-
-  for (let i = 0; i < firstFolderPath.length; i++) {
-    if (firstFolderPath[i] === lastFolderPath[i]) {
-      prefix += firstFolderPath[i]
-    } else {
-      break
-    }
-  }
-
-  return prefix
-}
-
+// TODO: try catch?
 function getHashHex(path) {
   return new Promise((resolve, reject) => {
     // SHA1 is faster than MD5
