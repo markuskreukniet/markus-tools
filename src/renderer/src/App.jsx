@@ -5,7 +5,6 @@ import LinesOfCode from './components/pages/LinesOfCode'
 import ReferencesByUrls from './components/pages/ReferencesByUrls'
 import Loader from './components/Loader'
 import PageNavigator from './components/PageNavigator'
-// import Versions from './components/Versions'
 // import logo from './assets/logo.svg'
 
 // TODO: check for good error handling whole app
@@ -43,8 +42,6 @@ function App() {
 
   return (
     <div class="container">
-      {/* <Versions /> */}
-
       <PageNavigator
         navigationBarItemPageCombinations={navigationBarItemPageCombinations}
         activeNavigationBarItem={activeNavigationBarItem}
