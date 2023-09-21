@@ -1,6 +1,6 @@
 import { constants, promises } from 'fs'
+import { open } from 'fs/promises'
 import path from 'path'
-import { open } from 'promises'
 import { ErrorTracker, inputError } from '../../preload/modules/errors'
 import { filePathsType, filePathType, fileType } from '../../preload/modules/files'
 import {

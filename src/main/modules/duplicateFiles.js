@@ -51,8 +51,9 @@ export default async function duplicateFiles(filePathObjects) {
 // TODO: try catch?
 function getHashHex(path) {
   return new Promise((resolve, reject) => {
-    // SHA1 is faster than MD5
-    const hash = crypto.createHash('sha1')
+    // sha256 is generally faster and more secure than SHA1
+    // SHA1 is generally faster and more secure than MD5
+    const hash = crypto.createHash('sha256')
     const stream = fs.createReadStream(path)
     stream.on('error', (err) => reject(err))
     stream.on('data', (chunk) => hash.update(chunk))
