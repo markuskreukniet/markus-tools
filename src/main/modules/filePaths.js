@@ -1,5 +1,6 @@
 import { constants, promises } from 'fs'
 import path from 'path'
+import { open } from 'promises'
 import { ErrorTracker, inputError } from '../../preload/modules/errors'
 import { filePathsType, filePathType, fileType } from '../../preload/modules/files'
 import {
@@ -274,6 +275,14 @@ export async function moveFile(sourcePath, destinationPath) {
   try {
     await promises.rename(sourcePath, destinationPath)
     return toResultObjectWithNullResultAndResultStatusOk()
+  } catch (error) {
+    return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
+  }
+}
+
+export async function getReadFileHandle(filePath) {
+  try {
+    return toResultObjectWithResultStatusOk(await open(filePath, 'r'))
   } catch (error) {
     return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
