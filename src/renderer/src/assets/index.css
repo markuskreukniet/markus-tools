@@ -190,16 +190,8 @@ button {
   background-color: var(--light-gray);
 }
 
-h1 {
-  margin-bottom: var(--size-1);
-}
-
-h2, ul {
-  padding-top: var(--size-1);
-}
-
-h2 {
-  margin-bottom: var(--size-1-s);
+h1, h2, ul {
+  padding: 0 0 var(--size-1) 0;
 }
 
 textarea, .custom-textarea-placeholder {
