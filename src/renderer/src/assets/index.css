@@ -195,7 +195,7 @@ h1 {
 }
 
 h2, ul {
-  margin-top: var(--size-1);
+  padding-top: var(--size-1);
 }
 
 h2 {
