@@ -20,6 +20,9 @@ $ npm install
 $ npm run dev
 ```
 
+Rules:
+- Don't use CSS Margins: https://www.youtube.com/watch?v=KVQMoEFUee8
+
 ### Build
 
 ```bash
