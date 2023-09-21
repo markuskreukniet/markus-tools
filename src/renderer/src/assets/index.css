@@ -246,6 +246,7 @@ button, textarea, #navigation-bar > li, .custom-textarea-placeholder {
   justify-content: flex-end;
 }
 
+/* TODO: fix class? fix margin */
 .not-first-child-margin-left-1 > :not(:first-child) {
   margin-left: var(--size-1);
 }
