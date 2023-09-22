@@ -60,7 +60,7 @@ export default function FileOrFolderInput(props) {
 
   return (
     <div>
-      <div class="display-flex not-first-child-margin-left-1">
+      <div class="display-flex gap-1">
         <Show when={showFilePathSelector(filePathSelectionType.file)}>
           <FilePathSelector onChange={handleChange} />
         </Show>
@@ -68,7 +68,7 @@ export default function FileOrFolderInput(props) {
           <FilePathSelector onChange={handleChange} directory />
         </Show>
       </div>
-      <div class="display-flex justify-content-flex-end not-first-child-margin-left-1">
+      <div class="display-flex justify-content-flex-end gap-1">
         <ActivatableButton text="reset" active={hasFilePathObject()} onAction={resetState} />
         {props.submitButton}
       </div>
