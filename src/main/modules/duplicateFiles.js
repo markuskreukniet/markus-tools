@@ -1,5 +1,4 @@
 import crypto from 'crypto'
-import fs from 'fs'
 import { filePathObjectsToFileObjects, getReadFileHandle } from './filePaths.js'
 import {
   isResultObjectOk,
@@ -7,7 +6,6 @@ import {
 } from '../../preload/modules/resultStatus'
 
 // TODO: has many similarities with imagesToDateRangeFolder.js
-// TODO: remove fs import
 export default async function duplicateFiles(filePathObjects) {
   // TODO: filePathObjects > 0
   // TODO: tree optional
@@ -27,14 +25,15 @@ export default async function duplicateFiles(filePathObjects) {
     const fileObject2 = fileObjects[i]
 
     if (fileObject.size === fileObject2.size) {
-      const hashHex = await getHashHex(fileObject.path)
-      const hashHex2 = await getHashHex(fileObject2.path)
+      const fileHash = await getFileHash(fileObject.path)
+      const fileHash2 = await getFileHash(fileObject2.path)
 
-      if (hashHex === hashHex2) {
+      if (fileHash === fileHash2) {
         if (lastPushedIndex !== i - 1) {
-          duplicates.push({ path: fileObject.path, hash: hashHex })
+          // TODO: create object with function
+          duplicates.push({ path: fileObject.path, hash: fileHash })
         }
-        duplicates.push({ path: fileObject2.path, hash: hashHex2 })
+        duplicates.push({ path: fileObject2.path, hash: fileHash2 })
         lastPushedIndex = i
       }
     }
@@ -48,8 +47,8 @@ export default async function duplicateFiles(filePathObjects) {
   }
 }
 
-function getFileHash(filePath) {
-  const fileHandleRO = getReadFileHandle(filePath)
+async function getFileHash(filePath) {
+  const fileHandleRO = await getReadFileHandle(filePath)
   if (!isResultObjectOk(fileHandleRO)) {
     return toResultObjectWithNullResultByResultObject(fileHandleRO)
   }
@@ -61,34 +60,36 @@ function getFileHash(filePath) {
     //
   }
 
+  let fileHash = ''
+  await getFileHashByReadStream(readStream)
+    .then((hash) => {
+      fileHash = hash
+    })
+    .catch((error) => {
+      console.error('Error:', error)
+    })
+
+  fileHandleRO.result.close()
+  return fileHash
+}
+
+function getFileHashByReadStream(readStream) {
   // sha256 is generally faster and more secure than SHA1
   // SHA1 is generally faster and more secure than MD5
   const hash = crypto.createHash('sha256')
 
-  readStream.on('data', (chunk) => hash.update(chunk))
-  readStream.on('end', () => {
-    fileHandleRO.result.close()
-    return hash.digest('hex') // TODO: RO
-  })
-  readStream.on('error', (error) => {
-    fileHandleRO.result.close()
-    // TODO: RO
-  })
-}
-
-// TODO: try catch?
-function getHashHex(path) {
   return new Promise((resolve, reject) => {
-    // sha256 is generally faster and more secure than SHA1
-    // SHA1 is generally faster and more secure than MD5
-    const hash = crypto.createHash('sha256')
-    const stream = fs.createReadStream(path)
-    stream.on('error', (err) => reject(err))
-    stream.on('data', (chunk) => hash.update(chunk))
-    stream.on('end', () => resolve(hash.digest('hex')))
+    readStream.on('data', (chunk) => hash.update(chunk))
+    readStream.on('end', () => {
+      resolve(hash.digest('hex')) // TODO: RO
+    })
+    readStream.on('error', (error) => {
+      reject(error) // TODO: RO
+    })
   })
 }
 
+// TODO:
 // This option is slower when I test it
 // 1048576 * 100 // 1 MiB = 1048576 bytes
 // const filePartSize = Math.round((1024 * 1024 * 1024) / 10); // Math.round((1 GiB) / 10)
@@ -120,6 +121,7 @@ function compare(a, b) {
 function duplicatesArrayToResultString(duplicates) {
   let result = duplicates[0].path
   for (let i = 1; i < duplicates.length; i++) {
+    // TODO: create string with function?
     let resultPart = `\n${duplicates[i].path}`
 
     if (duplicates[i].hash !== duplicates[i - 1].hash) {
