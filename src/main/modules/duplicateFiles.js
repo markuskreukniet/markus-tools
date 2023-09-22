@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import fs from 'fs'
-import { filePathObjectsToFileObjects } from './filePaths.js'
+import { filePathObjectsToFileObjects, getReadFileHandle } from './filePaths.js'
 import {
   isResultObjectOk,
   toResultObjectWithNullResultByResultObject
@@ -9,6 +9,7 @@ import {
 // TODO: has many similarities with imagesToDateRangeFolder.js
 // TODO: remove fs import
 export default async function duplicateFiles(filePathObjects) {
+  // TODO: filePathObjects > 0
   // TODO: tree optional
   const filePathObjectsToFileObjectsRO = await filePathObjectsToFileObjects(filePathObjects, true)
   if (!isResultObjectOk(filePathObjectsToFileObjectsRO)) {
@@ -18,7 +19,6 @@ export default async function duplicateFiles(filePathObjects) {
   const fileObjects = filePathObjectsToFileObjectsRO.result
   fileObjects.sort(compare)
 
-  // duplicates of path and hash combinations
   const duplicates = []
   let lastPushedIndex = -1
 
@@ -45,6 +45,23 @@ export default async function duplicateFiles(filePathObjects) {
     return ''
   } else {
     return duplicatesArrayToResultString(duplicates)
+  }
+}
+
+function getFileHash(filePath) {
+  const fileHandleRO = getReadFileHandle(filePath)
+  if (!isResultObjectOk(fileHandleRO)) {
+    return toResultObjectWithNullResultByResultObject(fileHandleRO)
+  }
+
+  // sha256 is generally faster and more secure than SHA1
+  // SHA1 is generally faster and more secure than MD5
+  const hash = crypto.createHash('sha256')
+
+  try {
+    const readStream = fileHandleRO.result.createReadStream()
+  } catch {
+    //
   }
 }
 
