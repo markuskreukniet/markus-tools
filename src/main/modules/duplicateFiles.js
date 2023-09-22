@@ -66,10 +66,14 @@ function getFileHash(filePath) {
   const hash = crypto.createHash('sha256')
 
   readStream.on('data', (chunk) => hash.update(chunk))
-  readStream.on('end', () => hash.digest('hex'))
-  readStream.on('error', (error) => {}) // TODO:
-
-  // TODO: fileHandleRO.result.close()
+  readStream.on('end', () => {
+    fileHandleRO.result.close()
+    return hash.digest('hex') // TODO: RO
+  })
+  readStream.on('error', (error) => {
+    fileHandleRO.result.close()
+    // TODO: RO
+  })
 }
 
 // TODO: try catch?
