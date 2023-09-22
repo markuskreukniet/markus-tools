@@ -54,15 +54,22 @@ function getFileHash(filePath) {
     return toResultObjectWithNullResultByResultObject(fileHandleRO)
   }
 
+  let readStream = null
+  try {
+    readStream = fileHandleRO.result.createReadStream()
+  } catch {
+    //
+  }
+
   // sha256 is generally faster and more secure than SHA1
   // SHA1 is generally faster and more secure than MD5
   const hash = crypto.createHash('sha256')
 
-  try {
-    const readStream = fileHandleRO.result.createReadStream()
-  } catch {
-    //
-  }
+  readStream.on('data', (chunk) => hash.update(chunk))
+  readStream.on('end', () => hash.digest('hex'))
+  readStream.on('error', (error) => {}) // TODO:
+
+  // TODO: fileHandleRO.result.close()
 }
 
 // TODO: try catch?
