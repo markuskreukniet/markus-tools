@@ -5,6 +5,7 @@ import {
   toResultObjectWithNullResultByResultObject
 } from '../../preload/modules/resultStatus'
 
+// TODO: return RO
 // TODO: has many similarities with imagesToDateRangeFolder.js
 export default async function duplicateFiles(filePathObjects) {
   // TODO: filePathObjects > 0
@@ -57,7 +58,7 @@ async function getFileHash(filePath) {
   try {
     readStream = fileHandleRO.result.createReadStream()
   } catch {
-    //
+    // TODO:
   }
 
   let fileHash = ''
@@ -66,7 +67,7 @@ async function getFileHash(filePath) {
       fileHash = hash
     })
     .catch((error) => {
-      console.error('Error:', error)
+      console.error('Error:', error) // TODO:
     })
 
   fileHandleRO.result.close()
