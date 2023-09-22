@@ -61,6 +61,7 @@ async function getFileHash(filePath) {
     // TODO:
   }
 
+  // TODO: change to try catch?
   let fileHash = ''
   await getFileHashByReadStream(readStream)
     .then((hash) => {
