@@ -60,7 +60,7 @@ async function getFileHash(filePath) {
     readStream = fileHandleRO.result.createReadStream()
     fileHash = await getFileHashByReadStream(readStream)
   } catch {
-    // TODO: even in catch readStream.close()
+    // TODO: even in catch or finally readStream.close()
   }
 
   readStream.close()
