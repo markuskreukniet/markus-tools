@@ -55,21 +55,13 @@ async function getFileHash(filePath) {
   }
 
   let readStream = null
+  let fileHash = ''
   try {
     readStream = fileHandleRO.result.createReadStream()
+    fileHash = await getFileHashByReadStream(readStream)
   } catch {
-    // TODO:
+    // TODO: even in catch readStream.close()
   }
-
-  // TODO: change to try catch?
-  let fileHash = ''
-  await getFileHashByReadStream(readStream)
-    .then((hash) => {
-      fileHash = hash
-    })
-    .catch((error) => {
-      console.error('Error:', error) // TODO:
-    })
 
   readStream.close()
   return fileHash
