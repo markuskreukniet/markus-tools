@@ -71,7 +71,7 @@ async function getFileHash(filePath) {
       console.error('Error:', error) // TODO:
     })
 
-  fileHandleRO.result.close()
+  readStream.close()
   return fileHash
 }
 
