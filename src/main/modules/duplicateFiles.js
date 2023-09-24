@@ -2,7 +2,9 @@ import crypto from 'crypto'
 import { filePathObjectsToFileObjects, getReadFileHandle } from './filePaths.js'
 import {
   isResultObjectOk,
-  toResultObjectWithNullResultByResultObject
+  toResultObjectWithNullResultByResultObject,
+  toResultObjectWithNullResultAndResultStatusErrorSystem,
+  toResultObjectWithResultStatusOk
 } from '../../preload/modules/resultStatus'
 
 // TODO: return RO
@@ -55,16 +57,16 @@ async function getFileHash(filePath) {
   }
 
   let readStream = null
-  let fileHash = ''
+  let result = null
   try {
     readStream = fileHandleRO.result.createReadStream()
-    fileHash = await getFileHashByReadStream(readStream)
-  } catch {
-    // TODO: even in catch or finally readStream.close()
+    result = toResultObjectWithResultStatusOk(await getFileHashByReadStream(readStream))
+  } catch (error) {
+    result = toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
 
   readStream.close()
-  return fileHash
+  return result.result // TODO:
 }
 
 function getFileHashByReadStream(readStream) {
