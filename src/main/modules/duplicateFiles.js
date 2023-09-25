@@ -64,8 +64,14 @@ async function getFileHash(filePath) {
     result = toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
 
-  // TODO: filehandle.close(), with try catch
-  readStream.destroy() // TODO: can return error, should use try catch
+  try {
+    // readStream.destroy() should come before filehandle.close()
+    readStream.destroy()
+    fileHandleRO.result.close()
+  } catch (error) {
+    // TODO:
+  }
+
   return result.result // TODO:
 }
 
