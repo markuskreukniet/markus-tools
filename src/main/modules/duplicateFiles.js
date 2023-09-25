@@ -73,6 +73,7 @@ async function getFileHash(filePath) {
   try {
     await fileHandleRO.result.close()
   } catch (error) {
+    // TODO: should add error to result, when it has already an error
     return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
 
