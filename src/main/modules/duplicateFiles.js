@@ -64,9 +64,13 @@ async function getFileHash(filePath) {
     result = toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
 
+  // When we use "readStream.on 'error'," we don't have to use try-catch
+  // readStream.destroy() should come before filehandle.close()
+  if (readStream) {
+    readStream.destroy() // TODO: should have await?
+  }
+
   try {
-    // readStream.destroy() should come before filehandle.close()
-    readStream.destroy() // TODO: should have await?  // TODO: What if destroy trows an error?
     fileHandleRO.result.close() // TODO: should have await?
   } catch (error) {
     // TODO:
