@@ -67,13 +67,13 @@ async function getFileHash(filePath) {
   // When we use "readStream.on 'error'," we don't have to use try-catch
   // readStream.destroy() should come before filehandle.close()
   if (readStream) {
-    readStream.destroy() // TODO: should have await?
+    readStream.destroy()
   }
 
   try {
-    fileHandleRO.result.close() // TODO: should have await?
+    await fileHandleRO.result.close()
   } catch (error) {
-    // TODO:
+    return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
 
   return result.result // TODO:
