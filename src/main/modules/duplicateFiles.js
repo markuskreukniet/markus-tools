@@ -66,8 +66,8 @@ async function getFileHash(filePath) {
 
   try {
     // readStream.destroy() should come before filehandle.close()
-    readStream.destroy()
-    fileHandleRO.result.close()
+    readStream.destroy() // TODO: should have await?  // TODO: What if destroy trows an error?
+    fileHandleRO.result.close() // TODO: should have await?
   } catch (error) {
     // TODO:
   }
