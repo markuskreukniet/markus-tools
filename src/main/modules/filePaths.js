@@ -72,7 +72,7 @@ export async function getDirectoryFileObjects(
 
   if (typeFilePaths === filePathsType.directories && typeFile !== fileType.all) {
     return toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem(
-      inputError.wrongFunctionArguments
+      inputError.aWrongCombinationOfArguments
     )
   }
 
