@@ -10,7 +10,6 @@ import {
 // TODO: return RO
 // TODO: has many similarities with imagesToDateRangeFolder.js
 export default async function duplicateFiles(filePathObjects) {
-  // TODO: filePathObjects > 0
   // TODO: tree optional
   const filePathObjectsToFileObjectsRO = await filePathObjectsToFileObjects(filePathObjects, true)
   if (!isResultObjectOk(filePathObjectsToFileObjectsRO)) {

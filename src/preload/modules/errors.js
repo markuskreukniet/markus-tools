@@ -8,8 +8,7 @@ import {
 
 // We can't use symbols across the Electron IPC (inter-process communication) boundary
 export const inputError = Object.freeze({
-  aWrongCombinationOfArguments: 'A wrong combination of arguments.',
-  anArgumentShouldHaveAtLeastTwoElements: 'An argument should have at least two elements.'
+  aWrongCombinationOfArguments: 'A wrong combination of arguments.'
 })
 
 export class ErrorTracker {
