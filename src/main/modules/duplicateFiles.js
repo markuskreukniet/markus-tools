@@ -52,6 +52,7 @@ function toDuplicateObject(path, hash) {
   return { path, hash }
 }
 
+// TODO: check logic error, fileHandle, and readStream
 async function getFileHash(filePath) {
   const fileHandleRO = await getReadFileHandle(filePath)
   if (!isResultObjectOk(fileHandleRO)) {
@@ -62,9 +63,12 @@ async function getFileHash(filePath) {
   let resultRO = null
   try {
     readStream = fileHandleRO.result.createReadStream()
-    resultRO = toResultObjectWithResultStatusOk(await getFileHashByReadStream(readStream))
   } catch (error) {
     resultRO = toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
+  }
+
+  if (!resultRO) {
+    resultRO = await getFileHashByReadStream(readStream)
   }
 
   // When we use "readStream.on 'error'," we don't have to use try-catch
@@ -94,10 +98,10 @@ function getFileHashByReadStream(readStream) {
   return new Promise((resolve, reject) => {
     readStream.on('data', (chunk) => hash.update(chunk))
     readStream.on('end', () => {
-      resolve(hash.digest('hex')) // TODO: RO
+      resolve(toResultObjectWithResultStatusOk(hash.digest('hex')))
     })
     readStream.on('error', (error) => {
-      reject(error) // TODO: RO
+      reject(toResultObjectWithNullResultAndResultStatusErrorSystem(error.message))
     })
   })
 }
