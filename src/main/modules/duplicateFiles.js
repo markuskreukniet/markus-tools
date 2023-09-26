@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import { filePathObjectsToFileObjects, getReadFileHandle } from './filePaths.js'
+import { concatErrorMessageOnNewLine } from '../../preload/modules/errors'
 import {
   isResultObjectOk,
   toResultObjectWithNullResultByResultObject,
@@ -78,8 +79,7 @@ async function getFileHash(filePath) {
     if (isResultObjectOk(resultRO)) {
       return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
     } else {
-      // TODO: copied from errors.js
-      resultRO.message = `${resultRO.message}\n${error.message}`
+      resultRO.message = concatErrorMessageOnNewLine(resultRO.message, error.message)
     }
   }
 

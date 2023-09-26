@@ -11,6 +11,10 @@ export const inputError = Object.freeze({
   aWrongCombinationOfArguments: 'A wrong combination of arguments.'
 })
 
+export function concatErrorMessageOnNewLine(currentErrorMessage, errorMessage) {
+  return `${currentErrorMessage}\n${errorMessage}`
+}
+
 export class ErrorTracker {
   constructor(maxPossibleErrors) {
     this.errorCount = 0
@@ -24,7 +28,7 @@ export class ErrorTracker {
 
   concatErrorMessageOnNewLineAndIncrementErrorCount(errorMessage) {
     this.errorCount++
-    this.errorMessage = `${this.errorMessage}\n${errorMessage}`
+    this.errorMessage = concatErrorMessageOnNewLine(this.errorMessage, errorMessage)
   }
 
   createResultObject(result) {
