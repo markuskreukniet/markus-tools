@@ -7,7 +7,6 @@ import {
   toResultObjectWithResultStatusOk
 } from '../../preload/modules/resultStatus'
 
-// TODO: return RO
 // TODO: has many similarities with imagesToDateRangeFolder.js
 export default async function duplicateFiles(filePathObjects) {
   // TODO: tree optional
@@ -32,10 +31,9 @@ export default async function duplicateFiles(filePathObjects) {
 
       if (fileHash === fileHash2) {
         if (lastPushedIndex !== i - 1) {
-          // TODO: create object with function
-          duplicates.push({ path: fileObject.path, hash: fileHash })
+          duplicates.push(toDuplicateObject(fileObject.path, fileHash))
         }
-        duplicates.push({ path: fileObject2.path, hash: fileHash2 })
+        duplicates.push(toDuplicateObject(fileObject2.path, fileHash2))
         lastPushedIndex = i
       }
     }
@@ -47,6 +45,10 @@ export default async function duplicateFiles(filePathObjects) {
   } else {
     return duplicatesArrayToResultString(duplicates)
   }
+}
+
+function toDuplicateObject(path, hash) {
+  return { path, hash }
 }
 
 async function getFileHash(filePath) {
