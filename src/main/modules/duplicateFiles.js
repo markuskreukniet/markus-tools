@@ -52,7 +52,6 @@ function toDuplicateObject(path, hash) {
   return { path, hash }
 }
 
-// TODO: check logic error, fileHandle, and readStream
 async function getFileHash(filePath) {
   const fileHandleRO = await getReadFileHandle(filePath)
   if (!isResultObjectOk(fileHandleRO)) {
@@ -69,11 +68,9 @@ async function getFileHash(filePath) {
 
   if (!resultRO) {
     resultRO = await getFileHashByReadStream(readStream)
-  }
 
-  // When we use "readStream.on 'error'," we don't have to use try-catch
-  // readStream.destroy() should come before filehandle.close()
-  if (readStream) {
+    // When we use "readStream.on 'error'," we don't have to use try-catch
+    // readStream.destroy() should come before filehandle.close()
     readStream.destroy()
   }
 
