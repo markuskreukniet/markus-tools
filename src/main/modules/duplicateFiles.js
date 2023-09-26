@@ -56,12 +56,12 @@ async function getFileHash(filePath) {
   }
 
   let readStream = null
-  let result = null
+  let resultRO = null
   try {
     readStream = fileHandleRO.result.createReadStream()
-    result = toResultObjectWithResultStatusOk(await getFileHashByReadStream(readStream))
+    resultRO = toResultObjectWithResultStatusOk(await getFileHashByReadStream(readStream))
   } catch (error) {
-    result = toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
+    resultRO = toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
 
   // When we use "readStream.on 'error'," we don't have to use try-catch
@@ -73,11 +73,15 @@ async function getFileHash(filePath) {
   try {
     await fileHandleRO.result.close()
   } catch (error) {
-    // TODO: should add error to result, when it has already an error
-    return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
+    if (isResultObjectOk(resultRO)) {
+      return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
+    } else {
+      // TODO: copied from errors.js
+      resultRO.message = `${resultRO.message}\n${error.message}`
+    }
   }
 
-  return result.result // TODO:
+  return resultRO.result // TODO:
 }
 
 function getFileHashByReadStream(readStream) {
