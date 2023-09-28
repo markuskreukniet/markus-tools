@@ -21,7 +21,8 @@ function numberOfFileLinesWithoutCommentsAndEmptyLines(path) {
 }
 
 function removeCommentsAndEmptyLines(code) {
-  code = code.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$|<!--(.|\s)*?-->/gm, '') // removes JavaScript, HTML, and CSS comments
+  // should remove all JavaScript, HTML, and CSS comments
+  code = code.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$|<!--(.|\s)*?-->/gm, '')
 
   let lines = code.split(endOfLine)
   lines = lines.filter((line) => line.trim() !== '')
