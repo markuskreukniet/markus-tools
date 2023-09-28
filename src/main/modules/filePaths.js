@@ -14,6 +14,7 @@ import {
 export async function filePathObjectsToFileObjects(filePathObjects, useDirectoriesTreeInput) {
   const errorTracker = new ErrorTracker(filePathObjects.length)
 
+  // TODO: always ImageFileObjects?
   const inputImageFileObjects = []
   for (const filePathObject of filePathObjects) {
     let inputRO = null
