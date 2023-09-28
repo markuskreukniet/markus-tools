@@ -40,7 +40,6 @@ export default async function duplicateFiles(filePathObjects) {
     }
   }
 
-  // result
   if (duplicates.length === 0) {
     return ''
   } else {
