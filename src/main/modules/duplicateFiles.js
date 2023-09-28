@@ -27,7 +27,7 @@ export default async function duplicateFiles(filePathObjects) {
     const fileObject2 = fileObjects[i]
 
     if (fileObject.size === fileObject2.size) {
-      // Do not perform two times getFileHash for the same file, which happens otherwise with at least three files with the same file size.
+      // Performing two times getFileHash for the same file is a performance loss, which happens otherwise with at least three files with the same file size.
       const fileHash = fileObject.fileHash || (await getFileHash(fileObject.path))
       const fileHash2 = await getFileHash(fileObject2.path)
       fileObject2.fileHash = fileHash2
