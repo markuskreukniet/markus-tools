@@ -288,3 +288,11 @@ export async function getReadFileHandle(filePath) {
     return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
 }
+
+export async function getUtf8FileContents(filePath) {
+  try {
+    return toResultObjectWithResultStatusOk(await promises.readFile(filePath, { encoding: 'utf8' }))
+  } catch (error) {
+    return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
+  }
+}

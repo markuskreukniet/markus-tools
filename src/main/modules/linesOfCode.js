@@ -1,19 +1,21 @@
-import fs from 'fs'
+import { getUtf8FileContents } from './filePaths.js'
 
 const endOfLine = '\n'
 
 export default async function linesOfCode(filePaths) {
   let result = 0
   for (const path of filePaths) {
-    result += numberOfFileLinesWithoutCommentsAndEmptyLines(path.value)
+    // TODO: use promise.all ?
+    result += await numberOfFileLinesWithoutCommentsAndEmptyLines(path.value)
   }
 
   return result
 }
 
-function numberOfFileLinesWithoutCommentsAndEmptyLines(path) {
-  let code = fs.readFileSync(path, { encoding: 'utf8' })
-  code = removeCommentsAndEmptyLines(code)
+async function numberOfFileLinesWithoutCommentsAndEmptyLines(filePath) {
+  // TODO: error handling
+  let code = await getUtf8FileContents(filePath)
+  code = removeCommentsAndEmptyLines(code.result)
   const lines = code.split(endOfLine)
 
   return lines.length
