@@ -4,9 +4,8 @@ const endOfLine = '\n'
 
 export default async function linesOfCode(filePaths) {
   let result = 0
-
   for (const path of filePaths) {
-    result += numberOfFileLinesWithoutCommentsAndEmptyLines(path)
+    result += numberOfFileLinesWithoutCommentsAndEmptyLines(path.value)
   }
 
   return result
