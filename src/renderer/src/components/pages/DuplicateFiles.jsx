@@ -23,9 +23,7 @@ export default function DuplicateFiles(props) {
     }
   }
 
-  const inputComponent = (
-    <SubmittableFileOrFolderInput onChange={handleFilePathsRO} minimumFiles={2} />
-  )
+  const inputComponent = <SubmittableFileOrFolderInput onChange={handleFilePathsRO} />
 
   const placeholderContent = (
     <>

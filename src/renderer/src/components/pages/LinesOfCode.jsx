@@ -7,17 +7,14 @@ export default function LinesOfCode(props) {
   const [linesOfCode, setLinesOfCode] = createSignal(0)
 
   async function setOutput(filePaths) {
-    const linesOfCode = await window.codeQuality.getLinesOfCode(filePaths)
-    setLinesOfCode(linesOfCode)
+    setLinesOfCode(await window.codeQuality.getLinesOfCode(filePaths))
   }
 
   function handleFilePaths(filePaths) {
-    setGetOutput(setOutput(filePaths))
+    setGetOutput(setOutput(filePaths.result.selectedFilePathObjects))
   }
 
-  const inputComponent = (
-    <SubmittableFileOrFolderInput onChange={handleFilePaths} minimumFiles={1} />
-  )
+  const inputComponent = <SubmittableFileOrFolderInput onChange={handleFilePaths} />
 
   return (
     <TextResultPage
