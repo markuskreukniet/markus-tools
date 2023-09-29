@@ -11,7 +11,8 @@ export default function LinesOfCode(props) {
   }
 
   function handleFilePaths(filePaths) {
-    setGetOutput(setOutput(filePaths.result.selectedFilePathObjects))
+    // TODO: error handling
+    setGetOutput(setOutput(filePaths.result))
   }
 
   const inputComponent = <SubmittableFileOrFolderInput onChange={handleFilePaths} />
