@@ -147,6 +147,15 @@ export async function getDirectoryImageFileObjectsWithoutZeroByteOnes(
   )
 }
 
+export async function getFileAndDirectoryFileObjects(directoryPath, directoryTree) {
+  return getDirectoryFileObjects(
+    directoryPath,
+    directoryTree,
+    filePathsType.filesAndDirectories,
+    fileType.all
+  )
+}
+
 // TODO: maybe function is useless since objects might not be needed
 export async function removeEmptyDirectories(fileObjects) {
   const errorTracker = new ErrorTracker(fileObjects.length)

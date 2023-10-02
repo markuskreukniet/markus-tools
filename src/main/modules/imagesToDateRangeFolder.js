@@ -20,6 +20,7 @@ import {
 } from '../../preload/modules/resultStatus'
 
 // TODO: rename resultStatus file
+// TODO: rename useDirectoriesTreeInput, without use?
 export default async function imagesToDateRangeFolder(
   filePathObjects,
   outputPath,
