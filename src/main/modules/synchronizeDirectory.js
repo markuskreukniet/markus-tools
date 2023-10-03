@@ -10,7 +10,7 @@ export default async function synchronizeDirectory(
   // added getFileAndDirectoryFileObjects for synchronizeDirectory
   getFileAndDirectoryFileObjects(originalDirectoryFilePathObject.value, directoriesTree)
 
-  getFileAndDirectoryFileObjects(destinationDirectoryFilePathObject, directoriesTree)
+  getFileAndDirectoryFileObjects(destinationDirectoryFilePathObject.value, directoriesTree)
 
   // if a file in the destination directory exists and if the date modified of the file in the original directory is newer,
   // then replace the file in the destination directory
