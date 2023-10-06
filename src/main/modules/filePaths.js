@@ -320,6 +320,7 @@ export async function getUtf8FileContents(filePath) {
 // When one error happens, the directory tree does not get copied and should return an error.
 export async function copyDirectoryTree(inputFilePath, outputFilePath) {
   // TODO: should be makeDirectory
+  // TODO: is needed?
   await makeDirectoryIfNotExists(outputFilePath)
 
   const stack = [inputFilePath]
