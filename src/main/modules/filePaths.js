@@ -6,6 +6,7 @@ import { filePathsType, filePathType, fileType } from '../../preload/modules/fil
 import {
   isResultObjectOk,
   toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem,
+  toResultObjectWithNullResultByResultObject,
   toResultObjectWithNullResultAndResultStatusErrorSystem,
   toResultObjectWithNullResultAndResultStatusOk,
   toResultObjectWithResultStatusOk
@@ -290,6 +291,16 @@ export async function moveFile(sourcePath, destinationPath) {
   }
 }
 
+// TODO: promises.copyFile does not work efficient with huge files
+async function copyFile(sourcePath, destinationPath) {
+  try {
+    await promises.copyFile(sourcePath, destinationPath)
+    return toResultObjectWithNullResultAndResultStatusOk()
+  } catch (error) {
+    return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
+  }
+}
+
 export async function getReadFileHandle(filePath) {
   try {
     return toResultObjectWithResultStatusOk(await open(filePath, 'r'))
@@ -304,4 +315,38 @@ export async function getUtf8FileContents(filePath) {
   } catch (error) {
     return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
   }
+}
+
+// When one error happens, the directory tree does not get copied and should return an error.
+export async function copyDirectoryTree(inputFilePath, outputFilePath) {
+  // TODO: should be makeDirectory
+  await makeDirectoryIfNotExists(outputFilePath)
+
+  const stack = [inputFilePath]
+  while (stack.length > 0) {
+    const currentPath = stack.pop()
+    const readFilesFromDirectoryRO = await readFilesFromDirectory(currentPath)
+    if (!isResultObjectOk(readFilesFromDirectoryRO)) {
+      return toResultObjectWithNullResultByResultObject(readFilesFromDirectoryRO)
+    }
+
+    for (const file of readFilesFromDirectoryRO.result) {
+      const filePathInput = combinePathParts(currentPath, file)
+      const filePathOutput = filePathInput.replace(inputFilePath, outputFilePath)
+      const fileObjectRO = await getFileObject(filePathInput)
+      if (!isResultObjectOk(fileObjectRO)) {
+        return toResultObjectWithNullResultByResultObject(fileObjectRO)
+      }
+
+      if (fileObjectRO.result.isDirectory) {
+        stack.push(filePathInput)
+        // TODO: should be makeDirectory
+        await makeDirectoryIfNotExists(filePathOutput)
+      } else {
+        await copyFile(filePathInput, filePathOutput)
+      }
+    }
+  }
+
+  return toResultObjectWithNullResultAndResultStatusOk()
 }
