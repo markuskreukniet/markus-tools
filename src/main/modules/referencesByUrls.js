@@ -53,12 +53,11 @@ function getUrls(urlsString, protocolStrings) {
     const httpIndex = urlsString.indexOf(protocolStrings[0], protocolStrings[0].length)
     const httpsIndex = urlsString.indexOf(protocolStrings[1], protocolStrings[1].length)
 
+    // case httpIndex === -1 is not needed
     let firstIndex = httpsIndex
     if (httpIndex === -1 && httpsIndex === -1) {
       urls = includesOneOfTheSubstringsAddToUrls(urlsString, protocolStrings, urls)
       return urls
-    } else if (httpIndex === -1) {
-      firstIndex = httpsIndex
     } else if (httpsIndex === -1 || httpIndex < httpsIndex) {
       firstIndex = httpIndex
     }
