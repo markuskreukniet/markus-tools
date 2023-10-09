@@ -59,9 +59,7 @@ function getUrls(urlsString, protocolStrings) {
       return urls
     } else if (httpIndex === -1) {
       firstIndex = httpsIndex
-    } else if (httpsIndex === -1) {
-      firstIndex = httpIndex
-    } else if (httpIndex < httpsIndex) {
+    } else if (httpsIndex === -1 || httpIndex < httpsIndex) {
       firstIndex = httpIndex
     }
 
