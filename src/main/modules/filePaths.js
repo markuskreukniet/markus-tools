@@ -292,7 +292,7 @@ export async function moveFile(sourcePath, destinationPath) {
 }
 
 // TODO: promises.copyFile does not work efficient with huge files
-async function copyFile(sourcePath, destinationPath) {
+export async function copyFile(sourcePath, destinationPath) {
   try {
     await promises.copyFile(sourcePath, destinationPath)
     return toResultObjectWithNullResultAndResultStatusOk()
