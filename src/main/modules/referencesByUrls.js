@@ -71,6 +71,7 @@ function getUrls(urlsString, protocolStrings) {
 }
 
 function includesOneOfTheSubstringsAddToUrls(string, substrings, urls) {
+  // TODO: change to filter?
   for (const substring of substrings) {
     if (string.includes(substring)) {
       urls.push(string)
