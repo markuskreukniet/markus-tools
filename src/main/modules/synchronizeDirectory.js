@@ -34,7 +34,7 @@ export default async function synchronizeDirectory(
         // if destination does not have the file
         await copyFile()
         // if destination does have the file and original file is newer, replace the file
-        // TODO: copyFile does replace?
+        // copyFile does replace, fs.copyFile and fs.createWriteStream, both do that, keep this comment, but in filePaths.js
         await copyFile()
       }
     }
