@@ -38,5 +38,7 @@ export default async function synchronizeDirectory(
         await copyFile()
       }
     }
+
+    // check for files in destination that are removed in original and remove them from destination
   }
 }
