@@ -61,6 +61,7 @@ export default function imagesToDateRangeFolder(props) {
     setGetOutput(processInputToOutput(inputFilePathObjects, outputFilePath))
   }
 
+  // TODO: maxOneInput is needed?
   const inputComponent = (
     <div>
       <FileOrFolderInput onChange={handleInputFilePathsRO} />
