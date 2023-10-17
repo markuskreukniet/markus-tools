@@ -3,6 +3,7 @@ import DuplicateFiles from './components/pages/DuplicateFiles'
 import ImagesToDateRangeFolder from './components/pages/ImagesToDateRangeFolder'
 import LinesOfCode from './components/pages/LinesOfCode'
 import ReferencesByUrls from './components/pages/ReferencesByUrls'
+import SynchronizeDirectory from './components/pages/SynchronizeDirectory'
 import Loader from './components/Loader'
 import PageNavigator from './components/PageNavigator'
 // import logo from './assets/logo.svg'
@@ -18,8 +19,10 @@ function App() {
   const [loading, setLoading] = createSignal(false)
   const duplicateFilesTitle = 'Duplicate Files'
   const linesOfCodeTitle = 'Lines of Code (LOC)'
-  const ReferencesByUrlsTitle = 'References by URLs'
-  const ImagesToDateRangeFolderTitle = 'Images to Date Range Folder'
+  const referencesByUrlsTitle = 'References by URLs'
+  const imagesToDateRangeFolderTitle = 'Images to Date Range Folder'
+  const synchronizeDirectoryTitle = 'Synchronize Directory'
+  // TODO: make of abstraction of navigationBarItem and page
   const navigationBarItemPageCombinations = [
     {
       navigationBarItem: duplicateFilesTitle,
@@ -30,12 +33,16 @@ function App() {
       page: <LinesOfCode title={linesOfCodeTitle} onLoading={setLoading} />
     },
     {
-      navigationBarItem: ReferencesByUrlsTitle,
-      page: <ReferencesByUrls title={ReferencesByUrlsTitle} onLoading={setLoading} />
+      navigationBarItem: referencesByUrlsTitle,
+      page: <ReferencesByUrls title={referencesByUrlsTitle} onLoading={setLoading} />
     },
     {
-      navigationBarItem: ImagesToDateRangeFolderTitle,
-      page: <ImagesToDateRangeFolder title={ImagesToDateRangeFolderTitle} onLoading={setLoading} />
+      navigationBarItem: imagesToDateRangeFolderTitle,
+      page: <ImagesToDateRangeFolder title={imagesToDateRangeFolderTitle} onLoading={setLoading} />
+    },
+    {
+      navigationBarItem: synchronizeDirectoryTitle,
+      page: <SynchronizeDirectory title={synchronizeDirectoryTitle} onLoading={setLoading} />
     }
   ]
   const activeNavigationBarItem = navigationBarItemPageCombinations[0].navigationBarItem
