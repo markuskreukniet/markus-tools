@@ -98,6 +98,16 @@ async function imagesToDateRangeFolderBE(e, filePathObjects, path, useDirectorie
 }
 ipcMain.handle('imagesToDateRangeFolderBE', imagesToDateRangeFolderBE)
 
+import synchronizeDirectory from './modules/synchronizeDirectory'
+async function synchronizeDirectoryBE(
+  e,
+  originalDirectoryFilePathObject,
+  destinationDirectoryFilePathObject
+) {
+  return synchronizeDirectory(originalDirectoryFilePathObject, destinationDirectoryFilePathObject)
+}
+ipcMain.handle('synchronizeDirectoryBE', synchronizeDirectoryBE)
+
 import openFileDialog from './modules/openFileDialog'
 async function openFileDialogBE(e, selectFolder) {
   return openFileDialog(selectFolder)

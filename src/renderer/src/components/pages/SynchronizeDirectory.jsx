@@ -8,14 +8,8 @@ export default function SynchronizeDirectory(props) {
   const [status, setStatus] = createSignal('')
 
   async function test() {
-    // const imagesToDateRangeFolderRO = await window.dateRangeFolder.imagesToDateRangeFolderBE(
-    //   filePathObjects,
-    //   path,
-    //   useDirectoriesTreeInput
-    // )
-
-    let test = 'test'
-    setStatus(test)
+    const testA = await window.synchronization.synchronizeDirectoryBE('a', 'b')
+    setStatus(testA)
   }
 
   function handleInputDirectoryRO(resultObject) {

@@ -37,6 +37,15 @@ contextBridge.exposeInMainWorld('dateRangeFolder', {
     ipcRenderer.invoke('imagesToDateRangeFolderBE', filePathObjects, path, useDirectoriesTreeInput)
 })
 
+contextBridge.exposeInMainWorld('synchronization', {
+  synchronizeDirectoryBE: (originalDirectoryFilePathObject, destinationDirectoryFilePathObject) =>
+    ipcRenderer.invoke(
+      'synchronizeDirectoryBE',
+      originalDirectoryFilePathObject,
+      destinationDirectoryFilePathObject
+    )
+})
+
 contextBridge.exposeInMainWorld('dialog', {
   openFileDialogBE: (selectFolder) => ipcRenderer.invoke('openFileDialogBE', selectFolder)
 })
