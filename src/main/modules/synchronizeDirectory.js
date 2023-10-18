@@ -4,7 +4,7 @@ export default async function synchronizeDirectory(
   originalDirectoryFilePathObject,
   destinationDirectoryFilePathObject
 ) {
-  return `${originalDirectoryFilePathObject} testB ${destinationDirectoryFilePathObject}`
+  return `${originalDirectoryFilePathObject.value} testB ${destinationDirectoryFilePathObject.value}`
 
   // TODO: this boolean should come from UI
   const directoriesTree = true

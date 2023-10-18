@@ -1,27 +1,49 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
+import ActivatableSubmitButton from '../activatableButton/ActivatableSubmitButton'
 import FileOrFolderInput from '../filePathInput/FileOrFolderInput'
 import { filePathSelectionType } from '../../../../preload/modules/files'
 
 export default function SynchronizeDirectory(props) {
+  let originalDirectoryFilePathObject = null
+  let destinationDirectoryFilePathObject = null
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [status, setStatus] = createSignal('')
 
   async function test() {
-    const testA = await window.synchronization.synchronizeDirectoryBE('a', 'b')
+    const testA = await window.synchronization.synchronizeDirectoryBE(
+      originalDirectoryFilePathObject,
+      destinationDirectoryFilePathObject
+    )
     setStatus(testA)
   }
 
-  function handleInputDirectoryRO(resultObject) {
+  function handleInputOriginalDirectoryRO(resultObject) {
+    originalDirectoryFilePathObject = resultObject.result.selectedFilePathObjects[0]
+  }
+
+  function handleInputDestinationDirectoryRO(resultObject) {
+    destinationDirectoryFilePathObject = resultObject.result.selectedFilePathObjects[0]
+  }
+
+  function submit() {
     setGetOutput(test)
   }
 
   const inputComponent = (
-    <FileOrFolderInput
-      onChange={handleInputDirectoryRO}
-      filePathSelectionType={filePathSelectionType.directory}
-      maxOneInput
-    />
+    <div>
+      <FileOrFolderInput
+        onChange={handleInputOriginalDirectoryRO}
+        filePathSelectionType={filePathSelectionType.directory}
+        maxOneInput
+      />
+      <FileOrFolderInput
+        onChange={handleInputDestinationDirectoryRO}
+        filePathSelectionType={filePathSelectionType.directory}
+        maxOneInput
+      />
+      <ActivatableSubmitButton active={true} onAction={submit} />
+    </div>
   )
 
   return (
