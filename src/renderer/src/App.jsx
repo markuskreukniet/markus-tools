@@ -22,6 +22,7 @@ import PageNavigator from './components/PageNavigator'
 //     return <p class="">{message}</p>
 //   }
 // }
+// Or convert a resultObject to a JSX
 function App() {
   const [loading, setLoading] = createSignal(false)
   const duplicateFilesTitle = 'Duplicate Files'
