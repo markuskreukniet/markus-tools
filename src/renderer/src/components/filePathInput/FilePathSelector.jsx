@@ -8,7 +8,7 @@ export default function FilePathSelector(props) {
   async function clickInput() {
     const openFileDialogRO = await window.dialog.openFileDialogBE(props.directory)
 
-    if (isResultObjectOk(openFileDialogRO)) {
+    if (isResultObjectOk(openFileDialogRO) && openFileDialogRO.result !== '') {
       const result = { value: openFileDialogRO.result, filePathType: filePathType.file }
       if (props.directory) {
         result.filePathType = filePathType.directory

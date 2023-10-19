@@ -1,8 +1,7 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
 import ActivatableSubmitButton from '../activatableButton/ActivatableSubmitButton'
-import FileOrFolderInput from '../filePathInput/FileOrFolderInput'
-import { filePathSelectionType } from '../../../../preload/modules/files'
+import MaxOneDirectoryInput from '../filePathInput/MaxOneDirectoryInput'
 
 export default function SynchronizeDirectory(props) {
   let originalDirectoryFilePathObject = null
@@ -19,11 +18,11 @@ export default function SynchronizeDirectory(props) {
   }
 
   function handleInputOriginalDirectoryRO(resultObject) {
-    originalDirectoryFilePathObject = resultObject.result.selectedFilePathObjects[0]
+    originalDirectoryFilePathObject = resultObject.result.selectedFilePathObject
   }
 
   function handleInputDestinationDirectoryRO(resultObject) {
-    destinationDirectoryFilePathObject = resultObject.result.selectedFilePathObjects[0]
+    destinationDirectoryFilePathObject = resultObject.result.selectedFilePathObject
   }
 
   function submit() {
@@ -32,16 +31,8 @@ export default function SynchronizeDirectory(props) {
 
   const inputComponent = (
     <div>
-      <FileOrFolderInput
-        onChange={handleInputOriginalDirectoryRO}
-        filePathSelectionType={filePathSelectionType.directory}
-        maxOneInput
-      />
-      <FileOrFolderInput
-        onChange={handleInputDestinationDirectoryRO}
-        filePathSelectionType={filePathSelectionType.directory}
-        maxOneInput
-      />
+      <MaxOneDirectoryInput onChange={handleInputOriginalDirectoryRO} />
+      <MaxOneDirectoryInput onChange={handleInputDestinationDirectoryRO} />
       <ActivatableSubmitButton active={true} onAction={submit} />
     </div>
   )

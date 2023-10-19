@@ -62,6 +62,7 @@ export default function imagesToDateRangeFolder(props) {
   }
 
   // TODO: maxOneInput is needed?
+  // TODO: use MaxOneDirectoryInput and remove comment about strategy pattern
   const inputComponent = (
     <div>
       <FileOrFolderInput onChange={handleInputFilePathsRO} />
