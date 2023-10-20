@@ -2,8 +2,8 @@ import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
 import ActivatableSubmitButton from '../activatableButton/ActivatableSubmitButton'
 import FileOrFolderInput from '../filePathInput/FileOrFolderInput'
-import { filePathSelectionType } from '../../../../preload/modules/files'
 import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
+import MaxOneDirectoryInput from '../filePathInput/MaxOneDirectoryInput'
 
 export default function imagesToDateRangeFolder(props) {
   let inputFilePathObjects = []
@@ -48,9 +48,7 @@ export default function imagesToDateRangeFolder(props) {
 
   function handleOutputDirectoryRO(resultObject) {
     if (isResultObjectOk(resultObject)) {
-      // The result should not have an array.
-      // We could use a strategy pattern for a clean solution, resulting in more code and a performance loss.
-      outputFilePath = resultObject.result.selectedFilePathObjects[0].value
+      outputFilePath = resultObject.result.selectedFilePathObject.value
       validateInput()
     } else {
       setStatus(resultObject.message)
@@ -61,16 +59,10 @@ export default function imagesToDateRangeFolder(props) {
     setGetOutput(processInputToOutput(inputFilePathObjects, outputFilePath))
   }
 
-  // TODO: maxOneInput is needed?
-  // TODO: use MaxOneDirectoryInput and remove comment about strategy pattern
   const inputComponent = (
     <div>
       <FileOrFolderInput onChange={handleInputFilePathsRO} />
-      <FileOrFolderInput
-        onChange={handleOutputDirectoryRO}
-        filePathSelectionType={filePathSelectionType.directory}
-        maxOneInput
-      />
+      <MaxOneDirectoryInput onChange={handleOutputDirectoryRO} />
       <ActivatableSubmitButton active={hasValidInput()} onAction={submit} />
     </div>
   )
