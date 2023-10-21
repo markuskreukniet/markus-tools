@@ -334,7 +334,10 @@ export async function copyDirectoryTree(inputFilePath, outputFilePath) {
     // TODO: this for can be optimized with promise.all?, maybe also other for loops then
     for (const file of readFilesFromDirectoryRO.result) {
       const filePathInput = combinePathParts(currentPath, file)
-      const filePathOutput = filePathInput.replace(inputFilePath, outputFilePath)
+      // TODO: path.relative can fail?
+      const relativePath = path.relative(inputFilePath, filePathInput)
+      // filePathInput.replace results in a bug
+      const filePathOutput = combinePathParts(outputFilePath, relativePath)
       const fileObjectRO = await getFileObject(filePathInput)
       if (!isResultObjectOk(fileObjectRO)) {
         return toResultObjectWithNullResultByResultObject(fileObjectRO)
