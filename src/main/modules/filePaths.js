@@ -317,6 +317,10 @@ export async function getUtf8FileContents(filePath) {
   }
 }
 
+function getRelativePath(filePathFrom, filePathTo) {
+  return path.relative(filePathFrom, filePathTo)
+}
+
 // When one error happens, the directory tree does not get copied and should return an error.
 export async function copyDirectoryTree(inputFilePath, outputFilePath) {
   // TODO: should be makeDirectory
@@ -334,10 +338,11 @@ export async function copyDirectoryTree(inputFilePath, outputFilePath) {
     // TODO: this for can be optimized with promise.all?, maybe also other for loops then
     for (const file of readFilesFromDirectoryRO.result) {
       const filePathInput = combinePathParts(currentPath, file)
-      // TODO: path.relative can fail?
-      const relativePath = path.relative(inputFilePath, filePathInput)
       // filePathInput.replace results in a bug
-      const filePathOutput = combinePathParts(outputFilePath, relativePath)
+      const filePathOutput = combinePathParts(
+        outputFilePath,
+        getRelativePath(inputFilePath, filePathInput)
+      )
       const fileObjectRO = await getFileObject(filePathInput)
       if (!isResultObjectOk(fileObjectRO)) {
         return toResultObjectWithNullResultByResultObject(fileObjectRO)
