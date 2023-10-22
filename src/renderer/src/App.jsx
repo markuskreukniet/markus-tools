@@ -15,6 +15,7 @@ import PageNavigator from './components/PageNavigator'
 // TODO: rename files.js to filePath.js
 // TODO: rename openFileDialog to openFilePathDialog.js with functions
 // TODO: imagesToDateRangeFolder check input and output folder is not the same or a child
+// TODO: No Symlink Handling, which results in bugs
 
 // TODO: backend functions should return a object for:
 // function tagsAndMessageToJsx(openingTag, closingTag, message) {
