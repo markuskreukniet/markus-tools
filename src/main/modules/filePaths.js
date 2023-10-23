@@ -361,6 +361,7 @@ export async function copyDirectoryTree(inputFilePath, outputFilePath) {
         stack.push(filePathInput)
         const makeDirectoryRO = await makeDirectory(filePathOutput)
         if (!isResultObjectOk(makeDirectoryRO)) {
+          // TODO: should be return makeDirectoryRO??? If so, same problem at other places
           return toResultObjectWithNullResultByResultObject(makeDirectoryRO)
         }
       } else {
