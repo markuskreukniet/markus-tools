@@ -273,10 +273,9 @@ async function readFilesFromDirectory(filePath) {
 
 export async function makeDirectoryIfNotExists(filePath) {
   if (await filePathExists(filePath)) {
-    try {
-      await promises.mkdir(filePath)
-    } catch (error) {
-      return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
+    const makeDirectoryRO = await makeDirectory(filePath)
+    if (!isResultObjectOk(makeDirectoryRO)) {
+      return toResultObjectWithNullResultAndResultStatusErrorSystem(makeDirectoryRO.message)
     }
   }
   return toResultObjectWithNullResultAndResultStatusOk()
@@ -332,9 +331,9 @@ function getRelativePath(filePathFrom, filePathTo) {
 
 // When one error happens, the directory tree does not get copied and should return an error.
 export async function copyDirectoryTree(inputFilePath, outputFilePath) {
-  // TODO: should be makeDirectory
   // TODO: is needed?
-  await makeDirectoryIfNotExists(outputFilePath)
+  // TODO: makeDirectory can fail
+  await makeDirectory(outputFilePath)
 
   const stack = [inputFilePath]
   while (stack.length > 0) {
@@ -359,8 +358,8 @@ export async function copyDirectoryTree(inputFilePath, outputFilePath) {
 
       if (fileObjectRO.result.isDirectory) {
         stack.push(filePathInput)
-        // TODO: should be makeDirectory
-        await makeDirectoryIfNotExists(filePathOutput)
+        // TODO: makeDirectory can fail
+        await makeDirectory(filePathOutput)
       } else {
         await copyFile(filePathInput, filePathOutput)
       }
