@@ -275,7 +275,7 @@ export async function makeDirectoryIfNotExists(filePath) {
   if (await filePathExists(filePath)) {
     const makeDirectoryRO = await makeDirectory(filePath)
     if (!isResultObjectOk(makeDirectoryRO)) {
-      return toResultObjectWithNullResultAndResultStatusErrorSystem(makeDirectoryRO.message)
+      return toResultObjectWithNullResultByResultObject(makeDirectoryRO)
     }
   }
   return toResultObjectWithNullResultAndResultStatusOk()
@@ -359,8 +359,10 @@ export async function copyDirectoryTree(inputFilePath, outputFilePath) {
 
       if (fileObjectRO.result.isDirectory) {
         stack.push(filePathInput)
-        // TODO: makeDirectory can fail
-        await makeDirectory(filePathOutput)
+        const makeDirectoryRO = await makeDirectory(filePathOutput)
+        if (!isResultObjectOk(makeDirectoryRO)) {
+          return toResultObjectWithNullResultByResultObject(makeDirectoryRO)
+        }
       } else {
         await copyFile(filePathInput, filePathOutput)
       }
