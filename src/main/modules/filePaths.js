@@ -332,7 +332,8 @@ function getRelativePath(filePathFrom, filePathTo) {
 // When one error happens, the directory tree does not get copied and should return an error.
 export async function copyDirectoryTree(inputFilePath, outputFilePath) {
   // TODO: makeDirectory can fail
-  await makeDirectory(outputFilePath)
+  // TODO: check if await makeDirectory(outputFilePath) is needed
+  // await makeDirectory(outputFilePath)
 
   const stack = [inputFilePath]
   while (stack.length > 0) {
