@@ -1,11 +1,10 @@
 import { copyDirectoryTree, copyFile, getFileAndDirectoryFileObjects } from './filePaths.js'
+import { isResultObjectOk } from '../../preload/modules/resultStatus'
 
 export default async function synchronizeDirectory(
   originalDirectoryFilePath,
   destinationDirectoryFilePath
 ) {
-  return `${originalDirectoryFilePath} testB ${destinationDirectoryFilePath}`
-
   // TODO: this boolean should come from UI
   const directoriesTree = true
   // added getFileAndDirectoryFileObjects for synchronizeDirectory
@@ -22,10 +21,17 @@ export default async function synchronizeDirectory(
       originalDirectoryPath,
       directoriesTree
     )
+    if (!isResultObjectOk(originalFileAndDirectoryFileObjectsRO)) {
+      return originalFileAndDirectoryFileObjectsRO
+    }
+
     const destinationFileAndDirectoryFileObjectsRO = await getFileAndDirectoryFileObjects(
       destinationDirectoryPath,
       directoriesTree
     )
+    if (!isResultObjectOk(destinationFileAndDirectoryFileObjectsRO)) {
+      return destinationFileAndDirectoryFileObjectsRO
+    }
 
     for (const fileObject of originalFileAndDirectoryFileObjectsRO.result) {
       if (fileObject.isDirectory) {
@@ -43,4 +49,6 @@ export default async function synchronizeDirectory(
 
     // check for files in destination that are removed in original and remove them from destination
   }
+
+  return `${originalDirectoryFilePath} testB ${destinationDirectoryFilePath}`
 }
