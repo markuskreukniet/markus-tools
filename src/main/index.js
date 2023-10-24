@@ -99,12 +99,8 @@ async function imagesToDateRangeFolderBE(e, filePathObjects, path, useDirectorie
 ipcMain.handle('imagesToDateRangeFolderBE', imagesToDateRangeFolderBE)
 
 import synchronizeDirectory from './modules/synchronizeDirectory'
-async function synchronizeDirectoryBE(
-  e,
-  originalDirectoryFilePathObject,
-  destinationDirectoryFilePathObject
-) {
-  return synchronizeDirectory(originalDirectoryFilePathObject, destinationDirectoryFilePathObject)
+async function synchronizeDirectoryBE(e, originalDirectoryFilePath, destinationDirectoryFilePath) {
+  return synchronizeDirectory(originalDirectoryFilePath, destinationDirectoryFilePath)
 }
 ipcMain.handle('synchronizeDirectoryBE', synchronizeDirectoryBE)
 

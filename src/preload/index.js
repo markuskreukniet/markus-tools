@@ -38,11 +38,11 @@ contextBridge.exposeInMainWorld('dateRangeFolder', {
 })
 
 contextBridge.exposeInMainWorld('synchronization', {
-  synchronizeDirectoryBE: (originalDirectoryFilePathObject, destinationDirectoryFilePathObject) =>
+  synchronizeDirectoryBE: (originalDirectoryFilePath, destinationDirectoryFilePath) =>
     ipcRenderer.invoke(
       'synchronizeDirectoryBE',
-      originalDirectoryFilePathObject,
-      destinationDirectoryFilePathObject
+      originalDirectoryFilePath,
+      destinationDirectoryFilePath
     )
 })
 

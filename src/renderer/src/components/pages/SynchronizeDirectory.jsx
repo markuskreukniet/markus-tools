@@ -4,25 +4,26 @@ import ActivatableSubmitButton from '../activatableButton/ActivatableSubmitButto
 import MaxOneDirectoryInput from '../filePathInput/MaxOneDirectoryInput'
 
 export default function SynchronizeDirectory(props) {
-  let originalDirectoryFilePathObject = null
-  let destinationDirectoryFilePathObject = null
+  let originalDirectoryFilePath = null
+  let destinationDirectoryFilePath = null
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [status, setStatus] = createSignal('')
 
   async function test() {
     const testA = await window.synchronization.synchronizeDirectoryBE(
-      originalDirectoryFilePathObject,
-      destinationDirectoryFilePathObject
+      originalDirectoryFilePath,
+      destinationDirectoryFilePath
     )
     setStatus(testA)
   }
 
   function handleInputOriginalDirectoryRO(resultObject) {
-    originalDirectoryFilePathObject = resultObject.result.selectedFilePathObject
+    // TODO: resultObject.result should be different, maybe only value?
+    originalDirectoryFilePath = resultObject.result.selectedFilePathObject.value
   }
 
   function handleInputDestinationDirectoryRO(resultObject) {
-    destinationDirectoryFilePathObject = resultObject.result.selectedFilePathObject
+    destinationDirectoryFilePath = resultObject.result.selectedFilePathObject.value
   }
 
   function submit() {

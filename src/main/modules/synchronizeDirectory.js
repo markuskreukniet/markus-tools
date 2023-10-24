@@ -1,21 +1,21 @@
 import { copyDirectoryTree, copyFile, getFileAndDirectoryFileObjects } from './filePaths.js'
 
 export default async function synchronizeDirectory(
-  originalDirectoryFilePathObject,
-  destinationDirectoryFilePathObject
+  originalDirectoryFilePath,
+  destinationDirectoryFilePath
 ) {
-  return `${originalDirectoryFilePathObject.value} testB ${destinationDirectoryFilePathObject.value}`
+  return `${originalDirectoryFilePath} testB ${destinationDirectoryFilePath}`
 
   // TODO: this boolean should come from UI
   const directoriesTree = true
   // added getFileAndDirectoryFileObjects for synchronizeDirectory
 
-  const stack = [originalDirectoryFilePathObject.value]
+  const stack = [originalDirectoryFilePath]
   while (stack.length > 0) {
     const originalDirectoryPath = stack.pop()
     const destinationDirectoryPath = originalDirectoryPath.replace(
-      originalDirectoryFilePathObject.value,
-      destinationDirectoryFilePathObject.value
+      originalDirectoryFilePath,
+      destinationDirectoryFilePath
     )
 
     const originalFileAndDirectoryFileObjectsRO = await getFileAndDirectoryFileObjects(
