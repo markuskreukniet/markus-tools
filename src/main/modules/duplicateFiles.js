@@ -3,7 +3,6 @@ import { filePathObjectsToFileObjects, getReadFileHandle } from './filePaths.js'
 import { concatErrorMessageOnNewLine } from '../../preload/modules/errors'
 import {
   isResultObjectOk,
-  toResultObjectWithNullResultByResultObject,
   toResultObjectWithNullResultAndResultStatusErrorSystem,
   toResultObjectWithResultStatusOk
 } from '../../preload/modules/resultStatus'
@@ -13,7 +12,7 @@ export default async function duplicateFiles(filePathObjects) {
   // TODO: tree optional
   const filePathObjectsToFileObjectsRO = await filePathObjectsToFileObjects(filePathObjects, true)
   if (!isResultObjectOk(filePathObjectsToFileObjectsRO)) {
-    return toResultObjectWithNullResultByResultObject(filePathObjectsToFileObjectsRO)
+    return filePathObjectsToFileObjectsRO
   }
 
   const fileObjects = filePathObjectsToFileObjectsRO.result
@@ -56,7 +55,7 @@ function toDuplicateObject(path, hash) {
 async function getFileHash(filePath) {
   const fileHandleRO = await getReadFileHandle(filePath)
   if (!isResultObjectOk(fileHandleRO)) {
-    return toResultObjectWithNullResultByResultObject(fileHandleRO)
+    return fileHandleRO
   }
 
   let readStream = null

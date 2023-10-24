@@ -15,8 +15,7 @@ import {
   isResultObjectPartiallyOk,
   toResultObjectWithNullResultAndResultStatusErrorSystem,
   toResultObjectWithNullResultAndResultStatusOk,
-  toResultObjectWithNullResultAndResultStatusPartiallyOk,
-  toResultObjectWithNullResultByResultObject
+  toResultObjectWithNullResultAndResultStatusPartiallyOk
 } from '../../preload/modules/resultStatus'
 
 // TODO: rename resultStatus file
@@ -40,7 +39,7 @@ export default async function imagesToDateRangeFolder(
     useDirectoriesTreeInput
   )
   if (!isResultObjectOk(filePathObjectsToFileObjectsRO)) {
-    return toResultObjectWithNullResultByResultObject(filePathObjectsToFileObjectsRO)
+    return filePathObjectsToFileObjectsRO
   }
 
   const outputImageFileObjectsRO = await getDirectoryImageFileObjectsWithoutZeroByteOnes(
@@ -48,18 +47,18 @@ export default async function imagesToDateRangeFolder(
     false
   )
   if (!isResultObjectOk(outputImageFileObjectsRO)) {
-    return toResultObjectWithNullResultByResultObject(outputImageFileObjectsRO)
+    return outputImageFileObjectsRO
   }
 
   // TODO: use inputDirectoryFileObjectsTreeRO
   // const inputDirectoryFileObjectsTreeRO = await getDirectoryDirectoryFileObjects(inputPath, true)
   // if (!isResultObjectOk(inputDirectoryFileObjectsTreeRO)) {
-  //   return toResultObjectWithNullResultByResultObject(inputDirectoryFileObjectsTreeRO)
+  //   return inputDirectoryFileObjectsTreeRO
   // }
 
   const outputDirectoryFileObjectsRO = await getDirectoryDirectoryFileObjects(outputPath, false)
   if (!isResultObjectOk(outputDirectoryFileObjectsRO)) {
-    return toResultObjectWithNullResultByResultObject(outputDirectoryFileObjectsRO)
+    return outputDirectoryFileObjectsRO
   }
 
   const groups = getDateRangeGroups([
@@ -69,7 +68,7 @@ export default async function imagesToDateRangeFolder(
 
   const groupsToDirectoriesRO = await groupsToDirectories(groups, outputPath)
   if (!isResultObjectOk(groupsToDirectoriesRO)) {
-    return toResultObjectWithNullResultByResultObject(groupsToDirectoriesRO)
+    return groupsToDirectoriesRO
   }
 
   // the array can have duplicate directories

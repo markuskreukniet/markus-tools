@@ -23,11 +23,6 @@ export function toResultObjectWithNullResultAndResultStatusPartiallyOk(message) 
   return toResultObject(null, resultStatus.partiallyOk, message)
 }
 
-// toResultObjectWithNullResultByResultObject
-export function toResultObjectWithNullResultByResultObject(resultObject) {
-  return toResultObject(null, resultObject.status, resultObject.message)
-}
-
 // toResultObjectWithResultStatus
 export function toResultObjectWithResultStatusOk(result, message) {
   return toResultObject(result, resultStatus.ok, message)

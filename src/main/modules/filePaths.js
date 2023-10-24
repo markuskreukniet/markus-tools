@@ -6,7 +6,6 @@ import { filePathsType, filePathType, fileType } from '../../preload/modules/fil
 import {
   isResultObjectOk,
   toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem,
-  toResultObjectWithNullResultByResultObject,
   toResultObjectWithNullResultAndResultStatusErrorSystem,
   toResultObjectWithNullResultAndResultStatusOk,
   toResultObjectWithResultStatusOk
@@ -275,7 +274,7 @@ export async function makeDirectoryIfNotExists(filePath) {
   if (await filePathExists(filePath)) {
     const makeDirectoryRO = await makeDirectory(filePath)
     if (!isResultObjectOk(makeDirectoryRO)) {
-      return toResultObjectWithNullResultByResultObject(makeDirectoryRO)
+      return makeDirectoryRO
     }
   }
   return toResultObjectWithNullResultAndResultStatusOk()
@@ -341,7 +340,7 @@ export async function copyDirectoryTree(inputFilePath, outputFilePath) {
     const currentPath = stack.pop()
     const readFilesFromDirectoryRO = await readFilesFromDirectory(currentPath)
     if (!isResultObjectOk(readFilesFromDirectoryRO)) {
-      return toResultObjectWithNullResultByResultObject(readFilesFromDirectoryRO)
+      return readFilesFromDirectoryRO
     }
 
     // TODO: this for can be optimized with promise.all?, maybe also other for loops then
@@ -354,15 +353,14 @@ export async function copyDirectoryTree(inputFilePath, outputFilePath) {
       )
       const fileObjectRO = await getFileObject(filePathInput)
       if (!isResultObjectOk(fileObjectRO)) {
-        return toResultObjectWithNullResultByResultObject(fileObjectRO)
+        return fileObjectRO
       }
 
       if (fileObjectRO.result.isDirectory) {
         stack.push(filePathInput)
         const makeDirectoryRO = await makeDirectory(filePathOutput)
         if (!isResultObjectOk(makeDirectoryRO)) {
-          // TODO: should be return makeDirectoryRO??? If so, same problem at other places
-          return toResultObjectWithNullResultByResultObject(makeDirectoryRO)
+          return makeDirectoryRO
         }
       } else {
         await copyFile(filePathInput, filePathOutput)
