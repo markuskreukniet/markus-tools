@@ -253,7 +253,7 @@ export function combinePathParts(filePath1, filePath2) {
   return path.join(filePath1, filePath2)
 }
 
-async function filePathExists(filePath) {
+export async function filePathExists(filePath) {
   try {
     await promises.access(filePath, constants.F_OK)
     return toResultObjectWithResultStatusOk(true)
@@ -328,6 +328,15 @@ function getRelativePath(filePathFrom, filePathTo) {
   return path.relative(filePathFrom, filePathTo)
 }
 
+// inputFilePathFull.replace to determine the result ends up in a bug.
+export function combineOutputFilePathWithRelativeInputFilePath(
+  inputFilePathPart,
+  inputFilePathFull,
+  outputFilePath
+) {
+  return combinePathParts(outputFilePath, getRelativePath(inputFilePathPart, inputFilePathFull))
+}
+
 // When one error happens, the directory tree does not get copied and should return an error.
 // TODO: check if copyDirectoryTree is a correct name
 export async function copyDirectoryTree(inputFilePath, outputFilePath) {
@@ -346,7 +355,6 @@ export async function copyDirectoryTree(inputFilePath, outputFilePath) {
     // TODO: this for can be optimized with promise.all?, maybe also other for loops then
     for (const file of readFilesFromDirectoryRO.result) {
       const filePathInput = combinePathParts(currentPath, file)
-      // filePathInput.replace to determine filePathOutput results in a bug.
       const filePathOutput = combinePathParts(
         outputFilePath,
         getRelativePath(inputFilePath, filePathInput)
