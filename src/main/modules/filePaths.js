@@ -240,6 +240,7 @@ function calculateDirectoryCheck(typeFilePaths, isDirectory) {
   return isDirectoryCheck || isNotDirectoryCheck
 }
 
+// TODO: if you can select only a image, this becomes useless
 function isImageFilePath(filePath) {
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']
   return imageExtensions.includes(filePath.toLowerCase().slice(filePath.lastIndexOf('.')))
