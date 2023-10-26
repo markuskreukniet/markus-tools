@@ -1,11 +1,16 @@
-import { copyDirectoryTree, copyFile, getFileAndDirectoryFileObjects } from './filePaths.js'
+import {
+  combineOutputFilePathWithRelativeInputFilePath,
+  copyDirectoryTree,
+  copyFile,
+  filePathExists,
+  getFileAndDirectoryFileObjects
+} from './filePaths.js'
 import { isResultObjectOk } from '../../preload/modules/resultStatus'
 
 export default async function synchronizeDirectory(
   originalDirectoryFilePath,
   destinationDirectoryFilePath
 ) {
-  // TODO: this boolean should come from UI
   const directoriesTree = true
   // added getFileAndDirectoryFileObjects for synchronizeDirectory
 
@@ -34,6 +39,19 @@ export default async function synchronizeDirectory(
     }
 
     for (const fileObject of originalFileAndDirectoryFileObjectsRO.result) {
+      // example of fileObject.path: C:\Users\shono\Desktop\test\test\New folder
+
+      const outputFilePath = combineOutputFilePathWithRelativeInputFilePath(
+        originalDirectoryFilePath,
+        fileObject.path,
+        destinationDirectoryFilePath
+      )
+
+      if (filePathExists(outputFilePath)) {
+        // check modified date time
+      } else {
+      }
+
       if (fileObject.isDirectory) {
         // if destination does not have the directory, copyDirectoryTree
         await copyDirectoryTree()
