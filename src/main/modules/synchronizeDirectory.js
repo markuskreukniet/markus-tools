@@ -30,6 +30,7 @@ export default async function synchronizeDirectory(
       return originalFileAndDirectoryFileObjectsRO
     }
 
+    // TODO: almost the same as originalFileAndDirectoryFileObjectsRO
     const destinationFileAndDirectoryFileObjectsRO = await getFileAndDirectoryFileObjects(
       destinationDirectoryPath,
       directoriesTree
@@ -47,21 +48,25 @@ export default async function synchronizeDirectory(
         destinationDirectoryFilePath
       )
 
-      if (filePathExists(outputFilePath)) {
-        // check modified date time
-      } else {
+      const filePathExistsRO = filePathExists(outputFilePath)
+      if (!isResultObjectOk(filePathExistsRO)) {
+        return filePathExistsRO
       }
 
-      if (fileObject.isDirectory) {
-        // if destination does not have the directory, copyDirectoryTree
-        await copyDirectoryTree()
-        // else stack.push(fileObject.path)
+      if (filePathExistsRO.result) {
+        if (!fileObject.isDirectory) {
+          // get output fileObject
+          // compare modified date time
+          // if destination does have the file and original file is newer, replace the file
+          // copyFile does replace, fs.copyFile and fs.createWriteStream, both do that, keep this comment, but in filePaths.js
+          await copyFile()
+        }
       } else {
-        // if destination does not have the file
-        await copyFile()
-        // if destination does have the file and original file is newer, replace the file
-        // copyFile does replace, fs.copyFile and fs.createWriteStream, both do that, keep this comment, but in filePaths.js
-        await copyFile()
+        if (fileObject.isDirectory) {
+          await copyDirectoryTree()
+        } else {
+          await copyFile()
+        }
       }
     }
 
