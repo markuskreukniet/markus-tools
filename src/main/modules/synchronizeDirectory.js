@@ -12,7 +12,6 @@ export default async function synchronizeDirectory(
   destinationDirectoryFilePath
 ) {
   const directoriesTree = true
-  // added getFileAndDirectoryFileObjects for synchronizeDirectory
 
   const stack = [originalDirectoryFilePath]
   while (stack.length > 0) {
@@ -54,7 +53,9 @@ export default async function synchronizeDirectory(
       }
 
       if (filePathExistsRO.result) {
-        if (!fileObject.isDirectory) {
+        if (fileObject.isDirectory) {
+          stack.push(fileObject.path)
+        } else {
           // get output fileObject
           // compare modified date time
           // if destination does have the file and original file is newer, replace the file
@@ -67,6 +68,15 @@ export default async function synchronizeDirectory(
         } else {
           await copyFile()
         }
+      }
+    }
+
+    if (
+      originalFileAndDirectoryFileObjectsRO.result.length !==
+      destinationFileAndDirectoryFileObjectsRO.result.length
+    ) {
+      for (const fileObject of destinationFileAndDirectoryFileObjectsRO.result) {
+        //
       }
     }
 
