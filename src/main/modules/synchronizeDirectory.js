@@ -3,7 +3,9 @@ import {
   copyDirectoryTree,
   copyFile,
   filePathExists,
-  getFileAndDirectoryFileObjects
+  getFileAndDirectoryFileObjects,
+  removeDirectoryTree,
+  removeFile
 } from './filePaths.js'
 import { isResultObjectOk } from '../../preload/modules/resultStatus'
 
@@ -33,7 +35,10 @@ export default async function synchronizeDirectory(
     const originalFileAndDirectoryFileObjectsPathMap = new Map(
       originalFileAndDirectoryFileObjectsRO.result.map((fileObject) => [
         fileObject.path,
-        fileObject.dateCreated
+        {
+          dateModified: fileObject.dateCreated,
+          isDirectory: fileObject.isDirectory
+        }
       ])
     )
 
@@ -50,7 +55,10 @@ export default async function synchronizeDirectory(
     const destinationFileAndDirectoryFileObjectsPathMap = new Map(
       destinationFileAndDirectoryFileObjectsRO.result.map((fileObject) => [
         fileObject.path,
-        fileObject.dateCreated
+        {
+          dateModified: fileObject.dateCreated,
+          isDirectory: fileObject.isDirectory
+        }
       ])
     )
 
@@ -75,7 +83,7 @@ export default async function synchronizeDirectory(
         } else {
           if (
             fileObject.dateCreated >
-            destinationFileAndDirectoryFileObjectsPathMap.get(outputFilePath).dateCreated
+            destinationFileAndDirectoryFileObjectsPathMap.get(outputFilePath).dateModified
           ) {
             // TODO: RO
             // copyFile does replace, fs.copyFile and fs.createWriteStream, both do that, keep this comment, but in filePaths.js
@@ -94,18 +102,22 @@ export default async function synchronizeDirectory(
     }
 
     if (
-      originalFileAndDirectoryFileObjectsRO.result.length !==
-      destinationFileAndDirectoryFileObjectsRO.result.length
+      originalFileAndDirectoryFileObjectsPathMap.size !==
+      destinationFileAndDirectoryFileObjectsPathMap.size
     ) {
       for (const destinationFileObject of destinationFileAndDirectoryFileObjectsRO.result) {
         // destinationFileObject.path to original and use it in the if
         if (!originalFileAndDirectoryFileObjectsPathMap.has()) {
-          // remove file destinationFileObject.path
+          if (destinationFileObject.isDirectory) {
+            // TODO: RO
+            await removeDirectoryTree(destinationFileObject.path)
+          } else {
+            // TODO: RO
+            await removeFile(destinationFileObject.path)
+          }
         }
       }
     }
-
-    // check for files in destination that are removed in original and remove them from destination
   }
 
   return `${originalDirectoryFilePath} testB ${destinationDirectoryFilePath}`
