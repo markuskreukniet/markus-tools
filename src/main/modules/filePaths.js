@@ -156,7 +156,26 @@ export async function getFileAndDirectoryFileObjects(directoryPath, directoryTre
   )
 }
 
+export async function removeDirectoryTree(filePath) {
+  try {
+    await promises.rm(filePath, { recursive: true })
+    return toResultObjectWithNullResultAndResultStatusOk()
+  } catch (error) {
+    return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
+  }
+}
+
+export async function removeFile(filePath) {
+  try {
+    await promises.rm(filePath)
+    return toResultObjectWithNullResultAndResultStatusOk()
+  } catch (error) {
+    return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
+  }
+}
+
 // TODO: maybe function is useless since objects might not be needed
+// TODO: should use removeDirectoryTree with RO
 export async function removeEmptyDirectories(fileObjects) {
   const errorTracker = new ErrorTracker(fileObjects.length)
 
