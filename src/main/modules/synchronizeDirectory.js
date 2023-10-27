@@ -29,6 +29,14 @@ export default async function synchronizeDirectory(
       return originalFileAndDirectoryFileObjectsRO
     }
 
+    // TODO: originalFileAndDirectoryFileObjectsRO.result should be already a Map
+    const originalFileAndDirectoryFileObjectsPathMap = new Map(
+      originalFileAndDirectoryFileObjectsRO.result.map((fileObject) => [
+        fileObject.path,
+        fileObject.dateCreated
+      ])
+    )
+
     // TODO: almost the same as originalFileAndDirectoryFileObjectsRO
     const destinationFileAndDirectoryFileObjectsRO = await getFileAndDirectoryFileObjects(
       destinationDirectoryPath,
@@ -37,6 +45,14 @@ export default async function synchronizeDirectory(
     if (!isResultObjectOk(destinationFileAndDirectoryFileObjectsRO)) {
       return destinationFileAndDirectoryFileObjectsRO
     }
+
+    // TODO: originalFileAndDirectoryFileObjectsRO.result should be already a Map
+    const destinationFileAndDirectoryFileObjectsPathMap = new Map(
+      destinationFileAndDirectoryFileObjectsRO.result.map((fileObject) => [
+        fileObject.path,
+        fileObject.dateCreated
+      ])
+    )
 
     for (const fileObject of originalFileAndDirectoryFileObjectsRO.result) {
       // example of fileObject.path: C:\Users\shono\Desktop\test\test\New folder
@@ -47,6 +63,7 @@ export default async function synchronizeDirectory(
         destinationDirectoryFilePath
       )
 
+      // TODO: not needed anymore? Also remove export in filePaths
       const filePathExistsRO = filePathExists(outputFilePath)
       if (!isResultObjectOk(filePathExistsRO)) {
         return filePathExistsRO
@@ -56,17 +73,22 @@ export default async function synchronizeDirectory(
         if (fileObject.isDirectory) {
           stack.push(fileObject.path)
         } else {
-          // get output fileObject
-          // compare modified date time
-          // if destination does have the file and original file is newer, replace the file
-          // copyFile does replace, fs.copyFile and fs.createWriteStream, both do that, keep this comment, but in filePaths.js
-          await copyFile()
+          if (
+            fileObject.dateCreated >
+            destinationFileAndDirectoryFileObjectsPathMap.get(outputFilePath).dateCreated
+          ) {
+            // TODO: RO
+            // copyFile does replace, fs.copyFile and fs.createWriteStream, both do that, keep this comment, but in filePaths.js
+            await copyFile(fileObject.path, outputFilePath)
+          }
         }
       } else {
         if (fileObject.isDirectory) {
+          // TODO: RO
           await copyDirectoryTree()
         } else {
-          await copyFile()
+          // TODO: RO and copied
+          await copyFile(fileObject.path, outputFilePath)
         }
       }
     }
