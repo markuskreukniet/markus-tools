@@ -98,12 +98,9 @@ export default async function synchronizeDirectory(
       destinationFileAndDirectoryFileObjectsRO.result.length
     ) {
       for (const destinationFileObject of destinationFileAndDirectoryFileObjectsRO.result) {
-        if (
-          !originalFileAndDirectoryFileObjectsRO.result.find(
-            (originalFileObject) => originalFileObject.path === destinationFileObject.path
-          )
-        ) {
-          // remove
+        // destinationFileObject.path to original and use it in the if
+        if (!originalFileAndDirectoryFileObjectsPathMap.has()) {
+          // remove file destinationFileObject.path
         }
       }
     }
