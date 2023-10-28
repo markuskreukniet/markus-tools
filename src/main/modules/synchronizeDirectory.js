@@ -2,7 +2,6 @@ import {
   combineOutputFilePathWithRelativeInputFilePath,
   copyDirectoryTree,
   copyFile,
-  filePathExists,
   getFileAndDirectoryFileObjects,
   removeDirectoryTree,
   removeFile
@@ -62,58 +61,52 @@ export default async function synchronizeDirectory(
       ])
     )
 
-    for (const fileObject of originalFileAndDirectoryFileObjectsRO.result) {
+    for (const [
+      originalFilePath,
+      originalFileObject
+    ] of originalFileAndDirectoryFileObjectsPathMap.entries()) {
       // example of fileObject.path: C:\Users\shono\Desktop\test\test\New folder
 
       const outputFilePath = combineOutputFilePathWithRelativeInputFilePath(
         originalDirectoryFilePath,
-        fileObject.path,
+        originalFilePath,
         destinationDirectoryFilePath
       )
 
-      // TODO: not needed anymore? Also remove export in filePaths
-      const filePathExistsRO = filePathExists(outputFilePath)
-      if (!isResultObjectOk(filePathExistsRO)) {
-        return filePathExistsRO
-      }
-
-      if (filePathExistsRO.result) {
-        if (fileObject.isDirectory) {
-          stack.push(fileObject.path)
+      if (destinationFileAndDirectoryFileObjectsPathMap.has(outputFilePath)) {
+        if (originalFileObject.isDirectory) {
+          stack.push(originalFilePath)
         } else {
           if (
-            fileObject.dateCreated >
+            originalFileObject.dateModified >
             destinationFileAndDirectoryFileObjectsPathMap.get(outputFilePath).dateModified
           ) {
             // TODO: RO
             // copyFile does replace, fs.copyFile and fs.createWriteStream, both do that, keep this comment, but in filePaths.js
-            await copyFile(fileObject.path, outputFilePath)
+            await copyFile(originalFilePath, outputFilePath)
           }
         }
       } else {
-        if (fileObject.isDirectory) {
+        if (originalFileObject.isDirectory) {
           // TODO: RO
           await copyDirectoryTree()
         } else {
           // TODO: RO and copied
-          await copyFile(fileObject.path, outputFilePath)
+          await copyFile(originalFilePath, outputFilePath)
         }
       }
-    }
 
-    if (
-      originalFileAndDirectoryFileObjectsPathMap.size !==
-      destinationFileAndDirectoryFileObjectsPathMap.size
-    ) {
-      for (const destinationFileObject of destinationFileAndDirectoryFileObjectsRO.result) {
-        // destinationFileObject.path to original and use it in the if
-        if (!originalFileAndDirectoryFileObjectsPathMap.has()) {
+      for (const [
+        destinationFilePath,
+        destinationFileObject
+      ] of destinationFileAndDirectoryFileObjectsPathMap.entries()) {
+        if (!originalFileAndDirectoryFileObjectsPathMap.has(destinationFilePath)) {
           if (destinationFileObject.isDirectory) {
             // TODO: RO
-            await removeDirectoryTree(destinationFileObject.path)
+            await removeDirectoryTree(destinationFilePath)
           } else {
             // TODO: RO
-            await removeFile(destinationFileObject.path)
+            await removeFile(destinationFilePath)
           }
         }
       }

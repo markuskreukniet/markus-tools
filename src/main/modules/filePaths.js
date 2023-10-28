@@ -273,7 +273,7 @@ export function combinePathParts(filePath1, filePath2) {
   return path.join(filePath1, filePath2)
 }
 
-export async function filePathExists(filePath) {
+async function filePathExists(filePath) {
   try {
     await promises.access(filePath, constants.F_OK)
     return toResultObjectWithResultStatusOk(true)
