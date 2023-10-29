@@ -80,7 +80,7 @@ export default async function synchronizeDirectory(
           await copyFile(originalFileObject.path, destinationFilePath)
         }
 
-        // remove entry from Map
+        destinationFileAndDirectoryFileObjectsPathMap.delete(destinationFilePath)
       } else {
         if (originalFileObject.isDirectory) {
           // TODO: RO
