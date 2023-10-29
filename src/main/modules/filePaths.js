@@ -253,6 +253,7 @@ function calculateDirectoryCheck(typeFilePaths, isDirectory) {
 
   const isNotDirectoryCheck =
     (typeFilePaths === filePathsType.files ||
+      typeFilePaths === filePathsType.filesAndDirectories ||
       typeFilePaths === filePathsType.filesWithoutZeroByteFiles) &&
     !isDirectory
 
