@@ -273,7 +273,7 @@ export function combinePathParts(filePath1, filePath2) {
   return path.join(filePath1, filePath2)
 }
 
-async function filePathExists(filePath) {
+export async function filePathExists(filePath) {
   try {
     await promises.access(filePath, constants.F_OK)
     return toResultObjectWithResultStatusOk(true)
@@ -300,7 +300,7 @@ export async function makeDirectoryIfNotExists(filePath) {
   return toResultObjectWithNullResultAndResultStatusOk()
 }
 
-async function makeDirectory(filePath) {
+export async function makeDirectory(filePath) {
   try {
     await promises.mkdir(filePath)
     return toResultObjectWithNullResultAndResultStatusOk()
@@ -357,6 +357,7 @@ export function combineOutputFilePathWithRelativeInputFilePath(
   return combinePathParts(outputFilePath, getRelativePath(inputFilePathPart, inputFilePathFull))
 }
 
+// TODO useless now?
 // When one error happens, the directory tree does not get copied and should return an error.
 // TODO: check if copyDirectoryTree is a correct name
 export async function copyDirectoryTree(inputFilePath, outputFilePath) {
