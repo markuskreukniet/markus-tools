@@ -89,7 +89,7 @@ export default async function synchronizeDirectory(
       } else {
         if (originalFileObject.isDirectory) {
           // TODO: RO
-          await copyDirectoryTree()
+          await copyDirectoryTree(originalFilePath, outputFilePath)
         } else {
           // TODO: RO and copied
           await copyFile(originalFilePath, outputFilePath)
