@@ -2,6 +2,7 @@ package internal
 
 import (
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -23,4 +24,12 @@ func getFileDetail(path string) (FileDetail, error) {
 		Size:             fileInfo.Size(),
 		IsDirectory:      fileInfo.IsDir(),
 	}, nil
+}
+
+func joinOutputBasePathWithRelativeInputPath(inputBasePath, inputFullPath, outputBasePath string) (string, error) {
+	relativePath, err := filepath.Rel(inputBasePath, inputFullPath)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(outputBasePath, relativePath), nil
 }
