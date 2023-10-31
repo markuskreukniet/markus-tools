@@ -7,48 +7,54 @@ import (
 
 // TODO: check this test
 func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
+	const inputBasePath string = "/home/user/source"
+	const inputFullPath string = "/home/user/source/directory/file.txt"
+	const outputBasePath string = "/home/user/destination"
+	const otherFullPath string = "/home/other/folder/file.txt"
+	const joinedOutputBasePathWithRelativeInputPath string = "/home/user/destination/directory/file.txt"
+
 	tests := []struct {
 		name           string
 		inputBasePath  string
 		inputFullPath  string
 		outputBasePath string
 		expected       string
-		expectErr      bool
+		expectedErr    bool
 	}{
 		{
 			name:           "Basic",
-			inputBasePath:  "/home/user/source",
-			inputFullPath:  "/home/user/source/subdir/file.txt",
-			outputBasePath: "/home/user/dest",
-			expected:       filepath.FromSlash("/home/user/dest/subdir/file.txt"),
-			expectErr:      false,
+			inputBasePath:  inputBasePath,
+			inputFullPath:  inputFullPath,
+			outputBasePath: outputBasePath,
+			expected:       filepath.FromSlash(joinedOutputBasePathWithRelativeInputPath),
+			expectedErr:    false,
 		},
 		{
 			name:           "Error case",
-			inputBasePath:  "/home/user/source",
-			inputFullPath:  "/home/other/folder/file.txt",
-			outputBasePath: "/home/user/dest",
-			expected:       filepath.FromSlash("/home/other/folder/file.txt"),
-			expectErr:      false,
+			inputBasePath:  inputBasePath,
+			inputFullPath:  otherFullPath,
+			outputBasePath: outputBasePath,
+			expected:       filepath.FromSlash(otherFullPath),
+			expectedErr:    false,
 		},
 		{
 			name:           "Equivalent paths",
-			inputBasePath:  "/home/user/source",
-			inputFullPath:  "/home/user/source",
-			outputBasePath: "/home/user/dest",
-			expected:       filepath.FromSlash("/home/user/dest"),
-			expectErr:      false,
+			inputBasePath:  inputBasePath,
+			inputFullPath:  inputBasePath,
+			outputBasePath: outputBasePath,
+			expected:       filepath.FromSlash(outputBasePath),
+			expectedErr:    false,
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result, err := joinOutputBasePathWithRelativeInputPath(tt.inputBasePath, tt.inputFullPath, tt.outputBasePath)
-			if (err != nil) != tt.expectErr {
-				t.Fatalf("expected error: %v, got %v", tt.expectErr, err)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result, err := joinOutputBasePathWithRelativeInputPath(test.inputBasePath, test.inputFullPath, test.outputBasePath)
+			if (err != nil) != test.expectedErr {
+				t.Fatalf("expected error: %v, got %v", test.expectedErr, err)
 			}
-			if err == nil && result != tt.expected {
-				t.Fatalf("expected: %s, got %s", tt.expected, result)
+			if err == nil && result != test.expected {
+				t.Fatalf("expected: %s, got %s", test.expected, result)
 			}
 		})
 	}
