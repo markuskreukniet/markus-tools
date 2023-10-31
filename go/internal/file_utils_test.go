@@ -9,7 +9,6 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	const inputBasePath string = "/home/user/source"
 	const inputFullPath string = "/home/user/source/directory/file.txt"
 	const outputBasePath string = "/home/user/destination"
-	const otherFullPath string = "/home/other/folder/file.txt"
 	const joinedOutputBasePathWithRelativeInputPath string = "/home/user/destination/directory/file.txt"
 
 	tests := []struct {
