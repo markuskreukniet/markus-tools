@@ -121,3 +121,26 @@ export default async function synchronizeDirectory(
 
   return `${originalDirectoryFilePath} testB ${destinationDirectoryFilePath}`
 }
+
+// Go test code
+// const { exec } = require('child_process');
+
+// // Execute the Go program using 'go run' and pass the message as an argument
+// const goExecutable = 'go' // Replace with the path to your Go executable if needed
+// const goFilePath = './go/main.go' // Path to your Go source code
+// const message = 'have fun' // Your message
+
+// const goProcess = exec(
+//   `${goExecutable} run ${goFilePath} "${message}"`,
+//   (error, stdout, stderr) => {
+//     if (error) {
+//       console.error(`Error executing Go program: ${error}`)
+//       return
+//     }
+//     console.log(`Go program output: ${stdout}`)
+//   }
+// )
+
+// goProcess.on('close', (code) => {
+//   console.log(`Go program exited with code ${code}`)
+// })
