@@ -24,3 +24,5 @@ func getFileDetail(path string) (FileDetail, error) {
 		IsDirectory:      fileInfo.IsDir(),
 	}, nil
 }
+
+// file_utils.go better naming?
