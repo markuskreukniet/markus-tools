@@ -5,7 +5,6 @@ import (
 	"testing"
 )
 
-// TODO: check this test
 func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	const inputBasePath string = "/home/user/source"
 	const inputFullPath string = "/home/user/source/directory/file.txt"
@@ -30,15 +29,23 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 			expectedErr:    false,
 		},
 		{
-			name:           "Error case",
-			inputBasePath:  inputBasePath,
-			inputFullPath:  otherFullPath,
+			name:           "Empty inputBasePath",
+			inputBasePath:  "",
+			inputFullPath:  inputFullPath,
 			outputBasePath: outputBasePath,
-			expected:       filepath.FromSlash(otherFullPath),
-			expectedErr:    false,
+			expected:       "",
+			expectedErr:    true,
 		},
 		{
-			name:           "Equivalent paths",
+			name:           "Empty inputFullPath",
+			inputBasePath:  inputBasePath,
+			inputFullPath:  "",
+			outputBasePath: outputBasePath,
+			expected:       "",
+			expectedErr:    true,
+		},
+		{
+			name:           "Equivalent input paths",
 			inputBasePath:  inputBasePath,
 			inputFullPath:  inputBasePath,
 			outputBasePath: outputBasePath,
