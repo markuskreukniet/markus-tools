@@ -13,10 +13,10 @@ type FileDetail struct {
 	IsDirectory      bool
 }
 
-type FileSelectionMode int
+type FileFilterMode int
 
 const (
-	files FileSelectionMode = iota
+	files FileFilterMode = iota
 	filesWithoutZeroByteFiles
 	filesAndDirectories
 	filesAndDirectoriesWithoutZeroByteFiles
@@ -37,7 +37,7 @@ func getFileDetail(filePath string) (FileDetail, error) {
 }
 
 // directoryTree good naming? recursive is better?
-// func getAsdf(filePath string, directoryTree bool, fileSelectionMode FileSelectionMode) ([]FileDetail, error) {
+// func getAsdf(filePath string, directoryTree bool, fileFilterMode FileFilterMode) ([]FileDetail, error) {
 
 // }
 
