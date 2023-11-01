@@ -36,9 +36,10 @@ func getFileDetail(filePath string) (FileDetail, error) {
 	}, nil
 }
 
-// directoryTree good naming? recursive is better?
+// WIP
 // func getAsdf(filePath string, directoryTree bool, fileFilterMode FileFilterMode) ([]FileDetail, error) {
-
+// 	var fileDetails []FileDetail
+// 	var stack []string
 // }
 
 func joinOutputBasePathWithRelativeInputPath(inputBasePath, inputFullPath, outputBasePath string) (string, error) {
