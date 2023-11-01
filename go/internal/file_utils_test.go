@@ -4,7 +4,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 )
 
 func fatalLogIfError(t *testing.T, err error) {
@@ -30,16 +29,16 @@ func TestGetFileDetail(t *testing.T) {
 		t.Fatalf("Failed to write to temp file: %v", err)
 	}
 
-	time.Sleep(1 * time.Second)
+	nonExistentFilePath := filepath.Join(tempDir, "nonExistentFile.txt")
 
 	// Act
-	const errMsgPrefix = "getFileDetail() error:"
-
 	dirDetail, err := getFileDetail(tempDir)
 	fatalLogIfError(t, err)
 
 	fileDetail, err := getFileDetail(filePath)
 	fatalLogIfError(t, err)
+
+	_, err = getFileDetail(nonExistentFilePath)
 
 	// Assert
 	if dirDetail.Path != tempDir {
@@ -60,6 +59,10 @@ func TestGetFileDetail(t *testing.T) {
 
 	if fileDetail.IsDirectory {
 		t.Errorf("Expected IsDirectory to be false, got %v", fileDetail.IsDirectory)
+	}
+
+	if err == nil {
+		t.Errorf("Expected an error when trying to get details of a non-existent file, but got none")
 	}
 }
 
