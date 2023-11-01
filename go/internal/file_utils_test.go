@@ -1,9 +1,67 @@
 package internal
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
+	"time"
 )
+
+func fatalLogIfError(t *testing.T, err error) {
+	t.Helper()
+	if err != nil {
+		t.Fatalf("getFileDetail() error: %v", err)
+	}
+}
+
+func TestGetFileDetail(t *testing.T) {
+	const testText string = "test text"
+
+	// Arrange
+	tempDir, err := os.MkdirTemp("", "testTempDir")
+	if err != nil {
+		t.Fatalf("Failed to create temp dir: %v", err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	filePath := filepath.Join(tempDir, "testFile.txt")
+	err = os.WriteFile(filePath, []byte(testText), 0666)
+	if err != nil {
+		t.Fatalf("Failed to write to temp file: %v", err)
+	}
+
+	time.Sleep(1 * time.Second)
+
+	// Act
+	const errMsgPrefix = "getFileDetail() error:"
+
+	dirDetail, err := getFileDetail(tempDir)
+	fatalLogIfError(t, err)
+
+	fileDetail, err := getFileDetail(filePath)
+	fatalLogIfError(t, err)
+
+	// Assert
+	if dirDetail.Path != tempDir {
+		t.Errorf("Expected Path %v, got %v", tempDir, dirDetail.Path)
+	}
+
+	if !dirDetail.IsDirectory {
+		t.Errorf("Expected IsDirectory to be true, got %v", dirDetail.IsDirectory)
+	}
+
+	if fileDetail.Path != filePath {
+		t.Errorf("Expected Path %v, got %v", filePath, fileDetail.Path)
+	}
+
+	if fileDetail.Size != int64(len(testText)) {
+		t.Errorf("Expected Size %v, got %v", len(testText), fileDetail.Size)
+	}
+
+	if fileDetail.IsDirectory {
+		t.Errorf("Expected IsDirectory to be false, got %v", fileDetail.IsDirectory)
+	}
+}
 
 func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	const inputBasePath string = "/home/user/source"
