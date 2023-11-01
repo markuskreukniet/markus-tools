@@ -17,7 +17,7 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 		inputFullPath  string
 		outputBasePath string
 		expected       string
-		expectedErr    bool
+		expectErr      bool
 	}{
 		{
 			name:           "Basic",
@@ -25,7 +25,7 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 			inputFullPath:  inputFullPath,
 			outputBasePath: outputBasePath,
 			expected:       filepath.FromSlash(joinedOutputBasePathWithRelativeInputPath),
-			expectedErr:    false,
+			expectErr:      false,
 		},
 		{
 			name:           "Empty inputBasePath",
@@ -33,7 +33,7 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 			inputFullPath:  inputFullPath,
 			outputBasePath: outputBasePath,
 			expected:       "",
-			expectedErr:    true,
+			expectErr:      true,
 		},
 		{
 			name:           "Empty inputFullPath",
@@ -41,7 +41,7 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 			inputFullPath:  "",
 			outputBasePath: outputBasePath,
 			expected:       "",
-			expectedErr:    true,
+			expectErr:      true,
 		},
 		{
 			name:           "Equivalent input paths",
@@ -49,15 +49,15 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 			inputFullPath:  inputBasePath,
 			outputBasePath: outputBasePath,
 			expected:       filepath.FromSlash(outputBasePath),
-			expectedErr:    false,
+			expectErr:      false,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			result, err := joinOutputBasePathWithRelativeInputPath(test.inputBasePath, test.inputFullPath, test.outputBasePath)
-			if (err != nil) != test.expectedErr {
-				t.Fatalf("expected error: %v, got %v", test.expectedErr, err)
+			if (err != nil) != test.expectErr {
+				t.Fatalf("expected error: %v, got %v", test.expectErr, err)
 			}
 			if err == nil && result != test.expected {
 				t.Fatalf("expected: %s, got %s", test.expected, result)
