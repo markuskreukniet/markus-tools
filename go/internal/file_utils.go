@@ -40,6 +40,13 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // func getAsdf(filePath string, directoryTree bool, fileFilterMode FileFilterMode) ([]FileDetail, error) {
 // 	var fileDetails []FileDetail
 // 	var stack []string
+// 	for stackLength := len(stack); stackLength > 0; stackLength = len(stack) {
+// 		var stackLengthMinOne int = stackLength - 1
+// 		fileDetail := stack[stackLengthMinOne]
+// 		stack = stack[:stackLengthMinOne]
+
+// 		// read files from directory
+// 	}
 // }
 
 func joinOutputBasePathWithRelativeInputPath(inputBasePath, inputFullPath, outputBasePath string) (string, error) {
