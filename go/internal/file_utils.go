@@ -68,7 +68,7 @@ func getFilteredFileDetailsFromDirectoryTree(rootFilePath string, fileFilterMode
 		}
 
 		// zero byte check
-		if size > 0 && (fileFilterMode == filesWithoutZeroByteFiles || fileFilterMode == filesAndDirectoriesWithoutZeroByteFiles) {
+		if size == 0 && (fileFilterMode == filesWithoutZeroByteFiles || fileFilterMode == filesAndDirectoriesWithoutZeroByteFiles) {
 			return nil
 		}
 
