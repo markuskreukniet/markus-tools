@@ -44,27 +44,27 @@ func TestGetFileDetail(t *testing.T) {
 
 	// Assert
 	if dirDetail.Path != tempDir {
-		t.Errorf("Expected Path %v, got %v", tempDir, dirDetail.Path)
+		t.Errorf("Want Path %v, got %v", tempDir, dirDetail.Path)
 	}
 
 	if !dirDetail.IsDirectory {
-		t.Errorf("Expected IsDirectory to be true, got %v", dirDetail.IsDirectory)
+		t.Errorf("Want IsDirectory to be true, got %v", dirDetail.IsDirectory)
 	}
 
 	if fileDetail.Path != filePath {
-		t.Errorf("Expected Path %v, got %v", filePath, fileDetail.Path)
+		t.Errorf("Want Path %v, got %v", filePath, fileDetail.Path)
 	}
 
 	if fileDetail.Size != int64(len(testText)) {
-		t.Errorf("Expected Size %v, got %v", len(testText), fileDetail.Size)
+		t.Errorf("Want Size %v, got %v", len(testText), fileDetail.Size)
 	}
 
 	if fileDetail.IsDirectory {
-		t.Errorf("Expected IsDirectory to be false, got %v", fileDetail.IsDirectory)
+		t.Errorf("Want IsDirectory to be false, got %v", fileDetail.IsDirectory)
 	}
 
 	if err == nil {
-		t.Errorf("Expected an error when trying to get details of a non-existent file, but got none")
+		t.Errorf("Want an error when trying to get details of a non-existent file, but got none")
 	}
 }
 
@@ -154,51 +154,51 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 		inputBasePath  string
 		inputFullPath  string
 		outputBasePath string
-		expected       string
-		expectErr      bool
+		want           string
+		wantErr        bool
 	}{
 		{
 			name:           "Basic",
 			inputBasePath:  inputBasePath,
 			inputFullPath:  inputFullPath,
 			outputBasePath: outputBasePath,
-			expected:       filepath.FromSlash(joinedOutputBasePathWithRelativeInputPath),
-			expectErr:      false,
+			want:           filepath.FromSlash(joinedOutputBasePathWithRelativeInputPath),
+			wantErr:        false,
 		},
 		{
 			name:           "Empty inputBasePath",
 			inputBasePath:  "",
 			inputFullPath:  inputFullPath,
 			outputBasePath: outputBasePath,
-			expected:       "",
-			expectErr:      true,
+			want:           "",
+			wantErr:        true,
 		},
 		{
 			name:           "Empty inputFullPath",
 			inputBasePath:  inputBasePath,
 			inputFullPath:  "",
 			outputBasePath: outputBasePath,
-			expected:       "",
-			expectErr:      true,
+			want:           "",
+			wantErr:        true,
 		},
 		{
 			name:           "Equivalent input paths",
 			inputBasePath:  inputBasePath,
 			inputFullPath:  inputBasePath,
 			outputBasePath: outputBasePath,
-			expected:       filepath.FromSlash(outputBasePath),
-			expectErr:      false,
+			want:           filepath.FromSlash(outputBasePath),
+			wantErr:        false,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			result, err := joinOutputBasePathWithRelativeInputPath(test.inputBasePath, test.inputFullPath, test.outputBasePath)
-			if (err != nil) != test.expectErr {
-				t.Fatalf("expected error: %v, got %v", test.expectErr, err)
+			if (err != nil) != test.wantErr {
+				t.Fatalf("want error: %v, got %v", test.wantErr, err)
 			}
-			if err == nil && result != test.expected {
-				t.Fatalf("expected: %s, got %s", test.expected, result)
+			if err == nil && result != test.want {
+				t.Fatalf("want: %s, got %s", test.want, result)
 			}
 		})
 	}
