@@ -49,7 +49,6 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 	}
 // }
 
-// TODO: use FileFilterMode
 func getFilteredFileDetailsFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) ([]FileDetail, error) {
 	var fileDetails []FileDetail
 	err := filepath.WalkDir(rootFilePath, func(filePath string, dirEntry os.DirEntry, err error) error {
@@ -60,11 +59,24 @@ func getFilteredFileDetailsFromDirectoryTree(rootFilePath string, fileFilterMode
 		if err != nil {
 			return err
 		}
+		size := fileInfo.Size()
+		isDir := dirEntry.IsDir()
+
+		// is directory check
+		if isDir && (fileFilterMode == files || fileFilterMode == filesWithoutZeroByteFiles) {
+			return nil
+		}
+
+		// zero byte check
+		if size > 0 && (fileFilterMode == filesWithoutZeroByteFiles || fileFilterMode == filesAndDirectoriesWithoutZeroByteFiles) {
+			return nil
+		}
+
 		fileDetails = append(fileDetails, FileDetail{
 			Path:             filePath,
 			ModificationTime: fileInfo.ModTime(),
-			Size:             fileInfo.Size(),
-			IsDirectory:      dirEntry.IsDir(),
+			Size:             size,
+			IsDirectory:      isDir,
 		})
 		return nil
 	})
