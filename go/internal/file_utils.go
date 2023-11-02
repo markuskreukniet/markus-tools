@@ -49,6 +49,31 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 	}
 // }
 
+// TODO: use FileFilterMode
+func getFilteredFileDetailsFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) ([]FileDetail, error) {
+	var fileDetails []FileDetail
+	err := filepath.WalkDir(rootFilePath, func(filePath string, dirEntry os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		fileInfo, err := dirEntry.Info()
+		if err != nil {
+			return err
+		}
+		fileDetails = append(fileDetails, FileDetail{
+			Path:             filePath,
+			ModificationTime: fileInfo.ModTime(),
+			Size:             fileInfo.Size(),
+			IsDirectory:      dirEntry.IsDir(),
+		})
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return fileDetails, nil
+}
+
 func joinOutputBasePathWithRelativeInputPath(inputBasePath, inputFullPath, outputBasePath string) (string, error) {
 	relativePath, err := filepath.Rel(inputBasePath, inputFullPath)
 	if err != nil {
