@@ -62,6 +62,11 @@ func getFilteredFileDetailsFromDirectoryTree(rootFilePath string, fileFilterMode
 		size := fileInfo.Size()
 		isDir := dirEntry.IsDir()
 
+		// is file check
+		if !isDir && fileFilterMode == directories {
+			return nil
+		}
+
 		// is directory check
 		if isDir && (fileFilterMode == files || fileFilterMode == filesWithoutZeroByteFiles) {
 			return nil

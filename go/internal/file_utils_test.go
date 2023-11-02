@@ -109,6 +109,16 @@ func TestGetFilteredFileDetailsFromDirectoryTree(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name:           "DirectoriesOnly",
+			rootFilePath:   tmpDir,
+			fileFilterMode: directories,
+			want: []FileDetail{
+				{Path: tmpDir, IsDirectory: true},
+				{Path: subDir, IsDirectory: true},
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
