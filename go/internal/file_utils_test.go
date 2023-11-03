@@ -136,10 +136,32 @@ func TestGetFilteredFileDetailsFromDirectoryTree(t *testing.T) {
 			want:           nil,
 			wantErr:        true,
 		},
+		// {
+		// 	name:           "PermissionError",
+		// 	rootFilePath:   tmpDir,
+		// 	fileFilterMode: files,
+		// 	want: []FileDetail{
+		// 		{Path: filepath.Join(tmpDir, "file1.txt"), Size: 7, IsDirectory: false},
+		// 		{Path: filepath.Join(tmpDir, "file2.txt"), Size: 0, IsDirectory: false},
+		// 	},
+		// 	wantErr: false,
+		// },
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// if tt.name == "PermissionError" {
+			// 	err := os.Chmod(subDir, 0000)
+			// 	if err != nil {
+			// 		t.Fatal(err)
+			// 	}
+			// 	defer func() {
+			// 		if err := os.Chmod(subDir, 0755); err != nil {
+			// 			t.Log("Warning: Failed to restore permissions for subDir:", err)
+			// 		}
+			// 	}()
+			// }
+
 			got, err := getFilteredFileDetailsFromDirectoryTree(tt.rootFilePath, tt.fileFilterMode)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getFilteredFileDetailsFromDirectoryTree() error: %v, wantErr %v", err, tt.wantErr)
