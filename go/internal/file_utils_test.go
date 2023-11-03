@@ -119,6 +119,16 @@ func TestGetFilteredFileDetailsFromDirectoryTree(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name:           "FilesWithoutZeroByteFiles",
+			rootFilePath:   tmpDir,
+			fileFilterMode: filesWithoutZeroByteFiles,
+			want: []FileDetail{
+				{Path: filepath.Join(tmpDir, "file1.txt"), Size: 7, IsDirectory: false},
+				{Path: filepath.Join(subDir, "file3.txt"), Size: 7, IsDirectory: false},
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
