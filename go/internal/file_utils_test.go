@@ -129,6 +129,13 @@ func TestGetFilteredFileDetailsFromDirectoryTree(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name:           "InvalidRootPath",
+			rootFilePath:   "/invalid/path",
+			fileFilterMode: files,
+			want:           nil,
+			wantErr:        true,
+		},
 	}
 
 	for _, tt := range tests {
