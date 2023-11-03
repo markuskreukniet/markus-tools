@@ -49,6 +49,11 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 	}
 // }
 
+// WIP
+// func synchronizeDirectoryTrees(sourceFilePath, destinationFilePath string) error {
+// 	fileDetails, err := getFilteredFileDetailsFromDirectoryTree(sourceFilePath, filesAndDirectories)
+// }
+
 func getFilteredFileDetailsFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) ([]FileDetail, error) {
 	var fileDetails []FileDetail
 	err := filepath.WalkDir(rootFilePath, func(filePath string, dirEntry os.DirEntry, err error) error {
