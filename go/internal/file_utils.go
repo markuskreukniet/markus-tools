@@ -88,19 +88,14 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 	return fileInfos, nil
 // }
 
-// TODO: WalkDir should become Walk
 func getFilteredFileDetailsFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) ([]FileDetail, error) {
 	var fileDetails []FileDetail
-	err := filepath.WalkDir(rootFilePath, func(filePath string, dirEntry os.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
-		fileInfo, err := dirEntry.Info()
+	err := filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 		size := fileInfo.Size()
-		isDir := dirEntry.IsDir()
+		isDir := fileInfo.IsDir()
 
 		// is file check
 		if !isDir && fileFilterMode == directories {
