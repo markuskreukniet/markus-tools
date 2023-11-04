@@ -13,6 +13,13 @@ type FileDetail struct {
 	IsDirectory      bool
 }
 
+// WIP
+// type FileInfo struct {
+// 	ModificationTime time.Time
+// 	Size             int64
+// 	IsDirectory      bool
+// }
+
 type FileFilterMode int
 
 const (
@@ -50,10 +57,38 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // }
 
 // WIP
-// func synchronizeDirectoryTrees(sourceFilePath, destinationFilePath string) error {
-// 	fileDetails, err := getFilteredFileDetailsFromDirectoryTree(sourceFilePath, filesAndDirectories)
+// func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) error {
+// 	if err := os.MkdirAll(destinationDirectory, os.ModePerm); err != nil {
+// 		return err
+// 	}
+// 	destinationFileInfos, err := getFilteredFileInfosFromDirectoryTree(destinationDirectory, filesAndDirectories)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	err := filepath.Walk(sourceDirectory, func(filePath string, fileInfo os.FileInfo, err error) error {
+// 		if err != nil {
+// 			return err
+// 		}
+// 		destinationFilePath, err := joinOutputBasePathWithRelativeInputPath(sourceDirectory, filePath, destinationDirectory)
+// 		if fileInfo.IsDir() {
+
+// 		}
+// 		return nil
+// 	})
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
 // }
 
+// WIP
+// func getFilteredFileInfosFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) (map[string]FileInfo, error) {
+// 	fileInfos := make(map[string]FileInfo)
+
+// 	return fileInfos, nil
+// }
+
+// TODO: WalkDir should become Walk
 func getFilteredFileDetailsFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) ([]FileDetail, error) {
 	var fileDetails []FileDetail
 	err := filepath.WalkDir(rootFilePath, func(filePath string, dirEntry os.DirEntry, err error) error {
