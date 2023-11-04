@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// TODO: FileInfo should be part of FileDetail
 type FileDetail struct {
 	Path             string
 	ModificationTime time.Time
@@ -13,12 +14,11 @@ type FileDetail struct {
 	IsDirectory      bool
 }
 
-// WIP
-// type FileInfo struct {
-// 	ModificationTime time.Time
-// 	Size             int64
-// 	IsDirectory      bool
-// }
+type FileInfo struct {
+	ModificationTime time.Time
+	Size             int64
+	IsDirectory      bool
+}
 
 type FileFilterMode int
 
@@ -81,16 +81,28 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 	return nil
 // }
 
-// WIP
-// func getFilteredFileInfosFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) (map[string]FileInfo, error) {
-// 	fileInfos := make(map[string]FileInfo)
-
-// 	return fileInfos, nil
-// }
+func getFilteredFileInfosFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) (map[string]FileInfo, error) {
+	fileInfos := make(map[string]FileInfo)
+	err := walkFileDetails(rootFilePath, fileFilterMode, func(fileDetail FileDetail) {
+		fileInfos[fileDetail.Path] = FileInfo{
+			ModificationTime: fileDetail.ModificationTime,
+			Size:             fileDetail.Size,
+			IsDirectory:      fileDetail.IsDirectory,
+		}
+	})
+	return fileInfos, err
+}
 
 func getFilteredFileDetailsFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) ([]FileDetail, error) {
 	var fileDetails []FileDetail
-	err := filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
+	err := walkFileDetails(rootFilePath, fileFilterMode, func(fileDetail FileDetail) {
+		fileDetails = append(fileDetails, fileDetail)
+	})
+	return fileDetails, err
+}
+
+func walkFileDetails(rootFilePath string, fileFilterMode FileFilterMode, handler func(FileDetail)) error {
+	return filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -112,7 +124,7 @@ func getFilteredFileDetailsFromDirectoryTree(rootFilePath string, fileFilterMode
 			return nil
 		}
 
-		fileDetails = append(fileDetails, FileDetail{
+		handler(FileDetail{
 			Path:             filePath,
 			ModificationTime: fileInfo.ModTime(),
 			Size:             size,
@@ -120,10 +132,6 @@ func getFilteredFileDetailsFromDirectoryTree(rootFilePath string, fileFilterMode
 		})
 		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
-	return fileDetails, nil
 }
 
 func joinOutputBasePathWithRelativeInputPath(inputBasePath, inputFullPath, outputBasePath string) (string, error) {
