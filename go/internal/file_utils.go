@@ -58,14 +58,16 @@ func getFileDetail(filePath string) (FileDetail, error) {
 
 // WIP
 // func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) error {
-// 	if err := os.MkdirAll(destinationDirectory, os.ModePerm); err != nil {
+// 	// TODO: should get same permission as sourceDirectory
+// 	err := os.MkdirAll(destinationDirectory, os.ModePerm)
+// 	if err != nil {
 // 		return err
 // 	}
 // 	destinationFileInfos, err := getFilteredFileInfosFromDirectoryTree(destinationDirectory, filesAndDirectories)
 // 	if err != nil {
 // 		return err
 // 	}
-// 	err := filepath.Walk(sourceDirectory, func(filePath string, fileInfo os.FileInfo, err error) error {
+// 	err = filepath.Walk(sourceDirectory, func(filePath string, fileInfo os.FileInfo, err error) error {
 // 		if err != nil {
 // 			return err
 // 		}
@@ -75,10 +77,7 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 		}
 // 		return nil
 // 	})
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return nil
+// 	return err
 // }
 
 func getFilteredFileInfosFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) (map[string]FileInfo, error) {
