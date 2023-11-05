@@ -63,7 +63,7 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 	if err != nil {
 // 		return err
 // 	}
-// 	destinationFileInfos, err := getFilteredFileInfosFromDirectoryTree(destinationDirectory, filesAndDirectories)
+// 	destinationFileDetails, err := getFilteredFileDetailsMapFromDirectoryTree(destinationDirectory, filesAndDirectories)
 // 	if err != nil {
 // 		return err
 // 	}
@@ -72,15 +72,27 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 			return err
 // 		}
 // 		destinationFilePath, err := joinOutputBasePathWithRelativeInputPath(sourceDirectory, filePath, destinationDirectory)
-// 		if fileInfo.IsDir() {
-
+// 		if err != nil {
+// 			return err
+// 		}
+// 		value, ok := destinationFileDetails[destinationFilePath]
+// 		if ok {
+// 			if !fileInfo.IsDir() && fileInfo.ModTime().After(value.ModificationTime) {
+// 				// copy replace file
+// 			}
+// 		} else {
+// 			if fileInfo.IsDir() {
+// 				// make directory
+// 			} else {
+// 				// copy replace file
+// 			}
 // 		}
 // 		return nil
 // 	})
 // 	return err
 // }
 
-func getFilteredFileInfosFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) (map[string]FileDetailMapValue, error) {
+func getFilteredFileDetailsMapFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) (map[string]FileDetailMapValue, error) {
 	fileInfos := make(map[string]FileDetailMapValue)
 	err := walkFileDetails(rootFilePath, fileFilterMode, func(fileDetail FileDetail) {
 		fileInfos[fileDetail.Path] = FileDetailMapValue{
@@ -92,6 +104,7 @@ func getFilteredFileInfosFromDirectoryTree(rootFilePath string, fileFilterMode F
 	return fileInfos, err
 }
 
+// TODO: rename to getFilteredFileDetailsSliceFromDirectoryTree
 func getFilteredFileDetailsFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) ([]FileDetail, error) {
 	var fileDetails []FileDetail
 	err := walkFileDetails(rootFilePath, fileFilterMode, func(fileDetail FileDetail) {
