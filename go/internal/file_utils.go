@@ -76,16 +76,10 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 			return err
 // 		}
 // 		value, ok := destinationFileDetails[destinationFilePath]
-// 		if ok {
-// 			if !fileInfo.IsDir() && fileInfo.ModTime().After(value.ModificationTime) {
-// 				// copy replace file
-// 			}
+// 		if !fileInfo.IsDir() && (!ok || (ok && fileInfo.ModTime().After(value.ModificationTime))) {
+// 			// copy replace file
 // 		} else {
-// 			if fileInfo.IsDir() {
-// 				// make directory
-// 			} else {
-// 				// copy replace file
-// 			}
+// 			// make directory
 // 		}
 // 		return nil
 // 	})
