@@ -14,7 +14,7 @@ type FileDetail struct {
 	IsDirectory      bool
 }
 
-type FileInfo struct {
+type FileDetailMapValue struct {
 	ModificationTime time.Time
 	Size             int64
 	IsDirectory      bool
@@ -80,10 +80,10 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 	return err
 // }
 
-func getFilteredFileInfosFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) (map[string]FileInfo, error) {
-	fileInfos := make(map[string]FileInfo)
+func getFilteredFileInfosFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) (map[string]FileDetailMapValue, error) {
+	fileInfos := make(map[string]FileDetailMapValue)
 	err := walkFileDetails(rootFilePath, fileFilterMode, func(fileDetail FileDetail) {
-		fileInfos[fileDetail.Path] = FileInfo{
+		fileInfos[fileDetail.Path] = FileDetailMapValue{
 			ModificationTime: fileDetail.ModificationTime,
 			Size:             fileDetail.Size,
 			IsDirectory:      fileDetail.IsDirectory,
