@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// TODO: FileInfo should be part of FileDetail
+// TODO: FileDetailMapValue should be part of FileDetail
 type FileDetail struct {
 	Path             string
 	ModificationTime time.Time
