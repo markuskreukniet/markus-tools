@@ -87,9 +87,8 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 	return err
 // }
 
-// TODO: destinationFile should get same permissions as sourceFile. After the TODO, the function name should also change
 // TODO: comment about buffering
-func copyFile(sourceFilePath, destinationFilePath string) error {
+func copyFileWithFileMode(sourceFilePath, destinationFilePath string) error {
 	sourceFile, err := os.Open(sourceFilePath)
 	if err != nil {
 		return err
@@ -101,7 +100,14 @@ func copyFile(sourceFilePath, destinationFilePath string) error {
 	}
 	defer destinationFile.Close()
 	_, err = io.Copy(destinationFile, sourceFile)
-	return err
+	if err != nil {
+		return err
+	}
+	fileInfo, err := os.Stat(sourceFilePath)
+	if err != nil {
+		return err
+	}
+	return os.Chmod(destinationFilePath, fileInfo.Mode())
 }
 
 func getFilteredFileDetailsMapFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) (map[string]FileDetailMapValue, error) {
