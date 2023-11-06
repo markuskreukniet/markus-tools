@@ -100,10 +100,8 @@ func copyFile(sourceFilePath, destinationFilePath string) error {
 		return err
 	}
 	defer destinationFile.Close()
-	if _, err := io.Copy(destinationFile, sourceFile); err != nil {
-		return err
-	}
-	return nil
+	_, err = io.Copy(destinationFile, sourceFile)
+	return err
 }
 
 func getFilteredFileDetailsMapFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) (map[string]FileDetailMapValue, error) {
