@@ -86,8 +86,19 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 		} else if isDir && !ok {
 // 			err = os.Mkdir(destinationFilePath, fileInfo.Mode())
 // 		}
+// 		// TODO: when ok, remove from destinationFileDetails
 // 		return err
 // 	})
+// 	if err != nil {
+// 		return err
+// 	}
+// 	for key, value := range destinationFileDetails {
+// 		sourceFilePath, err := joinOutputBasePathWithRelativeInputPath(destinationDirectory, key, sourceDirectory)
+// 		if err != nil {
+// 			return err
+// 		}
+// 		// TODO: sourceFilePath exists
+// 	}
 // 	return err
 // }
 
