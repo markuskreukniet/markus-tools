@@ -59,7 +59,8 @@ func getFileDetail(filePath string) (FileDetail, error) {
 
 // WIP
 // func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) error {
-// 	// TODO: should get same permission as sourceDirectory
+// 	// TODO: destinationDirectory should get same permission as sourceDirectory
+// 	// TODO: MkdirAll is needed?
 // 	err := os.MkdirAll(destinationDirectory, os.ModePerm)
 // 	if err != nil {
 // 		return err
@@ -68,21 +69,22 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 	if err != nil {
 // 		return err
 // 	}
-// 	err = filepath.Walk(sourceDirectory, func(filePath string, fileInfo os.FileInfo, err error) error {
+// 	err = filepath.Walk(sourceDirectory, func(sourceFilePath string, fileInfo os.FileInfo, err error) error {
 // 		if err != nil {
 // 			return err
 // 		}
-// 		destinationFilePath, err := joinOutputBasePathWithRelativeInputPath(sourceDirectory, filePath, destinationDirectory)
+// 		destinationFilePath, err := joinOutputBasePathWithRelativeInputPath(sourceDirectory, sourceFilePath, destinationDirectory)
 // 		if err != nil {
 // 			return err
 // 		}
+// 		isDir := fileInfo.IsDir()
 // 		value, ok := destinationFileDetails[destinationFilePath]
-// 		if !fileInfo.IsDir() && (!ok || (ok && fileInfo.ModTime().After(value.ModificationTime))) {
-// 			// copy replace file
-// 		} else {
+// 		if !isDir && (!ok || (ok && fileInfo.ModTime().After(value.ModificationTime))) {
+// 			err = copyFileWithFileMode(sourceFilePath, destinationFilePath)
+// 		} else if isDir && !ok {
 // 			// make directory
 // 		}
-// 		return nil
+// 		return err
 // 	})
 // 	return err
 // }
