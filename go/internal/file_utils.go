@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"io"
 	"os"
 	"path/filepath"
 	"time"
@@ -85,6 +86,25 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 	})
 // 	return err
 // }
+
+// TODO: destinationFile should get same permissions as sourceFile. After the TODO, the function name should also change
+// TODO: comment about buffering
+func copyFile(sourceFilePath, destinationFilePath string) error {
+	sourceFile, err := os.Open(sourceFilePath)
+	if err != nil {
+		return err
+	}
+	defer sourceFile.Close()
+	destinationFile, err := os.Create(destinationFilePath)
+	if err != nil {
+		return err
+	}
+	defer destinationFile.Close()
+	if _, err := io.Copy(destinationFile, sourceFile); err != nil {
+		return err
+	}
+	return nil
+}
 
 func getFilteredFileDetailsMapFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) (map[string]FileDetailMapValue, error) {
 	fileInfos := make(map[string]FileDetailMapValue)
