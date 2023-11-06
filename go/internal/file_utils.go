@@ -124,8 +124,7 @@ func getFilteredFileDetailsMapFromDirectoryTree(rootFilePath string, fileFilterM
 	return fileInfos, err
 }
 
-// TODO: rename to getFilteredFileDetailsSliceFromDirectoryTree
-func getFilteredFileDetailsFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) ([]FileDetail, error) {
+func getFilteredFileDetailsSliceFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) ([]FileDetail, error) {
 	var fileDetails []FileDetail
 	err := walkFileDetails(rootFilePath, fileFilterMode, func(fileDetail FileDetail) {
 		fileDetails = append(fileDetails, fileDetail)

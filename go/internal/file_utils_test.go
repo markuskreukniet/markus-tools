@@ -69,7 +69,7 @@ func TestGetFileDetail(t *testing.T) {
 }
 
 // TODO: WIP
-func TestGetFilteredFileDetailsFromDirectoryTree(t *testing.T) {
+func TestGetFilteredFileDetailsSliceFromDirectoryTree(t *testing.T) {
 	tmpDir, err := os.MkdirTemp("", "testTempDir")
 	if err != nil {
 		t.Fatal(err)
@@ -162,9 +162,9 @@ func TestGetFilteredFileDetailsFromDirectoryTree(t *testing.T) {
 			// 	}()
 			// }
 
-			got, err := getFilteredFileDetailsFromDirectoryTree(tt.rootFilePath, tt.fileFilterMode)
+			got, err := getFilteredFileDetailsSliceFromDirectoryTree(tt.rootFilePath, tt.fileFilterMode)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getFilteredFileDetailsFromDirectoryTree() error: %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("getFilteredFileDetailsSliceFromDirectoryTree() error: %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
@@ -184,7 +184,7 @@ func TestGetFilteredFileDetailsFromDirectoryTree(t *testing.T) {
 					if got[i].Path != tt.want[i].Path ||
 						got[i].Size != tt.want[i].Size ||
 						got[i].IsDirectory != tt.want[i].IsDirectory {
-						t.Errorf("getFilteredFileDetailsFromDirectoryTree() details mismatch; got %+v, want %+v", got[i], tt.want[i])
+						t.Errorf("getFilteredFileDetailsSliceFromDirectoryTree() details mismatch; got %+v, want %+v", got[i], tt.want[i])
 					}
 				}
 			}
