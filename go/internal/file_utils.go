@@ -60,14 +60,7 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 	}
 // }
 
-// WIP
 func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) error {
-	// TODO: destinationDirectory should get same permission as sourceDirectory
-	// TODO: MkdirAll is needed?
-	err := os.MkdirAll(destinationDirectory, os.ModePerm)
-	if err != nil {
-		return err
-	}
 	destinationFileDetails, err := getFilteredFileDetailsMapFromDirectoryTree(destinationDirectory, filesAndDirectories)
 	if err != nil {
 		return err
