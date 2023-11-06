@@ -86,7 +86,9 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 		} else if isDir && !ok {
 // 			err = os.Mkdir(destinationFilePath, fileInfo.Mode())
 // 		}
-// 		// TODO: when ok, remove from destinationFileDetails
+// 		if ok {
+// 			delete(destinationFileDetails, destinationFilePath)
+// 		}
 // 		return err
 // 	})
 // 	if err != nil {
