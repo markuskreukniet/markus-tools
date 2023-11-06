@@ -81,7 +81,7 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 		}
 // 		isDir := fileInfo.IsDir()
 // 		value, ok := destinationFileDetails[destinationFilePath]
-// 		if !isDir && (!ok || (ok && fileInfo.ModTime().After(value.ModificationTime))) {
+// 		if !isDir && (!ok || fileInfo.ModTime().After(value.ModificationTime)) {
 // 			err = copyFileWithFileMode(sourceFilePath, destinationFilePath, fileInfo.Mode())
 // 		} else if isDir && !ok {
 // 			err = os.Mkdir(destinationFilePath, fileInfo.Mode())
@@ -95,11 +95,12 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 		return err
 // 	}
 // 	for key, value := range destinationFileDetails {
-// 		sourceFilePath, err := joinOutputBasePathWithRelativeInputPath(destinationDirectory, key, sourceDirectory)
-// 		if err != nil {
-// 			return err
+// 		isDirectory := value.IsDirectory
+// 		if !isDirectory {
+// 			// remove file
+// 		} else {
+// 			// remove folder
 // 		}
-// 		// TODO: sourceFilePath exists
 // 	}
 // 	return err
 // }
