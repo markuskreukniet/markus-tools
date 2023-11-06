@@ -2,12 +2,14 @@ package internal
 
 import (
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"time"
 )
 
 // TODO: FileDetailMapValue should be part of FileDetail
+// TODO: FileDetail and FileDetailMapValue have maybe unused fields
 type FileDetail struct {
 	Path             string
 	ModificationTime time.Time
@@ -80,9 +82,9 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 		isDir := fileInfo.IsDir()
 // 		value, ok := destinationFileDetails[destinationFilePath]
 // 		if !isDir && (!ok || (ok && fileInfo.ModTime().After(value.ModificationTime))) {
-// 			err = copyFileWithFileMode(sourceFilePath, destinationFilePath)
+// 			err = copyFileWithFileMode(sourceFilePath, destinationFilePath, fileInfo.Mode())
 // 		} else if isDir && !ok {
-// 			// make directory
+// 			err = os.Mkdir(destinationFilePath, fileInfo.Mode())
 // 		}
 // 		return err
 // 	})
@@ -90,7 +92,7 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // }
 
 // TODO: comment about buffering
-func copyFileWithFileMode(sourceFilePath, destinationFilePath string) error {
+func copyFileWithFileMode(sourceFilePath string, destinationFilePath string, fileMode fs.FileMode) error {
 	sourceFile, err := os.Open(sourceFilePath)
 	if err != nil {
 		return err
@@ -105,11 +107,7 @@ func copyFileWithFileMode(sourceFilePath, destinationFilePath string) error {
 	if err != nil {
 		return err
 	}
-	fileInfo, err := os.Stat(sourceFilePath)
-	if err != nil {
-		return err
-	}
-	return os.Chmod(destinationFilePath, fileInfo.Mode())
+	return os.Chmod(destinationFilePath, fileMode)
 }
 
 func getFilteredFileDetailsMapFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) (map[string]FileDetailMapValue, error) {
