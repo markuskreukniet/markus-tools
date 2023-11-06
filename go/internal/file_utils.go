@@ -10,6 +10,7 @@ import (
 
 // TODO: FileDetailMapValue should be part of FileDetail
 // TODO: FileDetail and FileDetailMapValue have maybe unused fields
+// TODO: add new struct for synchronizeDirectoryTrees to use less memory
 type FileDetail struct {
 	Path             string
 	ModificationTime time.Time
@@ -60,50 +61,48 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // }
 
 // WIP
-// func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) error {
-// 	// TODO: destinationDirectory should get same permission as sourceDirectory
-// 	// TODO: MkdirAll is needed?
-// 	err := os.MkdirAll(destinationDirectory, os.ModePerm)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	destinationFileDetails, err := getFilteredFileDetailsMapFromDirectoryTree(destinationDirectory, filesAndDirectories)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	err = filepath.Walk(sourceDirectory, func(sourceFilePath string, fileInfo os.FileInfo, err error) error {
-// 		if err != nil {
-// 			return err
-// 		}
-// 		destinationFilePath, err := joinOutputBasePathWithRelativeInputPath(sourceDirectory, sourceFilePath, destinationDirectory)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		isDir := fileInfo.IsDir()
-// 		value, ok := destinationFileDetails[destinationFilePath]
-// 		if !isDir && (!ok || fileInfo.ModTime().After(value.ModificationTime)) {
-// 			err = copyFileWithFileMode(sourceFilePath, destinationFilePath, fileInfo.Mode())
-// 		} else if isDir && !ok {
-// 			err = os.Mkdir(destinationFilePath, fileInfo.Mode())
-// 		}
-// 		if ok {
-// 			delete(destinationFileDetails, destinationFilePath)
-// 		}
-// 		return err
-// 	})
-// 	if err != nil {
-// 		return err
-// 	}
-// 	for key, value := range destinationFileDetails {
-// 		isDirectory := value.IsDirectory
-// 		if !isDirectory {
-// 			// remove file
-// 		} else {
-// 			// remove folder
-// 		}
-// 	}
-// 	return err
-// }
+func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) error {
+	// TODO: destinationDirectory should get same permission as sourceDirectory
+	// TODO: MkdirAll is needed?
+	err := os.MkdirAll(destinationDirectory, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	destinationFileDetails, err := getFilteredFileDetailsMapFromDirectoryTree(destinationDirectory, filesAndDirectories)
+	if err != nil {
+		return err
+	}
+	err = filepath.Walk(sourceDirectory, func(sourceFilePath string, fileInfo os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		destinationFilePath, err := joinOutputBasePathWithRelativeInputPath(sourceDirectory, sourceFilePath, destinationDirectory)
+		if err != nil {
+			return err
+		}
+		isDir := fileInfo.IsDir()
+		value, ok := destinationFileDetails[destinationFilePath]
+		if !isDir && (!ok || fileInfo.ModTime().After(value.ModificationTime)) {
+			err = copyFileWithFileMode(sourceFilePath, destinationFilePath, fileInfo.Mode())
+		} else if isDir && !ok {
+			err = os.Mkdir(destinationFilePath, fileInfo.Mode())
+		}
+		if ok {
+			delete(destinationFileDetails, destinationFilePath)
+		}
+		return err
+	})
+	if err != nil {
+		return err
+	}
+	for key, _ := range destinationFileDetails {
+		err := os.RemoveAll(key)
+		if err != nil && !os.IsNotExist(err) {
+			return err
+		}
+	}
+	return err
+}
 
 // TODO: comment about buffering
 func copyFileWithFileMode(sourceFilePath string, destinationFilePath string, fileMode fs.FileMode) error {
