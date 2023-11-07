@@ -278,7 +278,7 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	const outputBasePath string = "/home/user/destination"
 	const joinedOutputBasePathWithRelativeInputPath string = "/home/user/destination/directory/file.txt"
 
-	tests := []struct {
+	testCases := []struct {
 		name           string
 		inputBasePath  string
 		inputFullPath  string
@@ -311,7 +311,7 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 			wantErr:        true,
 		},
 		{
-			name:           "Equivalent input paths",
+			name:           "Equivalent Input Paths",
 			inputBasePath:  inputBasePath,
 			inputFullPath:  inputBasePath,
 			outputBasePath: outputBasePath,
@@ -320,14 +320,14 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			result, err := joinOutputBasePathWithRelativeInputPath(test.inputBasePath, test.inputFullPath, test.outputBasePath)
-			if (err != nil) != test.wantErr {
-				t.Fatalf("want error: %v, got %v", test.wantErr, err)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			result, err := joinOutputBasePathWithRelativeInputPath(tc.inputBasePath, tc.inputFullPath, tc.outputBasePath)
+			if (err != nil) != tc.wantErr {
+				t.Fatalf("want error: %v, got %v", tc.wantErr, err)
 			}
-			if err == nil && result != test.want {
-				t.Fatalf("want: %s, got %s", test.want, result)
+			if err == nil && result != tc.want {
+				t.Fatalf("want: %s, got %s", tc.want, result)
 			}
 		})
 	}
