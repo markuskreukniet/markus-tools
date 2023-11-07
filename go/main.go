@@ -6,23 +6,20 @@ import (
 	"os"
 )
 
-type MyData struct {
-	SourceDirectoryFilePath      string `json:"sourceDirectoryFilePath"`
-	DestinationDirectoryFilePath string `json:"destinationDirectoryFilePath"`
+type synchronizeDirectoryTreesArguments struct {
+	SourceDirectory      string `json:"sourceDirectory"`
+	DestinationDirectory string `json:"destinationDirectory"`
 }
 
 func main() {
 	if len(os.Args) > 1 {
-		jsonData := os.Args[1]
-
-		// Parse the JSON data into the MyData struct
-		var data MyData
-		if err := json.Unmarshal([]byte(jsonData), &data); err != nil {
+		jsonString := os.Args[1]
+		var arguments synchronizeDirectoryTreesArguments
+		if err := json.Unmarshal([]byte(jsonString), &arguments); err != nil {
 			fmt.Printf("Error parsing JSON: %s\n", err)
 			return
 		}
-
-		fmt.Printf("Received message: %s\n", data.SourceDirectoryFilePath)
+		fmt.Printf("Received message: %s\n", arguments.SourceDirectory)
 	} else {
 		fmt.Println("No message received.")
 	}
