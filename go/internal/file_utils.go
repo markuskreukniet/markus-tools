@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"encoding/json"
 	"io"
 	"io/fs"
 	"os"
@@ -51,6 +52,18 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 		// read files from directory
 // 	}
 // }
+
+func synchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory string) string {
+	err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
+	if err == nil {
+		return `""`
+	}
+	jsonBytes, err := json.Marshal(err.Error())
+	if err != nil {
+		return `"json.Marshal error"`
+	}
+	return string(jsonBytes)
+}
 
 func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) error {
 	destinationFilePathModificationTimeMap, err := getFilteredFilePathModificationTimeMapFromDirectoryTree(destinationDirectory, filesAndDirectories)
