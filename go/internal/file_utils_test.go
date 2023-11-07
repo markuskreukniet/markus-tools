@@ -43,12 +43,21 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 				"file1.txt": 0666,
 				"dir":       0755 | fs.ModeDir,
 			},
+			destStruct:    map[string]fs.FileMode{},
+			expectedError: false,
+		},
+		{
+			name: "Simple sync 2",
+			sourceStruct: map[string]fs.FileMode{
+				"file1.txt": 0666,
+				"dir":       0755 | fs.ModeDir,
+			},
 			destStruct: map[string]fs.FileMode{
-				// Initially empty
+				"file2.txt": 0666,
+				"dir2":      0755 | fs.ModeDir,
 			},
 			expectedError: false,
 		},
-		// Add more test cases here
 	}
 
 	for _, tc := range testCases {
@@ -75,8 +84,35 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 				t.Errorf("synchronizeDirectoryTrees() error = %v, expectedError %v", err, tc.expectedError)
 			}
 
-			// Add more checks here to verify the state of destDir
-			// For example, check if the destination directory has the expected files and directories
+			// Check if the destination directory has the expected files and directories
+			err = filepath.Walk(destDir, func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+
+				relPath, err := filepath.Rel(destDir, path)
+				if err != nil {
+					return err
+				}
+
+				// Skip the root of the destination directory
+				if relPath == "." {
+					return nil
+				}
+
+				srcPath := filepath.Join(sourceDir, relPath)
+				if _, err := os.Stat(srcPath); os.IsNotExist(err) {
+					t.Errorf("Extra file or directory in destination: %s", relPath)
+				}
+
+				return nil
+			})
+			if err != nil {
+				t.Errorf("Error walking through destination directory: %v", err)
+			}
+
+			// Optionally, check file contents and other properties
+			// ...
 
 			if err := os.RemoveAll(sourceDir); err != nil {
 				t.Fatalf("Failed to remove source directory: %v", err)
