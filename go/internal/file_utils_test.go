@@ -1,12 +1,92 @@
 package internal
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 	"sort"
 	"testing"
 	"time"
 )
+
+// WIP
+func createTestDirectoryStructure(basePath string, structure map[string]fs.FileMode) error {
+	for path, mode := range structure {
+		fullPath := filepath.Join(basePath, path)
+		if mode.IsDir() {
+			if err := os.MkdirAll(fullPath, mode); err != nil {
+				return err
+			}
+		} else {
+			file, err := os.Create(fullPath)
+			if err != nil {
+				return err
+			}
+			file.Close()
+			os.Chmod(fullPath, mode)
+		}
+	}
+	return nil
+}
+
+// WIP
+func TestSynchronizeDirectoryTrees(t *testing.T) {
+	testCases := []struct {
+		name          string
+		sourceStruct  map[string]fs.FileMode
+		destStruct    map[string]fs.FileMode
+		expectedError bool
+	}{
+		{
+			name: "Simple sync",
+			sourceStruct: map[string]fs.FileMode{
+				"file1.txt": 0666,
+				"dir":       0755 | fs.ModeDir,
+			},
+			destStruct: map[string]fs.FileMode{
+				// Initially empty
+			},
+			expectedError: false,
+		},
+		// Add more test cases here
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			sourceDir, err := os.MkdirTemp("", "source")
+			if err != nil {
+				t.Fatalf("Failed to create temporary source directory: %v", err)
+			}
+			destDir, err := os.MkdirTemp("", "dest")
+			if err != nil {
+				t.Fatalf("Failed to create temporary destination directory: %v", err)
+			}
+
+			if err := createTestDirectoryStructure(sourceDir, tc.sourceStruct); err != nil {
+				t.Fatalf("Failed to create source directory structure: %v", err)
+			}
+			if err := createTestDirectoryStructure(destDir, tc.destStruct); err != nil {
+				t.Fatalf("Failed to create destination directory structure: %v", err)
+			}
+
+			err = synchronizeDirectoryTrees(sourceDir, destDir)
+
+			if (err != nil) != tc.expectedError {
+				t.Errorf("synchronizeDirectoryTrees() error = %v, expectedError %v", err, tc.expectedError)
+			}
+
+			// Add more checks here to verify the state of destDir
+			// For example, check if the destination directory has the expected files and directories
+
+			if err := os.RemoveAll(sourceDir); err != nil {
+				t.Fatalf("Failed to remove source directory: %v", err)
+			}
+			if err := os.RemoveAll(destDir); err != nil {
+				t.Fatalf("Failed to remove destination directory: %v", err)
+			}
+		})
+	}
+}
 
 func fatalLogIfError(t *testing.T, err error) {
 	t.Helper()
