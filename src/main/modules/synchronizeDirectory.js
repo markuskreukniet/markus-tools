@@ -125,15 +125,18 @@ export default async function synchronizeDirectory(
 // Go test code
 // const { exec } = require('child_process')
 
-// const message = 'have fun' // Your message
-// const goProcess = exec(`go run ./go/main.go "${message}"`, (error, stdout) => {
-//   if (error) {
-//     console.error(`Error executing Go program: ${error}`)
-//     return
-//   }
-//   console.log(`Go program output: ${stdout}`)
-// })
+//   const jsonArguments = JSON.stringify({
+//     sourceDirectoryFilePath,
+//     destinationDirectoryFilePath
+//   }).replace(/"/g, '\\"')
+//   const goProcess = exec(`go run ./go/main.go "${jsonArguments}"`, (error, stdout) => {
+//     if (error) {
+//       console.error(`Error executing Go program: ${error}`)
+//       return
+//     }
+//     console.log(`Go program output: ${stdout}`)
+//   })
 
-// goProcess.on('close', (code) => {
-//   console.log(`Go program exited with code ${code}`)
-// })
+//   goProcess.on('close', (code) => {
+//     console.log(`Go program exited with code ${code}`)
+//   })
