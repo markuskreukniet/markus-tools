@@ -8,17 +8,9 @@ import (
 	"time"
 )
 
-// TODO: FileDetailMapValue should be part of FileDetail
-// TODO: FileDetail and FileDetailMapValue have maybe unused fields
-// TODO: add new struct for synchronizeDirectoryTrees to use less memory
+// TODO: FileDetail has maybe unused fields
 type FileDetail struct {
 	Path             string
-	ModificationTime time.Time
-	Size             int64
-	IsDirectory      bool
-}
-
-type FileDetailMapValue struct {
 	ModificationTime time.Time
 	Size             int64
 	IsDirectory      bool
@@ -61,7 +53,7 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // }
 
 func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) error {
-	destinationFileDetails, err := getFilteredFileDetailsMapFromDirectoryTree(destinationDirectory, filesAndDirectories)
+	destinationFilePathModificationTimeMap, err := getFilteredFilePathModificationTimeMapFromDirectoryTree(destinationDirectory, filesAndDirectories)
 	if err != nil {
 		return err
 	}
@@ -74,21 +66,21 @@ func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) err
 			return err
 		}
 		isDir := fileInfo.IsDir()
-		value, ok := destinationFileDetails[destinationFilePath]
-		if !isDir && (!ok || fileInfo.ModTime().After(value.ModificationTime)) {
+		value, ok := destinationFilePathModificationTimeMap[destinationFilePath]
+		if !isDir && (!ok || fileInfo.ModTime().After(value)) {
 			err = copyFileWithFileMode(sourceFilePath, destinationFilePath, fileInfo.Mode())
 		} else if isDir && !ok {
 			err = os.Mkdir(destinationFilePath, fileInfo.Mode())
 		}
 		if ok {
-			delete(destinationFileDetails, destinationFilePath)
+			delete(destinationFilePathModificationTimeMap, destinationFilePath)
 		}
 		return err
 	})
 	if err != nil {
 		return err
 	}
-	for key, _ := range destinationFileDetails {
+	for key, _ := range destinationFilePathModificationTimeMap {
 		err := os.RemoveAll(key)
 		if err != nil && !os.IsNotExist(err) {
 			return err
@@ -118,16 +110,12 @@ func copyFileWithFileMode(sourceFilePath string, destinationFilePath string, fil
 	return os.Chmod(destinationFilePath, fileMode)
 }
 
-func getFilteredFileDetailsMapFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) (map[string]FileDetailMapValue, error) {
-	fileInfos := make(map[string]FileDetailMapValue)
+func getFilteredFilePathModificationTimeMapFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) (map[string]time.Time, error) {
+	filePathModificationTimeMap := make(map[string]time.Time)
 	err := walkFileDetails(rootFilePath, fileFilterMode, func(fileDetail FileDetail) {
-		fileInfos[fileDetail.Path] = FileDetailMapValue{
-			ModificationTime: fileDetail.ModificationTime,
-			Size:             fileDetail.Size,
-			IsDirectory:      fileDetail.IsDirectory,
-		}
+		filePathModificationTimeMap[fileDetail.Path] = fileDetail.ModificationTime
 	})
-	return fileInfos, err
+	return filePathModificationTimeMap, err
 }
 
 func getFilteredFileDetailsSliceFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) ([]FileDetail, error) {
