@@ -80,7 +80,7 @@ func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) err
 	if err != nil {
 		return err
 	}
-	for key, _ := range destinationFilePathModificationTimeMap {
+	for key := range destinationFilePathModificationTimeMap {
 		err := os.RemoveAll(key)
 		if err != nil && !os.IsNotExist(err) {
 			return err
