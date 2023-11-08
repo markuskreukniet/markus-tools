@@ -53,8 +53,17 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 	}
 // }
 
-func EscapedStringToJSON(escapedString string) string {
+// TODO: func useless?
+func escapedStringToJSON(escapedString string) string {
 	return `"` + escapedString + `"`
+}
+
+func JSONMarshalWithFallbackJSONError(nonJSON string) string {
+	jsonBytes, err := json.Marshal(nonJSON)
+	if err != nil {
+		return escapedStringToJSON("json.Marshal error")
+	}
+	return string(jsonBytes)
 }
 
 func SynchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory string) string {
@@ -62,11 +71,7 @@ func SynchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory strin
 	if err == nil {
 		return `""`
 	}
-	jsonBytes, err := json.Marshal(err.Error())
-	if err != nil {
-		return EscapedStringToJSON("json.Marshal error")
-	}
-	return string(jsonBytes)
+	return JSONMarshalWithFallbackJSONError(err.Error())
 }
 
 func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) error {
