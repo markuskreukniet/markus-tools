@@ -18,8 +18,7 @@ func main() {
 		if err := json.Unmarshal([]byte(os.Args[1]), &arguments); err != nil {
 			result = jsonMarshalWithFallbackJSONError(err.Error())
 		} else {
-			result = arguments.SourceDirectory + " test"
-			// result = internal.SynchronizeDirectoryTreesToJSON(arguments.SourceDirectory, arguments.DestinationDirectory)
+			result = synchronizeDirectoryTreesToJSON(arguments.SourceDirectory, arguments.DestinationDirectory)
 		}
 	}
 	fmt.Print(result)

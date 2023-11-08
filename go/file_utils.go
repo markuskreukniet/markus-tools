@@ -66,7 +66,7 @@ func jsonMarshalWithFallbackJSONError(nonJSON string) string {
 	return string(jsonBytes)
 }
 
-func SynchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory string) string {
+func synchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory string) string {
 	err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
 	if err == nil {
 		return `""`
