@@ -1,4 +1,4 @@
-package internal
+package main
 
 import (
 	"encoding/json"
@@ -58,7 +58,7 @@ func escapedStringToJSON(escapedString string) string {
 	return `"` + escapedString + `"`
 }
 
-func JSONMarshalWithFallbackJSONError(nonJSON string) string {
+func jsonMarshalWithFallbackJSONError(nonJSON string) string {
 	jsonBytes, err := json.Marshal(nonJSON)
 	if err != nil {
 		return escapedStringToJSON("json.Marshal error")
@@ -71,7 +71,7 @@ func SynchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory strin
 	if err == nil {
 		return `""`
 	}
-	return JSONMarshalWithFallbackJSONError(err.Error())
+	return jsonMarshalWithFallbackJSONError(err.Error())
 }
 
 func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) error {

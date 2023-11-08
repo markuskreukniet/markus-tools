@@ -12,15 +12,15 @@ type synchronizeDirectoryTreesArguments struct {
 }
 
 func main() {
+	var result = jsonMarshalWithFallbackJSONError("os.Args did not receive at least two arguments")
 	if len(os.Args) > 1 {
-		jsonString := os.Args[1]
 		var arguments synchronizeDirectoryTreesArguments
-		if err := json.Unmarshal([]byte(jsonString), &arguments); err != nil {
-			fmt.Printf("Error parsing JSON: %s\n", err)
-			return
+		if err := json.Unmarshal([]byte(os.Args[1]), &arguments); err != nil {
+			result = jsonMarshalWithFallbackJSONError(err.Error())
+		} else {
+			result = arguments.SourceDirectory + " test"
+			// result = internal.SynchronizeDirectoryTreesToJSON(arguments.SourceDirectory, arguments.DestinationDirectory)
 		}
-		fmt.Printf("Received message: %s\n", arguments.SourceDirectory)
-	} else {
-		fmt.Println("No message received.")
 	}
+	fmt.Print(result)
 }
