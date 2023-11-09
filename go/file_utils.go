@@ -75,7 +75,7 @@ func synchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory strin
 }
 
 func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) error {
-	destinationFilePathModificationTimeMap, err := getFilteredFilePathModificationTimeMapFromDirectoryTree(destinationDirectory, filesAndDirectories)
+	destinationFilePathModificationTimeMap, err := getFilePathModificationTimeMapFromDirectoryTree(destinationDirectory)
 	if err != nil {
 		return err
 	}
@@ -132,14 +132,15 @@ func copyFileWithFileMode(sourceFilePath string, destinationFilePath string, fil
 	return os.Chmod(destinationFilePath, fileMode)
 }
 
-func getFilteredFilePathModificationTimeMapFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) (map[string]time.Time, error) {
+func getFilePathModificationTimeMapFromDirectoryTree(rootFilePath string) (map[string]time.Time, error) {
 	filePathModificationTimeMap := make(map[string]time.Time)
-	err := walkFileDetails(rootFilePath, fileFilterMode, func(fileDetail FileDetail) {
+	err := walkFileDetails(rootFilePath, filesAndDirectories, func(fileDetail FileDetail) {
 		filePathModificationTimeMap[fileDetail.Path] = fileDetail.ModificationTime
 	})
 	return filePathModificationTimeMap, err
 }
 
+// TODO: not used, but does get tested
 func getFilteredFileDetailsSliceFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) ([]FileDetail, error) {
 	var fileDetails []FileDetail
 	err := walkFileDetails(rootFilePath, fileFilterMode, func(fileDetail FileDetail) {
