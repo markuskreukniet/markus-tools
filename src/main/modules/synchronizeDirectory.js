@@ -130,7 +130,7 @@ export default async function synchronizeDirectory(
 //   destinationDirectory
 // }).replace(/"/g, '\\"')
 // const goProcess = exec(
-//   `go run ./go/main.go ./go/file_utils.go "${jsonArguments}"`,
+//   `go run ./go/main.go ./go/file_utils.go ./go/synchronize_directory_trees.go "${jsonArguments}"`,
 //   (error, stdout) => {
 //     if (error) {
 //       console.error(`Error executing Go program: ${error}`)

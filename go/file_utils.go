@@ -66,51 +66,6 @@ func jsonMarshalWithFallbackJSONError(nonJSON string) string {
 	return string(jsonBytes)
 }
 
-func synchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory string) string {
-	err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
-	if err == nil {
-		return `""`
-	}
-	return jsonMarshalWithFallbackJSONError(err.Error())
-}
-
-func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) error {
-	destinationFilePathModificationTimeMap, err := getFilePathModificationTimeMapFromDirectoryTree(destinationDirectory)
-	if err != nil {
-		return err
-	}
-	err = filepath.Walk(sourceDirectory, func(sourceFilePath string, fileInfo os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		destinationFilePath, err := joinOutputBasePathWithRelativeInputPath(sourceDirectory, sourceFilePath, destinationDirectory)
-		if err != nil {
-			return err
-		}
-		isDir := fileInfo.IsDir()
-		value, ok := destinationFilePathModificationTimeMap[destinationFilePath]
-		if !isDir && (!ok || fileInfo.ModTime().After(value)) {
-			err = copyFileWithFileMode(sourceFilePath, destinationFilePath, fileInfo.Mode())
-		} else if isDir && !ok {
-			err = os.Mkdir(destinationFilePath, fileInfo.Mode())
-		}
-		if ok {
-			delete(destinationFilePathModificationTimeMap, destinationFilePath)
-		}
-		return err
-	})
-	if err != nil {
-		return err
-	}
-	for key := range destinationFilePathModificationTimeMap {
-		err := os.RemoveAll(key)
-		if err != nil && !os.IsNotExist(err) {
-			return err
-		}
-	}
-	return err
-}
-
 // Copying files in this function could be faster with buffering.
 // However, to determine an optimal buffer size for copying a file, we need to know the block size of the storage device.
 // Determining such block sizes is relatively hard with only official Go packages.
