@@ -7,14 +7,14 @@ type FileSystemNode struct {
 	IsDirectory bool
 }
 
-type FileMetadata struct {
+type FileIdentifier struct {
 	ModificationTime time.Time
 	Size             int64
 	Hash             string
 }
 
 // func duplicateFiles(uniqueFileSystemNodes []FileSystemNode) {
-// 	var filesMetadata []FileMetadata
+// 	var FileIdentifiers []FileIdentifier
 // 	for _, value := range uniqueFileSystemNodes {
 // 		if !value.IsDirectory {
 // 			//
