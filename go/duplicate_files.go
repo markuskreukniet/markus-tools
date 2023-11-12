@@ -1,6 +1,12 @@
 package main
 
-import "sort"
+import (
+	"crypto/sha256"
+	"encoding/hex"
+	"io"
+	"os"
+	"sort"
+)
 
 type FileSystemNode struct {
 	Path        string
@@ -19,6 +25,19 @@ func appendFileIdentifier(fileIdentifiers *[]FileIdentifier, fileDetail FileDeta
 		Size: fileDetail.Size,
 		Hash: "",
 	})
+}
+
+func getFileHash(filePath string) (string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+	hashGenerator := sha256.New()
+	if _, err := io.Copy(hashGenerator, file); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(hashGenerator.Sum(nil)), nil
 }
 
 func duplicateFilesString(uniqueFileSystemNodes []FileSystemNode) (string, error) {
@@ -46,13 +65,13 @@ func duplicateFilesString(uniqueFileSystemNodes []FileSystemNode) (string, error
 	})
 	var duplicates []FileIdentifier
 	var lastAppendedIndex = -1
-	for i := 1; i < len(fileIdentifiers); i++ {
-		previousFileIdentifier := fileIdentifiers[i-1]
-		currentFileIdentifier := fileIdentifiers[i]
-		if previousFileIdentifier.Size == currentFileIdentifier.Size {
+	// for i := 1; i < len(fileIdentifiers); i++ {
+	// 	previousFileIdentifier := fileIdentifiers[i-1]
+	// 	currentFileIdentifier := fileIdentifiers[i]
+	// 	if previousFileIdentifier.Size == currentFileIdentifier.Size {
 
-		}
-	}
+	// 	}
+	// }
 	//
 	return "", nil
 }
