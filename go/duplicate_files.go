@@ -45,6 +45,14 @@ func duplicateFilesString(uniqueFileSystemNodes []FileSystemNode) (string, error
 		return fileIdentifiers[i].Size < fileIdentifiers[j].Size
 	})
 	var duplicates []FileIdentifier
+	var lastAppendedIndex = -1
+	for i := 1; i < len(fileIdentifiers); i++ {
+		previousFileIdentifier := fileIdentifiers[i-1]
+		currentFileIdentifier := fileIdentifiers[i]
+		if previousFileIdentifier.Size == currentFileIdentifier.Size {
+
+		}
+	}
 	//
 	return "", nil
 }
