@@ -66,12 +66,27 @@ func duplicateFilesString(uniqueFileSystemNodes []FileSystemNode) (string, error
 	var duplicates []FileIdentifier
 	var lastAppendedIndex = -1
 	// for i := 1; i < len(fileIdentifiers); i++ {
-	// 	previousFileIdentifier := fileIdentifiers[i-1]
-	// 	currentFileIdentifier := fileIdentifiers[i]
+	// 	previousFileIdentifier := fileIdentifiers[i-1] // not needed
+	// 	currentFileIdentifier := fileIdentifiers[i]    // not needed
 	// 	if previousFileIdentifier.Size == currentFileIdentifier.Size {
+	// 		var err error
+	// 		if previousFileIdentifier.Hash == "" {
+	// 			previousFileIdentifier.Hash, err = getFileHash(previousFileIdentifier.Path)
+	// 			if err != nil {
+	// 				return "", err
+	// 			}
+	// 		}
+	// 		currentFileIdentifier.Hash, err = getFileHash(currentFileIdentifier.Path)
+	// 		if err != nil {
+	// 			return "", err
+	// 		}
+	// 		if previousFileIdentifier.Hash == currentFileIdentifier.Hash {
+	// 			if lastAppendedIndex != i-1 {
 
+	// 			}
+	// 		}
 	// 	}
 	// }
-	//
+
 	return "", nil
 }
