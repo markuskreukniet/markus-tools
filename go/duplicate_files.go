@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"sort"
+	"strings"
 )
 
 type FileSystemNode struct {
@@ -55,20 +56,34 @@ func getFileHash(filePath string) (string, error) {
 	return hex.EncodeToString(hashGenerator.Sum(nil)), nil
 }
 
-// TODO:
-func duplicateFilesToNewlineSeparatedString(duplicateFiles []DuplicateFile) string {
+// TODO: result.WriteString(newLine) with "\n" to new function?
+func duplicateFilesToNewlineSeparatedString(duplicateFiles []DuplicateFile) (string, error) {
 	if len(duplicateFiles) == 0 {
-		return ""
+		return "", nil
 	}
-	result := duplicateFiles[0].Path
+	newLine := "\n"
+	var result strings.Builder
+	_, err := result.WriteString(duplicateFiles[0].Path)
+	if err != nil {
+		return "", err
+	}
 	for i := 1; i < len(duplicateFiles); i++ {
-		newlinePart := "\n"
-		if duplicateFiles[i].Hash != duplicateFiles[i-1].Hash {
-			newlinePart = "\n\n"
+		_, err = result.WriteString(newLine)
+		if err != nil {
+			return "", err
 		}
-		result += newlinePart + duplicateFiles[i].Path
+		if duplicateFiles[i].Hash != duplicateFiles[i-1].Hash {
+			_, err = result.WriteString(newLine)
+			if err != nil {
+				return "", err
+			}
+		}
+		_, err = result.WriteString(duplicateFiles[i].Path)
+		if err != nil {
+			return "", err
+		}
 	}
-	return result
+	return result.String(), nil
 }
 
 func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []FileSystemNode) (string, error) {
@@ -121,5 +136,9 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []FileSyste
 			}
 		}
 	}
-	return duplicateFilesToNewlineSeparatedString(duplicateFiles), nil
+	newlineSeparatedString, err := duplicateFilesToNewlineSeparatedString(duplicateFiles)
+	if err != nil {
+		return "", err
+	}
+	return newlineSeparatedString, nil
 }
