@@ -45,6 +45,9 @@ func getFileHash(filePath string) (string, error) {
 		return "", err
 	}
 	defer file.Close()
+
+	// sha256 is generally faster and more secure than SHA1
+	// SHA1 is generally faster and more secure than MD5
 	hashGenerator := sha256.New()
 	if _, err := io.Copy(hashGenerator, file); err != nil {
 		return "", err
