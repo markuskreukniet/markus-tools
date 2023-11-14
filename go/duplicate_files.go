@@ -56,7 +56,15 @@ func getFileHash(filePath string) (string, error) {
 	return hex.EncodeToString(hashGenerator.Sum(nil)), nil
 }
 
-// TODO: result.WriteString(newLine) with "\n" to new function?
+func writeNewlineString(builder *strings.Builder) (int, error) {
+	bytesWritten, err := builder.WriteString("\n")
+	if err != nil {
+		return bytesWritten, err
+	}
+	return bytesWritten, nil
+}
+
+// TODO: use writeNewlineString and cleanup
 func duplicateFilesToNewlineSeparatedString(duplicateFiles []DuplicateFile) (string, error) {
 	if len(duplicateFiles) == 0 {
 		return "", nil
