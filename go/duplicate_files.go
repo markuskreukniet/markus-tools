@@ -52,7 +52,12 @@ func getFileHash(filePath string) (string, error) {
 	return hex.EncodeToString(hashGenerator.Sum(nil)), nil
 }
 
-func duplicateFilesString(uniqueFileSystemNodes []FileSystemNode) (string, error) {
+func duplicateFilesToNewlineSeparatedString(duplicateFiles []DuplicateFile) string {
+	// TODO:
+	return ""
+}
+
+func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []FileSystemNode) (string, error) {
 	var fileIdentifiers []FileIdentifier
 	for _, value := range uniqueFileSystemNodes {
 		if !value.IsDirectory {
@@ -79,8 +84,8 @@ func duplicateFilesString(uniqueFileSystemNodes []FileSystemNode) (string, error
 	var lastAppendedIndex = -1
 	for i := 1; i < len(fileIdentifiers); i++ {
 		previousIndex := i - 1
-		previousFileIdentifier := fileIdentifiers[previousIndex] // not needed
-		currentFileIdentifier := fileIdentifiers[i]              // not needed
+		previousFileIdentifier := fileIdentifiers[previousIndex] // TODO: not needed
+		currentFileIdentifier := fileIdentifiers[i]              // TODO: not needed
 		if previousFileIdentifier.Size == currentFileIdentifier.Size {
 			var err error
 			if previousFileIdentifier.Hash == "" {
@@ -102,6 +107,5 @@ func duplicateFilesString(uniqueFileSystemNodes []FileSystemNode) (string, error
 			}
 		}
 	}
-
-	return "", nil
+	return duplicateFilesToNewlineSeparatedString(duplicateFiles), nil
 }
