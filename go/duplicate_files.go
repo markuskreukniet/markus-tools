@@ -19,11 +19,24 @@ type FileIdentifier struct {
 	Hash string
 }
 
+type DuplicateFile struct {
+	Path string
+	Hash string
+}
+
+// TODO: is pointer a good option?
 func appendFileIdentifier(fileIdentifiers *[]FileIdentifier, fileDetail FileDetail) []FileIdentifier {
 	return append(*fileIdentifiers, FileIdentifier{
 		Path: fileDetail.Path,
 		Size: fileDetail.Size,
 		Hash: "",
+	})
+}
+
+func appendDuplicateFile(duplicateFiles *[]DuplicateFile, fileIdentifier FileIdentifier) []DuplicateFile {
+	return append(*duplicateFiles, DuplicateFile{
+		Path: fileIdentifier.Path,
+		Hash: fileIdentifier.Hash,
 	})
 }
 
@@ -63,30 +76,31 @@ func duplicateFilesString(uniqueFileSystemNodes []FileSystemNode) (string, error
 	sort.Slice(fileIdentifiers, func(i, j int) bool {
 		return fileIdentifiers[i].Size < fileIdentifiers[j].Size
 	})
-	var duplicates []FileIdentifier
+	var duplicateFiles []DuplicateFile
 	var lastAppendedIndex = -1
-	// for i := 1; i < len(fileIdentifiers); i++ {
-	// 	previousFileIdentifier := fileIdentifiers[i-1] // not needed
-	// 	currentFileIdentifier := fileIdentifiers[i]    // not needed
-	// 	if previousFileIdentifier.Size == currentFileIdentifier.Size {
-	// 		var err error
-	// 		if previousFileIdentifier.Hash == "" {
-	// 			previousFileIdentifier.Hash, err = getFileHash(previousFileIdentifier.Path)
-	// 			if err != nil {
-	// 				return "", err
-	// 			}
-	// 		}
-	// 		currentFileIdentifier.Hash, err = getFileHash(currentFileIdentifier.Path)
-	// 		if err != nil {
-	// 			return "", err
-	// 		}
-	// 		if previousFileIdentifier.Hash == currentFileIdentifier.Hash {
-	// 			if lastAppendedIndex != i-1 {
-
-	// 			}
-	// 		}
-	// 	}
-	// }
+	for i := 1; i < len(fileIdentifiers); i++ {
+		previousIndex := i - 1
+		previousFileIdentifier := fileIdentifiers[previousIndex] // not needed
+		currentFileIdentifier := fileIdentifiers[i]              // not needed
+		if previousFileIdentifier.Size == currentFileIdentifier.Size {
+			var err error
+			if previousFileIdentifier.Hash == "" {
+				previousFileIdentifier.Hash, err = getFileHash(previousFileIdentifier.Path)
+				if err != nil {
+					return "", err
+				}
+			}
+			currentFileIdentifier.Hash, err = getFileHash(currentFileIdentifier.Path)
+			if err != nil {
+				return "", err
+			}
+			if previousFileIdentifier.Hash == currentFileIdentifier.Hash {
+				if lastAppendedIndex != previousIndex {
+					appendDuplicateFile(&duplicateFiles, previousFileIdentifier)
+				}
+			}
+		}
+	}
 
 	return "", nil
 }
