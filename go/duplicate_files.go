@@ -24,17 +24,16 @@ type DuplicateFile struct {
 	Hash string
 }
 
-// TODO: is pointer a good option?
-func appendFileIdentifier(fileIdentifiers *[]FileIdentifier, fileDetail FileDetail) []FileIdentifier {
-	return append(*fileIdentifiers, FileIdentifier{
+func appendFileIdentifier(fileIdentifiers *[]FileIdentifier, fileDetail FileDetail) {
+	*fileIdentifiers = append(*fileIdentifiers, FileIdentifier{
 		Path: fileDetail.Path,
 		Size: fileDetail.Size,
 		Hash: "",
 	})
 }
 
-func appendDuplicateFile(duplicateFiles *[]DuplicateFile, fileIdentifier FileIdentifier) []DuplicateFile {
-	return append(*duplicateFiles, DuplicateFile{
+func appendDuplicateFile(duplicateFiles *[]DuplicateFile, fileIdentifier FileIdentifier) {
+	*duplicateFiles = append(*duplicateFiles, DuplicateFile{
 		Path: fileIdentifier.Path,
 		Hash: fileIdentifier.Hash,
 	})
@@ -98,6 +97,8 @@ func duplicateFilesString(uniqueFileSystemNodes []FileSystemNode) (string, error
 				if lastAppendedIndex != previousIndex {
 					appendDuplicateFile(&duplicateFiles, previousFileIdentifier)
 				}
+				appendDuplicateFile(&duplicateFiles, currentFileIdentifier)
+				lastAppendedIndex = i
 			}
 		}
 	}
