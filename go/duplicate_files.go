@@ -55,12 +55,19 @@ func getFileHash(filePath string) (string, error) {
 	return hex.EncodeToString(hashGenerator.Sum(nil)), nil
 }
 
+// TODO:
 func duplicateFilesToNewlineSeparatedString(duplicateFiles []DuplicateFile) string {
 	if len(duplicateFiles) == 0 {
 		return ""
 	}
 	result := duplicateFiles[0].Path
-	//
+	for i := 1; i < len(duplicateFiles); i++ {
+		newlinePart := "\n"
+		if duplicateFiles[i].Hash != duplicateFiles[i-1].Hash {
+			newlinePart = "\n\n"
+		}
+		result += newlinePart + duplicateFiles[i].Path
+	}
 	return result
 }
 
