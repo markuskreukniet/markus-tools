@@ -56,8 +56,12 @@ func getFileHash(filePath string) (string, error) {
 }
 
 func duplicateFilesToNewlineSeparatedString(duplicateFiles []DuplicateFile) string {
-	// TODO:
-	return ""
+	if len(duplicateFiles) == 0 {
+		return ""
+	}
+	result := duplicateFiles[0].Path
+	//
+	return result
 }
 
 func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []FileSystemNode) (string, error) {
