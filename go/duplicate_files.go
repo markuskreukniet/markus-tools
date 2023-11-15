@@ -64,24 +64,22 @@ func writeNewlineString(builder *strings.Builder) (int, error) {
 	return bytesWritten, nil
 }
 
-// TODO: use writeNewlineString and cleanup
 func duplicateFilesToNewlineSeparatedString(duplicateFiles []DuplicateFile) (string, error) {
 	if len(duplicateFiles) == 0 {
 		return "", nil
 	}
-	newLine := "\n"
 	var result strings.Builder
 	_, err := result.WriteString(duplicateFiles[0].Path)
 	if err != nil {
 		return "", err
 	}
 	for i := 1; i < len(duplicateFiles); i++ {
-		_, err = result.WriteString(newLine)
+		_, err = writeNewlineString(&result)
 		if err != nil {
 			return "", err
 		}
 		if duplicateFiles[i].Hash != duplicateFiles[i-1].Hash {
-			_, err = result.WriteString(newLine)
+			_, err = writeNewlineString(&result)
 			if err != nil {
 				return "", err
 			}
