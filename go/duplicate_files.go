@@ -119,25 +119,23 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []FileSyste
 	var lastAppendedIndex = -1
 	for i := 1; i < len(fileIdentifiers); i++ {
 		previousIndex := i - 1
-		previousFileIdentifier := fileIdentifiers[previousIndex] // TODO: not needed
-		currentFileIdentifier := fileIdentifiers[i]              // TODO: not needed
-		if previousFileIdentifier.Size == currentFileIdentifier.Size {
+		if fileIdentifiers[previousIndex].Size == fileIdentifiers[i].Size {
 			var err error
-			if previousFileIdentifier.Hash == "" {
-				previousFileIdentifier.Hash, err = getFileHash(previousFileIdentifier.Path)
+			if fileIdentifiers[previousIndex].Hash == "" {
+				fileIdentifiers[previousIndex].Hash, err = getFileHash(fileIdentifiers[previousIndex].Path)
 				if err != nil {
 					return "", err
 				}
 			}
-			currentFileIdentifier.Hash, err = getFileHash(currentFileIdentifier.Path)
+			fileIdentifiers[i].Hash, err = getFileHash(fileIdentifiers[i].Path)
 			if err != nil {
 				return "", err
 			}
-			if previousFileIdentifier.Hash == currentFileIdentifier.Hash {
+			if fileIdentifiers[previousIndex].Hash == fileIdentifiers[i].Hash {
 				if lastAppendedIndex != previousIndex {
-					appendDuplicateFile(&duplicateFiles, previousFileIdentifier)
+					appendDuplicateFile(&duplicateFiles, fileIdentifiers[previousIndex])
 				}
-				appendDuplicateFile(&duplicateFiles, currentFileIdentifier)
+				appendDuplicateFile(&duplicateFiles, fileIdentifiers[i])
 				lastAppendedIndex = i
 			}
 		}
