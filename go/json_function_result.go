@@ -10,8 +10,8 @@ type FunctionResult struct {
 func jsonMarshalWithFallbackJSONError(nonJSON string) string {
 	jsonBytes, err := json.Marshal(nonJSON)
 	if err != nil {
-		// TODO: comment
-		return `{"Result": null, "ErrorMessage": "test"}`
+		// This JSON string should match FunctionResult.
+		return `{"Result": null, "ErrorMessage": "json.Marshal error"}`
 	}
 	return string(jsonBytes)
 }
