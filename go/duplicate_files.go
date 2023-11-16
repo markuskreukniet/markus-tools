@@ -115,6 +115,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []FileSyste
 	sort.Slice(fileIdentifiers, func(i, j int) bool {
 		return fileIdentifiers[i].Size < fileIdentifiers[j].Size
 	})
+	// TODO: We can make this function efficient by making from here the newlineSeparatedString, instead of making first the duplicateFiles slice
 	var duplicateFiles []DuplicateFile
 	var lastAppendedIndex = -1
 	for i := 1; i < len(fileIdentifiers); i++ {
