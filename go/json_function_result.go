@@ -7,7 +7,7 @@ type FunctionResult struct {
 	ErrorMessage string
 }
 
-func jsonMarshalWithFallbackJSONError(nonJSON string) string {
+func jsonMarshalWithFallbackJSONError(nonJSON any) string {
 	jsonBytes, err := json.Marshal(nonJSON)
 	if err != nil {
 		// This JSON string should match FunctionResult.

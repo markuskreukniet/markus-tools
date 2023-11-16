@@ -5,13 +5,16 @@ import (
 	"path/filepath"
 )
 
-// TODO: fix this func
 func synchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory string) string {
-	err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
-	if err == nil {
-		return `""`
+	functionResult := FunctionResult{
+		Result:       "",
+		ErrorMessage: "",
 	}
-	return jsonMarshalWithFallbackJSONError(err.Error())
+	err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
+	if err != nil {
+		functionResult.ErrorMessage = err.Error()
+	}
+	return jsonMarshalWithFallbackJSONError(functionResult)
 }
 
 func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) error {
