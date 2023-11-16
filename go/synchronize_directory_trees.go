@@ -6,10 +6,7 @@ import (
 )
 
 func synchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory string) string {
-	functionResult := FunctionResult{
-		Result:       "",
-		ErrorMessage: "",
-	}
+	functionResult := createFunctionResultWithEmptyStringResult()
 	err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
 	if err != nil {
 		functionResult.ErrorMessage = err.Error()

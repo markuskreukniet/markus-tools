@@ -92,6 +92,17 @@ func duplicateFilesToNewlineSeparatedString(duplicateFiles []DuplicateFile) (str
 	return result.String(), nil
 }
 
+func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []FileSystemNode) string {
+	functionResult := createFunctionResultWithEmptyStringResult()
+	newlineSeparatedString, err := getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes)
+	if err == nil {
+		functionResult.Result = newlineSeparatedString
+	} else {
+		functionResult.ErrorMessage = err.Error()
+	}
+	return jsonMarshalWithFallbackJSONError(functionResult)
+}
+
 func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []FileSystemNode) (string, error) {
 	var fileIdentifiers []FileIdentifier
 	for _, value := range uniqueFileSystemNodes {

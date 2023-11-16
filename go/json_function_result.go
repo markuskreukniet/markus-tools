@@ -7,6 +7,13 @@ type FunctionResult struct {
 	ErrorMessage string
 }
 
+func createFunctionResultWithEmptyStringResult() FunctionResult {
+	return FunctionResult{
+		Result:       "",
+		ErrorMessage: "",
+	}
+}
+
 func jsonMarshalWithFallbackJSONError(nonJSON any) string {
 	jsonBytes, err := json.Marshal(nonJSON)
 	if err != nil {
