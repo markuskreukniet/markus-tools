@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 )
 
+// TODO: fix this func
 func synchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory string) string {
 	err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
 	if err == nil {
