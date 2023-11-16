@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"io"
 	"io/fs"
 	"os"
@@ -52,19 +51,6 @@ func getFileDetail(filePath string) (FileDetail, error) {
 // 		// read files from directory
 // 	}
 // }
-
-// TODO: func useless?
-func escapedStringToJSON(escapedString string) string {
-	return `"` + escapedString + `"`
-}
-
-func jsonMarshalWithFallbackJSONError(nonJSON string) string {
-	jsonBytes, err := json.Marshal(nonJSON)
-	if err != nil {
-		return escapedStringToJSON("json.Marshal error")
-	}
-	return string(jsonBytes)
-}
 
 // Copying files in this function could be faster with buffering.
 // However, to determine an optimal buffer size for copying a file, we need to know the block size of the storage device.
