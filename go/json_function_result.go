@@ -3,7 +3,7 @@ package main
 import "encoding/json"
 
 type FunctionResult struct {
-	Result       interface{}
+	Result       any
 	ErrorMessage string
 }
 

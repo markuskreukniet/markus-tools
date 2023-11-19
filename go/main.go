@@ -6,7 +6,16 @@ import (
 	"os"
 )
 
-type synchronizeDirectoryTreesArguments struct {
+type FunctionCall struct {
+	Function  string `json:"function"`
+	Arguments []any  `json:"arguments"`
+}
+
+type GetDuplicateFilesAsNewlineSeparatedStringArgument struct {
+	UniqueFileSystemNodes []FileSystemNode `json:"uniqueFileSystemNodes"`
+}
+
+type SynchronizeDirectoryTreesArguments struct {
 	SourceDirectory      string `json:"sourceDirectory"`
 	DestinationDirectory string `json:"destinationDirectory"`
 }
@@ -14,7 +23,7 @@ type synchronizeDirectoryTreesArguments struct {
 func main() {
 	var result = jsonMarshalWithFallbackJSONError("os.Args did not receive at least two arguments")
 	if len(os.Args) > 1 {
-		var arguments synchronizeDirectoryTreesArguments
+		var arguments SynchronizeDirectoryTreesArguments
 		if err := json.Unmarshal([]byte(os.Args[1]), &arguments); err != nil {
 			result = jsonMarshalWithFallbackJSONError(err.Error())
 		} else {
