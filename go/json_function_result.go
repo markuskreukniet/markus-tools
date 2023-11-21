@@ -7,11 +7,23 @@ type FunctionResult struct {
 	ErrorMessage string
 }
 
-func createFunctionResultWithEmptyStringResult() FunctionResult {
+func createFunctionResult(result any, errorMessage string) FunctionResult {
 	return FunctionResult{
-		Result:       "",
-		ErrorMessage: "",
+		Result:       result,
+		ErrorMessage: errorMessage,
 	}
+}
+
+func defaultJSONFunctionResult() string {
+	return jsonMarshalWithFallbackJSONError(createFunctionResult(nil, ""))
+}
+
+func resultToJSONFunctionResult(result any) string {
+	return jsonMarshalWithFallbackJSONError(createFunctionResult(result, ""))
+}
+
+func errorMessageToJSONFunctionResult(errorMessage string) string {
+	return jsonMarshalWithFallbackJSONError(createFunctionResult(nil, errorMessage))
 }
 
 func jsonMarshalWithFallbackJSONError(nonJSON any) string {

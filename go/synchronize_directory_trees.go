@@ -6,12 +6,10 @@ import (
 )
 
 func synchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory string) string {
-	functionResult := createFunctionResultWithEmptyStringResult()
-	err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
-	if err != nil {
-		functionResult.ErrorMessage = err.Error()
+	if err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory); err != nil {
+		return errorMessageToJSONFunctionResult(err.Error())
 	}
-	return jsonMarshalWithFallbackJSONError(functionResult)
+	return defaultJSONFunctionResult()
 }
 
 func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) error {

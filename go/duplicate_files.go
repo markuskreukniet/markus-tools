@@ -93,14 +93,11 @@ func duplicateFilesToNewlineSeparatedString(duplicateFiles []DuplicateFile) (str
 }
 
 func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []FileSystemNode) string {
-	functionResult := createFunctionResultWithEmptyStringResult()
 	newlineSeparatedString, err := getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes)
-	if err == nil {
-		functionResult.Result = newlineSeparatedString
-	} else {
-		functionResult.ErrorMessage = err.Error()
+	if err != nil {
+		return errorMessageToJSONFunctionResult(err.Error())
 	}
-	return jsonMarshalWithFallbackJSONError(functionResult)
+	return resultToJSONFunctionResult(newlineSeparatedString)
 }
 
 func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []FileSystemNode) (string, error) {
