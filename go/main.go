@@ -6,11 +6,6 @@ import (
 	"os"
 )
 
-type FunctionCall struct {
-	Function  string `json:"function"`
-	Arguments []any  `json:"arguments"`
-}
-
 type GetDuplicateFilesAsNewlineSeparatedStringArgument struct {
 	UniqueFileSystemNodes []FileSystemNode `json:"uniqueFileSystemNodes"`
 }
@@ -21,14 +16,25 @@ type SynchronizeDirectoryTreesArguments struct {
 }
 
 func main() {
-	var result = jsonMarshalWithFallbackJSONError("os.Args did not receive at least two arguments")
-	if len(os.Args) > 1 {
-		var arguments SynchronizeDirectoryTreesArguments
-		if err := json.Unmarshal([]byte(os.Args[1]), &arguments); err != nil {
-			result = jsonMarshalWithFallbackJSONError(err.Error())
+	var result string
+	if len(os.Args) > 2 {
+		var functionCall string
+		if err := json.Unmarshal([]byte(os.Args[1]), &functionCall); err != nil {
+			result = errorMessageToJSONFunctionResult(err.Error())
 		} else {
-			result = synchronizeDirectoryTreesToJSON(arguments.SourceDirectory, arguments.DestinationDirectory)
+			// TODO: enum
+			switch functionCall {
+			case "SynchronizeDirectoryTrees":
+				var arguments SynchronizeDirectoryTreesArguments
+				if err = json.Unmarshal([]byte(os.Args[2]), &arguments); err != nil {
+					result = errorMessageToJSONFunctionResult(err.Error())
+				} else {
+					result = synchronizeDirectoryTreesToJSON(arguments.SourceDirectory, arguments.DestinationDirectory)
+				}
+			}
 		}
+	} else {
+		result = errorMessageToJSONFunctionResult("os.Args did not receive at least three arguments")
 	}
 	fmt.Print(result)
 }
