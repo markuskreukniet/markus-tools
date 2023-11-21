@@ -15,12 +15,11 @@ type SynchronizeDirectoryTreesArguments struct {
 	DestinationDirectory string `json:"destinationDirectory"`
 }
 
-// TODO: do the TODO and use this function
 func jsonToFunctionCallWithArguments(jsonFunctionCall, jsonArguments string) string {
 	var functionCall string
 	err := json.Unmarshal([]byte(jsonFunctionCall), &functionCall)
 	if err == nil {
-		// TODO: enum
+		// TODO: if possible, switch on enum
 		switch functionCall {
 		case "synchronizeDirectoryTreesToJSON":
 			var arguments SynchronizeDirectoryTreesArguments
@@ -33,25 +32,9 @@ func jsonToFunctionCallWithArguments(jsonFunctionCall, jsonArguments string) str
 }
 
 func main() {
-	var result string
 	if len(os.Args) > 2 {
-		var functionCall string
-		if err := json.Unmarshal([]byte(os.Args[1]), &functionCall); err != nil {
-			result = errorMessageToJSONFunctionResult(err.Error())
-		} else {
-			// TODO: enum
-			switch functionCall {
-			case "SynchronizeDirectoryTrees":
-				var arguments SynchronizeDirectoryTreesArguments
-				if err = json.Unmarshal([]byte(os.Args[2]), &arguments); err != nil {
-					result = errorMessageToJSONFunctionResult(err.Error())
-				} else {
-					result = synchronizeDirectoryTreesToJSON(arguments.SourceDirectory, arguments.DestinationDirectory)
-				}
-			}
-		}
+		fmt.Print(jsonToFunctionCallWithArguments(os.Args[1], os.Args[2]))
 	} else {
-		result = errorMessageToJSONFunctionResult("os.Args did not receive at least three arguments")
+		fmt.Print(errorMessageToJSONFunctionResult("os.Args did not receive at least three arguments"))
 	}
-	fmt.Print(result)
 }
