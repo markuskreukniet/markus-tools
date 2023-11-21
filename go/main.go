@@ -15,6 +15,7 @@ type SynchronizeDirectoryTreesArguments struct {
 	DestinationDirectory string `json:"destinationDirectory"`
 }
 
+// TODO: do the TODO and use this function
 func jsonToFunctionCallWithArguments(jsonFunctionCall, jsonArguments string) string {
 	var functionCall string
 	err := json.Unmarshal([]byte(jsonFunctionCall), &functionCall)
