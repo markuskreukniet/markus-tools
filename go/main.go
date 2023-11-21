@@ -15,6 +15,22 @@ type SynchronizeDirectoryTreesArguments struct {
 	DestinationDirectory string `json:"destinationDirectory"`
 }
 
+func jsonToFunctionCallWithArguments(jsonFunctionCall, jsonArguments string) string {
+	var functionCall string
+	err := json.Unmarshal([]byte(jsonFunctionCall), &functionCall)
+	if err == nil {
+		// TODO: enum
+		switch functionCall {
+		case "synchronizeDirectoryTreesToJSON":
+			var arguments SynchronizeDirectoryTreesArguments
+			if err = json.Unmarshal([]byte(jsonArguments), &arguments); err == nil {
+				return synchronizeDirectoryTreesToJSON(arguments.SourceDirectory, arguments.DestinationDirectory)
+			}
+		}
+	}
+	return errorMessageToJSONFunctionResult(err.Error())
+}
+
 func main() {
 	var result string
 	if len(os.Args) > 2 {
