@@ -6,6 +6,11 @@ import (
 	"os"
 )
 
+const (
+	FunctionCallSynchronizeDirectoryTreesToJSON                 string = "synchronizeDirectoryTreesToJSON"
+	FunctionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON string = "getDuplicateFilesAsNewlineSeparatedStringToJSON"
+)
+
 type GetDuplicateFilesAsNewlineSeparatedStringArgument struct {
 	UniqueFileSystemNodes []FileSystemNode `json:"uniqueFileSystemNodes"`
 }
@@ -19,9 +24,8 @@ func jsonToFunctionCallWithArguments(jsonFunctionCall, jsonArguments string) str
 	var functionCall string
 	err := json.Unmarshal([]byte(jsonFunctionCall), &functionCall)
 	if err == nil {
-		// TODO: if possible, switch on enum
 		switch functionCall {
-		case "synchronizeDirectoryTreesToJSON":
+		case FunctionCallSynchronizeDirectoryTreesToJSON:
 			var arguments SynchronizeDirectoryTreesArguments
 			if err = json.Unmarshal([]byte(jsonArguments), &arguments); err == nil {
 				return synchronizeDirectoryTreesToJSON(arguments.SourceDirectory, arguments.DestinationDirectory)
