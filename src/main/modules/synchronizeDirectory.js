@@ -1,12 +1,16 @@
 import { exec } from 'child_process'
+import path from 'path'
 
 export default async function synchronizeDirectory(sourceDirectory, destinationDirectory) {
+  const goDir = path.join(__dirname, '..', '..', 'go')
+
   const jsonArguments = JSON.stringify({
     sourceDirectory,
     destinationDirectory
   }).replace(/"/g, '\\"')
   const goProcess = exec(
-    `go run ./go/main.go ./go/json_function_result.go ./go/file_utils.go ./go/synchronize_directory_trees.go "synchronizeDirectoryTreesToJSON" "${jsonArguments}"`,
+    `go run main.go json_function_result.go file_utils.go synchronize_directory_trees.go "synchronizeDirectoryTreesToJSON" "${jsonArguments}"`,
+    { cwd: goDir },
     (error, stdout) => {
       if (error) {
         console.error(`Error executing Go program: ${error}`)
