@@ -29,7 +29,11 @@ func stringsToFunctionCallWithArguments(functionCall, jsonArguments string) stri
 			return synchronizeDirectoryTreesToJSON(arguments.SourceDirectory, arguments.DestinationDirectory)
 		}
 	}
-	return errorMessageToJSONFunctionResult(err.Error())
+	errorMessage := "did not receive a correct function call string"
+	if err != nil {
+		errorMessage = err.Error()
+	}
+	return errorMessageToJSONFunctionResult(errorMessage)
 }
 
 func main() {
