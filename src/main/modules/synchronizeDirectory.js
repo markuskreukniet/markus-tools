@@ -9,7 +9,7 @@ export default async function synchronizeDirectory(sourceDirectory, destinationD
     destinationDirectory
   }).replace(/"/g, '\\"')
   const goProcess = exec(
-    `go run main.go json_function_result.go file_utils.go synchronize_directory_trees.go "synchronizeDirectoryTreesToJSON" "${jsonArguments}"`,
+    `go run . "synchronizeDirectoryTreesToJSON" "${jsonArguments}"`,
     { cwd: goDir },
     (error, stdout) => {
       if (error) {
