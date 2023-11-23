@@ -7,13 +7,13 @@ import (
 )
 
 const (
-	FunctionCallSynchronizeDirectoryTreesToJSON string = "synchronizeDirectoryTreesToJSON"
-	// FunctionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON string = "getDuplicateFilesAsNewlineSeparatedStringToJSON"
+	FunctionCallSynchronizeDirectoryTreesToJSON                 string = "synchronizeDirectoryTreesToJSON"
+	FunctionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON string = "getDuplicateFilesAsNewlineSeparatedStringToJSON"
 )
 
-// type GetDuplicateFilesAsNewlineSeparatedStringArgument struct {
-// 	UniqueFileSystemNodes []FileSystemNode `json:"uniqueFileSystemNodes"`
-// }
+type GetDuplicateFilesAsNewlineSeparatedStringArgument struct {
+	UniqueFileSystemNodes []FileSystemNode `json:"uniqueFileSystemNodes"`
+}
 
 type SynchronizeDirectoryTreesArguments struct {
 	SourceDirectory      string `json:"sourceDirectory"`
