@@ -24,7 +24,6 @@ async function stringsToGoFunctionCallWithArguments(functionCall, jsonArguments)
       { cwd: path.join(__dirname, '..', '..', 'go') },
       (error, stdout) => {
         if (error) {
-          console.error(`Error executing Go program: ${error}`)
           reject(error)
           return
         }
