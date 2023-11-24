@@ -1,19 +1,24 @@
 import { exec } from 'child_process'
 import path from 'path'
 
-// TODO: fix errors, on close, and use stringsToGoFunctionCallWithArguments result
+// TODO: fix error handling
 export default async function synchronizeDirectory(sourceDirectory, destinationDirectory) {
   const jsonArguments = JSON.stringify({
     sourceDirectory,
     destinationDirectory
   }).replace(/"/g, '\\"')
-  await stringsToGoFunctionCallWithArguments('synchronizeDirectoryTreesToJSON', jsonArguments)
+  const result = await stringsToGoFunctionCallWithArguments(
+    'synchronizeDirectoryTreesToJSON',
+    jsonArguments
+  )
+  // TODO: this log
+  console.log(`Go program output: ${result}`)
 
   return `${sourceDirectory} testB ${destinationDirectory}`
 }
 
 async function stringsToGoFunctionCallWithArguments(functionCall, jsonArguments) {
-  await new Promise((resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const goProcess = exec(
       `go run . "${functionCall}" "${jsonArguments}"`,
       { cwd: path.join(__dirname, '..', '..', 'go') },
@@ -23,10 +28,10 @@ async function stringsToGoFunctionCallWithArguments(functionCall, jsonArguments)
           reject(error)
           return
         }
-        console.log(`Go program output: ${stdout}`)
         resolve(stdout)
       }
     )
+    // TODO: this log
     goProcess.on('close', (code) => {
       console.log(`Go program exited with code ${code}`)
     })
