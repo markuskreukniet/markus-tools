@@ -28,6 +28,11 @@ func stringsToFunctionCallWithArguments(functionCall, jsonArguments string) stri
 		if err = json.Unmarshal([]byte(jsonArguments), &arguments); err == nil {
 			return synchronizeDirectoryTreesToJSON(arguments.SourceDirectory, arguments.DestinationDirectory)
 		}
+	case FunctionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON:
+		var argument GetDuplicateFilesAsNewlineSeparatedStringArgument
+		if err = json.Unmarshal([]byte(jsonArguments), &argument); err == nil {
+			return getDuplicateFilesAsNewlineSeparatedStringToJSON(argument.UniqueFileSystemNodes)
+		}
 	}
 	errorMessage := "did not receive a correct function call string"
 	if err != nil {
