@@ -19,20 +19,22 @@ export default async function synchronizeDirectory(sourceDirectory, destinationD
 
 async function stringsToGoFunctionCallWithArguments(functionCall, jsonArguments) {
   return new Promise((resolve, reject) => {
-    const goProcess = exec(
-      `go run . "${functionCall}" "${jsonArguments}"`,
-      { cwd: path.join(__dirname, '..', '..', 'go') },
-      (error, stdout) => {
-        if (error) {
-          reject(error)
-          return
-        }
-        resolve(stdout)
-      }
-    )
-    // TODO: this log
+    let result = ''
+    const goProcess = exec(`go run . "${functionCall}" "${jsonArguments}"`, {
+      cwd: path.join(__dirname, '..', '..', 'go')
+    })
+    goProcess.stdout.on('data', (data) => {
+      result += data
+    })
+    goProcess.on('error', (error) => {
+      reject(error)
+    })
     goProcess.on('close', (code) => {
-      console.log(`Go program exited with code ${code}`)
+      if (code !== 0) {
+        reject(new Error(`Go process exited with code ${code}`))
+      } else {
+        resolve(result)
+      }
     })
   })
 }
