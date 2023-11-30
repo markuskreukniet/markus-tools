@@ -1,33 +1,12 @@
 package main
 
 import (
-	"io/fs"
 	"os"
 	"path/filepath"
 	"sort"
 	"testing"
 	"time"
 )
-
-// WIP
-func createTestDirectoryStructure(basePath string, structure map[string]fs.FileMode) error {
-	for path, mode := range structure {
-		fullPath := filepath.Join(basePath, path)
-		if mode.IsDir() {
-			if err := os.MkdirAll(fullPath, mode); err != nil {
-				return err
-			}
-		} else {
-			file, err := os.Create(fullPath)
-			if err != nil {
-				return err
-			}
-			file.Close()
-			os.Chmod(fullPath, mode)
-		}
-	}
-	return nil
-}
 
 func fatalLogIfError(t *testing.T, err error) {
 	t.Helper()
@@ -219,6 +198,7 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	const outputBasePath string = "/home/user/destination"
 	const joinedOutputBasePathWithRelativeInputPath string = "/home/user/destination/directory/file.txt"
 
+	// TODO: properties should have caps
 	testCases := []struct {
 		name           string
 		inputBasePath  string
