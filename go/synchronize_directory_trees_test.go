@@ -6,6 +6,29 @@ import (
 	"testing"
 )
 
+func haveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory string) (bool, error) {
+	haveSameFilePaths := true
+	err := filepath.Walk(sourceDirectory, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		relativePath, err := filepath.Rel(sourceDirectory, path)
+		if err != nil {
+			return err
+		}
+		destinationPath := filepath.Join(destinationDirectory, relativePath)
+		if _, err := os.Stat(destinationPath); os.IsNotExist(err) {
+			haveSameFilePaths = false
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return false, err
+	}
+	return haveSameFilePaths, nil
+}
+
 func createTempFileSystemStructure(directoryPathEndParts []string, filePathEndParts []string) (string, error) {
 	tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
 	if err != nil {
@@ -60,7 +83,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			WantErr:                          false,
 		},
 	}
-
+	// TODO: when Fatalf happens, os.RemoveAll does not happen
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			// arrange
@@ -80,27 +103,19 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			if (err != nil) != tc.WantErr {
 				t.Fatalf("want error: %v, got %v", tc.WantErr, err)
 			}
-
-			// TODO: this walk code with error should a function that is also tested?
-			// TODO: Also, now is only checked if the source has the same files/folders as destination, but not the other way around. Maybe a file or folder did not get copied
-			err = filepath.Walk(destinationDirectory, func(path string, info os.FileInfo, err error) error {
-				if err != nil {
-					return err
-				}
-				relPath, err := filepath.Rel(destinationDirectory, path)
-				if err != nil {
-					return err
-				}
-				if relPath != "." {
-					sourcePath := filepath.Join(sourceDirectory, relPath)
-					if _, err := os.Stat(sourcePath); os.IsNotExist(err) {
-						t.Errorf("Extra file or directory in destination: %s", relPath)
-					}
-				}
-				return nil
-			})
+			haveSameFilePaths, err := haveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory)
 			if err != nil {
-				t.Errorf("Error walking through destination directory: %v", err)
+				t.Fatalf("Failed to check if the source and destination directory trees have the same file paths: %v", err)
+			}
+			if !haveSameFilePaths {
+				t.Fatalf("The source and destination directory trees do not have the same file paths.")
+			}
+			haveSameFilePaths, err = haveDirectoryTreesSameFilePaths(destinationDirectory, sourceDirectory)
+			if err != nil {
+				t.Fatalf("Failed to check if the destination and source directory trees have the same file paths: %v", err)
+			}
+			if !haveSameFilePaths {
+				t.Fatalf("The destination and source directory trees do not have the same file paths.")
 			}
 
 			// tear down
