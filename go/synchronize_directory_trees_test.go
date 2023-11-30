@@ -83,18 +83,28 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			WantErr:                          false,
 		},
 	}
-	// TODO: when Fatalf happens, os.RemoveAll does not happen
+
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
-			// arrange
+			// arrange and tear down
 			sourceDirectory, err := createTempFileSystemStructure(tc.SourceDirectoryPathEndParts, tc.SourceFilePathEndParts)
 			if err != nil {
 				t.Fatalf("Failed to create temporary source directory: %v", err)
 			}
+			defer func() {
+				if err := os.RemoveAll(sourceDirectory); err != nil {
+					t.Errorf("Failed to remove source directory: %v", err)
+				}
+			}()
 			destinationDirectory, err := createTempFileSystemStructure(tc.DestinationDirectoryPathEndParts, tc.DestinationFilePathEndParts)
 			if err != nil {
 				t.Fatalf("Failed to create temporary destination directory: %v", err)
 			}
+			defer func() {
+				if err := os.RemoveAll(destinationDirectory); err != nil {
+					t.Errorf("Failed to remove destination directory: %v", err)
+				}
+			}()
 
 			// act
 			err = synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
@@ -116,14 +126,6 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			}
 			if !haveSameFilePaths {
 				t.Fatalf("The destination and source directory trees do not have the same file paths.")
-			}
-
-			// tear down
-			if err := os.RemoveAll(sourceDirectory); err != nil {
-				t.Fatalf("Failed to remove source directory: %v", err)
-			}
-			if err := os.RemoveAll(destinationDirectory); err != nil {
-				t.Fatalf("Failed to remove destination directory: %v", err)
 			}
 		})
 	}
