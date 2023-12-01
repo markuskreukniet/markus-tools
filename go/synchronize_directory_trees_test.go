@@ -6,6 +6,13 @@ import (
 	"testing"
 )
 
+func haveDirectoryTreesSameFilePathsOrGetFalse(sourceDirectory, destinationDirectory string) (bool, error) {
+	if sourceDirectory == "" || destinationDirectory == "" {
+		return false, nil
+	}
+	return haveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory)
+}
+
 func haveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory string) (bool, error) {
 	haveSameFilePaths := true
 	err := filepath.Walk(sourceDirectory, func(path string, info os.FileInfo, err error) error {
@@ -27,6 +34,13 @@ func haveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory strin
 		return false, err
 	}
 	return haveSameFilePaths, nil
+}
+
+func createTempFileSystemStructureOrGetEmptyString(directoryPathEndParts []string, filePathEndParts []string) (string, error) {
+	if len(directoryPathEndParts) == 0 {
+		return "", nil
+	}
+	return createTempFileSystemStructure(directoryPathEndParts, filePathEndParts)
 }
 
 func createTempFileSystemStructure(directoryPathEndParts []string, filePathEndParts []string) (string, error) {
@@ -66,12 +80,15 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 	destinationDirectoryPathEndParts := []string{directoryEmpty, directory2WithDirectory3}
 	destinationFilePathEndParts := []string{txtFile3, txtFile4}
 
+	var emptyPathEndParts []string
+
 	testCases := []struct {
 		Name                             string
 		SourceDirectoryPathEndParts      []string
 		SourceFilePathEndParts           []string
 		DestinationDirectoryPathEndParts []string
 		DestinationFilePathEndParts      []string
+		WantSameFilePaths                bool
 		WantErr                          bool
 	}{
 		{
@@ -80,14 +97,24 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			SourceFilePathEndParts:           sourceFilePathEndParts,
 			DestinationDirectoryPathEndParts: destinationDirectoryPathEndParts,
 			DestinationFilePathEndParts:      destinationFilePathEndParts,
+			WantSameFilePaths:                true,
 			WantErr:                          false,
+		},
+		{
+			Name:                             "Empty DestinationPathEndParts",
+			SourceDirectoryPathEndParts:      sourceDirectoryPathEndParts,
+			SourceFilePathEndParts:           sourceFilePathEndParts,
+			DestinationDirectoryPathEndParts: emptyPathEndParts,
+			DestinationFilePathEndParts:      emptyPathEndParts,
+			WantSameFilePaths:                false,
+			WantErr:                          true,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			// arrange and tear down
-			sourceDirectory, err := createTempFileSystemStructure(tc.SourceDirectoryPathEndParts, tc.SourceFilePathEndParts)
+			sourceDirectory, err := createTempFileSystemStructureOrGetEmptyString(tc.SourceDirectoryPathEndParts, tc.SourceFilePathEndParts)
 			if err != nil {
 				t.Fatalf("Failed to create temporary source directory: %v", err)
 			}
@@ -96,7 +123,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 					t.Errorf("Failed to remove source directory: %v", err)
 				}
 			}()
-			destinationDirectory, err := createTempFileSystemStructure(tc.DestinationDirectoryPathEndParts, tc.DestinationFilePathEndParts)
+			destinationDirectory, err := createTempFileSystemStructureOrGetEmptyString(tc.DestinationDirectoryPathEndParts, tc.DestinationFilePathEndParts)
 			if err != nil {
 				t.Fatalf("Failed to create temporary destination directory: %v", err)
 			}
@@ -113,18 +140,18 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			if (err != nil) != tc.WantErr {
 				t.Fatalf("want error: %v, got %v", tc.WantErr, err)
 			}
-			haveSameFilePaths, err := haveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory)
+			haveSameFilePaths, err := haveDirectoryTreesSameFilePathsOrGetFalse(sourceDirectory, destinationDirectory)
 			if err != nil {
 				t.Fatalf("Failed to check if the source and destination directory trees have the same file paths: %v", err)
 			}
-			if !haveSameFilePaths {
+			if tc.WantSameFilePaths && !haveSameFilePaths {
 				t.Fatalf("The source and destination directory trees do not have the same file paths.")
 			}
-			haveSameFilePaths, err = haveDirectoryTreesSameFilePaths(destinationDirectory, sourceDirectory)
+			haveSameFilePaths, err = haveDirectoryTreesSameFilePathsOrGetFalse(destinationDirectory, sourceDirectory)
 			if err != nil {
 				t.Fatalf("Failed to check if the destination and source directory trees have the same file paths: %v", err)
 			}
-			if !haveSameFilePaths {
+			if tc.WantSameFilePaths && !haveSameFilePaths {
 				t.Fatalf("The destination and source directory trees do not have the same file paths.")
 			}
 		})
