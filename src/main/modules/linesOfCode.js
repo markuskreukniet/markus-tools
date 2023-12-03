@@ -3,13 +3,12 @@ import { getUtf8FileContents } from './filePaths.js'
 const endOfLine = '\n'
 
 export default async function linesOfCode(filePaths) {
-  let result = 0
-  for (const path of filePaths) {
-    // TODO: use promise.all ?
-    result += await numberOfFileLinesWithoutCommentsAndEmptyLines(path.value)
-  }
-
-  return result
+  // TODO: error handling
+  const promises = filePaths.map((path) =>
+    numberOfFileLinesWithoutCommentsAndEmptyLines(path.value)
+  )
+  const results = await Promise.all(promises)
+  return results.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
 }
 
 async function numberOfFileLinesWithoutCommentsAndEmptyLines(filePath) {
