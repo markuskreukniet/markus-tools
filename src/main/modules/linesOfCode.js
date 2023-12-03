@@ -29,7 +29,6 @@ async function numberOfFileLinesWithoutCommentsAndEmptyLines(filePath) {
   }
 }
 
-// TODO: function is not needed
 async function getUtf8FileContents(filePath) {
   try {
     return Either.right(await promises.readFile(filePath, { encoding: 'utf8' }))
