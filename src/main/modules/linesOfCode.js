@@ -1,5 +1,5 @@
+import { promises } from 'fs'
 import { Either } from '../../preload/monads/either'
-import { getUtf8FileContents } from './filePaths.js'
 
 const endOfLine = '\n'
 
@@ -33,6 +33,14 @@ async function numberOfFileLinesWithoutCommentsAndEmptyLines(filePath) {
     return Either.right(lines.length)
   } else {
     return result
+  }
+}
+
+async function getUtf8FileContents(filePath) {
+  try {
+    return Either.right(await promises.readFile(filePath, { encoding: 'utf8' }))
+  } catch (error) {
+    return Either.left(error)
   }
 }
 
