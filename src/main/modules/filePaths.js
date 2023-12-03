@@ -2,6 +2,7 @@ import { constants, promises } from 'fs'
 import { open } from 'fs/promises'
 import path from 'path'
 import { ErrorTracker, inputError } from '../../preload/modules/errors'
+import { Either } from '../../preload/monads/either'
 import { filePathsType, filePathType, fileType } from '../../preload/modules/files'
 import {
   isResultObjectOk,
@@ -333,9 +334,9 @@ export async function getReadFileHandle(filePath) {
 
 export async function getUtf8FileContents(filePath) {
   try {
-    return toResultObjectWithResultStatusOk(await promises.readFile(filePath, { encoding: 'utf8' }))
+    return Either.right(await promises.readFile(filePath, { encoding: 'utf8' }))
   } catch (error) {
-    return toResultObjectWithNullResultAndResultStatusErrorSystem(error.message)
+    return Either.left(error)
   }
 }
 
