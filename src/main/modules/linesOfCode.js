@@ -15,7 +15,6 @@ export default async function linesOfCode(filePaths) {
       return result
     }
   }
-
   return numberOfLines
 }
 
