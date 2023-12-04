@@ -5,7 +5,6 @@ const endOfLine = '\n'
 
 export default function linesOfCode(filePaths) {
   // TODO: use error handling in GUI
-  // When one numberOfFileLinesWithoutCommentsAndEmptyLines fails, the function should stop immediately, which is impossible with a promise.all solution.
   let numberOfLines = 0
   for (const path of filePaths) {
     const result = numberOfFileLinesWithoutCommentsAndEmptyLines(path.value)
