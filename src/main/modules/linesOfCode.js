@@ -1,14 +1,14 @@
-import { promises } from 'fs'
+import { readFileSync } from 'node:fs'
 import { Either } from '../../preload/monads/either'
 
 const endOfLine = '\n'
 
-export default async function linesOfCode(filePaths) {
+export default function linesOfCode(filePaths) {
   // TODO: use error handling in GUI
   // When one numberOfFileLinesWithoutCommentsAndEmptyLines fails, the function should stop immediately, which is impossible with a promise.all solution.
   let numberOfLines = 0
   for (const path of filePaths) {
-    const result = await numberOfFileLinesWithoutCommentsAndEmptyLines(path.value)
+    const result = numberOfFileLinesWithoutCommentsAndEmptyLines(path.value)
     if (result.isRight()) {
       numberOfLines += result.value
     } else {
@@ -18,23 +18,16 @@ export default async function linesOfCode(filePaths) {
   return numberOfLines
 }
 
-async function numberOfFileLinesWithoutCommentsAndEmptyLines(filePath) {
-  const result = await getUtf8FileContents(filePath)
-  if (result.isRight()) {
-    const code = removeCommentsAndEmptyLines(result.value)
-    const lines = code.split(endOfLine)
-    return Either.right(lines.length)
-  } else {
-    return result
-  }
-}
-
-async function getUtf8FileContents(filePath) {
+function numberOfFileLinesWithoutCommentsAndEmptyLines(filePath) {
+  let fileContents = ''
   try {
-    return Either.right(await promises.readFile(filePath, { encoding: 'utf8' }))
+    fileContents = readFileSync(filePath, { encoding: 'utf8' })
   } catch (error) {
     return Either.left(error)
   }
+  const code = removeCommentsAndEmptyLines(fileContents)
+  const lines = code.split(endOfLine)
+  return Either.right(lines.length)
 }
 
 function removeCommentsAndEmptyLines(code) {
