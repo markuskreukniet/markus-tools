@@ -4,7 +4,7 @@ import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFold
 
 export default function LinesOfCode(props) {
   const [getOutput, setGetOutput] = createSignal(function () {})
-  const [linesOfCodeResult, setLinesOfCodeResult] = createSignal(0)
+  const [linesOfCodeResult, setLinesOfCodeResult] = createSignal('')
 
   async function setOutput(filePaths) {
     // TODO: error handling
