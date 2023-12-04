@@ -4,10 +4,11 @@ import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFold
 
 export default function LinesOfCode(props) {
   const [getOutput, setGetOutput] = createSignal(function () {})
-  const [linesOfCode, setLinesOfCode] = createSignal(0)
+  const [linesOfCodeResult, setLinesOfCodeResult] = createSignal(0)
 
   async function setOutput(filePaths) {
-    setLinesOfCode(await window.codeQuality.getLinesOfCode(filePaths))
+    // TODO: error handling
+    setLinesOfCodeResult(`Lines of code: ${await window.codeQuality.getLinesOfCode(filePaths)}`)
   }
 
   function handleFilePaths(filePaths) {
@@ -21,7 +22,7 @@ export default function LinesOfCode(props) {
     <TextResultPage
       title={props.title}
       inputComponent={inputComponent}
-      output={`Lines of code: ${linesOfCode()}`}
+      output={linesOfCodeResult()}
       getOutput={getOutput}
       onLoading={props.onLoading}
     />

@@ -3,6 +3,7 @@ import { Either } from '../../preload/monads/either'
 
 const endOfLine = '\n'
 
+// TODO: functions this function starting from GUI are still async, which is not needed
 export default function linesOfCode(filePaths) {
   // TODO: use error handling in GUI
   let numberOfLines = 0
@@ -14,6 +15,7 @@ export default function linesOfCode(filePaths) {
       return result
     }
   }
+  // TODO: should be Either.right(numberOfLines)?
   return numberOfLines
 }
 
