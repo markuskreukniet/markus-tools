@@ -20,7 +20,6 @@ export default function SynchronizeDirectory(props) {
       originalDirectoryFilePath,
       destinationDirectoryFilePath
     )
-    console.log('result', result)
     if (isEitherRightResult(result)) {
       // TODO: done is also used somewhere else
       setStatus('done')
