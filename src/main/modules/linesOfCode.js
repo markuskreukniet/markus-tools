@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { Either } from '../../preload/monads/either'
+import { Either, toEitherRightResult } from '../../preload/monads/either'
 
 const endOfLine = '\n'
 
@@ -15,8 +15,7 @@ export default function linesOfCode(filePaths) {
       return result
     }
   }
-  // TODO: should be Either.right(numberOfLines)?
-  return numberOfLines
+  return toEitherRightResult(numberOfLines)
 }
 
 function numberOfFileLinesWithoutCommentsAndEmptyLines(filePath) {

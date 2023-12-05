@@ -1,4 +1,5 @@
 import { createSignal } from 'solid-js'
+import { isEitherRightResult } from '../../../../preload/monads/either'
 import TextResultPage from '../page/TextResultPage'
 import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFolderInput'
 
@@ -7,8 +8,13 @@ export default function LinesOfCode(props) {
   const [linesOfCodeResult, setLinesOfCodeResult] = createSignal('')
 
   async function setOutput(filePaths) {
-    // TODO: error handling
-    setLinesOfCodeResult(`Lines of code: ${await window.codeQuality.getLinesOfCode(filePaths)}`)
+    const result = await window.codeQuality.getLinesOfCode(filePaths)
+    if (isEitherRightResult(result)) {
+      setLinesOfCodeResult(`Lines of code: ${result.value}`)
+    } else {
+      // TODO: should become reusable function
+      setLinesOfCodeResult(`error: ${result.value.message}`)
+    }
   }
 
   function handleFilePaths(filePaths) {

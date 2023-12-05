@@ -26,3 +26,20 @@ class Right {
     return true
   }
 }
+
+export const eitherType = Object.freeze({
+  left: 'left',
+  right: 'right'
+})
+
+export function toEitherLeftResult(value) {
+  return { type: eitherType.left, value }
+}
+
+export function toEitherRightResult(value) {
+  return { type: eitherType.right, value }
+}
+
+export function isEitherRightResult(eitherResult) {
+  return eitherResult.type === eitherType.right
+}
