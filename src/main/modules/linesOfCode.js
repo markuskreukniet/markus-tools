@@ -5,7 +5,6 @@ const endOfLine = '\n'
 
 // TODO: functions this function starting from GUI are still async, which is not needed
 export default function linesOfCode(filePaths) {
-  // TODO: use error handling in GUI
   let numberOfLines = 0
   for (const path of filePaths) {
     const result = numberOfFileLinesWithoutCommentsAndEmptyLines(path.value)
