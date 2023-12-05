@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { Either, toEitherRightResult } from '../../preload/monads/either'
+import { Either, toEitherLeftResult, toEitherRightResult } from '../../preload/monads/either'
 
 const endOfLine = '\n'
 
@@ -11,7 +11,7 @@ export default function linesOfCode(filePaths) {
     if (result.isRight()) {
       numberOfLines += result.value
     } else {
-      return result
+      return toEitherLeftResult(result)
     }
   }
   return toEitherRightResult(numberOfLines)
