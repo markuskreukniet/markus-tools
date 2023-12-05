@@ -13,7 +13,7 @@ export default function LinesOfCode(props) {
       setLinesOfCodeResult(`Lines of code: ${result.value}`)
     } else {
       // TODO: should become reusable function
-      setLinesOfCodeResult(`error: ${result.value.message}`)
+      setLinesOfCodeResult(`error: ${result.value}`)
     }
   }
 

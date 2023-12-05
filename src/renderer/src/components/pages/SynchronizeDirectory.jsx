@@ -10,6 +10,7 @@ export default function SynchronizeDirectory(props) {
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [status, setStatus] = createSignal('')
 
+  // TODO: rename synchronizeDirectory
   // TODO: rename test
   async function test() {
     const result = await window.synchronization.synchronizeDirectoryBE(

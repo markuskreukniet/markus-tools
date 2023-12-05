@@ -22,8 +22,7 @@ function numberOfFileLinesWithoutCommentsAndEmptyLines(filePath) {
   try {
     fileContents = readFileSync(filePath, { encoding: 'utf8' })
   } catch (error) {
-    // TODO: should return error.message, also fix that in GUI
-    return Either.left(error)
+    return Either.left(error.message)
   }
   const code = removeCommentsAndEmptyLines(fileContents)
   const lines = code.split(endOfLine)
