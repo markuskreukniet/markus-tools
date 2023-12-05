@@ -1,6 +1,9 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
-import { isEitherRightResult } from '../../../../preload/monads/either'
+import {
+  eitherLeftResultToErrorString,
+  isEitherRightResult
+} from '../../../../preload/monads/either'
 import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFolderInput'
 
 export default function LinesOfCode(props) {
@@ -12,8 +15,7 @@ export default function LinesOfCode(props) {
     if (isEitherRightResult(result)) {
       setLinesOfCodeResult(`Lines of code: ${result.value}`)
     } else {
-      // TODO: should become reusable function
-      setLinesOfCodeResult(`error: ${result.value}`)
+      setLinesOfCodeResult(eitherLeftResultToErrorString(result))
     }
   }
 

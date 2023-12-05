@@ -43,3 +43,7 @@ export function toEitherRightResult(value) {
 export function isEitherRightResult(eitherResult) {
   return eitherResult.type === type.right
 }
+
+export function eitherLeftResultToErrorString(eitherResult) {
+  return `error: ${eitherResult.value}`
+}
