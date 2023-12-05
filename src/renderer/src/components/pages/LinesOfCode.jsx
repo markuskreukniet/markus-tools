@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js'
-import { isEitherRightResult } from '../../../../preload/monads/either'
 import TextResultPage from '../page/TextResultPage'
+import { isEitherRightResult } from '../../../../preload/monads/either'
 import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFolderInput'
 
 export default function LinesOfCode(props) {

@@ -1,20 +1,23 @@
+import { toEitherLeftResult, toEitherRightResult } from '../../preload/monads/either'
 import { exec } from 'child_process'
 import path from 'path'
 
-// TODO: fix error handling
 export default async function synchronizeDirectory(sourceDirectory, destinationDirectory) {
+  // TODO: does the replace work on systems besides Windows?
   const jsonArguments = JSON.stringify({
     sourceDirectory,
     destinationDirectory
   }).replace(/"/g, '\\"')
-  const result = await stringsToGoFunctionCallWithArguments(
-    'synchronizeDirectoryTreesToJSON',
-    jsonArguments
+  const result = JSON.parse(
+    await stringsToGoFunctionCallWithArguments('synchronizeDirectoryTreesToJSON', jsonArguments)
   )
-  // TODO: this log
-  console.log(`Go program output: ${result}`)
 
-  return `${sourceDirectory} testB ${destinationDirectory}`
+  // TODO: make function for this
+  if (result.ErrorMessage === '') {
+    return toEitherRightResult(result.Result)
+  } else {
+    return toEitherLeftResult(result.ErrorMessage)
+  }
 }
 
 async function stringsToGoFunctionCallWithArguments(functionCall, jsonArguments) {
