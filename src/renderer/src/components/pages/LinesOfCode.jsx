@@ -10,8 +10,9 @@ export default function LinesOfCode(props) {
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [linesOfCodeResult, setLinesOfCodeResult] = createSignal('')
 
+  // TODO: are it filePaths?
   async function setOutput(filePaths) {
-    const result = await window.codeQuality.getLinesOfCode(filePaths)
+    const result = await window.codeQuality.linesOfCodeBE(filePaths)
     if (isEitherRightResult(result)) {
       setLinesOfCodeResult(`Lines of code: ${result.value}`)
     } else {

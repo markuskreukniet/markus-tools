@@ -73,7 +73,7 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 
 // self added with ipcMain import
-// TODO: rename return functions: duplicateFiles, linesOfCode, referencesByUrls
+// TODO: rename return functions: duplicateFiles, referencesByUrls
 import duplicateFiles from './modules/duplicateFiles'
 async function getDuplicateFiles(e, filePaths) {
   return duplicateFiles(filePaths)
@@ -81,10 +81,10 @@ async function getDuplicateFiles(e, filePaths) {
 ipcMain.handle('getDuplicateFiles', getDuplicateFiles)
 
 import linesOfCode from './modules/linesOfCode'
-async function getLinesOfCode(e, filePaths) {
+async function linesOfCodeBE(e, filePaths) {
   return linesOfCode(filePaths)
 }
-ipcMain.handle('getLinesOfCode', getLinesOfCode)
+ipcMain.handle('linesOfCodeBE', linesOfCodeBE)
 
 import referencesByUrls from './modules/referencesByUrls'
 async function getReferencesByUrls(e, urlsString) {
