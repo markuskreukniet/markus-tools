@@ -74,7 +74,6 @@ app.on('window-all-closed', () => {
 
 // self added with ipcMain import
 // TODO: filePaths should be fileSystemNodes
-// TODO: rename return functions: referencesByUrls
 import duplicateFiles from './modules/duplicateFiles'
 async function duplicateFilesBE(e, filePaths) {
   return duplicateFiles(filePaths)
@@ -88,10 +87,10 @@ async function linesOfCodeBE(e, filePaths) {
 ipcMain.handle('linesOfCodeBE', linesOfCodeBE)
 
 import referencesByUrls from './modules/referencesByUrls'
-async function getReferencesByUrls(e, urlsString) {
+async function referencesByUrlsBE(e, urlsString) {
   return referencesByUrls(urlsString)
 }
-ipcMain.handle('getReferencesByUrls', getReferencesByUrls)
+ipcMain.handle('referencesByUrlsBE', referencesByUrlsBE)
 
 import imagesToDateRangeFolder from './modules/imagesToDateRangeFolder'
 async function imagesToDateRangeFolderBE(e, filePathObjects, path, useDirectoriesTreeInput) {

@@ -29,7 +29,7 @@ contextBridge.exposeInMainWorld('codeQuality', {
 })
 
 contextBridge.exposeInMainWorld('references', {
-  getReferencesByUrls: (urlsString) => ipcRenderer.invoke('getReferencesByUrls', urlsString)
+  referencesByUrlsBE: (urlsString) => ipcRenderer.invoke('referencesByUrlsBE', urlsString)
 })
 
 contextBridge.exposeInMainWorld('dateRangeFolder', {

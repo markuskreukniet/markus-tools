@@ -23,7 +23,7 @@ export default function ReferencesByUrls(props) {
   }
 
   async function setStateOutputComponent() {
-    const result = await window.references.getReferencesByUrls(textAreaValue())
+    const result = await window.references.referencesByUrlsBE(textAreaValue())
     setReferences(result)
   }
 
