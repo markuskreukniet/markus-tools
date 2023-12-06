@@ -9,7 +9,7 @@ export default function DuplicateFiles(props) {
   const [result, setResult] = createSignal('')
 
   async function setStateOutputComponent(filePathObjects) {
-    const duplicateFiles = await window.duplicateFiles.getDuplicateFiles(filePathObjects)
+    const duplicateFiles = await window.duplicateFiles.duplicateFilesBE(filePathObjects)
     const textareaValue = duplicateFiles !== '' ? duplicateFiles : 'No duplicate files found'
     setResult(textareaValue)
   }

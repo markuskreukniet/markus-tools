@@ -21,7 +21,7 @@ if (process.contextIsolated) {
 
 // self added with ipcRenderer import
 contextBridge.exposeInMainWorld('duplicateFiles', {
-  getDuplicateFiles: (filePaths) => ipcRenderer.invoke('getDuplicateFiles', filePaths)
+  duplicateFilesBE: (filePaths) => ipcRenderer.invoke('duplicateFilesBE', filePaths)
 })
 
 contextBridge.exposeInMainWorld('codeQuality', {
