@@ -2,7 +2,7 @@ import { constants, promises } from 'fs'
 import { open } from 'fs/promises'
 import path from 'path'
 import { ErrorTracker, inputError } from '../../preload/modules/errors'
-import { filePathsType, filePathType, fileType } from '../../preload/modules/files'
+import { filePathsType, fileType } from '../../preload/modules/files'
 import {
   isResultObjectOk,
   toResultObjectWithEmptyArrayResultAndResultStatusErrorSystem,
@@ -19,12 +19,12 @@ export async function filePathObjectsToFileObjects(filePathObjects, useDirectori
   for (const filePathObject of filePathObjects) {
     let inputRO = null
 
-    if (filePathObject.filePathType === filePathType.file) {
+    if (!filePathObject.isDirectory) {
       // TODO: should be getImageFileObject? probably not, only image selection should happen in dialog
-      inputRO = await getFileObject(filePathObject.value, false)
+      inputRO = await getFileObject(filePathObject.path, false)
     } else {
       inputRO = await getDirectoryImageFileObjectsWithoutZeroByteOnes(
-        filePathObject.value,
+        filePathObject.path,
         useDirectoriesTreeInput
       )
     }

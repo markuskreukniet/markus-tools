@@ -7,20 +7,20 @@ import {
 } from '../../../../preload/modules/resultStatus'
 
 export default function SubmittableFileOrFolderInput(props) {
-  let selectedFilePathObjects = []
+  let selectedFileSystemNodes = []
   const [buttonActive, setButtonActive] = createSignal(false)
 
   function setState(resultObject) {
     if (isResultObjectOk(resultObject)) {
-      selectedFilePathObjects = resultObject.result.selectedFilePathObjects
-      setButtonActive(resultObject.result.hasFilePathObject)
+      selectedFileSystemNodes = resultObject.result.selectedFileSystemNodes
+      setButtonActive(resultObject.result.hasFileSystemNode)
     } else {
       props.onChange(resultObject)
     }
   }
 
   function submit() {
-    props.onChange(toResultObjectWithResultStatusOk(selectedFilePathObjects))
+    props.onChange(toResultObjectWithResultStatusOk(selectedFileSystemNodes))
   }
 
   const submitButton = <ActivatableSubmitButton active={buttonActive()} onAction={submit} />

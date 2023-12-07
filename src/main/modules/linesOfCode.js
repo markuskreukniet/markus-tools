@@ -7,7 +7,7 @@ const endOfLine = '\n'
 export default function linesOfCode(filePaths) {
   let numberOfLines = 0
   for (const path of filePaths) {
-    const result = numberOfFileLinesWithoutCommentsAndEmptyLines(path.value)
+    const result = numberOfFileLinesWithoutCommentsAndEmptyLines(path.path)
     if (result.isRight()) {
       numberOfLines += result.value
     } else {

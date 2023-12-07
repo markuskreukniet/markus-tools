@@ -6,8 +6,8 @@ export default function MaxOneDirectoryInput(props) {
   function handleOnChange(resultObject) {
     if (isResultObjectOk(resultObject)) {
       resultObject.result = {
-        selectedFilePathObject: resultObject.result.selectedFilePathObjects[0],
-        hasFilePathObject: resultObject.result.hasFilePathObject
+        selectedFileSystemNode: resultObject.result.selectedFileSystemNodes[0],
+        hasFileSystemNode: resultObject.result.hasFileSystemNode
       }
     }
     props.onChange(resultObject)

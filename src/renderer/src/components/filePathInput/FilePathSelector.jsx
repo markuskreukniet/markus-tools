@@ -1,4 +1,3 @@
-import { filePathType } from '../../../../preload/modules/files'
 import {
   isResultObjectOk,
   toResultObjectWithResultStatusOk
@@ -9,9 +8,9 @@ export default function FilePathSelector(props) {
     const openFileDialogRO = await window.dialog.openFileDialogBE(props.directory)
 
     if (isResultObjectOk(openFileDialogRO) && openFileDialogRO.result !== '') {
-      const result = { value: openFileDialogRO.result, filePathType: filePathType.file }
+      const result = { path: openFileDialogRO.result, isDirectory: false }
       if (props.directory) {
-        result.filePathType = filePathType.directory
+        result.isDirectory = true
       }
 
       props.onChange(toResultObjectWithResultStatusOk(result))

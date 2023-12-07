@@ -13,21 +13,21 @@ import {
 // Checking child folders of a folder is only possible in the main, which is possible by adding such a function in the main.
 
 export default function FileOrFolderInput(props) {
-  const [selectedFilePathObjects, setSelectedFilePathObjects] = createSignal([])
-  const [hasFilePathObject, setHasFilePathObject] = createSignal(false)
+  const [selectedFileSystemNodes, setSelectedFileSystemNodes] = createSignal([])
+  const [hasFileSystemNode, setHasFileSystemNode] = createSignal(false)
 
   function setState(result) {
-    if (result.value !== '') {
+    if (result.path !== '') {
       if (props.maxOneInput) {
-        setSelectedFilePathObjects([result])
+        setSelectedFileSystemNodes([result])
       } else if (
-        !selectedFilePathObjects().some((filePathObject) => filePathObject.value === result.value)
+        !selectedFileSystemNodes().some((FileSystemNode) => FileSystemNode.path === result.path)
       ) {
-        setSelectedFilePathObjects([...selectedFilePathObjects(), result])
+        setSelectedFileSystemNodes([...selectedFileSystemNodes(), result])
       } else {
         return
       }
-      setHasFilePathObject(selectedFilePathObjects().length > 0)
+      setHasFileSystemNode(selectedFileSystemNodes().length > 0)
     }
   }
 
@@ -40,8 +40,8 @@ export default function FileOrFolderInput(props) {
   }
 
   function resetState() {
-    setSelectedFilePathObjects([])
-    setHasFilePathObject(false)
+    setSelectedFileSystemNodes([])
+    setHasFileSystemNode(false)
   }
 
   function handleChange(resultObject) {
@@ -49,8 +49,8 @@ export default function FileOrFolderInput(props) {
       setState(resultObject.result)
       props.onChange(
         toResultObjectWithResultStatusOk({
-          selectedFilePathObjects: selectedFilePathObjects(),
-          hasFilePathObject: hasFilePathObject()
+          selectedFileSystemNodes: selectedFileSystemNodes(),
+          hasFileSystemNode: hasFileSystemNode()
         })
       )
     } else {
@@ -69,12 +69,12 @@ export default function FileOrFolderInput(props) {
         </Show>
       </div>
       <div class="display-flex justify-content-flex-end gap-1">
-        <ActivatableButton text="reset" active={hasFilePathObject()} onAction={resetState} />
+        <ActivatableButton text="reset" active={hasFileSystemNode()} onAction={resetState} />
         {props.submitButton}
       </div>
       <ul>
-        <For each={selectedFilePathObjects()}>
-          {(filePathObject) => <li>{filePathObject.value}</li>}
+        <For each={selectedFileSystemNodes()}>
+          {(FileSystemNode) => <li>{FileSystemNode.path}</li>}
         </For>
       </ul>
     </div>
