@@ -20,6 +20,7 @@ import {
 
 // TODO: rename resultStatus file
 // TODO: rename useDirectoriesTreeInput, without use?
+// TODO: remove param useDirectoriesTreeInput
 // TODO: write access check?
 export default async function imagesToDateRangeFolder(
   filePathObjects,

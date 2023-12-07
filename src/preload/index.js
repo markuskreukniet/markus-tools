@@ -21,11 +21,11 @@ if (process.contextIsolated) {
 
 // self added with ipcRenderer import
 contextBridge.exposeInMainWorld('duplicateFiles', {
-  duplicateFilesBE: (filePaths) => ipcRenderer.invoke('duplicateFilesBE', filePaths)
+  duplicateFilesBE: (fileSystemNodes) => ipcRenderer.invoke('duplicateFilesBE', fileSystemNodes)
 })
 
 contextBridge.exposeInMainWorld('codeQuality', {
-  linesOfCodeBE: (filePaths) => ipcRenderer.invoke('linesOfCodeBE', filePaths)
+  linesOfCodeBE: (fileSystemNodes) => ipcRenderer.invoke('linesOfCodeBE', fileSystemNodes)
 })
 
 contextBridge.exposeInMainWorld('references', {
@@ -33,8 +33,8 @@ contextBridge.exposeInMainWorld('references', {
 })
 
 contextBridge.exposeInMainWorld('dateRangeFolder', {
-  imagesToDateRangeFolderBE: (filePathObjects, path, useDirectoriesTreeInput) =>
-    ipcRenderer.invoke('imagesToDateRangeFolderBE', filePathObjects, path, useDirectoriesTreeInput)
+  imagesToDateRangeFolderBE: (fileSystemNodes, path, useDirectoriesTreeInput) =>
+    ipcRenderer.invoke('imagesToDateRangeFolderBE', fileSystemNodes, path, useDirectoriesTreeInput)
 })
 
 contextBridge.exposeInMainWorld('synchronization', {

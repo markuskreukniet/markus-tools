@@ -73,16 +73,15 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 
 // self added with ipcMain import
-// TODO: filePaths should be fileSystemNodes
 import duplicateFiles from './modules/duplicateFiles'
-async function duplicateFilesBE(e, filePaths) {
-  return duplicateFiles(filePaths)
+async function duplicateFilesBE(e, fileSystemNodes) {
+  return duplicateFiles(fileSystemNodes)
 }
 ipcMain.handle('duplicateFilesBE', duplicateFilesBE)
 
 import linesOfCode from './modules/linesOfCode'
-async function linesOfCodeBE(e, filePaths) {
-  return linesOfCode(filePaths)
+async function linesOfCodeBE(e, fileSystemNodes) {
+  return linesOfCode(fileSystemNodes)
 }
 ipcMain.handle('linesOfCodeBE', linesOfCodeBE)
 
@@ -93,8 +92,8 @@ async function referencesByUrlsBE(e, urlsString) {
 ipcMain.handle('referencesByUrlsBE', referencesByUrlsBE)
 
 import imagesToDateRangeFolder from './modules/imagesToDateRangeFolder'
-async function imagesToDateRangeFolderBE(e, filePathObjects, path, useDirectoriesTreeInput) {
-  return imagesToDateRangeFolder(filePathObjects, path, useDirectoriesTreeInput)
+async function imagesToDateRangeFolderBE(e, fileSystemNodes, path, useDirectoriesTreeInput) {
+  return imagesToDateRangeFolder(fileSystemNodes, path, useDirectoriesTreeInput)
 }
 ipcMain.handle('imagesToDateRangeFolderBE', imagesToDateRangeFolderBE)
 
