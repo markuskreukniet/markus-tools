@@ -17,6 +17,8 @@ import PageNavigator from './components/PageNavigator'
 // TODO: imagesToDateRangeFolder check input and output folder is not the same or a child
 // TODO: No Symlink Handling, which results in bugs. Maybe is the right fix the use of symlinks (LStat)?
 
+// TODO: filePathObjects and filePaths to fileSystemNodes, also the non arrays
+
 // TODO: backend functions should return a object for:
 // function tagsAndMessageToJsx(openingTag, closingTag, message) {
 //   if (openingTag === 'ok-result' && closingTag === '</p>') {
