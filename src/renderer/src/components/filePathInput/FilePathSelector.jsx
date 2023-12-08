@@ -6,7 +6,7 @@ export default function FilePathSelector(props) {
     const result = await window.dialog.openFileDialogBE(props.directory)
     if (isEitherRightResult(result)) {
       const fileSystemNode = { path: result.value, isDirectory: false }
-      if (props.directory) {
+      if (props.directory && result.value !== '') {
         fileSystemNode.isDirectory = true
       }
       // TODO: use either
