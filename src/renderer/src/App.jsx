@@ -64,7 +64,7 @@ function App() {
         navigationBarItemPageCombinations={navigationBarItemPageCombinations}
         activeNavigationBarItem={activeNavigationBarItem}
       />
-      <Loader loading={loading} />
+      <Loader loading={loading()} />
 
       {/* <img class="hero-logo" src={logo} alt="logo" />
       <h2 class="hero-text">You{"'"}ve successfully created an Electron project with Solid</h2>

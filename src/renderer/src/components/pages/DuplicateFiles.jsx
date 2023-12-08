@@ -38,7 +38,6 @@ export default function DuplicateFiles(props) {
     </>
   )
 
-  // TODO: should be result()?
   const outputComponent = (
     <TextArea readOnly textAreaValue={result} placeholderContent={placeholderContent} />
   )
