@@ -9,7 +9,6 @@ import {
 
 // TODO: has many similarities with imagesToDateRangeFolder.js
 export default async function duplicateFiles(filePathObjects) {
-  // TODO: tree optional
   const filePathObjectsToFileObjectsRO = await filePathObjectsToFileObjects(filePathObjects, true)
   if (!isResultObjectOk(filePathObjectsToFileObjectsRO)) {
     return filePathObjectsToFileObjectsRO
@@ -113,16 +112,17 @@ function compare(a, b) {
   return 0
 }
 
+function prependNewline(string) {
+  return `\n${string}`
+}
+
 function duplicatesArrayToResultString(duplicates) {
   let result = duplicates[0].path
   for (let i = 1; i < duplicates.length; i++) {
-    // TODO: create string with function?
-    let resultPart = `\n${duplicates[i].path}`
-
+    let resultPart = prependNewline(duplicates[i].path)
     if (duplicates[i].hash !== duplicates[i - 1].hash) {
-      resultPart = `\n${resultPart}`
+      resultPart = prependNewline(resultPart)
     }
-
     result += resultPart
   }
 
