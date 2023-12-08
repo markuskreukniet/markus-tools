@@ -1,21 +1,19 @@
-import {
-  isResultObjectOk,
-  toResultObjectWithResultStatusOk
-} from '../../../../preload/modules/resultStatus'
+import { isEitherRightResult } from '../../../../preload/monads/either'
+import { toResultObjectWithResultStatusOk } from '../../../../preload/modules/resultStatus'
 
 export default function FilePathSelector(props) {
   async function clickInput() {
-    const openFileDialogRO = await window.dialog.openFileDialogBE(props.directory)
-
-    if (isResultObjectOk(openFileDialogRO) && openFileDialogRO.result !== '') {
-      const result = { path: openFileDialogRO.result, isDirectory: false }
+    const result = await window.dialog.openFileDialogBE(props.directory)
+    if (isEitherRightResult(result)) {
+      const fileSystemNode = { path: result.value, isDirectory: false }
       if (props.directory) {
-        result.isDirectory = true
+        fileSystemNode.isDirectory = true
       }
-
-      props.onChange(toResultObjectWithResultStatusOk(result))
+      // TODO: use either
+      props.onChange(toResultObjectWithResultStatusOk(fileSystemNode))
     } else {
-      props.onChange(openFileDialogRO)
+      // TODO: is wrong and should use either
+      props.onChange(toResultObjectWithResultStatusOk(''))
     }
   }
 

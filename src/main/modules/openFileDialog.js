@@ -1,8 +1,5 @@
 import { dialog } from 'electron'
-import {
-  toResultObjectWithResultStatusErrorSystem,
-  toResultObjectWithResultStatusOk
-} from '../../preload/modules/resultStatus'
+import { toEitherLeftResult, toEitherRightResult } from '../../preload/monads/either'
 
 export default async function openFileDialog(selectDirectory) {
   const properties = [selectDirectory ? 'openDirectory' : 'openFile']
@@ -13,10 +10,8 @@ export default async function openFileDialog(selectDirectory) {
       properties,
       filters
     })
-    return result.canceled
-      ? toResultObjectWithResultStatusOk('')
-      : toResultObjectWithResultStatusOk(result.filePaths[0])
+    return result.canceled ? toEitherRightResult('') : toEitherRightResult(result.filePaths[0])
   } catch (error) {
-    return toResultObjectWithResultStatusErrorSystem('', error.message)
+    return toEitherLeftResult(error.message)
   }
 }
