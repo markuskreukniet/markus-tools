@@ -3,7 +3,7 @@ import { filePathSelectionType } from '../../../../preload/modules/files'
 import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
 
 export default function MaxOneDirectoryInput(props) {
-  function handleOnChange(resultObject) {
+  function handleChange(resultObject) {
     if (isResultObjectOk(resultObject)) {
       resultObject.result = {
         selectedFileSystemNode: resultObject.result.selectedFileSystemNodes[0],
@@ -15,7 +15,7 @@ export default function MaxOneDirectoryInput(props) {
 
   return (
     <FileOrFolderInput
-      onChange={handleOnChange}
+      onChange={handleChange}
       filePathSelectionType={filePathSelectionType.directory}
       maxOneInput
     />
