@@ -19,6 +19,8 @@ import PageNavigator from './components/PageNavigator'
 
 // TODO: filePathObjects and filePaths to fileSystemNodes, also the non arrays
 
+// TODO: text 'done' and 'error: ' should be part of an component?
+
 // TODO: backend functions should return a object for:
 // function tagsAndMessageToJsx(openingTag, closingTag, message) {
 //   if (openingTag === 'ok-result' && closingTag === '</p>') {
