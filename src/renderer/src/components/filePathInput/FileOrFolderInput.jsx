@@ -2,10 +2,7 @@ import { createSignal, For, Show } from 'solid-js'
 import ActivatableButton from '../activatableButton/ActivatableButton'
 import FilePathSelector from './FilePathSelector'
 import { filePathSelectionType } from '../../../../preload/modules/files'
-import {
-  isResultObjectOk,
-  toResultObjectWithResultStatusOk
-} from '../../../../preload/modules/resultStatus'
+import { toResultObjectWithResultStatusOk } from '../../../../preload/modules/resultStatus'
 
 // TODO:
 // Adding a file could add a duplicate file since there could already be a folder with its whole tree of child folders already containing that file.
@@ -21,7 +18,7 @@ export default function FileOrFolderInput(props) {
       if (props.maxOneInput) {
         setSelectedFileSystemNodes([result])
       } else if (
-        !selectedFileSystemNodes().some((FileSystemNode) => FileSystemNode.path === result.path)
+        !selectedFileSystemNodes().some((fileSystemNode) => fileSystemNode.path === result.path)
       ) {
         setSelectedFileSystemNodes([...selectedFileSystemNodes(), result])
       } else {
@@ -44,9 +41,10 @@ export default function FileOrFolderInput(props) {
     setHasFileSystemNode(false)
   }
 
-  function handleChange(resultObject) {
-    if (isResultObjectOk(resultObject)) {
-      setState(resultObject.result)
+  // TODO: use Either
+  function handleChange(result) {
+    if (result.isRight()) {
+      setState(result.value)
       props.onChange(
         toResultObjectWithResultStatusOk({
           selectedFileSystemNodes: selectedFileSystemNodes(),
@@ -54,7 +52,7 @@ export default function FileOrFolderInput(props) {
         })
       )
     } else {
-      props.onChange(resultObject)
+      props.onChange(result)
     }
   }
 

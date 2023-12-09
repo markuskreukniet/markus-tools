@@ -1,5 +1,4 @@
-import { isEitherRightResult } from '../../../../preload/monads/either'
-import { toResultObjectWithResultStatusOk } from '../../../../preload/modules/resultStatus'
+import { Either, isEitherRightResult } from '../../../../preload/monads/either'
 
 export default function FilePathSelector(props) {
   async function clickInput() {
@@ -9,11 +8,9 @@ export default function FilePathSelector(props) {
       if (props.directory && result.value !== '') {
         fileSystemNode.isDirectory = true
       }
-      // TODO: use either
-      props.onChange(toResultObjectWithResultStatusOk(fileSystemNode))
+      props.onChange(Either.right(fileSystemNode))
     } else {
-      // TODO: is wrong and should use either
-      props.onChange(toResultObjectWithResultStatusOk(''))
+      props.onChange(Either.left(result.value))
     }
   }
 
