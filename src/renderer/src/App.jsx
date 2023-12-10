@@ -18,6 +18,9 @@ import PageNavigator from './components/PageNavigator'
 // TODO: No Symlink Handling, which results in bugs. Maybe is the right fix the use of symlinks (LStat)?
 
 // TODO: filePathObjects and filePaths to fileSystemNodes, also the non arrays
+// TODO: ResultObject or RO to either
+
+// TODO: bug: images to date: move images out of a date folder and the use the app again top create the same folder, then it wants to create the same folder, whcih it can't
 
 // TODO: text 'done' and 'error: ' should be part of an component?
 

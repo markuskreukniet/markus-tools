@@ -28,13 +28,14 @@ export default function SynchronizeDirectory(props) {
     }
   }
 
+  // TODO: either
   function handleInputOriginalDirectoryRO(resultObject) {
     // TODO: resultObject.result should be different, maybe only path?
-    originalDirectoryFilePath = resultObject.result.selectedFileSystemNode.path
+    originalDirectoryFilePath = resultObject.value.selectedFileSystemNode.path
   }
 
   function handleInputDestinationDirectoryRO(resultObject) {
-    destinationDirectoryFilePath = resultObject.result.selectedFileSystemNode.path
+    destinationDirectoryFilePath = resultObject.value.selectedFileSystemNode.path
   }
 
   function submit() {

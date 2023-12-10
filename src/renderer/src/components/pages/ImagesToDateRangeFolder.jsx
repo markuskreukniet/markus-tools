@@ -34,24 +34,24 @@ export default function imagesToDateRangeFolder(props) {
     }
   }
 
-  // We could extract similar code of the functions handleInputFilePathsRO and handleOutputDirectoryRO, for example, to the function handleRO.
-  // With this extraction, handleInputFilePathsRO and handleOutputDirectoryRO call both handleRO.
+  // We could extract similar code of the functions handleInputFileSystemNodes and handleOutputDirectory, for example, to the function handleChange.
+  // With this extraction, handleInputFileSystemNodes and handleOutputDirectory call both handleChange.
   // However, this extraction hurts the performance and results in more code.
-  function handleInputFilePathsRO(resultObject) {
-    if (isResultObjectOk(resultObject)) {
-      inputFilePathObjects = resultObject.result.selectedFileSystemNodes
+  function handleInputFileSystemNodes(result) {
+    if (result.isRight()) {
+      inputFilePathObjects = result.value.selectedFileSystemNodes
       validateInput()
     } else {
-      setStatus(resultObject.message)
+      setStatus(result.value)
     }
   }
 
-  function handleOutputDirectoryRO(resultObject) {
-    if (isResultObjectOk(resultObject)) {
-      outputFilePath = resultObject.result.selectedFileSystemNode.path
+  function handleOutputDirectory(result) {
+    if (result.isRight()) {
+      outputFilePath = result.value.selectedFileSystemNode.path
       validateInput()
     } else {
-      setStatus(resultObject.message)
+      setStatus(result.value)
     }
   }
 
@@ -61,8 +61,8 @@ export default function imagesToDateRangeFolder(props) {
 
   const inputComponent = (
     <div>
-      <FileOrFolderInput onChange={handleInputFilePathsRO} />
-      <MaxOneDirectoryInput onChange={handleOutputDirectoryRO} />
+      <FileOrFolderInput onChange={handleInputFileSystemNodes} />
+      <MaxOneDirectoryInput onChange={handleOutputDirectory} />
       <ActivatableSubmitButton active={hasValidInput()} onAction={submit} />
     </div>
   )

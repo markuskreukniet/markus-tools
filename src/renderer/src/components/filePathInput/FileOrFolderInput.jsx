@@ -1,8 +1,8 @@
 import { createSignal, For, Show } from 'solid-js'
 import ActivatableButton from '../activatableButton/ActivatableButton'
+import { Either } from '../../../../preload/monads/either'
 import FilePathSelector from './FilePathSelector'
 import { filePathSelectionType } from '../../../../preload/modules/files'
-import { toResultObjectWithResultStatusOk } from '../../../../preload/modules/resultStatus'
 
 // TODO:
 // Adding a file could add a duplicate file since there could already be a folder with its whole tree of child folders already containing that file.
@@ -41,12 +41,22 @@ export default function FileOrFolderInput(props) {
     setHasFileSystemNode(false)
   }
 
-  // TODO: use Either
+  // TODO: can be shortened to this, or reference problem?
+  // function handleChange(result) {
+  //   if (result.isRight()) {
+  //     setState(result.value)
+  //     result.value = {
+  //       selectedFileSystemNodes: selectedFileSystemNodes(),
+  //       hasFileSystemNode: hasFileSystemNode()
+  //     }
+  //   }
+  //   props.onChange(result)
+  // }
   function handleChange(result) {
     if (result.isRight()) {
       setState(result.value)
       props.onChange(
-        toResultObjectWithResultStatusOk({
+        Either.right({
           selectedFileSystemNodes: selectedFileSystemNodes(),
           hasFileSystemNode: hasFileSystemNode()
         })

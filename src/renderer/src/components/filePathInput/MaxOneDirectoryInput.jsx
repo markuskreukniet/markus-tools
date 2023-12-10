@@ -1,16 +1,15 @@
 import FileOrFolderInput from './FileOrFolderInput'
 import { filePathSelectionType } from '../../../../preload/modules/files'
-import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
 
 export default function MaxOneDirectoryInput(props) {
-  function handleChange(resultObject) {
-    if (isResultObjectOk(resultObject)) {
-      resultObject.result = {
-        selectedFileSystemNode: resultObject.result.selectedFileSystemNodes[0],
-        hasFileSystemNode: resultObject.result.hasFileSystemNode
+  function handleChange(result) {
+    if (result.isRight()) {
+      result.value = {
+        selectedFileSystemNode: result.value.selectedFileSystemNodes[0],
+        hasFileSystemNode: result.value.hasFileSystemNode
       }
     }
-    props.onChange(resultObject)
+    props.onChange(result)
   }
 
   return (

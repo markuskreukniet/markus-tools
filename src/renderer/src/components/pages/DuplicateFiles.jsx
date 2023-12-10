@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js'
 import ResultPage from '../page/ResultPage'
-import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
+import { eitherLeftResultToErrorString } from '../../../../preload/monads/either'
 import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFolderInput'
 import TextArea from '../TextArea'
 
@@ -15,15 +15,15 @@ export default function DuplicateFiles(props) {
   }
 
   // TODO: looks a lot like imagesToDateRangeFolder handleInputFilePathsRO
-  function handleFilePathsRO(resultObject) {
-    if (isResultObjectOk(resultObject)) {
-      setGetOutput(setStateOutputComponent(resultObject.result))
+  function handleChange(result) {
+    if (result.isRight()) {
+      setGetOutput(setStateOutputComponent(result.value))
     } else {
-      setResult(resultObject.message)
+      setResult(eitherLeftResultToErrorString(result))
     }
   }
 
-  const inputComponent = <SubmittableFileOrFolderInput onChange={handleFilePathsRO} />
+  const inputComponent = <SubmittableFileOrFolderInput onChange={handleChange} />
 
   const placeholderContent = (
     <>

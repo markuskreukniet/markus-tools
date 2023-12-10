@@ -8,7 +8,7 @@ export default function ReferencesByUrls(props) {
   const [isValid, setIsValid] = createSignal('')
   const [references, setReferences] = createSignal('')
 
-  function setStateInputComponent(textAreaValue) {
+  function handleChange(textAreaValue) {
     setTextAreaValue(textAreaValue)
 
     if (textAreaValue === '') {
@@ -38,7 +38,7 @@ export default function ReferencesByUrls(props) {
     <div>
       <TextArea
         textAreaValue={textAreaValue}
-        onChange={setStateInputComponent}
+        onChange={handleChange}
         placeholderContent={placeholderContent}
       />
       <button onClick={submit} disabled={!isValid()}>

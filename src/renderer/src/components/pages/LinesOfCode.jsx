@@ -10,22 +10,28 @@ export default function LinesOfCode(props) {
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [linesOfCodeResult, setLinesOfCodeResult] = createSignal('')
 
-  // TODO: are it filePaths?
-  async function setOutput(filePaths) {
-    const result = await window.codeQuality.linesOfCodeBE(filePaths)
+  async function setOutput(fileSystemNodes) {
+    const result = await window.codeQuality.linesOfCodeBE(fileSystemNodes)
     if (isEitherRightResult(result)) {
       setLinesOfCodeResult(`Lines of code: ${result.value}`)
     } else {
-      setLinesOfCodeResult(eitherLeftResultToErrorString(result))
+      setLinesOfCodeResultWithEitherLeftResultToErrorString(result)
     }
   }
 
-  function handleFilePaths(filePaths) {
-    // TODO: error handling
-    setGetOutput(setOutput(filePaths.result))
+  function handleChange(result) {
+    if (result.isRight()) {
+      setGetOutput(setOutput(result.value))
+    } else {
+      setLinesOfCodeResultWithEitherLeftResultToErrorString(result)
+    }
   }
 
-  const inputComponent = <SubmittableFileOrFolderInput onChange={handleFilePaths} />
+  function setLinesOfCodeResultWithEitherLeftResultToErrorString(result) {
+    setLinesOfCodeResult(eitherLeftResultToErrorString(result))
+  }
+
+  const inputComponent = <SubmittableFileOrFolderInput onChange={handleChange} />
 
   return (
     <TextResultPage
