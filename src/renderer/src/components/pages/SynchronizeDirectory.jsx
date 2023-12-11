@@ -30,12 +30,11 @@ export default function SynchronizeDirectory(props) {
 
   // TODO: either
   function handleInputSourceDirectory(result) {
-    // TODO: resultObject.result should be different, maybe only path? Yes since it is always a directory
-    originalDirectoryFilePath = result.value.selectedFileSystemNode.path
+    originalDirectoryFilePath = result.value
   }
 
   function handleInputDestinationDirectory(result) {
-    destinationDirectoryFilePath = result.value.selectedFileSystemNode.path
+    destinationDirectoryFilePath = result.value
   }
 
   function submit() {

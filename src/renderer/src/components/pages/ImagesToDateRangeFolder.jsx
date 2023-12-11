@@ -48,7 +48,7 @@ export default function imagesToDateRangeFolder(props) {
 
   function handleOutputDirectory(result) {
     if (result.isRight()) {
-      outputFilePath = result.value.selectedFileSystemNode.path
+      outputFilePath = result.value
       validateInput()
     } else {
       setStatus(result.value)

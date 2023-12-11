@@ -4,10 +4,8 @@ import { filePathSelectionType } from '../../../../preload/modules/files'
 export default function MaxOneDirectoryInput(props) {
   function handleChange(result) {
     if (result.isRight()) {
-      result.value = {
-        selectedFileSystemNode: result.value.selectedFileSystemNodes[0],
-        hasFileSystemNode: result.value.hasFileSystemNode
-      }
+      // result.value.hasFileSystemNode is not needed here at the moment
+      result.value = result.value.selectedFileSystemNodes[0].path
     }
     props.onChange(result)
   }
