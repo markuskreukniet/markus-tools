@@ -8,7 +8,7 @@ import {
 import MaxOneDirectoryInput from '../filePathInput/MaxOneDirectoryInput'
 
 export default function SynchronizeDirectory(props) {
-  let originalDirectoryFilePath = null
+  let sourceDirectoryFilePath = null
   let destinationDirectoryFilePath = null
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [status, setStatus] = createSignal('')
@@ -17,7 +17,7 @@ export default function SynchronizeDirectory(props) {
   // TODO: rename also on other to callBE()
   async function callBE() {
     const result = await window.synchronization.synchronizeDirectoryBE(
-      originalDirectoryFilePath,
+      sourceDirectoryFilePath,
       destinationDirectoryFilePath
     )
     if (isEitherRightResult(result)) {
@@ -28,19 +28,27 @@ export default function SynchronizeDirectory(props) {
     }
   }
 
-  // TODO: either
   function handleInputSourceDirectory(result) {
-    originalDirectoryFilePath = result.value
+    if (result.isRight()) {
+      sourceDirectoryFilePath = result.value
+    } else {
+      setStatus(eitherLeftResultToErrorString(result))
+    }
   }
 
   function handleInputDestinationDirectory(result) {
-    destinationDirectoryFilePath = result.value
+    if (result.isRight()) {
+      destinationDirectoryFilePath = result.value
+    } else {
+      setStatus(eitherLeftResultToErrorString(result))
+    }
   }
 
   function submit() {
     setGetOutput(callBE)
   }
 
+  // TODO: ActivatableSubmitButton should not always be active
   const inputComponent = (
     <div>
       <MaxOneDirectoryInput onChange={handleInputSourceDirectory} />
