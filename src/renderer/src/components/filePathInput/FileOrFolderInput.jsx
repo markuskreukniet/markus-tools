@@ -39,31 +39,33 @@ export default function FileOrFolderInput(props) {
   function resetState() {
     setSelectedFileSystemNodes([])
     setHasFileSystemNode(false)
+    onChangeEitherRight()
   }
 
   // TODO: can be shortened to this, or reference problem?
   // function handleChange(result) {
   //   if (result.isRight()) {
   //     setState(result.value)
-  //     result.value = {
-  //       selectedFileSystemNodes: selectedFileSystemNodes(),
-  //       hasFileSystemNode: hasFileSystemNode()
-  //     }
+  //     onChangeEitherRight()
   //   }
   //   props.onChange(result)
   // }
   function handleChange(result) {
     if (result.isRight()) {
       setState(result.value)
-      props.onChange(
-        Either.right({
-          selectedFileSystemNodes: selectedFileSystemNodes(),
-          hasFileSystemNode: hasFileSystemNode()
-        })
-      )
+      onChangeEitherRight()
     } else {
       props.onChange(result)
     }
+  }
+
+  function onChangeEitherRight() {
+    props.onChange(
+      Either.right({
+        selectedFileSystemNodes: selectedFileSystemNodes(),
+        hasFileSystemNode: hasFileSystemNode()
+      })
+    )
   }
 
   return (

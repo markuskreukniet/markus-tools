@@ -8,9 +8,10 @@ import {
 import MaxOneDirectoryInput from '../filePathInput/MaxOneDirectoryInput'
 
 export default function SynchronizeDirectory(props) {
-  let sourceDirectoryFilePath = null
-  let destinationDirectoryFilePath = null
+  let sourceDirectoryFilePath = ''
+  let destinationDirectoryFilePath = ''
   const [getOutput, setGetOutput] = createSignal(function () {})
+  const [hasValidInput, setHasValidInput] = createSignal(false)
   const [status, setStatus] = createSignal('')
 
   // TODO: rename synchronizeDirectory to what the Go version is
@@ -28,9 +29,18 @@ export default function SynchronizeDirectory(props) {
     }
   }
 
+  function validateInput() {
+    if (sourceDirectoryFilePath && destinationDirectoryFilePath) {
+      setHasValidInput(true)
+    } else {
+      setHasValidInput(false)
+    }
+  }
+
   function handleInputSourceDirectory(result) {
     if (result.isRight()) {
       sourceDirectoryFilePath = result.value
+      validateInput()
     } else {
       setStatus(eitherLeftResultToErrorString(result))
     }
@@ -39,6 +49,7 @@ export default function SynchronizeDirectory(props) {
   function handleInputDestinationDirectory(result) {
     if (result.isRight()) {
       destinationDirectoryFilePath = result.value
+      validateInput()
     } else {
       setStatus(eitherLeftResultToErrorString(result))
     }
@@ -48,12 +59,11 @@ export default function SynchronizeDirectory(props) {
     setGetOutput(callBE)
   }
 
-  // TODO: ActivatableSubmitButton should not always be active
   const inputComponent = (
     <div>
       <MaxOneDirectoryInput onChange={handleInputSourceDirectory} />
       <MaxOneDirectoryInput onChange={handleInputDestinationDirectory} />
-      <ActivatableSubmitButton active={true} onAction={submit} />
+      <ActivatableSubmitButton active={hasValidInput()} onAction={submit} />
     </div>
   )
 
