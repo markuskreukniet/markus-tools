@@ -14,8 +14,8 @@ export default function SynchronizeDirectory(props) {
   const [status, setStatus] = createSignal('')
 
   // TODO: rename synchronizeDirectory to what the Go version is
-  // TODO: rename test
-  async function test() {
+  // TODO: rename also on other to callBE()
+  async function callBE() {
     const result = await window.synchronization.synchronizeDirectoryBE(
       originalDirectoryFilePath,
       destinationDirectoryFilePath
@@ -29,23 +29,23 @@ export default function SynchronizeDirectory(props) {
   }
 
   // TODO: either
-  function handleInputOriginalDirectoryRO(resultObject) {
-    // TODO: resultObject.result should be different, maybe only path?
-    originalDirectoryFilePath = resultObject.value.selectedFileSystemNode.path
+  function handleInputSourceDirectory(result) {
+    // TODO: resultObject.result should be different, maybe only path? Yes since it is always a directory
+    originalDirectoryFilePath = result.value.selectedFileSystemNode.path
   }
 
-  function handleInputDestinationDirectoryRO(resultObject) {
-    destinationDirectoryFilePath = resultObject.value.selectedFileSystemNode.path
+  function handleInputDestinationDirectory(result) {
+    destinationDirectoryFilePath = result.value.selectedFileSystemNode.path
   }
 
   function submit() {
-    setGetOutput(test)
+    setGetOutput(callBE)
   }
 
   const inputComponent = (
     <div>
-      <MaxOneDirectoryInput onChange={handleInputOriginalDirectoryRO} />
-      <MaxOneDirectoryInput onChange={handleInputDestinationDirectoryRO} />
+      <MaxOneDirectoryInput onChange={handleInputSourceDirectory} />
+      <MaxOneDirectoryInput onChange={handleInputDestinationDirectory} />
       <ActivatableSubmitButton active={true} onAction={submit} />
     </div>
   )
