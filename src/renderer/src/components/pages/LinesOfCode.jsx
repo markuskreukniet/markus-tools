@@ -10,7 +10,7 @@ export default function LinesOfCode(props) {
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [linesOfCodeResult, setLinesOfCodeResult] = createSignal('')
 
-  async function setOutput(fileSystemNodes) {
+  async function setStateWithBE(fileSystemNodes) {
     const result = await window.codeQuality.linesOfCodeBE(fileSystemNodes)
     if (isEitherRightResult(result)) {
       setLinesOfCodeResult(`Lines of code: ${result.value}`)
@@ -21,7 +21,7 @@ export default function LinesOfCode(props) {
 
   function handleChange(result) {
     if (result.isRight()) {
-      setGetOutput(setOutput(result.value))
+      setGetOutput(setStateWithBE(result.value))
     } else {
       setLinesOfCodeResultWithEitherLeftResultToErrorString(result)
     }

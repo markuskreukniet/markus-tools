@@ -19,10 +19,10 @@ export default function ReferencesByUrls(props) {
   }
 
   function submit() {
-    setGetOutput(setStateOutputComponent())
+    setGetOutput(setStateWithBE())
   }
 
-  async function setStateOutputComponent() {
+  async function setStateWithBE() {
     const result = await window.references.referencesByUrlsBE(textAreaValue())
     setReferences(result)
   }

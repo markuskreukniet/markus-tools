@@ -15,8 +15,7 @@ export default function SynchronizeDirectory(props) {
   const [status, setStatus] = createSignal('')
 
   // TODO: rename synchronizeDirectory to what the Go version is
-  // TODO: rename also on other to callBE()
-  async function callBE() {
+  async function setStateWithBE() {
     const result = await window.synchronization.synchronizeDirectoryBE(
       sourceDirectoryFilePath,
       destinationDirectoryFilePath
@@ -56,7 +55,7 @@ export default function SynchronizeDirectory(props) {
   }
 
   function submit() {
-    setGetOutput(callBE)
+    setGetOutput(setStateWithBE)
   }
 
   const inputComponent = (

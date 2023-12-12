@@ -8,7 +8,7 @@ export default function DuplicateFiles(props) {
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [result, setResult] = createSignal('')
 
-  async function setStateOutputComponent(filePathObjects) {
+  async function setStateWithBE(filePathObjects) {
     const duplicateFiles = await window.duplicateFiles.duplicateFilesBE(filePathObjects)
     const textareaValue = duplicateFiles !== '' ? duplicateFiles : 'No duplicate files found'
     setResult(textareaValue)
@@ -17,7 +17,7 @@ export default function DuplicateFiles(props) {
   // TODO: looks a lot like imagesToDateRangeFolder handleInputFilePathsRO
   function handleChange(result) {
     if (result.isRight()) {
-      setGetOutput(setStateOutputComponent(result.value))
+      setGetOutput(setStateWithBE(result.value))
     } else {
       setResult(eitherLeftResultToErrorString(result))
     }
