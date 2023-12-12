@@ -2,7 +2,7 @@ import { toEitherLeftResult, toEitherRightResult } from '../../preload/monads/ei
 import { exec } from 'child_process'
 import path from 'path'
 
-export default async function synchronizeDirectory(sourceDirectory, destinationDirectory) {
+export default async function synchronizeDirectoryTrees(sourceDirectory, destinationDirectory) {
   // TODO: does the replace work on systems besides Windows?
   const jsonArguments = JSON.stringify({
     sourceDirectory,
