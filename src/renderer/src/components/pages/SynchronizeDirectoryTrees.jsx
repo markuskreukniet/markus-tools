@@ -7,14 +7,13 @@ import {
 } from '../../../../preload/monads/either'
 import MaxOneDirectoryInput from '../filePathInput/MaxOneDirectoryInput'
 
-export default function SynchronizeDirectory(props) {
+export default function SynchronizeDirectoryTrees(props) {
   let sourceDirectoryFilePath = ''
   let destinationDirectoryFilePath = ''
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [hasValidInput, setHasValidInput] = createSignal(false)
   const [status, setStatus] = createSignal('')
 
-  // TODO: rename synchronizeDirectory (also the file and app tab and import synchronizeDirectory) to what the Go version is
   async function setStateWithBE() {
     const result = await window.synchronization.synchronizeDirectoryTreesBE(
       sourceDirectoryFilePath,

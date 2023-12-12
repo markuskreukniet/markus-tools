@@ -3,7 +3,7 @@ import DuplicateFiles from './components/pages/DuplicateFiles'
 import ImagesToDateRangeFolder from './components/pages/ImagesToDateRangeFolder'
 import LinesOfCode from './components/pages/LinesOfCode'
 import ReferencesByUrls from './components/pages/ReferencesByUrls'
-import SynchronizeDirectory from './components/pages/SynchronizeDirectory'
+import SynchronizeDirectoryTrees from './components/pages/SynchronizeDirectoryTrees'
 import Loader from './components/Loader'
 import PageNavigator from './components/PageNavigator'
 // import logo from './assets/logo.svg'
@@ -40,7 +40,7 @@ function App() {
   const linesOfCodeTitle = 'Lines of Code (LOC)'
   const referencesByUrlsTitle = 'References by URLs'
   const imagesToDateRangeFolderTitle = 'Images to Date Range Folder'
-  const synchronizeDirectoryTitle = 'Synchronize Directory'
+  const synchronizeDirectoryTreesTitle = 'Synchronize Directory Trees'
   // TODO: make of abstraction of navigationBarItem and page
   const navigationBarItemPageCombinations = [
     {
@@ -60,8 +60,10 @@ function App() {
       page: <ImagesToDateRangeFolder title={imagesToDateRangeFolderTitle} onLoading={setLoading} />
     },
     {
-      navigationBarItem: synchronizeDirectoryTitle,
-      page: <SynchronizeDirectory title={synchronizeDirectoryTitle} onLoading={setLoading} />
+      navigationBarItem: synchronizeDirectoryTreesTitle,
+      page: (
+        <SynchronizeDirectoryTrees title={synchronizeDirectoryTreesTitle} onLoading={setLoading} />
+      )
     }
   ]
   const activeNavigationBarItem = navigationBarItemPageCombinations[0].navigationBarItem
