@@ -14,9 +14,9 @@ export default function SynchronizeDirectory(props) {
   const [hasValidInput, setHasValidInput] = createSignal(false)
   const [status, setStatus] = createSignal('')
 
-  // TODO: rename synchronizeDirectory to what the Go version is
+  // TODO: rename synchronizeDirectory (also the file and app tab and import synchronizeDirectory) to what the Go version is
   async function setStateWithBE() {
-    const result = await window.synchronization.synchronizeDirectoryBE(
+    const result = await window.synchronization.synchronizeDirectoryTreesBE(
       sourceDirectoryFilePath,
       destinationDirectoryFilePath
     )
