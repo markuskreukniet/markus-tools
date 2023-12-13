@@ -8,9 +8,9 @@ import Loader from './components/Loader'
 import PageNavigator from './components/PageNavigator'
 // import logo from './assets/logo.svg'
 
-// TODO: check for good error handling whole app
-// TODO: remove some createEffects
-// TODO: remove useless comments
+// TODO: check for error handling, createEffects, useless comments
+// TODO: use batch, untrack, on (with { defer: true }) from import { batch, on, untrack } from "solid-js";?
+
 // TODO: rename folder to directory
 // TODO: rename files.js to filePath.js
 // TODO: rename openFileDialog to openFilePathDialog.js with functions
@@ -21,19 +21,8 @@ import PageNavigator from './components/PageNavigator'
 // TODO: ResultObject or RO to either
 // TODO: OriginalDirectory rename to SourceDirectory
 
-// TODO: use batch, untrack, on (with { defer: true }) from import { batch, on, untrack } from "solid-js";?
-
 // TODO: bug: images to date: move images out of a date folder and the use the app again top create the same folder, then it wants to create the same folder, whcih it can't
 
-// TODO: text 'done' and 'error: ' should be part of an component?
-
-// TODO: backend functions should return a object for:
-// function tagsAndMessageToJsx(openingTag, closingTag, message) {
-//   if (openingTag === 'ok-result' && closingTag === '</p>') {
-//     return <p class="">{message}</p>
-//   }
-// }
-// Or convert a resultObject to a JSX
 function App() {
   const [loading, setLoading] = createSignal(false)
   const duplicateFilesTitle = 'Duplicate Files'
