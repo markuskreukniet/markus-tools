@@ -36,14 +36,14 @@ func haveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory strin
 	return haveSameFilePaths, nil
 }
 
-func createTempFileSystemStructureOrGetEmptyString(directoryPathEndParts []string, filePathEndParts []string) (string, error) {
+func createTempFileSystemStructureOrGetEmptyString(directoryPathEndParts, filePathEndParts []string) (string, error) {
 	if len(directoryPathEndParts) == 0 {
 		return "", nil
 	}
 	return createTempFileSystemStructure(directoryPathEndParts, filePathEndParts)
 }
 
-func createTempFileSystemStructure(directoryPathEndParts []string, filePathEndParts []string) (string, error) {
+func createTempFileSystemStructure(directoryPathEndParts, filePathEndParts []string) (string, error) {
 	tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
 	if err != nil {
 		return "", err
