@@ -1,30 +1,21 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
 import ActivatableSubmitButton from '../activatableButton/ActivatableSubmitButton'
-import {
-  eitherLeftResultToErrorString,
-  isEitherRightResult
-} from '../../../../preload/monads/either'
 import MaxOneDirectoryInput from '../filePathInput/MaxOneDirectoryInput'
 
 export default function SynchronizeDirectoryTrees(props) {
   let sourceDirectoryFilePath = ''
   let destinationDirectoryFilePath = ''
+  const [eitherResultOutput, setEitherResultOutput] = createSignal(null)
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [hasValidInput, setHasValidInput] = createSignal(false)
-  const [status, setStatus] = createSignal('')
 
   async function setStateWithBE() {
     const result = await window.synchronization.synchronizeDirectoryTreesBE(
       sourceDirectoryFilePath,
       destinationDirectoryFilePath
     )
-    if (isEitherRightResult(result)) {
-      // TODO: done is also used somewhere else
-      setStatus('done')
-    } else {
-      setStatus(eitherLeftResultToErrorString(result))
-    }
+    setEitherResultOutput(result)
   }
 
   function validateInput() {
@@ -40,7 +31,7 @@ export default function SynchronizeDirectoryTrees(props) {
       sourceDirectoryFilePath = result.value
       validateInput()
     } else {
-      setStatus(eitherLeftResultToErrorString(result))
+      setEitherResultOutput(result)
     }
   }
 
@@ -49,7 +40,7 @@ export default function SynchronizeDirectoryTrees(props) {
       destinationDirectoryFilePath = result.value
       validateInput()
     } else {
-      setStatus(eitherLeftResultToErrorString(result))
+      setEitherResultOutput(result)
     }
   }
 
@@ -69,7 +60,7 @@ export default function SynchronizeDirectoryTrees(props) {
     <TextResultPage
       title={props.title}
       inputComponent={inputComponent}
-      output={status()}
+      eitherResultOutput={eitherResultOutput()}
       getOutput={getOutput}
       onLoading={props.onLoading}
     />

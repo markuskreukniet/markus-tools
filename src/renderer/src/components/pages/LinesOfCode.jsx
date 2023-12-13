@@ -1,34 +1,26 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
-import {
-  eitherLeftResultToErrorString,
-  isEitherRightResult
-} from '../../../../preload/monads/either'
+import { isEitherRightResult } from '../../../../preload/monads/either'
 import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFolderInput'
 
 export default function LinesOfCode(props) {
+  const [eitherResultOutput, setEitherResultOutput] = createSignal(null)
   const [getOutput, setGetOutput] = createSignal(function () {})
-  const [linesOfCodeResult, setLinesOfCodeResult] = createSignal('')
 
   async function setStateWithBE(fileSystemNodes) {
     const result = await window.codeQuality.linesOfCodeBE(fileSystemNodes)
     if (isEitherRightResult(result)) {
-      setLinesOfCodeResult(`Lines of code: ${result.value}`)
-    } else {
-      setLinesOfCodeResultWithEitherLeftResultToErrorString(result)
+      result.value = `Lines of code: ${result.value}`
     }
+    setEitherResultOutput(result)
   }
 
   function handleChange(result) {
     if (result.isRight()) {
       setGetOutput(setStateWithBE(result.value))
     } else {
-      setLinesOfCodeResultWithEitherLeftResultToErrorString(result)
+      setEitherResultOutput(result)
     }
-  }
-
-  function setLinesOfCodeResultWithEitherLeftResultToErrorString(result) {
-    setLinesOfCodeResult(eitherLeftResultToErrorString(result))
   }
 
   const inputComponent = <SubmittableFileOrFolderInput onChange={handleChange} />
@@ -37,7 +29,7 @@ export default function LinesOfCode(props) {
     <TextResultPage
       title={props.title}
       inputComponent={inputComponent}
-      output={linesOfCodeResult()}
+      eitherResultOutput={eitherResultOutput()}
       getOutput={getOutput}
       onLoading={props.onLoading}
     />

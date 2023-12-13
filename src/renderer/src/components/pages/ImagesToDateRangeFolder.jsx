@@ -2,15 +2,15 @@ import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
 import ActivatableSubmitButton from '../activatableButton/ActivatableSubmitButton'
 import FileOrFolderInput from '../filePathInput/FileOrFolderInput'
-import { isResultObjectOk } from '../../../../preload/modules/resultStatus'
 import MaxOneDirectoryInput from '../filePathInput/MaxOneDirectoryInput'
+import { toEitherRightResult } from '../../../../preload/monads/either'
 
 export default function imagesToDateRangeFolder(props) {
   let inputFilePathObjects = []
   let outputFilePath = ''
+  const [eitherResultOutput, setEitherResultOutput] = createSignal(null)
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [hasValidInput, setHasValidInput] = createSignal(false)
-  const [status, setStatus] = createSignal('')
 
   async function setStateWithBE(filePathObjects, path) {
     // TODO: should come from GUI
@@ -21,9 +21,8 @@ export default function imagesToDateRangeFolder(props) {
       path,
       useDirectoriesTreeInput
     )
-    setStatus(
-      isResultObjectOk(imagesToDateRangeFolderRO) ? 'done' : imagesToDateRangeFolderRO.message
-    )
+    // TODO: imagesToDateRangeFolderBE should return eitherResult and should be setEitherResultOutput(result)
+    setEitherResultOutput(toEitherRightResult(null))
   }
 
   function validateInput() {
@@ -42,7 +41,7 @@ export default function imagesToDateRangeFolder(props) {
       inputFilePathObjects = result.value.selectedFileSystemNodes
       validateInput()
     } else {
-      setStatus(result.value)
+      setEitherResultOutput(result)
     }
   }
 
@@ -51,7 +50,7 @@ export default function imagesToDateRangeFolder(props) {
       outputFilePath = result.value
       validateInput()
     } else {
-      setStatus(result.value)
+      setEitherResultOutput(result)
     }
   }
 
@@ -71,7 +70,7 @@ export default function imagesToDateRangeFolder(props) {
     <TextResultPage
       title={props.title}
       inputComponent={inputComponent}
-      output={status()}
+      eitherResultOutput={eitherResultOutput()}
       getOutput={getOutput}
       onLoading={props.onLoading}
     />
