@@ -116,20 +116,20 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			// arrange and tear down
 			sourceDirectory, err := createTempFileSystemStructureOrGetEmptyString(tc.SourceDirectoryPathEndParts, tc.SourceFilePathEndParts)
 			if err != nil {
-				t.Fatalf("Failed to create temporary source directory: %v", err)
+				t.Fatalf("Failed to create the temporary source directory: %v", err)
 			}
 			defer func() {
 				if err := os.RemoveAll(sourceDirectory); err != nil {
-					t.Errorf("Failed to remove temporary source directory: %v", err)
+					t.Errorf("Failed to remove the temporary source directory: %v", err)
 				}
 			}()
 			destinationDirectory, err := createTempFileSystemStructureOrGetEmptyString(tc.DestinationDirectoryPathEndParts, tc.DestinationFilePathEndParts)
 			if err != nil {
-				t.Fatalf("Failed to create temporary destination directory: %v", err)
+				t.Fatalf("Failed to create the temporary destination directory: %v", err)
 			}
 			defer func() {
 				if err := os.RemoveAll(destinationDirectory); err != nil {
-					t.Errorf("Failed to remove temporary destination directory: %v", err)
+					t.Errorf("Failed to remove the temporary destination directory: %v", err)
 				}
 			}()
 
