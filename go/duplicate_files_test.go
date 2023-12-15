@@ -1,42 +1,110 @@
 package main
 
-// TODO: Might work
-// func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
-// 	// Step 1: Test Setup
-// 	tempDir, err := os.MkdirTemp("", "test")
-// 	if err != nil {
-// 		t.Fatalf("Failed to create temp directory: %v", err)
-// 	}
-// 	defer os.RemoveAll(tempDir) // Clean up
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
 
-// 	// Create a set of test files, some of which are duplicates
-// 	fileContents := []string{"content1", "content2", "content1"} // 'content1' is duplicated
-// 	filePaths := make([]string, len(fileContents))
-// 	for i, content := range fileContents {
-// 		filePath := filepath.Join(tempDir, "file"+strconv.Itoa(i))
-// 		if err := os.WriteFile(filePath, []byte(content), 0666); err != nil {
-// 			t.Fatalf("Failed to create test file: %v", err)
-// 		}
-// 		filePaths[i] = filePath
-// 	}
+func writeFileContentAndWriteString(t *testing.T, directory string, filePathEndPart string, index int, builder *strings.Builder) {
+	duplicateFilePath := filepath.Join(directory, filePathEndPart)
+	if err := os.WriteFile(duplicateFilePath, []byte(fmt.Sprintf("content %d", index)), 0666); err != nil {
+		t.Errorf("Failed to write file content: %v", err)
+	}
+	_, err := builder.WriteString(duplicateFilePath)
+	if err != nil {
+		t.Errorf("Failed to write string: %v", err)
+	}
+}
 
-// 	// Step 2: Test Execution
-// 	// Convert filePaths to FileSystemNodes
-// 	nodes := make([]FileSystemNode, len(filePaths))
-// 	for i, path := range filePaths {
-// 		nodes[i] = FileSystemNode{Path: path, IsDirectory: false}
-// 	}
+func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
+	// arrange
+	// TODO: copied and expanded file path structure from TestSynchronizeDirectoryTrees.
+	// This structure should be part of an object which can return PathEndParts.
+	directoryEmpty := "directory empty"
+	directory1 := "directory 1"
+	directory2 := "directory 2"
+	directory2WithDirectoryEmpty := filepath.Join(directory2, directoryEmpty)
+	directory2WithDirectory3 := filepath.Join(directory2, "directory 3")
+	directory2WithDirectory4 := filepath.Join(directory2, "directory 4")
 
-// 	result, err := getDuplicateFilesAsNewlineSeparatedString(nodes)
-// 	if err != nil {
-// 		t.Fatalf("Function returned an error: %v", err)
-// 	}
+	txtFile1 := filepath.Join(directory1, "file 1.txt")
+	txtFile2 := filepath.Join(directory1, "file 2.txt")
+	txtFile3 := filepath.Join(directory2WithDirectory3, "file 3.txt")
+	txtFile4 := filepath.Join(directory2WithDirectory3, "file 4.txt")
+	txtFile5 := filepath.Join(directory2WithDirectory3, "file 5.txt")
+	txtFile6 := filepath.Join(directory2WithDirectory4, "file 6.txt")
 
-// 	// Step 3: Verification
-// 	expectedResult := filePaths[0] + "\n" + filePaths[2]
-// 	if result != expectedResult {
-// 		t.Errorf("Expected %q, got %q", expectedResult, result)
-// 	}
+	directoryPathEndParts := []string{directoryEmpty, directory1, directory2WithDirectoryEmpty, directory2WithDirectory3, directory2WithDirectory4}
+	filePathEndParts := []string{txtFile1, txtFile2, txtFile3, txtFile4, txtFile5, txtFile6}
+	duplicateFilePathEndPartGroups := [][]string{{txtFile2, txtFile3}, {txtFile4, txtFile5, txtFile6}}
 
-// 	// Step 4: Test Teardown is handled by defer statement
-// }
+	testCases := []struct {
+		Name                           string
+		DirectoryPathEndParts          []string
+		FilePathEndParts               []string
+		DuplicateFilePathEndPartGroups [][]string
+		WantErr                        bool
+	}{
+		{
+			Name:                           "Basic",
+			DirectoryPathEndParts:          directoryPathEndParts,
+			FilePathEndParts:               filePathEndParts,
+			DuplicateFilePathEndPartGroups: duplicateFilePathEndPartGroups,
+			WantErr:                        false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.Name, func(t *testing.T) {
+			// arrange and tear down
+			// TODO: move createTempFileSystemStructureOrGetEmptyString to a different file
+			directory, err := createTempFileSystemStructureOrGetEmptyString(tc.DirectoryPathEndParts, tc.FilePathEndParts)
+			if err != nil {
+				t.Fatalf("Failed to create the temporary directory: %v", err)
+			}
+			defer func() {
+				if err := os.RemoveAll(directory); err != nil {
+					t.Errorf("Failed to remove the temporary directory: %v", err)
+				}
+			}()
+			var builder strings.Builder
+			if len(tc.DuplicateFilePathEndPartGroups) > 0 {
+				for _, duplicateFilePathEndPart := range tc.DuplicateFilePathEndPartGroups[0] {
+					writeFileContentAndWriteString(t, directory, duplicateFilePathEndPart, 0, &builder)
+				}
+				for i := 1; i < len(tc.DuplicateFilePathEndPartGroups); i++ {
+					// TODO: move writeNewlineString to a different file
+					_, err = writeNewlineString(&builder)
+					if err != nil {
+						t.Errorf("writeNewlineString failed: %v", err)
+					}
+					for _, duplicateFilePathEndPart := range tc.DuplicateFilePathEndPartGroups[i] {
+						writeFileContentAndWriteString(t, directory, duplicateFilePathEndPart, i, &builder)
+					}
+				}
+			}
+			fileSystemNodes := []FileSystemNode{{
+				Path:        directory,
+				IsDirectory: true,
+			}}
+
+			// act
+			newlineSeparatedString, err := getDuplicateFilesAsNewlineSeparatedString(fileSystemNodes)
+
+			// assert
+			if (err != nil) != tc.WantErr {
+				t.Fatalf("want error: %v, got %v", tc.WantErr, err)
+			}
+			// TODO: fmt.Printlns
+			fmt.Println(builder.String())
+			fmt.Println("--- --- ---")
+			fmt.Println(newlineSeparatedString)
+			if builder.String() != newlineSeparatedString {
+				t.Fatalf("The newline-separated string is different than expected.")
+			}
+		})
+	}
+}
