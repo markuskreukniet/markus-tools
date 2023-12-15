@@ -112,7 +112,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []FileSyste
 				appendFileIdentifier(&fileIdentifiers, fileDetail)
 			}
 		} else {
-			err := walkFileDetails(value.Path, filesAndDirectoriesWithoutZeroByteFiles, func(fileDetail FileDetail) {
+			err := walkFileDetails(value.Path, filesWithoutZeroByteFiles, func(fileDetail FileDetail) {
 				appendFileIdentifier(&fileIdentifiers, fileDetail)
 			})
 			if err != nil {
