@@ -14,15 +14,16 @@ func testingWriteFileTestContent(t *testing.T, duplicateFilePath string, index i
 	}
 }
 
-func testingWriteNewlineString(t *testing.T, duplicateFilePath string, builder *strings.Builder) {
+func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
+	// TODO: move writeNewlineString to a different file
 	_, err := writeNewlineString(builder)
 	if err != nil {
 		t.Errorf("writeNewlineString failed: %v", err)
 	}
 }
 
-func testingWriteString(t *testing.T, duplicateFilePath string, builder *strings.Builder) {
-	_, err := builder.WriteString(duplicateFilePath)
+func testingWriteString(t *testing.T, stringToWrite string, builder *strings.Builder) {
+	_, err := builder.WriteString(stringToWrite)
 	if err != nil {
 		t.Errorf("Failed to write string: %v", err)
 	}
@@ -82,16 +83,17 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			var builder strings.Builder
 			if len(tc.DuplicateFilePathEndPartGroups) > 0 {
 				for _, duplicateFilePathEndPart := range tc.DuplicateFilePathEndPartGroups[0] {
-					writeFileContentAndWriteString(t, directory, duplicateFilePathEndPart, 0, &builder)
+					duplicateFilePath := filepath.Join(directory, duplicateFilePathEndPart)
+					testingWriteFileTestContent(t, duplicateFilePath, 0)
+					testingWriteString(t, duplicateFilePath, &builder)
 				}
 				for i := 1; i < len(tc.DuplicateFilePathEndPartGroups); i++ {
-					// TODO: move writeNewlineString to a different file
-					_, err = writeNewlineString(&builder)
-					if err != nil {
-						t.Errorf("writeNewlineString failed: %v", err)
-					}
+					testingWriteNewlineString(t, &builder)
 					for _, duplicateFilePathEndPart := range tc.DuplicateFilePathEndPartGroups[i] {
-						writeFileContentAndWriteString(t, directory, duplicateFilePathEndPart, i, &builder)
+						testingWriteNewlineString(t, &builder)
+						duplicateFilePath := filepath.Join(directory, duplicateFilePathEndPart)
+						testingWriteFileTestContent(t, duplicateFilePath, i)
+						testingWriteString(t, duplicateFilePath, &builder)
 					}
 				}
 			}
