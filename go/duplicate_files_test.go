@@ -82,9 +82,14 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			}()
 			var builder strings.Builder
 			if len(tc.DuplicateFilePathEndPartGroups) > 0 {
-				for _, duplicateFilePathEndPart := range tc.DuplicateFilePathEndPartGroups[0] {
+				if len(tc.DuplicateFilePathEndPartGroups[0][0]) > 0 {
+					duplicateFilePath := filepath.Join(directory, tc.DuplicateFilePathEndPartGroups[0][0])
+					testingWriteFileTestContent(t, duplicateFilePath, 0)
+					testingWriteString(t, duplicateFilePath, &builder)
+				}
+				for i := 1; i < len(tc.DuplicateFilePathEndPartGroups[0]); i++ {
 					testingWriteNewlineString(t, &builder)
-					duplicateFilePath := filepath.Join(directory, duplicateFilePathEndPart)
+					duplicateFilePath := filepath.Join(directory, tc.DuplicateFilePathEndPartGroups[0][i])
 					testingWriteFileTestContent(t, duplicateFilePath, 0)
 					testingWriteString(t, duplicateFilePath, &builder)
 				}
@@ -110,11 +115,6 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			if (err != nil) != tc.WantErr {
 				t.Fatalf("want error: %v, got %v", tc.WantErr, err)
 			}
-			// TODO: fmt.Printlns
-			fmt.Println("--- --- ---")
-			fmt.Println(builder.String())
-			fmt.Println("--- --- ---")
-			fmt.Println(newlineSeparatedString)
 			if builder.String() != newlineSeparatedString {
 				t.Fatalf("The newline-separated string is different than expected.")
 			}
