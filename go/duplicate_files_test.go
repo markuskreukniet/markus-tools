@@ -83,6 +83,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			var builder strings.Builder
 			if len(tc.DuplicateFilePathEndPartGroups) > 0 {
 				for _, duplicateFilePathEndPart := range tc.DuplicateFilePathEndPartGroups[0] {
+					testingWriteNewlineString(t, &builder)
 					duplicateFilePath := filepath.Join(directory, duplicateFilePathEndPart)
 					testingWriteFileTestContent(t, duplicateFilePath, 0)
 					testingWriteString(t, duplicateFilePath, &builder)
