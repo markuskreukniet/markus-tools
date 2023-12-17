@@ -31,22 +31,6 @@ func testingWriteString(t *testing.T, stringToWrite string, builder *strings.Bui
 
 func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	// arrange
-	// TODO: copied and expanded file path structure from TestSynchronizeDirectoryTrees.
-	// This structure should be part of an object which can return PathEndParts.
-	directoryEmpty := "directory empty"
-	directory1 := "directory 1"
-	directory2 := "directory 2"
-	directory2WithDirectoryEmpty := filepath.Join(directory2, directoryEmpty)
-	directory2WithDirectory3 := filepath.Join(directory2, "directory 3")
-	directory2WithDirectory4 := filepath.Join(directory2, "directory 4")
-
-	txtFile1 := filepath.Join(directory1, "file 1.txt")
-	txtFile2 := filepath.Join(directory1, "file 2.txt")
-	txtFile3 := filepath.Join(directory2WithDirectory3, "file 3.txt")
-	txtFile4 := filepath.Join(directory2WithDirectory3, "file 4.txt")
-	txtFile5 := filepath.Join(directory2WithDirectory3, "file 5.txt")
-	txtFile6 := filepath.Join(directory2WithDirectory4, "file 6.txt")
-
 	directoryPathEndParts := []string{directoryEmpty, directory1, directory2WithDirectoryEmpty, directory2WithDirectory3, directory2WithDirectory4}
 	filePathEndParts := []string{txtFile1, txtFile2, txtFile3, txtFile4, txtFile5, txtFile6}
 	duplicateFilePathEndPartGroups := [][]string{{txtFile2, txtFile3}, {txtFile4, txtFile5, txtFile6}}

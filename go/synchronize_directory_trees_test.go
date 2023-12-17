@@ -63,23 +63,10 @@ func createTempFileSystemStructure(directoryPathEndParts, filePathEndParts []str
 
 func TestSynchronizeDirectoryTrees(t *testing.T) {
 	// arrange
-	directoryEmpty := "directory empty"
-	directory1 := "directory 1"
-	directory2 := "directory 2"
-	directory2WithDirectoryEmpty := filepath.Join(directory2, directoryEmpty)
-	directory2WithDirectory3 := filepath.Join(directory2, "directory 3")
-
-	txtFile1 := filepath.Join(directory1, "file 1.txt")
-	txtFile2 := filepath.Join(directory1, "file 2.txt")
-	txtFile3 := filepath.Join(directory2WithDirectory3, "file 3.txt")
-	txtFile4 := filepath.Join(directory2WithDirectory3, "file 4.txt")
-
 	sourceDirectoryPathEndParts := []string{directoryEmpty, directory1, directory2WithDirectoryEmpty, directory2WithDirectory3}
 	sourceFilePathEndParts := []string{txtFile1, txtFile2, txtFile3}
-
 	destinationDirectoryPathEndParts := []string{directoryEmpty, directory2WithDirectory3}
 	destinationFilePathEndParts := []string{txtFile3, txtFile4}
-
 	var emptyPathEndParts []string
 
 	testCases := []struct {
