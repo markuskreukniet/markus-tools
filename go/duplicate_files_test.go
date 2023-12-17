@@ -8,11 +8,20 @@ import (
 	"testing"
 )
 
-func writeFileContentAndWriteString(t *testing.T, directory string, filePathEndPart string, index int, builder *strings.Builder) {
-	duplicateFilePath := filepath.Join(directory, filePathEndPart)
+func testingWriteFileTestContent(t *testing.T, duplicateFilePath string, index int) {
 	if err := os.WriteFile(duplicateFilePath, []byte(fmt.Sprintf("content %d", index)), 0666); err != nil {
 		t.Errorf("Failed to write file content: %v", err)
 	}
+}
+
+func testingWriteNewlineString(t *testing.T, duplicateFilePath string, builder *strings.Builder) {
+	_, err := writeNewlineString(builder)
+	if err != nil {
+		t.Errorf("writeNewlineString failed: %v", err)
+	}
+}
+
+func testingWriteString(t *testing.T, duplicateFilePath string, builder *strings.Builder) {
 	_, err := builder.WriteString(duplicateFilePath)
 	if err != nil {
 		t.Errorf("Failed to write string: %v", err)
@@ -99,6 +108,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 				t.Fatalf("want error: %v, got %v", tc.WantErr, err)
 			}
 			// TODO: fmt.Printlns
+			fmt.Println("--- --- ---")
 			fmt.Println(builder.String())
 			fmt.Println("--- --- ---")
 			fmt.Println(newlineSeparatedString)
