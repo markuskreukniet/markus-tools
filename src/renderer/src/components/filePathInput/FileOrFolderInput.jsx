@@ -42,14 +42,6 @@ export default function FileOrFolderInput(props) {
     onChangeEitherRight()
   }
 
-  // TODO: can be shortened to this, or reference problem?
-  // function handleChange(result) {
-  //   if (result.isRight()) {
-  //     setState(result.value)
-  //     onChangeEitherRight()
-  //   }
-  //   props.onChange(result)
-  // }
   function handleChange(result) {
     if (result.isRight()) {
       setState(result.value)
