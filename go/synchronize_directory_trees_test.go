@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// TODO: rename with testing
 func haveDirectoryTreesSameFilePathsOrGetFalse(sourceDirectory, destinationDirectory string) (bool, error) {
 	if sourceDirectory == "" || destinationDirectory == "" {
 		return false, nil
@@ -13,6 +14,7 @@ func haveDirectoryTreesSameFilePathsOrGetFalse(sourceDirectory, destinationDirec
 	return haveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory)
 }
 
+// TODO: rename with testing
 func haveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory string) (bool, error) {
 	haveSameFilePaths := true
 	err := filepath.Walk(sourceDirectory, func(path string, info os.FileInfo, err error) error {
@@ -36,38 +38,12 @@ func haveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory strin
 	return haveSameFilePaths, nil
 }
 
-func createTempFileSystemStructureOrGetEmptyString(directoryPathEndParts, filePathEndParts []string) (string, error) {
-	if len(directoryPathEndParts) == 0 {
-		return "", nil
-	}
-	return createTempFileSystemStructure(directoryPathEndParts, filePathEndParts)
-}
-
-func createTempFileSystemStructure(directoryPathEndParts, filePathEndParts []string) (string, error) {
-	tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
-	if err != nil {
-		return "", err
-	}
-	for _, part := range directoryPathEndParts {
-		if err := os.MkdirAll(filepath.Join(tempDirectory, part), 0755); err != nil {
-			return "", err
-		}
-	}
-	for _, part := range filePathEndParts {
-		if err := os.WriteFile(filepath.Join(tempDirectory, part), []byte{}, 0666); err != nil {
-			return "", err
-		}
-	}
-	return tempDirectory, nil
-}
-
 func TestSynchronizeDirectoryTrees(t *testing.T) {
 	// arrange
 	sourceDirectoryPathEndParts := []string{directoryEmpty, directory1, directory2WithDirectoryEmpty, directory2WithDirectory3}
 	sourceFilePathEndParts := []string{txtFile1, txtFile2, txtFile3}
 	destinationDirectoryPathEndParts := []string{directoryEmpty, directory2WithDirectory3}
 	destinationFilePathEndParts := []string{txtFile3, txtFile4}
-	var emptyPathEndParts []string
 
 	testCases := []struct {
 		Name                             string

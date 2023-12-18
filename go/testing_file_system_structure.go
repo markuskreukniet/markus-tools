@@ -1,6 +1,9 @@
 package main
 
-import "path/filepath"
+import (
+	"os"
+	"path/filepath"
+)
 
 var (
 	directoryEmpty               = "directory empty"
@@ -16,4 +19,33 @@ var (
 	txtFile4 = filepath.Join(directory2WithDirectory3, "file 4.txt")
 	txtFile5 = filepath.Join(directory2WithDirectory3, "file 5.txt")
 	txtFile6 = filepath.Join(directory2WithDirectory4, "file 6.txt")
+
+	emptyPathEndParts []string
 )
+
+// TODO: rename with testing
+func createTempFileSystemStructureOrGetEmptyString(directoryPathEndParts, filePathEndParts []string) (string, error) {
+	if len(directoryPathEndParts) == 0 {
+		return "", nil
+	}
+	return createTempFileSystemStructure(directoryPathEndParts, filePathEndParts)
+}
+
+// TODO: rename with testing
+func createTempFileSystemStructure(directoryPathEndParts, filePathEndParts []string) (string, error) {
+	tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
+	if err != nil {
+		return "", err
+	}
+	for _, part := range directoryPathEndParts {
+		if err := os.MkdirAll(filepath.Join(tempDirectory, part), 0755); err != nil {
+			return "", err
+		}
+	}
+	for _, part := range filePathEndParts {
+		if err := os.WriteFile(filepath.Join(tempDirectory, part), []byte{}, 0666); err != nil {
+			return "", err
+		}
+	}
+	return tempDirectory, nil
+}

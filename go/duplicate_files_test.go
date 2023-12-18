@@ -33,6 +33,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	directoryPathEndParts := []string{directoryEmpty, directory1, directory2WithDirectoryEmpty, directory2WithDirectory3, directory2WithDirectory4}
 	filePathEndParts := []string{txtFile1, txtFile2, txtFile3, txtFile4, txtFile5, txtFile6}
 	duplicateFilePathEndPartGroups := [][]string{{txtFile2, txtFile3}, {txtFile4, txtFile5, txtFile6}}
+	var emptyPathEndPartGroups [][]string
 
 	testCases := []struct {
 		Name                           string
@@ -46,6 +47,13 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			DirectoryPathEndParts:          directoryPathEndParts,
 			FilePathEndParts:               filePathEndParts,
 			DuplicateFilePathEndPartGroups: duplicateFilePathEndPartGroups,
+			WantErr:                        false,
+		},
+		{
+			Name:                           "No FileSystemNodes",
+			DirectoryPathEndParts:          emptyPathEndParts,
+			FilePathEndParts:               emptyPathEndParts,
+			DuplicateFilePathEndPartGroups: emptyPathEndPartGroups,
 			WantErr:                        false,
 		},
 	}
@@ -86,10 +94,13 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 					}
 				}
 			}
-			fileSystemNodes := []FileSystemNode{{
-				Path:        directory,
-				IsDirectory: true,
-			}}
+			var fileSystemNodes []FileSystemNode
+			if directory != "" {
+				fileSystemNodes = append(fileSystemNodes, FileSystemNode{
+					Path:        directory,
+					IsDirectory: true,
+				})
+			}
 
 			// act
 			newlineSeparatedString, err := getDuplicateFilesAsNewlineSeparatedString(fileSystemNodes)

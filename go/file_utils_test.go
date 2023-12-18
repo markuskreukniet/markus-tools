@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// TODO: rename with testing
 func fatalLogIfError(t *testing.T, err error) {
 	t.Helper()
 	if err != nil {
