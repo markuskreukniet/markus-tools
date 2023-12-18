@@ -50,7 +50,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			WantErr:                        false,
 		},
 		{
-			Name:                           "No FileSystemNodes",
+			Name:                           "Empty FileSystemNodes",
 			DirectoryPathEndParts:          emptyPathEndParts,
 			FilePathEndParts:               emptyPathEndParts,
 			DuplicateFilePathEndPartGroups: emptyPathEndPartGroups,
@@ -61,8 +61,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			// arrange and tear down
-			// TODO: move createTempFileSystemStructureOrGetEmptyString to a different file
-			directory, err := createTempFileSystemStructureOrGetEmptyString(tc.DirectoryPathEndParts, tc.FilePathEndParts)
+			directory, err := testingCreateTempFileSystemStructureOrGetEmptyString(tc.DirectoryPathEndParts, tc.FilePathEndParts)
 			if err != nil {
 				t.Fatalf("Failed to create the temporary directory: %v", err)
 			}

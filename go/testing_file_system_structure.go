@@ -23,16 +23,14 @@ var (
 	emptyPathEndParts []string
 )
 
-// TODO: rename with testing
-func createTempFileSystemStructureOrGetEmptyString(directoryPathEndParts, filePathEndParts []string) (string, error) {
+func testingCreateTempFileSystemStructureOrGetEmptyString(directoryPathEndParts, filePathEndParts []string) (string, error) {
 	if len(directoryPathEndParts) == 0 {
 		return "", nil
 	}
-	return createTempFileSystemStructure(directoryPathEndParts, filePathEndParts)
+	return testingCreateTempFileSystemStructure(directoryPathEndParts, filePathEndParts)
 }
 
-// TODO: rename with testing
-func createTempFileSystemStructure(directoryPathEndParts, filePathEndParts []string) (string, error) {
+func testingCreateTempFileSystemStructure(directoryPathEndParts, filePathEndParts []string) (string, error) {
 	tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
 	if err != nil {
 		return "", err
