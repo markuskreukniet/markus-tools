@@ -27,13 +27,13 @@ export default function DuplicateFiles(props) {
 
   const placeholderContent = (
     <>
-      Add at least two files or a folder with two files and press 'submit.'
+      Add at least two files or a directory with two files and press 'submit.'
       <br />
       <br />
-      Adding a folder also adds the files of its subfolders (its whole folder tree).
+      Adding a directory also adds the files of its subdirectories (its whole directory tree).
       <br />
       <br />
-      The more files a folder has, the more time it can take to add the files, which can be
+      The more files a directory has, the more time it can take to add the files, which can be
       noticeable. Also, the more files we add, the longer it takes to find duplicate files.
     </>
   )

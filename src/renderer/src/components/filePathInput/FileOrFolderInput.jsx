@@ -5,9 +5,9 @@ import FilePathSelector from './FilePathSelector'
 import { filePathSelectionType } from '../../../../preload/modules/files'
 
 // TODO:
-// Adding a file could add a duplicate file since there could already be a folder with its whole tree of child folders already containing that file.
-// Adding a folder could add a duplicate file since the folder with its whole tree of child folders could contain a duplicate file.
-// Checking child folders of a folder is only possible in the main, which is possible by adding such a function in the main.
+// Adding a file could add a duplicate file since there could already be a directory with its whole tree of child directories already containing that file.
+// Adding a directory could add a duplicate file since the directory with its whole tree of child directories could contain a duplicate file.
+// Checking child directories of a directory is only possible in the main, which is possible by adding such a function in the main.
 
 export default function FileOrFolderInput(props) {
   const [selectedFileSystemNodes, setSelectedFileSystemNodes] = createSignal([])

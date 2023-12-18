@@ -58,7 +58,7 @@ async function getFileObject(filePath, isDirectory) {
   }
 }
 
-// A 'Promise.all' solution for getting all the filePath stats of a folder results in an O(n2) solution.
+// A 'Promise.all' solution for getting all the filePath stats of a directory results in an O(n2) solution.
 // Also, with that solution, we can't use the getFileObject function efficiently since that function also gets filePath stats.
 async function getDirectoryFileObjects(directoryPath, directoryTree, typeFilePaths, typeFile) {
   if (!typeFile) {
