@@ -15,7 +15,6 @@ func testingWriteFileTestContent(t *testing.T, duplicateFilePath string, index i
 }
 
 func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
-	// TODO: move writeNewlineString to a different file
 	_, err := writeNewlineString(builder)
 	if err != nil {
 		t.Errorf("writeNewlineString failed: %v", err)
