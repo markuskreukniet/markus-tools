@@ -6,16 +6,14 @@ import (
 	"testing"
 )
 
-// TODO: rename with testing
-func haveDirectoryTreesSameFilePathsOrGetFalse(sourceDirectory, destinationDirectory string) (bool, error) {
+func testingHaveDirectoryTreesSameFilePathsOrGetFalse(sourceDirectory, destinationDirectory string) (bool, error) {
 	if sourceDirectory == "" || destinationDirectory == "" {
 		return false, nil
 	}
-	return haveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory)
+	return testingHaveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory)
 }
 
-// TODO: rename with testing
-func haveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory string) (bool, error) {
+func testingHaveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory string) (bool, error) {
 	haveSameFilePaths := true
 	err := filepath.Walk(sourceDirectory, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -103,14 +101,14 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			if (err != nil) != tc.WantErr {
 				t.Fatalf("want error: %v, got %v", tc.WantErr, err)
 			}
-			haveSameFilePaths, err := haveDirectoryTreesSameFilePathsOrGetFalse(sourceDirectory, destinationDirectory)
+			haveSameFilePaths, err := testingHaveDirectoryTreesSameFilePathsOrGetFalse(sourceDirectory, destinationDirectory)
 			if err != nil {
 				t.Fatalf("Failed to check if the source and destination directory trees have the same file paths: %v", err)
 			}
 			if tc.WantSameFilePaths && !haveSameFilePaths {
 				t.Fatalf("The source and destination directory trees do not have the same file paths.")
 			}
-			haveSameFilePaths, err = haveDirectoryTreesSameFilePathsOrGetFalse(destinationDirectory, sourceDirectory)
+			haveSameFilePaths, err = testingHaveDirectoryTreesSameFilePathsOrGetFalse(destinationDirectory, sourceDirectory)
 			if err != nil {
 				t.Fatalf("Failed to check if the destination and source directory trees have the same file paths: %v", err)
 			}

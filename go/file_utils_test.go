@@ -8,8 +8,7 @@ import (
 	"time"
 )
 
-// TODO: rename with testing
-func fatalLogIfError(t *testing.T, err error) {
+func testingFatalLogIfError(t *testing.T, err error) {
 	t.Helper()
 	if err != nil {
 		t.Fatalf("getFileDetail() error: %v", err)
@@ -36,10 +35,10 @@ func TestGetFileDetail(t *testing.T) {
 
 	// Act
 	dirDetail, err := getFileDetail(tempDir)
-	fatalLogIfError(t, err)
+	testingFatalLogIfError(t, err)
 
 	fileDetail, err := getFileDetail(filePath)
-	fatalLogIfError(t, err)
+	testingFatalLogIfError(t, err)
 
 	_, err = getFileDetail(nonExistentFilePath)
 
