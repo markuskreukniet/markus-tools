@@ -46,10 +46,9 @@ export async function filePathObjectsToFileObjects(filePathObjects, useDirectori
 async function getFileObject(filePath, isDirectory) {
   try {
     const stat = await promises.stat(filePath)
-    // TODO: dateCreated or dateModified?
     return toResultObjectWithResultStatusOk({
       path: filePath,
-      dateCreated: stat.mtime,
+      dateModified: stat.mtime,
       size: stat.size,
       isDirectory: isDirectory || stat.isDirectory()
     })

@@ -115,7 +115,7 @@ function getDateRangeGroups(fileObjects) {
     const fileObject = fileObjects[i - 1]
     const fileObject2 = fileObjects[i]
 
-    if (isWithinThreeDays(fileObject.dateCreated, fileObject2.dateCreated)) {
+    if (isWithinThreeDays(fileObject.dateModified, fileObject2.dateModified)) {
       group.push(fileObject2)
     } else {
       groups.push(group)
@@ -140,8 +140,8 @@ async function groupsToDirectories(groups, outputPath) {
   for (const group of groups) {
     errorTracker.addNumberOfPossibleErrors(group.length)
 
-    const oldestDate = formatTime(group[0].dateCreated)
-    const newestDate = formatTime(group[group.length - 1].dateCreated)
+    const oldestDate = formatTime(group[0].dateModified)
+    const newestDate = formatTime(group[group.length - 1].dateModified)
 
     let subFolderPath = combinePathParts(outputPath, oldestDate)
     if (oldestDate !== newestDate) {
@@ -213,10 +213,10 @@ function addPrefix0IfLessThan10(number) {
 }
 
 function compare(a, b) {
-  if (a.dateCreated < b.dateCreated) {
+  if (a.dateModified < b.dateModified) {
     return -1
   }
-  if (a.dateCreated > b.dateCreated) {
+  if (a.dateModified > b.dateModified) {
     return 1
   }
   return 0
