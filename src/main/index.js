@@ -100,10 +100,10 @@ ipcMain.handle('imagesToDateRangeFolderBE', imagesToDateRangeFolderBE)
 import synchronizeDirectoryTrees from './modules/synchronizeDirectoryTrees'
 async function synchronizeDirectoryTreesBE(
   e,
-  originalDirectoryFilePath,
+  sourceDirectoryFilePath,
   destinationDirectoryFilePath
 ) {
-  return synchronizeDirectoryTrees(originalDirectoryFilePath, destinationDirectoryFilePath)
+  return synchronizeDirectoryTrees(sourceDirectoryFilePath, destinationDirectoryFilePath)
 }
 ipcMain.handle('synchronizeDirectoryTreesBE', synchronizeDirectoryTreesBE)
 

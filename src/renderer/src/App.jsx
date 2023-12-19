@@ -19,7 +19,6 @@ import PageNavigator from './components/PageNavigator'
 
 // TODO: filePathObjects and filePaths to fileSystemNodes, also the non arrays
 // TODO: ResultObject or RO to either
-// TODO: OriginalDirectory rename to SourceDirectory
 
 // TODO: bug: images to date: move images out of a date folder and the use the app again top create the same folder, then it wants to create the same folder, whcih it can't
 
