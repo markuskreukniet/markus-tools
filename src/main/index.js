@@ -107,8 +107,8 @@ async function synchronizeDirectoryTreesBE(
 }
 ipcMain.handle('synchronizeDirectoryTreesBE', synchronizeDirectoryTreesBE)
 
-import openFileDialog from './modules/openFileDialog'
-async function openFileDialogBE(e, selectFolder) {
-  return openFileDialog(selectFolder)
+import selectFilePathDialog from './modules/selectFilePathDialog'
+async function selectFilePathDialogBE(e, selectFolder) {
+  return selectFilePathDialog(selectFolder)
 }
-ipcMain.handle('openFileDialogBE', openFileDialogBE)
+ipcMain.handle('selectFilePathDialogBE', selectFilePathDialogBE)

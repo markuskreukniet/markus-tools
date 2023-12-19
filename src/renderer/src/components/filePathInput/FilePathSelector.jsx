@@ -2,7 +2,7 @@ import { Either, isEitherRightResult } from '../../../../preload/monads/either'
 
 export default function FilePathSelector(props) {
   async function clickInput() {
-    const result = await window.dialog.openFileDialogBE(props.directory)
+    const result = await window.dialog.selectFilePathDialogBE(props.directory)
     if (isEitherRightResult(result)) {
       const fileSystemNode = { path: result.value, isDirectory: false }
       if (props.directory && result.value !== '') {

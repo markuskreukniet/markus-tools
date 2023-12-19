@@ -47,5 +47,6 @@ contextBridge.exposeInMainWorld('synchronization', {
 })
 
 contextBridge.exposeInMainWorld('dialog', {
-  openFileDialogBE: (selectFolder) => ipcRenderer.invoke('openFileDialogBE', selectFolder)
+  selectFilePathDialogBE: (selectFolder) =>
+    ipcRenderer.invoke('selectFilePathDialogBE', selectFolder)
 })

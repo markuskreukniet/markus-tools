@@ -1,7 +1,7 @@
 import { dialog } from 'electron'
 import { toEitherLeftResult, toEitherRightResult } from '../../preload/monads/either'
 
-export default async function openFileDialog(selectDirectory) {
+export default async function selectFilePathDialog(selectDirectory) {
   const properties = [selectDirectory ? 'openDirectory' : 'openFile']
   const filters = selectDirectory ? [{ name: 'All Files', extensions: ['*'] }] : []
 
