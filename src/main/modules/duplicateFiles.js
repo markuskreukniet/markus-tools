@@ -7,7 +7,6 @@ import {
   toResultObjectWithResultStatusOk
 } from '../../preload/modules/resultStatus'
 
-// TODO: has many similarities with imagesToDateRangeFolder.js
 export default async function duplicateFiles(filePathObjects) {
   const filePathObjectsToFileObjectsRO = await filePathObjectsToFileObjects(filePathObjects, true)
   if (!isResultObjectOk(filePathObjectsToFileObjectsRO)) {
