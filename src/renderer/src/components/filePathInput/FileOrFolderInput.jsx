@@ -28,6 +28,39 @@ export default function FileOrFolderInput(props) {
     }
   }
 
+  // C:/development/markus-tools
+  // C:/development/markus-tools/go
+  // C:/development/markus-tools/test.go
+
+  // in:  C:/development/markus-tools
+  // new: C:/development/markus-tools/test.go
+
+  // in:  C:/development/markus-tools/test.go, C:/development/test
+  // new: C:/development/markus-tools
+
+  // TODO: name and use function, or function content
+  // A trailing slash is needed. Without the slash, /path/sub is a parent of /path/subpath.
+  // This trailing slash method should also work on non-Windows systems.
+  function asdf(newFileSystemNode) {
+    const slash = '/'
+    const newPath = newFileSystemNode.path + slash
+    const filteredSelectedFileSystemNodes = []
+    let foundOrDescendantFilePath = false
+    for (const node of selectedFileSystemNodes()) {
+      const nodePath = node.path + slash
+      if (newPath === nodePath || newPath.startsWith(nodePath)) {
+        foundOrDescendantFilePath = true
+        break
+      }
+      if (!nodePath.startsWith(newPath)) {
+        filteredSelectedFileSystemNodes.push(node)
+      }
+    }
+    if (!foundOrDescendantFilePath) {
+      setSelectedFileSystemNodes([...filteredSelectedFileSystemNodes, newFileSystemNode])
+    }
+  }
+
   function showFilePathSelector(type) {
     return (
       !props.filePathSelectionType ||
