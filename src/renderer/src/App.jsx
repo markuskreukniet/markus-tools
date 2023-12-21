@@ -8,7 +8,7 @@ import Loader from './components/Loader'
 import PageNavigator from './components/PageNavigator'
 // import logo from './assets/logo.svg'
 
-// TODO: check for error handling, createEffects, useless comments
+// TODO: check for error handling, createEffects, useless comments, useless changes (onChange) to parent element
 // TODO: use batch, untrack, on (with { defer: true }) from import { batch, on, untrack } from "solid-js";?
 
 // TODO: rename folder to directory
