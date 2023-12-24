@@ -13,18 +13,34 @@ export default function FileOrFolderInput(props) {
   const [selectedFileSystemNodes, setSelectedFileSystemNodes] = createSignal([])
   const [hasFileSystemNode, setHasFileSystemNode] = createSignal(false)
 
+  // TODO: changedSelectedFileSystemNodes and foundOrDescendantFilePath could be changed to one bool?
   function setState(result) {
     if (result.path !== '') {
+      let changedSelectedFileSystemNodes = false
       if (props.maxOneInput) {
         setSelectedFileSystemNodes([result])
-      } else if (
-        !selectedFileSystemNodes().some((fileSystemNode) => fileSystemNode.path === result.path)
-      ) {
-        setSelectedFileSystemNodes([...selectedFileSystemNodes(), result])
+        changedSelectedFileSystemNodes = true
       } else {
-        return
+        const filteredSelectedFileSystemNodes = []
+        let foundOrDescendantFilePath = false
+        for (const node of selectedFileSystemNodes()) {
+          if (result.path === node.path || result.path.startsWith(node.path)) {
+            foundOrDescendantFilePath = true
+            break
+          }
+          if (!node.path.startsWith(result.path)) {
+            filteredSelectedFileSystemNodes.push(node)
+          }
+        }
+        if (!foundOrDescendantFilePath) {
+          setSelectedFileSystemNodes([...filteredSelectedFileSystemNodes, result])
+          changedSelectedFileSystemNodes = true
+        }
       }
-      setHasFileSystemNode(selectedFileSystemNodes().length > 0)
+      if (changedSelectedFileSystemNodes) {
+        setHasFileSystemNode(selectedFileSystemNodes().length > 0)
+        // onChange
+      }
     }
   }
 
@@ -42,17 +58,14 @@ export default function FileOrFolderInput(props) {
   // A trailing slash is needed. Without the slash, /path/sub is a parent of /path/subpath.
   // This trailing slash method should also work on non-Windows systems.
   function asdf(newFileSystemNode) {
-    const slash = '/'
-    const newPath = newFileSystemNode.path + slash
     const filteredSelectedFileSystemNodes = []
     let foundOrDescendantFilePath = false
     for (const node of selectedFileSystemNodes()) {
-      const nodePath = node.path + slash
-      if (newPath === nodePath || newPath.startsWith(nodePath)) {
+      if (newFileSystemNode.path === node.path || newFileSystemNode.path.startsWith(node.path)) {
         foundOrDescendantFilePath = true
         break
       }
-      if (!nodePath.startsWith(newPath)) {
+      if (!node.path.startsWith(newFileSystemNode.path)) {
         filteredSelectedFileSystemNodes.push(node)
       }
     }
