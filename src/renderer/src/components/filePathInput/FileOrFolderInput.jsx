@@ -4,16 +4,13 @@ import { Either } from '../../../../preload/monads/either'
 import FilePathSelector from './FilePathSelector'
 import { filePathSelectionType } from '../../../../preload/modules/files'
 
-// TODO:
-// Adding a file could add a duplicate file since there could already be a directory with its whole tree of child directories already containing that file.
-// Adding a directory could add a duplicate file since the directory with its whole tree of child directories could contain a duplicate file.
-// Checking child directories of a directory is only possible in the main, which is possible by adding such a function in the main.
-
 export default function FileOrFolderInput(props) {
   const [selectedFileSystemNodes, setSelectedFileSystemNodes] = createSignal([])
   const [hasFileSystemNode, setHasFileSystemNode] = createSignal(false)
 
   // TODO: changedSelectedFileSystemNodes and foundOrDescendantFilePath could be changed to one bool?
+  // A trailing slash is needed. Without the slash, /path/sub is a parent of /path/subpath.
+  // This trailing slash method should also work on non-Windows systems.
   function setState(result) {
     if (result.path !== '') {
       let changedSelectedFileSystemNodes = false
@@ -21,14 +18,16 @@ export default function FileOrFolderInput(props) {
         setSelectedFileSystemNodes([result])
         changedSelectedFileSystemNodes = true
       } else {
+        const newPath = getPathWithPossibleTrailingSlash(result)
         const filteredSelectedFileSystemNodes = []
         let foundOrDescendantFilePath = false
         for (const node of selectedFileSystemNodes()) {
-          if (result.path === node.path || result.path.startsWith(node.path)) {
+          const nodePath = getPathWithPossibleTrailingSlash(node)
+          if (newPath === nodePath || newPath.startsWith(nodePath)) {
             foundOrDescendantFilePath = true
             break
           }
-          if (!node.path.startsWith(result.path)) {
+          if (!nodePath.startsWith(newPath)) {
             filteredSelectedFileSystemNodes.push(node)
           }
         }
@@ -39,39 +38,21 @@ export default function FileOrFolderInput(props) {
       }
       if (changedSelectedFileSystemNodes) {
         setHasFileSystemNode(selectedFileSystemNodes().length > 0)
-        // onChange
+        // TODO: onChange
       }
     }
   }
 
-  // C:/development/markus-tools
-  // C:/development/markus-tools/go
-  // C:/development/markus-tools/test.go
-
-  // in:  C:/development/markus-tools
-  // new: C:/development/markus-tools/test.go
-
-  // in:  C:/development/markus-tools/test.go, C:/development/test
-  // new: C:/development/markus-tools
-
-  // TODO: name and use function, or function content
-  // A trailing slash is needed. Without the slash, /path/sub is a parent of /path/subpath.
-  // This trailing slash method should also work on non-Windows systems.
-  function asdf(newFileSystemNode) {
-    const filteredSelectedFileSystemNodes = []
-    let foundOrDescendantFilePath = false
-    for (const node of selectedFileSystemNodes()) {
-      if (newFileSystemNode.path === node.path || newFileSystemNode.path.startsWith(node.path)) {
-        foundOrDescendantFilePath = true
-        break
-      }
-      if (!node.path.startsWith(newFileSystemNode.path)) {
-        filteredSelectedFileSystemNodes.push(node)
+  function getPathWithPossibleTrailingSlash(fileSystemNode) {
+    let result = fileSystemNode.path
+    if (fileSystemNode.isDirectory) {
+      if (result.startsWith('/')) {
+        result = result + '/'
+      } else {
+        result = result + '\\'
       }
     }
-    if (!foundOrDescendantFilePath) {
-      setSelectedFileSystemNodes([...filteredSelectedFileSystemNodes, newFileSystemNode])
-    }
+    return result
   }
 
   function showFilePathSelector(type) {
