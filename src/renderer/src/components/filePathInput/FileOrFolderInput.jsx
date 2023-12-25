@@ -8,9 +8,9 @@ export default function FileOrFolderInput(props) {
   const [selectedFileSystemNodes, setSelectedFileSystemNodes] = createSignal([])
   const [hasFileSystemNode, setHasFileSystemNode] = createSignal(false)
 
-  // TODO: changedSelectedFileSystemNodes and foundOrDescendantFilePath could be changed to one bool?
   // A trailing slash is needed. Without the slash, /path/sub is a parent of /path/subpath.
   // This trailing slash method should also work on non-Windows systems.
+  // We cannot change changedSelectedFileSystemNodes and foundOrDescendantFilePath to one boolean.
   function setState(result) {
     if (result.path !== '') {
       let changedSelectedFileSystemNodes = false
