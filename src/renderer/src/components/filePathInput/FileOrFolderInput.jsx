@@ -15,9 +15,9 @@ export default function FileOrFolderInput(props) {
     if (fileSystemNode.isDirectory) {
       const forwardSlash = '/'
       if (result.startsWith(forwardSlash)) {
-        result = result + forwardSlash
+        result += forwardSlash
       } else {
-        result = result + '\\'
+        result += '\\'
       }
     }
     return result
