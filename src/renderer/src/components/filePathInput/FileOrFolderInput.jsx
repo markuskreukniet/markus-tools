@@ -10,39 +10,6 @@ export default function FileOrFolderInput(props) {
 
   // A trailing slash is needed. Without the slash, /path/sub is a parent of /path/subpath.
   // This trailing slash method should also work on non-Windows systems.
-  // We cannot change changedSelectedFileSystemNodes and foundOrDescendantFilePath to one boolean.
-  function setState(result) {
-    if (result.path !== '') {
-      let changedSelectedFileSystemNodes = false
-      if (props.maxOneInput) {
-        setSelectedFileSystemNodes([result])
-        changedSelectedFileSystemNodes = true
-      } else {
-        const newPath = getPathWithPossibleTrailingSlash(result)
-        const filteredSelectedFileSystemNodes = []
-        let foundOrDescendantFilePath = false
-        for (const node of selectedFileSystemNodes()) {
-          const nodePath = getPathWithPossibleTrailingSlash(node)
-          if (newPath === nodePath || newPath.startsWith(nodePath)) {
-            foundOrDescendantFilePath = true
-            break
-          }
-          if (!nodePath.startsWith(newPath)) {
-            filteredSelectedFileSystemNodes.push(node)
-          }
-        }
-        if (!foundOrDescendantFilePath) {
-          setSelectedFileSystemNodes([...filteredSelectedFileSystemNodes, result])
-          changedSelectedFileSystemNodes = true
-        }
-      }
-      if (changedSelectedFileSystemNodes) {
-        setHasFileSystemNode(selectedFileSystemNodes().length > 0)
-        // TODO: onChange
-      }
-    }
-  }
-
   function getPathWithPossibleTrailingSlash(fileSystemNode) {
     let result = fileSystemNode.path
     if (fileSystemNode.isDirectory) {
@@ -69,10 +36,38 @@ export default function FileOrFolderInput(props) {
     onChangeEitherRight()
   }
 
+  // We cannot change changedSelectedFileSystemNodes and foundOrDescendantFilePath to one boolean.
   function handleChange(result) {
     if (result.isRight()) {
-      setState(result.value)
-      onChangeEitherRight()
+      if (result.value.path !== '') {
+        let changedSelectedFileSystemNodes = false
+        if (props.maxOneInput) {
+          setSelectedFileSystemNodes([result.value])
+          changedSelectedFileSystemNodes = true
+        } else {
+          const newPath = getPathWithPossibleTrailingSlash(result.value)
+          const filteredSelectedFileSystemNodes = []
+          let foundOrDescendantFilePath = false
+          for (const node of selectedFileSystemNodes()) {
+            const nodePath = getPathWithPossibleTrailingSlash(node)
+            if (newPath === nodePath || newPath.startsWith(nodePath)) {
+              foundOrDescendantFilePath = true
+              break
+            }
+            if (!nodePath.startsWith(newPath)) {
+              filteredSelectedFileSystemNodes.push(node)
+            }
+          }
+          if (!foundOrDescendantFilePath) {
+            setSelectedFileSystemNodes([...filteredSelectedFileSystemNodes, result.value])
+            changedSelectedFileSystemNodes = true
+          }
+        }
+        if (changedSelectedFileSystemNodes) {
+          setHasFileSystemNode(selectedFileSystemNodes().length > 0)
+          onChangeEitherRight()
+        }
+      }
     } else {
       props.onChange(result)
     }
