@@ -13,8 +13,9 @@ export default function FileOrFolderInput(props) {
   function getPathWithPossibleTrailingSlash(fileSystemNode) {
     let result = fileSystemNode.path
     if (fileSystemNode.isDirectory) {
-      if (result.startsWith('/')) {
-        result = result + '/'
+      const forwardSlash = '/'
+      if (result.startsWith(forwardSlash)) {
+        result = result + forwardSlash
       } else {
         result = result + '\\'
       }
