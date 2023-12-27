@@ -4,7 +4,7 @@ import { Either } from '../../../../preload/monads/either'
 import FilePathSelector from './FilePathSelector'
 import { filePathSelectionType } from '../../../../preload/modules/files'
 
-export default function FileOrFolderInput(props) {
+export default function FileSystemNodesInput(props) {
   const [selectedFileSystemNodes, setSelectedFileSystemNodes] = createSignal([])
   const [hasFileSystemNode, setHasFileSystemNode] = createSignal(false)
 

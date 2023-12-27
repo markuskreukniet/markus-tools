@@ -1,4 +1,4 @@
-import FileOrFolderInput from './FileOrFolderInput'
+import FileSystemNodesInput from './FileSystemNodesInput'
 import { filePathSelectionType } from '../../../../preload/modules/files'
 
 export default function MaxOneDirectoryInput(props) {
@@ -15,7 +15,7 @@ export default function MaxOneDirectoryInput(props) {
   }
 
   return (
-    <FileOrFolderInput
+    <FileSystemNodesInput
       onChange={handleChange}
       filePathSelectionType={filePathSelectionType.directory}
       maxOneInput

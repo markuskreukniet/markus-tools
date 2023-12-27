@@ -1,7 +1,7 @@
 import { createSignal } from 'solid-js'
 import ResultPage from '../page/ResultPage'
 import { eitherLeftResultToErrorString } from '../../../../preload/monads/either'
-import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFolderInput'
+import SubmittableFileSystemNodesInput from '../filePathInput/SubmittableFileSystemNodesInput'
 import TextArea from '../TextArea'
 
 export default function DuplicateFiles(props) {
@@ -23,7 +23,7 @@ export default function DuplicateFiles(props) {
     }
   }
 
-  const inputComponent = <SubmittableFileOrFolderInput onChange={handleChange} />
+  const inputComponent = <SubmittableFileSystemNodesInput onChange={handleChange} />
 
   const placeholderContent = (
     <>

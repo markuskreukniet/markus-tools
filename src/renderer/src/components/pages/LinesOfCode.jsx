@@ -1,7 +1,7 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
 import { isEitherRightResult } from '../../../../preload/monads/either'
-import SubmittableFileOrFolderInput from '../filePathInput/SubmittableFileOrFolderInput'
+import SubmittableFileSystemNodesInput from '../filePathInput/SubmittableFileSystemNodesInput'
 
 export default function LinesOfCode(props) {
   const [eitherResultOutput, setEitherResultOutput] = createSignal(null)
@@ -23,7 +23,7 @@ export default function LinesOfCode(props) {
     }
   }
 
-  const inputComponent = <SubmittableFileOrFolderInput onChange={handleChange} />
+  const inputComponent = <SubmittableFileSystemNodesInput onChange={handleChange} />
 
   return (
     <TextResultPage

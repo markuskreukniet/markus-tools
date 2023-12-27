@@ -1,9 +1,9 @@
 import { createSignal } from 'solid-js'
 import ActivatableSubmitButton from '../activatableButton/ActivatableSubmitButton'
 import { Either } from '../../../../preload/monads/either'
-import FileOrFolderInput from './FileOrFolderInput'
+import FileSystemNodesInput from './FileSystemNodesInput'
 
-export default function SubmittableFileOrFolderInput(props) {
+export default function SubmittableFileSystemNodesInput(props) {
   let selectedFileSystemNodes = []
   const [buttonActive, setButtonActive] = createSignal(false)
 
@@ -22,5 +22,5 @@ export default function SubmittableFileOrFolderInput(props) {
 
   const submitButton = <ActivatableSubmitButton active={buttonActive()} onAction={submit} />
 
-  return <FileOrFolderInput onChange={handleChange} submitButton={submitButton} />
+  return <FileSystemNodesInput onChange={handleChange} submitButton={submitButton} />
 }

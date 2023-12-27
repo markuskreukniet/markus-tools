@@ -1,7 +1,7 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
 import ActivatableSubmitButton from '../activatableButton/ActivatableSubmitButton'
-import FileOrFolderInput from '../filePathInput/FileOrFolderInput'
+import FileSystemNodesInput from '../filePathInput/FileSystemNodesInput'
 import MaxOneDirectoryInput from '../filePathInput/MaxOneDirectoryInput'
 import { toEitherRightResult } from '../../../../preload/monads/either'
 
@@ -60,7 +60,7 @@ export default function imagesToDateRangeFolder(props) {
 
   const inputComponent = (
     <div>
-      <FileOrFolderInput onChange={handleInputFileSystemNodes} />
+      <FileSystemNodesInput onChange={handleInputFileSystemNodes} />
       <MaxOneDirectoryInput onChange={handleOutputDirectory} />
       <ActivatableSubmitButton active={hasValidInput()} onAction={submit} />
     </div>
