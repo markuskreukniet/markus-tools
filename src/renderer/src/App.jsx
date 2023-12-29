@@ -23,37 +23,21 @@ import PageNavigator from './components/PageNavigator'
 
 function App() {
   const [loading, setLoading] = createSignal(false)
-  const duplicateFilesTitle = 'Duplicate Files'
-  const linesOfCodeTitle = 'Lines of Code (LOC)'
-  const referencesByUrlsTitle = 'References by URLs'
-  const imagesToDateRangeFolderTitle = 'Images to Date Range Folder'
-  const synchronizeDirectoryTreesTitle = 'Synchronize Directory Trees'
-  // TODO: make of abstraction of navigationBarItem and page
   const navigationBarItemPageCombinations = [
-    {
-      navigationBarItem: duplicateFilesTitle,
-      page: <DuplicateFiles title={duplicateFilesTitle} onLoading={setLoading} />
-    },
-    {
-      navigationBarItem: linesOfCodeTitle,
-      page: <LinesOfCode title={linesOfCodeTitle} onLoading={setLoading} />
-    },
-    {
-      navigationBarItem: referencesByUrlsTitle,
-      page: <ReferencesByUrls title={referencesByUrlsTitle} onLoading={setLoading} />
-    },
-    {
-      navigationBarItem: imagesToDateRangeFolderTitle,
-      page: <ImagesToDateRangeFolder title={imagesToDateRangeFolderTitle} onLoading={setLoading} />
-    },
-    {
-      navigationBarItem: synchronizeDirectoryTreesTitle,
-      page: (
-        <SynchronizeDirectoryTrees title={synchronizeDirectoryTreesTitle} onLoading={setLoading} />
-      )
-    }
+    createNavigationBarItemPageCombination(DuplicateFiles, 'Duplicate Files'),
+    createNavigationBarItemPageCombination(LinesOfCode, 'Lines of Code (LOC)'),
+    createNavigationBarItemPageCombination(ReferencesByUrls, 'References by URLs'),
+    createNavigationBarItemPageCombination(ImagesToDateRangeFolder, 'Images to Date Range Folder'),
+    createNavigationBarItemPageCombination(SynchronizeDirectoryTrees, 'Synchronize Directory Trees')
   ]
   const activeNavigationBarItem = navigationBarItemPageCombinations[0].navigationBarItem
+
+  function createNavigationBarItemPageCombination(Component, title) {
+    return {
+      navigationBarItem: title,
+      page: <Component title={title} onLoading={setLoading} />
+    }
+  }
 
   return (
     <div class="container">
