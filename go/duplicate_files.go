@@ -102,9 +102,9 @@ func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []Fil
 
 func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []FileSystemNode) (string, error) {
 	var fileIdentifiers []FileIdentifier
-	for _, value := range uniqueFileSystemNodes {
-		if !value.IsDirectory {
-			fileDetail, err := getFileDetail(value.Path)
+	for _, node := range uniqueFileSystemNodes {
+		if !node.IsDirectory {
+			fileDetail, err := getFileDetail(node.Path)
 			if err != nil {
 				return "", err
 			}
@@ -112,7 +112,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []FileSyste
 				appendFileIdentifier(&fileIdentifiers, fileDetail)
 			}
 		} else {
-			err := walkFileDetails(value.Path, filesWithoutZeroByteFiles, func(fileDetail FileDetail) {
+			err := walkFileDetails(node.Path, filesWithoutZeroByteFiles, func(fileDetail FileDetail) {
 				appendFileIdentifier(&fileIdentifiers, fileDetail)
 			})
 			if err != nil {
