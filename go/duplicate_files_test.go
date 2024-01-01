@@ -107,8 +107,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			// assert
 			if (err != nil) != tc.WantErr {
 				t.Fatalf("want error: %v, got %v", tc.WantErr, err)
-			}
-			if builder.String() != newlineSeparatedString {
+			} else if builder.String() != newlineSeparatedString {
 				t.Fatalf("The newline-separated string is different than expected.")
 			}
 		})
