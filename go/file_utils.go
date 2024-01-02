@@ -15,7 +15,10 @@ type FileDetail struct {
 	IsDirectory      bool
 }
 
-type FileFilterMode int
+type (
+	FileFilterMode int
+	FileType       int
+)
 
 const (
 	files FileFilterMode = iota
@@ -23,6 +26,11 @@ const (
 	filesAndDirectories
 	filesAndDirectoriesWithoutZeroByteFiles
 	directories
+)
+
+const (
+	allFiles FileType = iota
+	plainTextFiles
 )
 
 func getFileDetail(filePath string) (FileDetail, error) {
@@ -39,15 +47,15 @@ func getFileDetail(filePath string) (FileDetail, error) {
 }
 
 // TODO: not used, but does get tested
-func getFilteredFileDetailsSliceFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode) ([]FileDetail, error) {
+func getFilteredFileDetailsSliceFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode, fileType FileType) ([]FileDetail, error) {
 	var fileDetails []FileDetail
-	err := walkFileDetails(rootFilePath, fileFilterMode, func(fileDetail FileDetail) {
+	err := walkFileDetails(rootFilePath, fileFilterMode, fileType, func(fileDetail FileDetail) {
 		fileDetails = append(fileDetails, fileDetail)
 	})
 	return fileDetails, err
 }
 
-func walkFileDetails(rootFilePath string, fileFilterMode FileFilterMode, handler func(FileDetail)) error {
+func walkFileDetails(rootFilePath string, fileFilterMode FileFilterMode, fileType FileType, handler func(FileDetail)) error {
 	return filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -68,6 +76,14 @@ func walkFileDetails(rootFilePath string, fileFilterMode FileFilterMode, handler
 		// zero byte check
 		if size == 0 && (fileFilterMode == filesWithoutZeroByteFiles || fileFilterMode == filesAndDirectoriesWithoutZeroByteFiles) {
 			return nil
+		}
+
+		// file type check
+		if fileType == plainTextFiles {
+			isTextFile, err := isZeroByteFileATextFile(filePath)
+			if err != nil || !isTextFile {
+				return err
+			}
 		}
 
 		handler(FileDetail{

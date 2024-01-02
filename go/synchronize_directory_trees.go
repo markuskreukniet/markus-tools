@@ -17,7 +17,7 @@ func synchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory strin
 
 func getFilePathModificationTimeMapFromDirectoryTree(rootFilePath string) (map[string]time.Time, error) {
 	filePathModificationTimeMap := make(map[string]time.Time)
-	err := walkFileDetails(rootFilePath, filesAndDirectories, func(fileDetail FileDetail) {
+	err := walkFileDetails(rootFilePath, filesAndDirectories, allFiles, func(fileDetail FileDetail) {
 		filePathModificationTimeMap[fileDetail.Path] = fileDetail.ModificationTime
 	})
 	return filePathModificationTimeMap, err

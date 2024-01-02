@@ -95,6 +95,7 @@ func TestGetFilteredFileDetailsSliceFromDirectoryTree(t *testing.T) {
 		name           string
 		rootFilePath   string
 		fileFilterMode FileFilterMode
+		fileType       FileType
 		want           []FileDetail
 		wantErr        bool
 	}{
@@ -102,6 +103,7 @@ func TestGetFilteredFileDetailsSliceFromDirectoryTree(t *testing.T) {
 			name:           "FilesOnly",
 			rootFilePath:   tmpDir,
 			fileFilterMode: files,
+			fileType:       allFiles,
 			want: []FileDetail{
 				{Path: filepath.Join(tmpDir, "file1.txt"), Size: 7, IsDirectory: false},
 				{Path: filepath.Join(tmpDir, "file2.txt"), Size: 0, IsDirectory: false},
@@ -113,6 +115,7 @@ func TestGetFilteredFileDetailsSliceFromDirectoryTree(t *testing.T) {
 			name:           "DirectoriesOnly",
 			rootFilePath:   tmpDir,
 			fileFilterMode: directories,
+			fileType:       allFiles,
 			want: []FileDetail{
 				{Path: tmpDir, IsDirectory: true},
 				{Path: subDir, IsDirectory: true},
@@ -123,6 +126,7 @@ func TestGetFilteredFileDetailsSliceFromDirectoryTree(t *testing.T) {
 			name:           "FilesWithoutZeroByteFiles",
 			rootFilePath:   tmpDir,
 			fileFilterMode: filesWithoutZeroByteFiles,
+			fileType:       allFiles,
 			want: []FileDetail{
 				{Path: filepath.Join(tmpDir, "file1.txt"), Size: 7, IsDirectory: false},
 				{Path: filepath.Join(subDir, "file3.txt"), Size: 7, IsDirectory: false},
@@ -133,6 +137,7 @@ func TestGetFilteredFileDetailsSliceFromDirectoryTree(t *testing.T) {
 			name:           "InvalidRootPath",
 			rootFilePath:   "/invalid/path",
 			fileFilterMode: files,
+			fileType:       allFiles,
 			want:           nil,
 			wantErr:        true,
 		},
@@ -162,7 +167,7 @@ func TestGetFilteredFileDetailsSliceFromDirectoryTree(t *testing.T) {
 			// 	}()
 			// }
 
-			got, err := getFilteredFileDetailsSliceFromDirectoryTree(tt.rootFilePath, tt.fileFilterMode)
+			got, err := getFilteredFileDetailsSliceFromDirectoryTree(tt.rootFilePath, tt.fileFilterMode, tt.fileType)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getFilteredFileDetailsSliceFromDirectoryTree() error: %v, wantErr %v", err, tt.wantErr)
 				return
