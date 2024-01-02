@@ -10,6 +10,7 @@ import PageNavigator from './components/PageNavigator'
 
 // TODO: check for error handling, createEffects, useless comments, useless changes (onChange) to parent element
 // TODO: use batch, untrack, on (with { defer: true }) from import { batch, on, untrack } from "solid-js";?
+// TODO: ImagesToDateRangeFolder: show how many files added/changed/removed
 
 // TODO: rename folder to directory
 // TODO: rename files.js to filePath.js
