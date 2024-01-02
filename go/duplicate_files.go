@@ -115,7 +115,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []FileSyste
 			if err != nil {
 				return "", err
 			}
-			if fileDetail.Size > 0 {
+			if isFileDetailNonZeroByte(fileDetail) {
 				appendFileIdentifier(&fileIdentifiers, fileDetail)
 			}
 		}

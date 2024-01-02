@@ -68,8 +68,7 @@ func textFilesToText(uniqueFileSystemNodes []FileSystemNode) (string, error) {
 			if err != nil {
 				return "", err
 			}
-			// TODO: duplicate: if fileDetail.Size > 0 {, maybe change getFileDetail
-			if fileDetail.Size > 0 {
+			if isFileDetailNonZeroByte(fileDetail) {
 				isTextFile, err := isNonZeroByteFileATextFile(fileDetail.Path)
 				if err != nil {
 					return "", err

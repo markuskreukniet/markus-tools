@@ -33,6 +33,13 @@ const (
 	plainTextFiles
 )
 
+func isFileDetailNonZeroByte(fileDetail FileDetail) bool {
+	if fileDetail.Size > 0 {
+		return true
+	}
+	return false
+}
+
 func getFileDetail(filePath string) (FileDetail, error) {
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
