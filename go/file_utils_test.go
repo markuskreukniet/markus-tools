@@ -45,20 +45,12 @@ func TestGetFileDetail(t *testing.T) {
 		t.Errorf("Want Path %v, got %v", tempDir, dirDetail.Path)
 	}
 
-	if !dirDetail.IsDirectory {
-		t.Errorf("Want IsDirectory to be true, got %v", dirDetail.IsDirectory)
-	}
-
 	if fileDetail.Path != filePath {
 		t.Errorf("Want Path %v, got %v", filePath, fileDetail.Path)
 	}
 
 	if fileDetail.Size != int64(len(testText)) {
 		t.Errorf("Want Size %v, got %v", len(testText), fileDetail.Size)
-	}
-
-	if fileDetail.IsDirectory {
-		t.Errorf("Want IsDirectory to be false, got %v", fileDetail.IsDirectory)
 	}
 
 	if err == nil {

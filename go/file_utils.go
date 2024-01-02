@@ -7,12 +7,10 @@ import (
 )
 
 // TODO: some things should be in other files since they are only used in one file
-// TODO: FileDetail has maybe unused fields
 type FileDetail struct {
 	Path             string
 	ModificationTime time.Time
 	Size             int64
-	IsDirectory      bool
 }
 
 type (
@@ -49,7 +47,6 @@ func getFileDetail(filePath string) (FileDetail, error) {
 		Path:             filePath,
 		ModificationTime: fileInfo.ModTime(),
 		Size:             fileInfo.Size(),
-		IsDirectory:      fileInfo.IsDir(),
 	}, nil
 }
 
@@ -88,7 +85,6 @@ func walkFileDetails(rootFilePath string, fileFilterMode FileFilterMode, fileTyp
 			Path:             filePath,
 			ModificationTime: fileInfo.ModTime(),
 			Size:             size,
-			IsDirectory:      isDir,
 		})
 		return nil
 	})
