@@ -53,15 +53,6 @@ func getFileDetail(filePath string) (FileDetail, error) {
 	}, nil
 }
 
-// TODO: not used, but does get tested
-func getFilteredFileDetailsSliceFromDirectoryTree(rootFilePath string, fileFilterMode FileFilterMode, fileType FileType) ([]FileDetail, error) {
-	var fileDetails []FileDetail
-	err := walkFileDetails(rootFilePath, fileFilterMode, fileType, func(fileDetail FileDetail) {
-		fileDetails = append(fileDetails, fileDetail)
-	})
-	return fileDetails, err
-}
-
 func walkFileDetails(rootFilePath string, fileFilterMode FileFilterMode, fileType FileType, handler func(FileDetail)) error {
 	return filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
 		if err != nil {
