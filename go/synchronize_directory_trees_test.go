@@ -118,3 +118,64 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 		})
 	}
 }
+
+func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
+	const inputBasePath string = "/home/user/source"
+	const inputFullPath string = "/home/user/source/directory/file.txt"
+	const outputBasePath string = "/home/user/destination"
+	const joinedOutputBasePathWithRelativeInputPath string = "/home/user/destination/directory/file.txt"
+
+	testCases := []struct {
+		Name           string
+		InputBasePath  string
+		InputFullPath  string
+		OutputBasePath string
+		Want           string
+		WantErr        bool
+	}{
+		{
+			Name:           "Basic",
+			InputBasePath:  inputBasePath,
+			InputFullPath:  inputFullPath,
+			OutputBasePath: outputBasePath,
+			Want:           filepath.FromSlash(joinedOutputBasePathWithRelativeInputPath),
+			WantErr:        false,
+		},
+		{
+			Name:           "Empty inputBasePath",
+			InputBasePath:  "",
+			InputFullPath:  inputFullPath,
+			OutputBasePath: outputBasePath,
+			Want:           "",
+			WantErr:        true,
+		},
+		{
+			Name:           "Empty inputFullPath",
+			InputBasePath:  inputBasePath,
+			InputFullPath:  "",
+			OutputBasePath: outputBasePath,
+			Want:           "",
+			WantErr:        true,
+		},
+		{
+			Name:           "Equivalent Input Paths",
+			InputBasePath:  inputBasePath,
+			InputFullPath:  inputBasePath,
+			OutputBasePath: outputBasePath,
+			Want:           filepath.FromSlash(outputBasePath),
+			WantErr:        false,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.Name, func(t *testing.T) {
+			result, err := joinOutputBasePathWithRelativeInputPath(tc.InputBasePath, tc.InputFullPath, tc.OutputBasePath)
+			if (err != nil) != tc.WantErr {
+				t.Fatalf("want error: %v, got %v", tc.WantErr, err)
+			}
+			if err == nil && result != tc.Want {
+				t.Fatalf("want: %s, got %s", tc.Want, result)
+			}
+		})
+	}
+}

@@ -89,11 +89,3 @@ func walkFileDetails(rootFilePath string, fileFilterMode FileFilterMode, fileTyp
 		return nil
 	})
 }
-
-func joinOutputBasePathWithRelativeInputPath(inputBasePath, inputFullPath, outputBasePath string) (string, error) {
-	relativePath, err := filepath.Rel(inputBasePath, inputFullPath)
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(outputBasePath, relativePath), nil
-}

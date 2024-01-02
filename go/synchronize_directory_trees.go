@@ -15,6 +15,14 @@ func synchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory strin
 	return defaultJSONFunctionResult()
 }
 
+func joinOutputBasePathWithRelativeInputPath(inputBasePath, inputFullPath, outputBasePath string) (string, error) {
+	relativePath, err := filepath.Rel(inputBasePath, inputFullPath)
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(outputBasePath, relativePath), nil
+}
+
 func getFilePathModificationTimeMapFromDirectoryTree(rootFilePath string) (map[string]time.Time, error) {
 	filePathModificationTimeMap := make(map[string]time.Time)
 	err := walkFileDetails(rootFilePath, filesAndDirectories, allFiles, func(fileDetail FileDetail) {
