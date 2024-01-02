@@ -6,7 +6,6 @@ import (
 	"time"
 )
 
-// TODO: some things should be in other files since they are only used in one file
 type FileDetail struct {
 	Path             string
 	ModificationTime time.Time
