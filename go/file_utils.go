@@ -80,7 +80,7 @@ func walkFileDetails(rootFilePath string, fileFilterMode FileFilterMode, fileTyp
 
 		// file type check
 		if fileType == plainTextFiles {
-			isTextFile, err := isZeroByteFileATextFile(filePath)
+			isTextFile, err := isNonZeroByteFileATextFile(filePath)
 			if err != nil || !isTextFile {
 				return err
 			}

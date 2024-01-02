@@ -8,7 +8,7 @@ import (
 	"unicode"
 )
 
-func isZeroByteFileATextFile(filePath string) (bool, error) {
+func isNonZeroByteFileATextFile(filePath string) (bool, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return false, err
@@ -68,9 +68,9 @@ func textFilesToText(uniqueFileSystemNodes []FileSystemNode) (string, error) {
 			if err != nil {
 				return "", err
 			}
-			// TODO: duplicate: if fileDetail.Size > 0 {
+			// TODO: duplicate: if fileDetail.Size > 0 {, maybe change getFileDetail
 			if fileDetail.Size > 0 {
-				isTextFile, err := isZeroByteFileATextFile(fileDetail.Path)
+				isTextFile, err := isNonZeroByteFileATextFile(fileDetail.Path)
 				if err != nil {
 					return "", err
 				}
