@@ -36,6 +36,7 @@ func testingHaveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirector
 	return haveSameFilePaths, nil
 }
 
+// TODO: test modified files
 func TestSynchronizeDirectoryTrees(t *testing.T) {
 	// arrange
 	sourceDirectoryPathEndParts := []string{directoryEmpty, directory1, directory2WithDirectoryEmpty, directory2WithDirectory3}
