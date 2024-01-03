@@ -63,7 +63,7 @@ func addLastPathElementAndAllLinesToBuilder(filePath string, builder *strings.Bu
 	return readLinesAddToBuilder(filePath, builder)
 }
 
-func textFilesToText(uniqueFileSystemNodes []FileSystemNode) (string, error) {
+func plainTextFilesToText(uniqueFileSystemNodes []FileSystemNode) (string, error) {
 	var filePaths []string
 	for _, node := range uniqueFileSystemNodes {
 		if node.IsDirectory {
