@@ -4,22 +4,32 @@ import "testing"
 
 func TestPlainTextFilesToText(t *testing.T) {
 	// arrange
-	// sourceDirectoryPathEndParts := []string{directoryEmpty, directory1, directory2WithDirectoryEmpty, directory2WithDirectory3}
-	// sourceFilePathEndParts := []string{txtFile1, txtFile2, txtFile3}
-	// destinationDirectoryPathEndParts := []string{directoryEmpty, directory2WithDirectory3}
-	// destinationFilePathEndParts := []string{txtFile3, txtFile4}
+	// directoryPathEndParts := []string{directory1, directory2WithDirectory3, directory2WithDirectory4}
+	// filePathEndParts := []string{txtFile1, txtFile3, txtFile6}
 
 	// testCases := []struct {
 	// 	Name                  string
 	// 	DirectoryPathEndParts []string
 	// 	FilePathEndParts      []string
-	// 	WantSameFilePaths     bool
 	// 	WantErr               bool
+	// }{
+	// 	{
+	// 		Name:                  "Basic",
+	// 		DirectoryPathEndParts: directoryPathEndParts,
+	// 		FilePathEndParts:      filePathEndParts,
+	// 		WantErr:               false,
+	// 	},
 	// }
 
 	// for _, tc := range testCases {
 	// 	t.Run(tc.Name, func(t *testing.T) {
-	// 		text, err := plainTextFilesToText()
+	// 		// arrange and tear down
+
+	// 		// act
+	// 		text, err := plainTextFilesToText(fileSystemNodes)
+
+	// 		// assert
+
 	// 	})
 	// }
 }
