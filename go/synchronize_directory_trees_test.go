@@ -39,7 +39,7 @@ func testingHaveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirector
 func TestSynchronizeDirectoryTrees(t *testing.T) {
 	// arrange
 	sourceDirectoryPathEndParts := []string{directoryEmpty, directory1, directory2WithDirectoryEmpty, directory2WithDirectory3}
-	sourceFilePathEndParts := []string{txtFile1, txtFile2, txtFile3}
+	sourceFilePathEndParts := []string{txtFile1, txtFile4, txtFile5}
 	destinationDirectoryPathEndParts := []string{directoryEmpty, directory2WithDirectory3}
 	destinationFilePathEndParts := []string{txtFile3, txtFile4}
 
