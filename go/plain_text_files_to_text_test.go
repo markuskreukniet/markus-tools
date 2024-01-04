@@ -1,8 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
+
+func testingWriteFileContentWithTwoContentLinesAndIndex(t *testing.T, filePath string, index int) {
+	testingWriteFileContent(t, filePath, fmt.Sprintf("content %s %d 1\ncontent %s %d 2", filePath, index, filePath, index))
+}
 
 // TODO: there are duplicate things, such as statements and structs, probably also in other tests
 func TestPlainTextFilesToText(t *testing.T) {
