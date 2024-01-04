@@ -95,12 +95,12 @@ func plainTextFilesToText(uniqueFileSystemNodes []FileSystemNode) (string, error
 		if err != nil {
 			return "", err
 		}
-		// TODO: use this [1:] also on other places
-		for _, path := range filePaths[1:] {
-			err := addLastPathElementAndAllLinesToBuilder("\n"+path, &result)
-			if err != nil {
-				return "", err
-			}
+	}
+	// TODO: use this [1:] also on other places
+	for _, path := range filePaths[1:] {
+		err := addLastPathElementAndAllLinesToBuilder("\n"+path, &result)
+		if err != nil {
+			return "", err
 		}
 	}
 	return result.String(), nil
