@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"testing"
 )
 
 var (
@@ -22,6 +23,12 @@ var (
 
 	emptyPathEndParts []string
 )
+
+func testingWriteFileContent(t *testing.T, filePath string, content string) {
+	if err := os.WriteFile(filePath, []byte(content), 0666); err != nil {
+		t.Errorf("Failed to write file content: %v", err)
+	}
+}
 
 func testingCreateTempFileSystemStructureOrGetEmptyString(directoryPathEndParts, filePathEndParts []string) (string, error) {
 	if len(directoryPathEndParts) == 0 {

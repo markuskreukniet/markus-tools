@@ -8,10 +8,8 @@ import (
 	"testing"
 )
 
-func testingWriteFileTestContent(t *testing.T, duplicateFilePath string, index int) {
-	if err := os.WriteFile(duplicateFilePath, []byte(fmt.Sprintf("content %d", index)), 0666); err != nil {
-		t.Errorf("Failed to write file content: %v", err)
-	}
+func testingWriteFileContentWithContentAndIndex(t *testing.T, filePath string, index int) {
+	testingWriteFileContent(t, filePath, fmt.Sprintf("content %d", index))
 }
 
 func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
@@ -74,13 +72,13 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			if len(tc.DuplicateFilePathEndPartGroups) > 0 {
 				if len(tc.DuplicateFilePathEndPartGroups[0][0]) > 0 {
 					duplicateFilePath := filepath.Join(directory, tc.DuplicateFilePathEndPartGroups[0][0])
-					testingWriteFileTestContent(t, duplicateFilePath, 0)
+					testingWriteFileContentWithContentAndIndex(t, duplicateFilePath, 0)
 					testingWriteString(t, duplicateFilePath, &builder)
 				}
 				for i := 1; i < len(tc.DuplicateFilePathEndPartGroups[0]); i++ {
 					testingWriteNewlineString(t, &builder)
 					duplicateFilePath := filepath.Join(directory, tc.DuplicateFilePathEndPartGroups[0][i])
-					testingWriteFileTestContent(t, duplicateFilePath, 0)
+					testingWriteFileContentWithContentAndIndex(t, duplicateFilePath, 0)
 					testingWriteString(t, duplicateFilePath, &builder)
 				}
 				for i := 1; i < len(tc.DuplicateFilePathEndPartGroups); i++ {
@@ -88,7 +86,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 					for _, duplicateFilePathEndPart := range tc.DuplicateFilePathEndPartGroups[i] {
 						testingWriteNewlineString(t, &builder)
 						duplicateFilePath := filepath.Join(directory, duplicateFilePathEndPart)
-						testingWriteFileTestContent(t, duplicateFilePath, i)
+						testingWriteFileContentWithContentAndIndex(t, duplicateFilePath, i)
 						testingWriteString(t, duplicateFilePath, &builder)
 					}
 				}
