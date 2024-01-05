@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,13 +16,13 @@ func isNonZeroByteFileATextFile(filePath string) (bool, error) {
 	}
 	defer file.Close()
 
-	// Read the first 512 bytes to check for non-text characters. DetectContentType of package 'net/http' works with a similar check.
+	// Read the first 512 or less to check for non-text characters. DetectContentType of package 'net/http' works with a similar check.
 	bytes := make([]byte, 512)
-	_, err = file.Read(bytes)
-	if err != nil {
+	numberOfBytesRead, err := file.Read(bytes)
+	if err != nil && err != io.EOF {
 		return false, err
 	}
-	for _, byte := range bytes {
+	for _, byte := range bytes[:numberOfBytesRead] {
 		if !unicode.IsPrint(rune(byte)) && !unicode.IsSpace(rune(byte)) {
 			return false, nil
 		}
@@ -95,12 +96,11 @@ func plainTextFilesToText(uniqueFileSystemNodes []FileSystemNode) (string, error
 		if err != nil {
 			return "", err
 		}
-	}
-	// TODO: use this [1:] also on other places
-	for _, path := range filePaths[1:] {
-		err := addLastPathElementAndAllLinesToBuilder("\n"+path, &result)
-		if err != nil {
-			return "", err
+		for i := 1; i < len(filePaths); i++ {
+			err := addLastPathElementAndAllLinesToBuilder("\n"+filePaths[i], &result)
+			if err != nil {
+				return "", err
+			}
 		}
 	}
 	return result.String(), nil
