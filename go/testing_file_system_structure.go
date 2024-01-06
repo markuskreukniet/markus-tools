@@ -26,6 +26,14 @@ var (
 	emptyPathEndParts []string
 )
 
+func writeNewlineString(builder *strings.Builder) (int, error) {
+	bytesWritten, err := builder.WriteString("\n")
+	if err != nil {
+		return bytesWritten, err
+	}
+	return bytesWritten, nil
+}
+
 func testingWriteFileContent(t *testing.T, filePath string, content string) {
 	if err := os.WriteFile(filePath, []byte(content), 0666); err != nil {
 		t.Errorf("Failed to write file content: %v", err)
