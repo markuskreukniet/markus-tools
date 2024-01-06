@@ -3,9 +3,11 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
+// TODO: rename file?
 var (
 	directoryEmpty               = "directory empty"
 	directory1                   = "directory 1"
@@ -27,6 +29,20 @@ var (
 func testingWriteFileContent(t *testing.T, filePath string, content string) {
 	if err := os.WriteFile(filePath, []byte(content), 0666); err != nil {
 		t.Errorf("Failed to write file content: %v", err)
+	}
+}
+
+func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
+	_, err := writeNewlineString(builder)
+	if err != nil {
+		t.Errorf("writeNewlineString failed: %v", err)
+	}
+}
+
+func testingWriteString(t *testing.T, stringToWrite string, builder *strings.Builder) {
+	_, err := builder.WriteString(stringToWrite)
+	if err != nil {
+		t.Errorf("Failed to write string: %v", err)
 	}
 }
 

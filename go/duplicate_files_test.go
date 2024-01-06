@@ -12,20 +12,6 @@ func testingWriteFileContentWithContentAndIndex(t *testing.T, filePath string, i
 	testingWriteFileContent(t, filePath, fmt.Sprintf("content %d", index))
 }
 
-func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
-	_, err := writeNewlineString(builder)
-	if err != nil {
-		t.Errorf("writeNewlineString failed: %v", err)
-	}
-}
-
-func testingWriteString(t *testing.T, stringToWrite string, builder *strings.Builder) {
-	_, err := builder.WriteString(stringToWrite)
-	if err != nil {
-		t.Errorf("Failed to write string: %v", err)
-	}
-}
-
 func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	// arrange
 	directoryPathEndParts := []string{directoryEmpty, directory1, directory2WithDirectoryEmpty, directory2WithDirectory3, directory2WithDirectory4}
