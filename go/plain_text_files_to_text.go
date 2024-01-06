@@ -97,7 +97,11 @@ func plainTextFilesToText(uniqueFileSystemNodes []FileSystemNode) (string, error
 			return "", err
 		}
 		for i := 1; i < len(filePaths); i++ {
-			err := addLastPathElementAndAllLinesToBuilder("\n"+filePaths[i], &result)
+			_, err := writeNewlineString(&result)
+			if err != nil {
+				return "", err
+			}
+			err = addLastPathElementAndAllLinesToBuilder(filePaths[i], &result)
 			if err != nil {
 				return "", err
 			}
