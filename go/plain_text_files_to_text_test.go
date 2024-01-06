@@ -8,6 +8,11 @@ import (
 	"testing"
 )
 
+// TODO: rename asdf
+func asdf(filePath string) string {
+	return fmt.Sprintf("%s\n", filepath.Base(filePath))
+}
+
 func testingCreateContentString(filePath string, index int) string {
 	return fmt.Sprintf("content %s %d 1\ncontent %s %d 2", filePath, index, filePath, index)
 }
@@ -64,15 +69,14 @@ func TestPlainTextFilesToText(t *testing.T) {
 				fullPath := filepath.Join(directory, filePathEndParts[0])
 				content := testingCreateContentString(fullPath, 0)
 				testingWriteFileContent(t, fullPath, content)
-				// TODO: duplicate: testingWriteString(t, fmt.Sprintf("\n\n%s\n", filepath.Base(filePathEndParts[i])), &builder)
-				testingWriteString(t, fmt.Sprintf("%s\n", filepath.Base(filePathEndParts[0])), &builder)
+				testingWriteString(t, asdf(filePathEndParts[0]), &builder)
 				testingWriteString(t, content, &builder)
 				for i := 1; i < len(filePathEndParts); i++ {
 					fullPath := filepath.Join(directory, filePathEndParts[i])
 					content := testingCreateContentString(fullPath, i)
 					testingWriteFileContent(t, fullPath, content)
-					// TODO: duplicate \n\n?
-					testingWriteString(t, fmt.Sprintf("\n\n%s\n", filepath.Base(filePathEndParts[i])), &builder)
+					testingWriteString(t, "\n\n", &builder)
+					testingWriteString(t, asdf(filePathEndParts[i]), &builder)
 					testingWriteString(t, content, &builder)
 				}
 			}
