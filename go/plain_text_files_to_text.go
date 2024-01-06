@@ -37,12 +37,6 @@ func readLinesAddToBuilder(filePath string, builder *strings.Builder) error {
 	}
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
-	if scanner.Scan() {
-		_, err := builder.WriteString(scanner.Text())
-		if err != nil {
-			return err
-		}
-	}
 	for scanner.Scan() {
 		_, err := writeNewlineString(builder)
 		if err != nil {
@@ -98,6 +92,10 @@ func plainTextFilesToText(uniqueFileSystemNodes []FileSystemNode) (string, error
 		}
 		for i := 1; i < len(filePaths); i++ {
 			_, err := writeNewlineString(&result)
+			if err != nil {
+				return "", err
+			}
+			_, err = writeNewlineString(&result)
 			if err != nil {
 				return "", err
 			}
