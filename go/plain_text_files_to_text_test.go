@@ -2,74 +2,90 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
-func testingWriteFileContentWithTwoContentLinesAndIndex(t *testing.T, filePath string, index int) {
-	testingWriteFileContent(t, filePath, fmt.Sprintf("content %s %d 1\ncontent %s %d 2", filePath, index, filePath, index))
+func testingCreateContentString(filePath string, index int) string {
+	return fmt.Sprintf("content %s %d 1\ncontent %s %d 2", filePath, index, filePath, index)
 }
 
-// TODO: there are duplicate things, such as statements and structs, probably also in other tests
+// TODO: there are duplicate things, such as statements, strings, and structs, probably also in other tests
 func TestPlainTextFilesToText(t *testing.T) {
 	// arrange
 	// TODO: add non text files to filePathEndParts
-	// directoryPathEndParts := []string{directory1, directory2WithDirectory3, directory2WithDirectory4}
-	// filePathEndParts := []string{txtFile1, txtFile3, txtFile6}
-	// fileSystemNodes := []FileSystemNode{
-	// 	{
-	// 		Path:        txtFile1,
-	// 		IsDirectory: false,
-	// 	},
-	// 	{
-	// 		Path:        directory2,
-	// 		IsDirectory: true,
-	// 	},
-	// }
+	directoryPathEndParts := []string{directory1, directory2WithDirectory3, directory2WithDirectory4}
+	filePathEndParts := []string{txtFile1, txtFile3, txtFile6}
+	fileSystemNodes := []FileSystemNode{
+		{
+			Path:        txtFile1,
+			IsDirectory: false,
+		},
+		{
+			Path:        directory2,
+			IsDirectory: true,
+		},
+	}
 
-	// testCases := []struct {
-	// 	Name                  string
-	// 	DirectoryPathEndParts []string
-	// 	FilePathEndParts      []string
-	// 	WantErr               bool
-	// }{
-	// 	{
-	// 		Name:                  "Basic",
-	// 		DirectoryPathEndParts: directoryPathEndParts,
-	// 		FilePathEndParts:      filePathEndParts,
-	// 		WantErr:               false,
-	// 	},
-	// }
+	testCases := []struct {
+		Name                  string
+		DirectoryPathEndParts []string
+		FilePathEndParts      []string
+		WantErr               bool
+	}{
+		{
+			Name:                  "Basic",
+			DirectoryPathEndParts: directoryPathEndParts,
+			FilePathEndParts:      filePathEndParts,
+			WantErr:               false,
+		},
+	}
 
-	// for _, tc := range testCases {
-	// 	t.Run(tc.Name, func(t *testing.T) {
-	// 		// arrange and tear down
-	// 		directory, err := testingCreateTempFileSystemStructureOrGetEmptyString(tc.DirectoryPathEndParts, tc.FilePathEndParts)
-	// 		if err != nil {
-	// 			t.Fatalf("Failed to create the temporary directory: %v", err)
-	// 		}
-	// 		defer func() {
-	// 			if err := os.RemoveAll(directory); err != nil {
-	// 				t.Errorf("Failed to remove the temporary directory: %v", err)
-	// 			}
-	// 		}()
-	// 		var builder strings.Builder
-	// 		if len(fileSystemNodes) > 0 {
-	// 			content := fmt.Sprintf("content %s %d\ncontent %s %d", fileSystemNodes[0].Path, 0)
-	// 			testingWriteFileContent(t, fileSystemNodes[0].Path, content)
-	// 			testingWriteString(t, content, &builder)
-	// 		}
-	// 		for _, node := range fileSystemNodes[1:] {
-	// 			// TODO: duplicate
-	// 			content := fmt.Sprintf("content %s %d\ncontent %s %d", fileSystemNodes[0].Path, 0)
-	// 			testingWriteFileContent(t, fileSystemNodes[0].Path, content)
-	// 			testingWriteString(t, content, &builder)
-	// 		}
+	for _, tc := range testCases {
+		t.Run(tc.Name, func(t *testing.T) {
+			// arrange and tear down
+			directory, err := testingCreateTempFileSystemStructureOrGetEmptyString(tc.DirectoryPathEndParts, tc.FilePathEndParts)
+			if err != nil {
+				t.Fatalf("Failed to create the temporary directory: %v", err)
+			}
+			defer func() {
+				if err := os.RemoveAll(directory); err != nil {
+					t.Errorf("Failed to remove the temporary directory: %v", err)
+				}
+			}()
+			for i := range fileSystemNodes {
+				fileSystemNodes[i].Path = filepath.Join(directory, fileSystemNodes[i].Path)
+			}
+			var builder strings.Builder
+			// TODO: filePathEndParts to full path happens also in testingCreateTempFileSystemStructureOrGetEmptyString?
+			if len(filePathEndParts) > 0 {
+				fullPath := filepath.Join(directory, filePathEndParts[0])
+				content := testingCreateContentString(fullPath, 0)
+				testingWriteFileContent(t, fullPath, content)
+				// TODO: duplicate: testingWriteString(t, fmt.Sprintf("\n\n%s\n", filepath.Base(filePathEndParts[i])), &builder)
+				testingWriteString(t, fmt.Sprintf("%s\n", filepath.Base(filePathEndParts[0])), &builder)
+				testingWriteString(t, content, &builder)
+				for i := 1; i < len(filePathEndParts); i++ {
+					fullPath := filepath.Join(directory, filePathEndParts[i])
+					content := testingCreateContentString(fullPath, i)
+					testingWriteFileContent(t, fullPath, content)
+					// TODO: duplicate \n\n?
+					testingWriteString(t, fmt.Sprintf("\n\n%s\n", filepath.Base(filePathEndParts[i])), &builder)
+					testingWriteString(t, content, &builder)
+				}
+			}
 
-	// 		// act
-	// 		text, err := plainTextFilesToText(fileSystemNodes)
+			// act
+			text, err := plainTextFilesToText(fileSystemNodes)
 
-	// 		// assert
-
-	// 	})
-	// }
+			// assert
+			if (err != nil) != tc.WantErr {
+				t.Fatalf("want error: %v, got %v", tc.WantErr, err)
+			} else if builder.String() != text {
+				t.Fatalf("The text is different than expected.")
+			}
+		})
+	}
 }
