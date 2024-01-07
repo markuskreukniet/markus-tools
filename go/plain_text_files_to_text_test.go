@@ -84,8 +84,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 			outcome, err := plainTextFilesToText(fileSystemNodes)
 
 			// assert
-			testingAssertErrorToWantError(t, err, tc.WantErr)
-			testingAssertOutcomeToBuilderString(t, outcome, builder)
+			testingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.WantErr, outcome, builder)
 		})
 	}
 }

@@ -86,14 +86,10 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			}
 
 			// act
-			newlineSeparatedString, err := getDuplicateFilesAsNewlineSeparatedString(fileSystemNodes)
+			outcome, err := getDuplicateFilesAsNewlineSeparatedString(fileSystemNodes)
 
 			// assert
-			if (err != nil) != tc.WantErr {
-				t.Fatalf("want error: %v, got %v", tc.WantErr, err)
-			} else if builder.String() != newlineSeparatedString {
-				t.Fatalf("The newline-separated string is different than expected.")
-			}
+			testingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.WantErr, outcome, builder)
 		})
 	}
 }

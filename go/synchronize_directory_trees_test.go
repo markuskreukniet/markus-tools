@@ -171,9 +171,7 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			result, err := joinOutputBasePathWithRelativeInputPath(tc.InputBasePath, tc.InputFullPath, tc.OutputBasePath)
-			if (err != nil) != tc.WantErr {
-				t.Fatalf("want error: %v, got %v", tc.WantErr, err)
-			}
+			testingAssertErrorToWantError(t, err, tc.WantErr)
 			if err == nil && result != tc.Want {
 				t.Fatalf("want: %s, got %s", tc.Want, result)
 			}
