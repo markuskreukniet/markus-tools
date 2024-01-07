@@ -7,7 +7,6 @@ import (
 	"testing"
 )
 
-// TODO: rename file?
 var (
 	directoryEmpty               = "directory empty"
 	directory1                   = "directory 1"

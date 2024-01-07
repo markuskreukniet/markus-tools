@@ -99,9 +99,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			err = synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
 
 			// assert
-			if (err != nil) != tc.WantErr {
-				t.Fatalf("want error: %v, got %v", tc.WantErr, err)
-			}
+			testingAssertErrorToWantError(t, err, tc.WantErr)
 			haveSameFilePaths, err := testingHaveDirectoryTreesSameFilePathsOrGetFalse(sourceDirectory, destinationDirectory)
 			if err != nil {
 				t.Fatalf("Failed to check if the source and destination directory trees have the same file paths: %v", err)
