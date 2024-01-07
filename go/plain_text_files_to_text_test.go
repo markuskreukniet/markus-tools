@@ -81,14 +81,11 @@ func TestPlainTextFilesToText(t *testing.T) {
 			}
 
 			// act
-			text, err := plainTextFilesToText(fileSystemNodes)
+			outcome, err := plainTextFilesToText(fileSystemNodes)
 
 			// assert
-			if (err != nil) != tc.WantErr {
-				t.Fatalf("want error: %v, got %v", tc.WantErr, err)
-			} else if builder.String() != text {
-				t.Fatalf("The text is different than expected.")
-			}
+			testingAssertErrorToWantError(t, err, tc.WantErr)
+			testingAssertOutcomeToBuilderString(t, outcome, builder)
 		})
 	}
 }
