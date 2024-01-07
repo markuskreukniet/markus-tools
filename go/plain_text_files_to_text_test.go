@@ -8,8 +8,7 @@ import (
 	"testing"
 )
 
-// TODO: rename asdf
-func asdf(filePath string) string {
+func testingLastPathElementOnNewline(filePath string) string {
 	return fmt.Sprintf("%s\n", filepath.Base(filePath))
 }
 
@@ -69,14 +68,14 @@ func TestPlainTextFilesToText(t *testing.T) {
 				fullPath := filepath.Join(directory, filePathEndParts[0])
 				content := testingCreateContentString(fullPath, 0)
 				testingWriteFileContent(t, fullPath, content)
-				testingWriteString(t, asdf(filePathEndParts[0]), &builder)
+				testingWriteString(t, testingLastPathElementOnNewline(filePathEndParts[0]), &builder)
 				testingWriteString(t, content, &builder)
 				for i := 1; i < len(filePathEndParts); i++ {
 					fullPath := filepath.Join(directory, filePathEndParts[i])
 					content := testingCreateContentString(fullPath, i)
 					testingWriteFileContent(t, fullPath, content)
 					testingWriteString(t, "\n\n", &builder)
-					testingWriteString(t, asdf(filePathEndParts[i]), &builder)
+					testingWriteString(t, testingLastPathElementOnNewline(filePathEndParts[i]), &builder)
 					testingWriteString(t, content, &builder)
 				}
 			}
