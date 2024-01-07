@@ -25,6 +25,7 @@ var (
 	emptyPathEndParts []string
 )
 
+// TODO: move to other util file
 func writeNewlineString(builder *strings.Builder) (int, error) {
 	bytesWritten, err := builder.WriteString("\n")
 	if err != nil {
