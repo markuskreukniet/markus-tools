@@ -22,6 +22,8 @@ var (
 	txtFile5 = filepath.Join(directory2WithDirectory3, "file 5.txt")
 	txtFile6 = filepath.Join(directory2WithDirectory4, "file 6.txt")
 
+	jpgFile4 = filepath.Join(directory1, "file 4.jpg")
+
 	emptyPathEndParts []string
 )
 
