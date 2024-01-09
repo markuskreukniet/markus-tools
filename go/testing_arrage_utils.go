@@ -11,3 +11,11 @@ func testingCreateTestCaseMetadata(name string, wantErr bool) TestCaseMetadata {
 		WantErr: wantErr,
 	}
 }
+
+func testingCreateTestCaseMetadataWithNameBasicAndWantErrFalse() TestCaseMetadata {
+	return testingCreateTestCaseMetadata("Basic", false)
+}
+
+func testingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse() TestCaseMetadata {
+	return testingCreateTestCaseMetadata("Empty FileSystemNodes", false)
+}

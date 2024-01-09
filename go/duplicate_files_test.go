@@ -26,13 +26,13 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 		DuplicateFilePathEndPartGroups [][]string
 	}{
 		{
-			Metadata:                       testingCreateTestCaseMetadata("Basic", false),
+			Metadata:                       testingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
 			DirectoryPathEndParts:          directoryPathEndParts,
 			FilePathEndParts:               filePathEndParts,
 			DuplicateFilePathEndPartGroups: duplicateFilePathEndPartGroups,
 		},
 		{
-			Metadata:                       testingCreateTestCaseMetadata("Empty FileSystemNodes", false),
+			Metadata:                       testingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse(),
 			DirectoryPathEndParts:          emptyPathEndParts,
 			FilePathEndParts:               emptyPathEndParts,
 			DuplicateFilePathEndPartGroups: emptyPathEndPartGroups,

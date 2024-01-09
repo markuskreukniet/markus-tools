@@ -42,12 +42,12 @@ func TestPlainTextFilesToText(t *testing.T) {
 		FileSystemNodes           []FileSystemNode
 	}{
 		{
-			Metadata:                  testingCreateTestCaseMetadata("Basic", false),
+			Metadata:                  testingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
 			PlainTextFilePathEndParts: plainTextFilePathEndParts,
 			FileSystemNodes:           fileSystemNodes,
 		},
 		{
-			Metadata:                  testingCreateTestCaseMetadata("Empty FileSystemNodes", false),
+			Metadata:                  testingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse(),
 			PlainTextFilePathEndParts: emptyPathEndParts,
 			FileSystemNodes:           emptyFileSystemNodes,
 		},
