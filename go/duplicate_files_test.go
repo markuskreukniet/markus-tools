@@ -20,30 +20,27 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	var emptyPathEndPartGroups [][]string
 
 	testCases := []struct {
-		Name                           string
+		Metadata                       TestCaseMetadata
 		DirectoryPathEndParts          []string
 		FilePathEndParts               []string
 		DuplicateFilePathEndPartGroups [][]string
-		WantErr                        bool
 	}{
 		{
-			Name:                           "Basic",
+			Metadata:                       testingCreateTestCaseMetadata("Basic", false),
 			DirectoryPathEndParts:          directoryPathEndParts,
 			FilePathEndParts:               filePathEndParts,
 			DuplicateFilePathEndPartGroups: duplicateFilePathEndPartGroups,
-			WantErr:                        false,
 		},
 		{
-			Name:                           "Empty FileSystemNodes",
+			Metadata:                       testingCreateTestCaseMetadata("Empty FileSystemNodes", false),
 			DirectoryPathEndParts:          emptyPathEndParts,
 			FilePathEndParts:               emptyPathEndParts,
 			DuplicateFilePathEndPartGroups: emptyPathEndPartGroups,
-			WantErr:                        false,
 		},
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.Name, func(t *testing.T) {
+		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and tear down
 			directory, err := testingCreateTempFileSystemStructureOrGetEmptyString(tc.DirectoryPathEndParts, tc.FilePathEndParts)
 			if err != nil {
@@ -89,7 +86,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			outcome, err := getDuplicateFilesAsNewlineSeparatedString(fileSystemNodes)
 
 			// assert
-			testingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.WantErr, outcome, builder)
+			testingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.Metadata.WantErr, outcome, builder)
 		})
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"testing"
 )
 
+// TODO: should move to arrange utils?
 var (
 	directoryEmpty               = "directory empty"
 	directory1                   = "directory 1"
@@ -26,18 +27,6 @@ var (
 
 	emptyPathEndParts []string
 )
-
-type TestCaseMetadata struct {
-	Name    string
-	WantErr bool
-}
-
-func createTestCaseMetadata(name string, wantErr bool) TestCaseMetadata {
-	return TestCaseMetadata{
-		Name:    name,
-		WantErr: wantErr,
-	}
-}
 
 // TODO: move to other util file
 func writeNewlineString(builder *strings.Builder) (int, error) {
