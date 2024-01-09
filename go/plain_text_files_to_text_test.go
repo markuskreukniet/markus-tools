@@ -37,24 +37,18 @@ func TestPlainTextFilesToText(t *testing.T) {
 
 	testCases := []struct {
 		Name                      string
-		DirectoryPathEndParts     []string
-		FilePathEndParts          []string
 		PlainTextFilePathEndParts []string
 		FileSystemNodes           []FileSystemNode
 		WantErr                   bool
 	}{
 		{
 			Name:                      "Basic",
-			DirectoryPathEndParts:     directoryPathEndParts,
-			FilePathEndParts:          filePathEndParts,
 			PlainTextFilePathEndParts: plainTextFilePathEndParts,
 			FileSystemNodes:           fileSystemNodes,
 			WantErr:                   false,
 		},
 		{
 			Name:                      "Empty FileSystemNodes",
-			DirectoryPathEndParts:     directoryPathEndParts,
-			FilePathEndParts:          filePathEndParts,
 			PlainTextFilePathEndParts: emptyPathEndParts,
 			FileSystemNodes:           emptyFileSystemNodes,
 			WantErr:                   false,
@@ -64,7 +58,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			// arrange and tear down
-			directory, err := testingCreateTempFileSystemStructureOrGetEmptyString(tc.DirectoryPathEndParts, tc.FilePathEndParts)
+			directory, err := testingCreateTempFileSystemStructureOrGetEmptyString(directoryPathEndParts, filePathEndParts)
 			if err != nil {
 				t.Fatalf("Failed to create the temporary directory: %v", err)
 			}
