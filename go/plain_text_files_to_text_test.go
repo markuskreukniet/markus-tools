@@ -17,6 +17,7 @@ func testingCreateContentString(filePath string, index int) string {
 }
 
 // TODO: there are duplicate or useless things, such as statements, strings, and structs, probably also in other tests
+// TODO: PlainTextFilePathEndParts is useless, should use only FileSystemNodes?
 func TestPlainTextFilesToText(t *testing.T) {
 	// arrange
 	directoryPathEndParts := []string{directory1, directory2WithDirectory3, directory2WithDirectory4}
@@ -32,12 +33,14 @@ func TestPlainTextFilesToText(t *testing.T) {
 			IsDirectory: true,
 		},
 	}
+	var emptyFileSystemNodes []FileSystemNode
 
 	testCases := []struct {
 		Name                      string
 		DirectoryPathEndParts     []string
 		FilePathEndParts          []string
 		PlainTextFilePathEndParts []string
+		FileSystemNodes           []FileSystemNode
 		WantErr                   bool
 	}{
 		{
@@ -45,6 +48,15 @@ func TestPlainTextFilesToText(t *testing.T) {
 			DirectoryPathEndParts:     directoryPathEndParts,
 			FilePathEndParts:          filePathEndParts,
 			PlainTextFilePathEndParts: plainTextFilePathEndParts,
+			FileSystemNodes:           fileSystemNodes,
+			WantErr:                   false,
+		},
+		{
+			Name:                      "Empty FileSystemNodes",
+			DirectoryPathEndParts:     directoryPathEndParts,
+			FilePathEndParts:          filePathEndParts,
+			PlainTextFilePathEndParts: emptyPathEndParts,
+			FileSystemNodes:           emptyFileSystemNodes,
 			WantErr:                   false,
 		},
 	}
@@ -61,29 +73,29 @@ func TestPlainTextFilesToText(t *testing.T) {
 					t.Errorf("Failed to remove the temporary directory: %v", err)
 				}
 			}()
-			for i := range fileSystemNodes {
-				fileSystemNodes[i].Path = filepath.Join(directory, fileSystemNodes[i].Path)
+			for i := range tc.FileSystemNodes {
+				tc.FileSystemNodes[i].Path = filepath.Join(directory, tc.FileSystemNodes[i].Path)
 			}
 			var builder strings.Builder
-			// TODO: plainTextFilePathEndParts to full path happens also in testingCreateTempFileSystemStructureOrGetEmptyString?
-			if len(plainTextFilePathEndParts) > 0 {
-				fullPath := filepath.Join(directory, plainTextFilePathEndParts[0])
+			// TODO: tc.PlainTextFilePathEndParts to full path happens also in testingCreateTempFileSystemStructureOrGetEmptyString?
+			if len(tc.PlainTextFilePathEndParts) > 0 {
+				fullPath := filepath.Join(directory, tc.PlainTextFilePathEndParts[0])
 				content := testingCreateContentString(fullPath, 0)
 				testingWriteFileContent(t, fullPath, content)
-				testingWriteString(t, testingLastPathElementOnNewline(plainTextFilePathEndParts[0]), &builder)
+				testingWriteString(t, testingLastPathElementOnNewline(tc.PlainTextFilePathEndParts[0]), &builder)
 				testingWriteString(t, content, &builder)
-				for i := 1; i < len(plainTextFilePathEndParts); i++ {
-					fullPath := filepath.Join(directory, plainTextFilePathEndParts[i])
+				for i := 1; i < len(tc.PlainTextFilePathEndParts); i++ {
+					fullPath := filepath.Join(directory, tc.PlainTextFilePathEndParts[i])
 					content := testingCreateContentString(fullPath, i)
 					testingWriteFileContent(t, fullPath, content)
 					testingWriteString(t, "\n\n", &builder)
-					testingWriteString(t, testingLastPathElementOnNewline(plainTextFilePathEndParts[i]), &builder)
+					testingWriteString(t, testingLastPathElementOnNewline(tc.PlainTextFilePathEndParts[i]), &builder)
 					testingWriteString(t, content, &builder)
 				}
 			}
 
 			// act
-			outcome, err := plainTextFilesToText(fileSystemNodes)
+			outcome, err := plainTextFilesToText(tc.FileSystemNodes)
 
 			// assert
 			testingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.WantErr, outcome, builder)
