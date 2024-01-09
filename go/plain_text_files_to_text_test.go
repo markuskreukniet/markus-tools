@@ -18,6 +18,7 @@ func testingCreateContentString(filePath string, index int) string {
 
 // TODO: there are duplicate or useless things, such as statements, strings, and structs, probably also in other tests
 // TODO: PlainTextFilePathEndParts is useless, should use only FileSystemNodes?
+// TODO: use TestCaseMetadata also on other places
 func TestPlainTextFilesToText(t *testing.T) {
 	// arrange
 	directoryPathEndParts := []string{directory1, directory2WithDirectory3, directory2WithDirectory4}
@@ -36,27 +37,24 @@ func TestPlainTextFilesToText(t *testing.T) {
 	var emptyFileSystemNodes []FileSystemNode
 
 	testCases := []struct {
-		Name                      string
+		Metadata                  TestCaseMetadata
 		PlainTextFilePathEndParts []string
 		FileSystemNodes           []FileSystemNode
-		WantErr                   bool
 	}{
 		{
-			Name:                      "Basic",
+			Metadata:                  createTestCaseMetadata("Basic", false),
 			PlainTextFilePathEndParts: plainTextFilePathEndParts,
 			FileSystemNodes:           fileSystemNodes,
-			WantErr:                   false,
 		},
 		{
-			Name:                      "Empty FileSystemNodes",
+			Metadata:                  createTestCaseMetadata("Empty FileSystemNodes", false),
 			PlainTextFilePathEndParts: emptyPathEndParts,
 			FileSystemNodes:           emptyFileSystemNodes,
-			WantErr:                   false,
 		},
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.Name, func(t *testing.T) {
+		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and tear down
 			directory, err := testingCreateTempFileSystemStructureOrGetEmptyString(directoryPathEndParts, filePathEndParts)
 			if err != nil {
@@ -92,7 +90,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 			outcome, err := plainTextFilesToText(tc.FileSystemNodes)
 
 			// assert
-			testingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.WantErr, outcome, builder)
+			testingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.Metadata.WantErr, outcome, builder)
 		})
 	}
 }
