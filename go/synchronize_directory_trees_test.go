@@ -45,36 +45,33 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 	destinationFilePathEndParts := []string{txtFile3, txtFile4}
 
 	testCases := []struct {
-		Name                             string
+		Metadata                         TestCaseMetadata
 		SourceDirectoryPathEndParts      []string
 		SourceFilePathEndParts           []string
 		DestinationDirectoryPathEndParts []string
 		DestinationFilePathEndParts      []string
 		WantSameFilePaths                bool
-		WantErr                          bool
 	}{
 		{
-			Name:                             "Basic",
+			Metadata:                         testingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
 			SourceDirectoryPathEndParts:      sourceDirectoryPathEndParts,
 			SourceFilePathEndParts:           sourceFilePathEndParts,
 			DestinationDirectoryPathEndParts: destinationDirectoryPathEndParts,
 			DestinationFilePathEndParts:      destinationFilePathEndParts,
 			WantSameFilePaths:                true,
-			WantErr:                          false,
 		},
 		{
-			Name:                             "Empty DestinationPathEndParts",
+			Metadata:                         testingCreateTestCaseMetadata("Empty DestinationPathEndParts", true),
 			SourceDirectoryPathEndParts:      sourceDirectoryPathEndParts,
 			SourceFilePathEndParts:           sourceFilePathEndParts,
 			DestinationDirectoryPathEndParts: emptyPathEndParts,
 			DestinationFilePathEndParts:      emptyPathEndParts,
 			WantSameFilePaths:                false,
-			WantErr:                          true,
 		},
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.Name, func(t *testing.T) {
+		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and tear down
 			sourceDirectory, err := testingCreateTempFileSystemStructureOrGetEmptyString(tc.SourceDirectoryPathEndParts, tc.SourceFilePathEndParts)
 			if err != nil {
@@ -99,7 +96,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			err = synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
 
 			// assert
-			testingAssertErrorToWantError(t, err, tc.WantErr)
+			testingAssertErrorToWantError(t, err, tc.Metadata.WantErr)
 			haveSameFilePaths, err := testingHaveDirectoryTreesSameFilePathsOrGetFalse(sourceDirectory, destinationDirectory)
 			if err != nil {
 				t.Fatalf("Failed to check if the source and destination directory trees have the same file paths: %v", err)
@@ -125,51 +122,46 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	const joinedOutputBasePathWithRelativeInputPath string = "/home/user/destination/directory/file.txt"
 
 	testCases := []struct {
-		Name           string
+		Metadata       TestCaseMetadata
 		InputBasePath  string
 		InputFullPath  string
 		OutputBasePath string
 		Want           string
-		WantErr        bool
 	}{
 		{
-			Name:           "Basic",
+			Metadata:       testingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
 			InputBasePath:  inputBasePath,
 			InputFullPath:  inputFullPath,
 			OutputBasePath: outputBasePath,
 			Want:           filepath.FromSlash(joinedOutputBasePathWithRelativeInputPath),
-			WantErr:        false,
 		},
 		{
-			Name:           "Empty inputBasePath",
+			Metadata:       testingCreateTestCaseMetadata("Empty InputBasePath", true),
 			InputBasePath:  "",
 			InputFullPath:  inputFullPath,
 			OutputBasePath: outputBasePath,
 			Want:           "",
-			WantErr:        true,
 		},
 		{
-			Name:           "Empty inputFullPath",
+			Metadata:       testingCreateTestCaseMetadata("Empty InputFullPath", true),
 			InputBasePath:  inputBasePath,
 			InputFullPath:  "",
 			OutputBasePath: outputBasePath,
 			Want:           "",
-			WantErr:        true,
 		},
 		{
-			Name:           "Equivalent Input Paths",
+			Metadata:       testingCreateTestCaseMetadata("Equivalent Input Paths", false),
 			InputBasePath:  inputBasePath,
 			InputFullPath:  inputBasePath,
 			OutputBasePath: outputBasePath,
 			Want:           filepath.FromSlash(outputBasePath),
-			WantErr:        false,
 		},
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.Name, func(t *testing.T) {
+		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			result, err := joinOutputBasePathWithRelativeInputPath(tc.InputBasePath, tc.InputFullPath, tc.OutputBasePath)
-			testingAssertErrorToWantError(t, err, tc.WantErr)
+			testingAssertErrorToWantError(t, err, tc.Metadata.WantErr)
 			if err == nil && result != tc.Want {
 				t.Fatalf("want: %s, got %s", tc.Want, result)
 			}
