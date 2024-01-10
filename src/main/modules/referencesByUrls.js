@@ -1,6 +1,7 @@
 import http from 'http'
 import https from 'https'
 
+// TODO: has bug, two links separated by newline does not work
 export default async function referencesByUrls(urlsString) {
   const protocolStrings = ['http://', 'https://']
   const urls = getUrls(urlsString, protocolStrings)
