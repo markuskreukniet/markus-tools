@@ -18,7 +18,6 @@ func testingCreateContentString(filePath string, index int) string {
 
 // TODO: there are duplicate or useless things, such as statements, strings, and structs, probably also in other tests
 // TODO: PlainTextFilePathEndParts is useless, should use only FileSystemNodes?
-// TODO: use TestCaseMetadata also on other places
 func TestPlainTextFilesToText(t *testing.T) {
 	// arrange
 	directoryPathEndParts := []string{directory1, directory2WithDirectory3, directory2WithDirectory4}
