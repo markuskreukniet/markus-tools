@@ -61,7 +61,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			WantSameFilePaths:                true,
 		},
 		{
-			Metadata:                         testingCreateTestCaseMetadata("Empty DestinationPathEndParts", true),
+			Metadata:                         testingCreateTestCaseMetadataWithWantErrTrue("Empty DestinationPathEndParts"),
 			SourceDirectoryPathEndParts:      sourceDirectoryPathEndParts,
 			SourceFilePathEndParts:           sourceFilePathEndParts,
 			DestinationDirectoryPathEndParts: emptyPathEndParts,
@@ -136,14 +136,14 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 			Want:           filepath.FromSlash(joinedOutputBasePathWithRelativeInputPath),
 		},
 		{
-			Metadata:       testingCreateTestCaseMetadata("Empty InputBasePath", true),
+			Metadata:       testingCreateTestCaseMetadataWithWantErrTrue("Empty InputBasePath"),
 			InputBasePath:  "",
 			InputFullPath:  inputFullPath,
 			OutputBasePath: outputBasePath,
 			Want:           "",
 		},
 		{
-			Metadata:       testingCreateTestCaseMetadata("Empty InputFullPath", true),
+			Metadata:       testingCreateTestCaseMetadataWithWantErrTrue("Empty InputFullPath"),
 			InputBasePath:  inputBasePath,
 			InputFullPath:  "",
 			OutputBasePath: outputBasePath,

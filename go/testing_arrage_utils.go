@@ -12,6 +12,10 @@ func testingCreateTestCaseMetadata(name string, wantErr bool) TestCaseMetadata {
 	}
 }
 
+func testingCreateTestCaseMetadataWithWantErrTrue(name string) TestCaseMetadata {
+	return testingCreateTestCaseMetadata(name, true)
+}
+
 func testingCreateTestCaseMetadataWithNameBasicAndWantErrFalse() TestCaseMetadata {
 	return testingCreateTestCaseMetadata("Basic", false)
 }
