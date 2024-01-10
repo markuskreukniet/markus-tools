@@ -17,7 +17,7 @@ export default async function referencesByUrls(urlsString) {
 async function getReferencePart(url, comma, protocolStrings) {
   let httpData = ''
   try {
-    httpData = await getData(url)
+    httpData = await fetchDataFromUrl(url)
   } catch (error) {
     //
   }
@@ -80,25 +80,21 @@ function includesOneOfTheSubstringsAddToUrls(string, substrings, urls) {
   return urls
 }
 
-function getData(url) {
+function fetchDataFromUrl(url) {
   const protocol = url.startsWith('https') ? https : http
-
   return new Promise((resolve, reject) => {
     protocol
       .get(url, (resp) => {
         let data = ''
-
         resp.on('data', (chunk) => {
           data += chunk
         })
-
         resp.on('end', () => {
           resolve(data)
         })
       })
-      .on('error', (err) => {
-        console.log('Error:', err.message)
-        reject()
+      .on('error', (error) => {
+        reject(error)
       })
   })
 }
