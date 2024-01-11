@@ -49,15 +49,14 @@ function getUrls(urlsString, protocolStrings) {
   for (const line of urlsStringLines) {
     let startIndex = 0
     while (startIndex < line.length) {
-      startIndex = testTest(protocolStrings[0], urls, line, startIndex)
-      startIndex = testTest(protocolStrings[1], urls, line, startIndex)
+      startIndex = setUrlsAndGetStartIndex(protocolStrings[0], urls, line, startIndex)
+      startIndex = setUrlsAndGetStartIndex(protocolStrings[1], urls, line, startIndex)
     }
   }
   return urls
 }
 
-// TODO: better naming
-function testTest(protocolString, urls, line, startIndex) {
+function setUrlsAndGetStartIndex(protocolString, urls, line, startIndex) {
   const index = line.indexOf(protocolString, startIndex)
   if (index !== -1) {
     let endIndex = line.indexOf(' ', index)
