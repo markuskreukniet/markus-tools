@@ -4,32 +4,31 @@ import https from 'https'
 export default async function referencesByUrls(urlsString) {
   const protocolStrings = ['http://', 'https://']
   const urls = getUrls(urlsString, protocolStrings)
-  let result = urls.length > 0 ? await getReferencePart(urls[0], false, protocolStrings) : ''
+  let result = urls.length > 0 ? await getReferencePart(urls[0], protocolStrings) : ''
   for (let i = 1; i < urls.length; i++) {
-    result += `, ${await getReferencePart(urls[i], false, protocolStrings)}`
+    result += `, ${await getReferencePart(urls[i], protocolStrings)}`
   }
   return `(sources: ${result}).`
 }
 
-async function getReferencePart(url, comma, protocolStrings) {
-  let httpData = ''
+// TODO: good naming?
+async function getReferencePart(url, protocolStrings) {
+  let data = ''
   try {
-    httpData = await fetchDataFromUrl(url)
+    data = await fetchDataFromUrl(url)
   } catch (error) {
-    //
+    // TODO:
   }
-
-  const tags = httpData !== '' ? findHtmlTags(httpData, 'h1') : []
+  const tags = data !== '' ? findHtmlTags(data, 'h1') : []
   if (tags?.length === 1) {
     // https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/
-    const innerHtml = tags[0].replace(/(<([^>]+)>)/gi, '')
-    const part = `"${innerHtml}" by ${getByPart(url, protocolStrings)}`
-    return comma ? `, ${part}` : part
+    return `"${tags[0].replace(/(<([^>]+)>)/gi, '')}" by ${getByPart(url, protocolStrings)}`
   } else {
     return ''
   }
 }
 
+// TODO: useless?
 function getByPart(url, protocolStrings) {
   for (const protocolString of protocolStrings) {
     if (url.includes(protocolString)) {
@@ -41,6 +40,7 @@ function getByPart(url, protocolStrings) {
   return ''
 }
 
+// TODO: useless?
 function getUrls(urlsString, protocolStrings) {
   const urlsStringLines = urlsString.split('\n')
   const urls = []
@@ -86,6 +86,8 @@ function fetchDataFromUrl(url) {
   })
 }
 
+// TODO: useless?
+// TODO: getHtmlTags?
 function findHtmlTags(html, tag) {
   // TODO: check https://regex101.com/. It gives now an error. Check if regex is correct
   const regex = new RegExp(`<${tag}[^>]*>(.*?)<\\/${tag}>`, 'gi')
