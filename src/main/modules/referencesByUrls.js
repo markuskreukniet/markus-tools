@@ -4,15 +4,14 @@ import https from 'https'
 export default async function referencesByUrls(urlsString) {
   const protocolStrings = ['http://', 'https://']
   const urls = getUrls(urlsString, protocolStrings)
-  let result = urls.length > 0 ? await getReferencePart(urls[0], protocolStrings) : ''
+  let result = urls.length > 0 ? await extractFormattedReference(urls[0], protocolStrings) : ''
   for (let i = 1; i < urls.length; i++) {
-    result += `, ${await getReferencePart(urls[i], protocolStrings)}`
+    result += `, ${await extractFormattedReference(urls[i], protocolStrings)}`
   }
   return `(sources: ${result}).`
 }
 
-// TODO: good naming?
-async function getReferencePart(url, protocolStrings) {
+async function extractFormattedReference(url, protocolStrings) {
   let data = ''
   try {
     data = await fetchDataFromUrl(url)
