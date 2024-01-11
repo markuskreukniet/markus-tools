@@ -15,7 +15,7 @@ export default async function referencesByUrls(urlsString) {
     }
   }
 
-  // create the result
+  // result
   let resultPart = urls.length > 0 ? await extractFormattedReference(urls[0], protocolStrings) : ''
   for (let i = 1; i < urls.length; i++) {
     resultPart += `, ${await extractFormattedReference(urls[i], protocolStrings)}`
