@@ -9,6 +9,7 @@ import PageNavigator from './components/PageNavigator'
 // import logo from './assets/logo.svg'
 
 // TODO: check for error handling, createEffects, useless comments, useless changes (onChange) to parent element
+// TODO: In JavaScript, when a function modifies an array, it is also modified outside the function, refactor code with this logic.
 // TODO: use batch, untrack, on (with { defer: true }) from import { batch, on, untrack } from "solid-js";?
 // TODO: ImagesToDateRangeFolder: show how many files added/changed/removed
 
