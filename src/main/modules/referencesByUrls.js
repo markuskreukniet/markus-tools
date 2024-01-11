@@ -1,7 +1,6 @@
 import http from 'http'
 import https from 'https'
 
-// TODO: has bug, two links separated by newline does not work
 export default async function referencesByUrls(urlsString) {
   const protocolStrings = ['http://', 'https://']
   const urls = getUrls(urlsString, protocolStrings)
@@ -45,39 +44,30 @@ function getByPart(url, protocolStrings) {
 }
 
 function getUrls(urlsString, protocolStrings) {
-  urlsString = urlsString.replaceAll('\n', '')
-  urlsString = urlsString.replaceAll(' ', '')
-
-  let urls = []
-
-  while (urlsString.length > protocolStrings[0].length) {
-    const httpIndex = urlsString.indexOf(protocolStrings[0], protocolStrings[0].length)
-    const httpsIndex = urlsString.indexOf(protocolStrings[1], protocolStrings[1].length)
-
-    // case httpIndex === -1 is not needed
-    let firstIndex = httpsIndex
-    if (httpIndex === -1 && httpsIndex === -1) {
-      urls = includesOneOfTheSubstringsAddToUrls(urlsString, protocolStrings, urls)
-      return urls
-    } else if (httpsIndex === -1 || httpIndex < httpsIndex) {
-      firstIndex = httpIndex
+  const urlsStringLines = urlsString.split('\n')
+  const urls = []
+  for (const line of urlsStringLines) {
+    let startIndex = 0
+    while (startIndex < line.length) {
+      startIndex = testTest(protocolStrings[0], urls, line, startIndex)
+      startIndex = testTest(protocolStrings[1], urls, line, startIndex)
     }
-
-    const beforeIndex = urlsString.slice(0, firstIndex)
-    urls = includesOneOfTheSubstringsAddToUrls(beforeIndex, protocolStrings, urls)
-    urlsString = urlsString.slice(firstIndex)
   }
-
   return urls
 }
 
-function includesOneOfTheSubstringsAddToUrls(string, substrings, urls) {
-  for (const substring of substrings) {
-    if (string.includes(substring)) {
-      urls.push(string)
+// TODO: better naming
+function testTest(protocolString, urls, line, startIndex) {
+  const index = line.indexOf(protocolString, startIndex)
+  if (index !== -1) {
+    let endIndex = line.indexOf(' ', index)
+    if (endIndex === -1) {
+      endIndex = line.length
     }
+    urls.push(line.substring(index, endIndex))
+    startIndex = endIndex
   }
-  return urls
+  return startIndex
 }
 
 function fetchDataFromUrl(url) {
