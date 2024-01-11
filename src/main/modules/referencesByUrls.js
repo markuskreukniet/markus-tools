@@ -3,12 +3,24 @@ import https from 'https'
 
 export default async function referencesByUrls(urlsString) {
   const protocolStrings = ['http://', 'https://']
-  const urls = getUrls(urlsString, protocolStrings)
-  let result = urls.length > 0 ? await extractFormattedReference(urls[0], protocolStrings) : ''
-  for (let i = 1; i < urls.length; i++) {
-    result += `, ${await extractFormattedReference(urls[i], protocolStrings)}`
+
+  // append urls
+  const urls = []
+  const urlsStringLines = urlsString.split('\n')
+  for (const line of urlsStringLines) {
+    let startIndex = 0
+    while (startIndex < line.length) {
+      startIndex = setUrlsAndGetStartIndex(protocolStrings[0], urls, line, startIndex)
+      startIndex = setUrlsAndGetStartIndex(protocolStrings[1], urls, line, startIndex)
+    }
   }
-  return `(sources: ${result}).`
+
+  // create the references
+  let resultPart = urls.length > 0 ? await extractFormattedReference(urls[0], protocolStrings) : ''
+  for (let i = 1; i < urls.length; i++) {
+    resultPart += `, ${await extractFormattedReference(urls[i], protocolStrings)}`
+  }
+  return `(sources: ${resultPart}).`
 }
 
 async function extractFormattedReference(url, protocolStrings) {
@@ -58,20 +70,6 @@ function getByPart(url, protocolStrings) {
   }
 
   return ''
-}
-
-// TODO: useless?
-function getUrls(urlsString, protocolStrings) {
-  const urlsStringLines = urlsString.split('\n')
-  const urls = []
-  for (const line of urlsStringLines) {
-    let startIndex = 0
-    while (startIndex < line.length) {
-      startIndex = setUrlsAndGetStartIndex(protocolStrings[0], urls, line, startIndex)
-      startIndex = setUrlsAndGetStartIndex(protocolStrings[1], urls, line, startIndex)
-    }
-  }
-  return urls
 }
 
 function setUrlsAndGetStartIndex(protocolString, urls, line, startIndex) {
