@@ -18,13 +18,34 @@ async function extractFormattedReference(url, protocolStrings) {
   } catch (error) {
     // TODO:
   }
-  const tags = data !== '' ? findHtmlTags(data, 'h1') : []
-  if (tags?.length === 1) {
-    // https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/
-    return `"${tags[0].replace(/(<([^>]+)>)/gi, '')}" by ${getByPart(url, protocolStrings)}`
+  const innerHtml = extractFirstH1InnerHtml(data)
+  if (innerHtml !== '') {
+    return `"${innerHtml}" by ${getByPart(url, protocolStrings)}`
   } else {
     return ''
   }
+}
+
+function extractFirstH1InnerHtml(html) {
+  // TODO: remove comments first
+
+  const startIndex = html.indexOf('<h1')
+  if (startIndex === -1) {
+    return ''
+  }
+  const endTag = '</h1>'
+  let endIndex = html.indexOf(endTag, startIndex)
+  if (endIndex === -1) {
+    return ''
+  }
+  endIndex += endTag.length
+
+  // regex: https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/
+  return html
+    .substring(startIndex, endIndex)
+    .replace(/(<([^>]+)>)/gi, '')
+    .trimStart()
+    .trimEnd()
 }
 
 // TODO: useless?
@@ -83,12 +104,4 @@ function fetchDataFromUrl(url) {
         reject(error)
       })
   })
-}
-
-// TODO: useless?
-// TODO: getHtmlTags?
-function findHtmlTags(html, tag) {
-  // TODO: check https://regex101.com/. It gives now an error. Check if regex is correct
-  const regex = new RegExp(`<${tag}[^>]*>(.*?)<\\/${tag}>`, 'gi')
-  return html.match(regex)
 }
