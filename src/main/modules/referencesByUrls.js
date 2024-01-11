@@ -6,7 +6,7 @@ export default async function referencesByUrls(urlsString) {
   const urls = getUrls(urlsString, protocolStrings)
   let result = urls.length > 0 ? await getReferencePart(urls[0], false, protocolStrings) : ''
   for (let i = 1; i < urls.length; i++) {
-    result += await getReferencePart(urls[i], true, protocolStrings)
+    result += `, ${await getReferencePart(urls[i], false, protocolStrings)}`
   }
   return `(sources: ${result}).`
 }
