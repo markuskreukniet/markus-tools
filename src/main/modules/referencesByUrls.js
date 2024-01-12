@@ -56,8 +56,7 @@ function extractFirstH1InnerHtml(html) {
   return html
     .substring(startIndex, endIndex)
     .replace(/(<([^>]+)>)/gi, '')
-    .trimStart()
-    .trimEnd()
+    .trim()
 }
 
 // TODO: useless?
