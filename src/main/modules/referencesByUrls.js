@@ -17,7 +17,6 @@ export default async function referencesByUrls(urlsString) {
   }
 
   // result
-  // TODO: result extractFormattedReference '' check
   let resultPart = urls.length > 0 ? await extractFormattedReference(urls[0], protocolStrings) : ''
   for (let i = 1; i < urls.length; i++) {
     resultPart += `, ${await extractFormattedReference(urls[i], protocolStrings)}`
@@ -52,7 +51,8 @@ async function extractFormattedReference(url, protocolStrings) {
   }
 
   // result
-  let result = ''
+  // 'let result = url' could be more efficient, but it is cleaner.
+  let result = url
   if (innerHtml !== '') {
     for (const protocolString of protocolStrings) {
       if (url.startsWith(protocolString)) {
