@@ -17,6 +17,7 @@ export default async function referencesByUrls(urlsString) {
   }
 
   // result
+  // TODO: result extractFormattedReference '' check
   let resultPart = urls.length > 0 ? await extractFormattedReference(urls[0], protocolStrings) : ''
   for (let i = 1; i < urls.length; i++) {
     resultPart += `, ${await extractFormattedReference(urls[i], protocolStrings)}`
@@ -31,44 +32,38 @@ async function extractFormattedReference(url, protocolStrings) {
   } catch (error) {
     // TODO:
   }
-  const innerHtml = extractFirstH1InnerHtml(data)
+
+  // extract first H1 inner HTML
+  let innerHtml = ''
+  data = removeHtmlCssJavaScriptComments(data)
+  const startIndex = data.indexOf('<h1')
+  if (startIndex !== -1) {
+    const endTag = '</h1>'
+    let endIndex = data.indexOf(endTag, startIndex)
+    if (endIndex !== -1) {
+      endIndex += endTag.length
+
+      // regex: https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/
+      innerHtml = data
+        .substring(startIndex, endIndex)
+        .replace(/(<([^>]+)>)/gi, '')
+        .trim()
+    }
+  }
 
   // result
   let result = ''
   if (innerHtml !== '') {
-    let domainName = ''
     for (const protocolString of protocolStrings) {
       if (url.startsWith(protocolString)) {
-        domainName = url.substr(
+        result = `"${innerHtml}" by ${url.substr(
           protocolString.length,
           url.indexOf('/', protocolString.length) - protocolString.length
-        )
+        )}`
       }
     }
-    result = `"${innerHtml}" by ${domainName}`
   }
   return result
-}
-
-// TODO: useless?
-function extractFirstH1InnerHtml(html) {
-  html = removeHtmlCssJavaScriptComments(html)
-  const startIndex = html.indexOf('<h1')
-  if (startIndex === -1) {
-    return ''
-  }
-  const endTag = '</h1>'
-  let endIndex = html.indexOf(endTag, startIndex)
-  if (endIndex === -1) {
-    return ''
-  }
-  endIndex += endTag.length
-
-  // regex: https://css-tricks.com/snippets/javascript/strip-html-tags-in-javascript/
-  return html
-    .substring(startIndex, endIndex)
-    .replace(/(<([^>]+)>)/gi, '')
-    .trim()
 }
 
 function setUrlsAndGetStartIndex(protocolString, urls, line, startIndex) {
