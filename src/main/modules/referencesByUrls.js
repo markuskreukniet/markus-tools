@@ -62,12 +62,13 @@ function extractFirstH1InnerHtml(html) {
 // TODO: useless?
 function getByPart(url, protocolStrings) {
   for (const protocolString of protocolStrings) {
-    if (url.includes(protocolString)) {
-      const endPosition = url.indexOf('/', protocolString.length) - protocolString.length
-      return url.substr(protocolString.length, endPosition)
+    if (url.startsWith(protocolString)) {
+      return url.substr(
+        protocolString.length,
+        url.indexOf('/', protocolString.length) - protocolString.length
+      )
     }
   }
-
   return ''
 }
 
