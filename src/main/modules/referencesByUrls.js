@@ -1,5 +1,6 @@
 import http from 'http'
 import https from 'https'
+import { removeHtmlCssJavaScriptComments } from './modifyString.js'
 
 export default async function referencesByUrls(urlsString) {
   const protocolStrings = ['http://', 'https://']
@@ -49,9 +50,9 @@ async function extractFormattedReference(url, protocolStrings) {
   return result
 }
 
+// TODO: useless?
 function extractFirstH1InnerHtml(html) {
-  // TODO: remove comments first
-
+  html = removeHtmlCssJavaScriptComments(html)
   const startIndex = html.indexOf('<h1')
   if (startIndex === -1) {
     return ''

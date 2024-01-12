@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs'
 import { Either, toEitherLeftResult, toEitherRightResult } from '../../preload/monads/either'
+import { removeHtmlCssJavaScriptComments } from './modifyString.js'
 
+// TODO:
 const endOfLine = '\n'
 
 // TODO: functions this function starting from GUI are still async, which is not needed
@@ -30,9 +32,9 @@ function numberOfFileLinesWithoutCommentsAndEmptyLines(filePath) {
 }
 
 function removeCommentsAndEmptyLines(code) {
-  // should remove all JavaScript, HTML, and CSS comments
-  code = code.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$|<!--(.|\s)*?-->/gm, '')
-  let lines = code.split(endOfLine)
-  lines = lines.filter((line) => line.trim() !== '')
-  return lines.join(endOfLine)
+  code = removeHtmlCssJavaScriptComments(code)
+  return code
+    .split(endOfLine)
+    .filter((line) => line.trim() !== '')
+    .join(endOfLine)
 }
