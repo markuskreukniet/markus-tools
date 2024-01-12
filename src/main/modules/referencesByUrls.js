@@ -31,11 +31,22 @@ async function extractFormattedReference(url, protocolStrings) {
     // TODO:
   }
   const innerHtml = extractFirstH1InnerHtml(data)
+
+  // result
+  let result = ''
   if (innerHtml !== '') {
-    return `"${innerHtml}" by ${getByPart(url, protocolStrings)}`
-  } else {
-    return ''
+    let domainName = ''
+    for (const protocolString of protocolStrings) {
+      if (url.startsWith(protocolString)) {
+        domainName = url.substr(
+          protocolString.length,
+          url.indexOf('/', protocolString.length) - protocolString.length
+        )
+      }
+    }
+    result = `"${innerHtml}" by ${domainName}`
   }
+  return result
 }
 
 function extractFirstH1InnerHtml(html) {
@@ -57,19 +68,6 @@ function extractFirstH1InnerHtml(html) {
     .substring(startIndex, endIndex)
     .replace(/(<([^>]+)>)/gi, '')
     .trim()
-}
-
-// TODO: useless?
-function getByPart(url, protocolStrings) {
-  for (const protocolString of protocolStrings) {
-    if (url.startsWith(protocolString)) {
-      return url.substr(
-        protocolString.length,
-        url.indexOf('/', protocolString.length) - protocolString.length
-      )
-    }
-  }
-  return ''
 }
 
 function setUrlsAndGetStartIndex(protocolString, urls, line, startIndex) {
