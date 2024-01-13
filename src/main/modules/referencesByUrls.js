@@ -1,5 +1,6 @@
 import http from 'http'
 import https from 'https'
+import { Either, toEitherLeftResult, toEitherRightResult } from '../../preload/monads/either'
 import { removeHtmlCssJavaScriptComments } from './modifyString.js'
 
 export default async function referencesByUrls(urlsString) {
@@ -17,11 +18,27 @@ export default async function referencesByUrls(urlsString) {
   }
 
   // result
-  let resultPart = urls.length > 0 ? await extractFormattedReference(urls[0], protocolStrings) : ''
-  for (let i = 1; i < urls.length; i++) {
-    resultPart += `, ${await extractFormattedReference(urls[i], protocolStrings)}`
+  let references = 'No references found'
+  if (urls.length > 0) {
+    let result = await extractFormattedReference(urls[0], protocolStrings)
+    if (result.isRight()) {
+      references = result.value
+    } else {
+      return toEitherLeftResult(result)
+    }
+    for (let i = 1; i < urls.length; i++) {
+      result = await extractFormattedReference(urls[i], protocolStrings)
+      if (result.isRight()) {
+        references += `, ${result.value}`
+      } else {
+        return toEitherLeftResult(result)
+      }
+    }
+    references = `(sources: ${references}).`
   }
-  return `(sources: ${resultPart}).`
+  // TODO:
+  // return toEitherRightResult(references)
+  return references
 }
 
 async function extractFormattedReference(url, protocolStrings) {
@@ -29,7 +46,7 @@ async function extractFormattedReference(url, protocolStrings) {
   try {
     data = await fetchDataFromUrl(url)
   } catch (error) {
-    // TODO:
+    Either.left(error.message)
   }
 
   // extract first H1 inner HTML
@@ -63,7 +80,7 @@ async function extractFormattedReference(url, protocolStrings) {
       }
     }
   }
-  return result
+  return Either.right(result)
 }
 
 function setUrlsAndGetStartIndex(protocolString, urls, line, startIndex) {
