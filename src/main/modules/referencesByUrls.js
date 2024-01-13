@@ -51,7 +51,7 @@ async function extractFormattedReference(url, protocolStrings) {
   }
 
   // result
-  // 'let result = url' could be more efficient, but it is cleaner.
+  // 'let result = url' is cleaner than making it more efficient.
   let result = url
   if (innerHtml !== '') {
     for (const protocolString of protocolStrings) {
