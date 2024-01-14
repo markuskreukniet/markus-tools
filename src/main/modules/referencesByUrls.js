@@ -36,9 +36,7 @@ export default async function referencesByUrls(urlsString) {
     }
     references = `(sources: ${references}).`
   }
-  // TODO:
-  // return toEitherRightResult(references)
-  return references
+  return toEitherRightResult(references)
 }
 
 async function extractFormattedReference(url, protocolStrings) {

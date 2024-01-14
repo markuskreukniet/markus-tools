@@ -24,7 +24,8 @@ export default function ReferencesByUrls(props) {
 
   async function setStateWithBE() {
     const result = await window.references.referencesByUrlsBE(textAreaValue())
-    setReferences(result)
+    // TODO: either
+    setReferences(result.value)
   }
 
   const placeholderContent = (
