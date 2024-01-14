@@ -1,6 +1,5 @@
 import { createEffect, createSignal, Show } from 'solid-js'
 
-// Since I want an optional 'on events,' I think these lines are needed: eslint-disable-next-line solid/reactivity
 export default function TextArea(props) {
   const [showTextArea, setShowTextArea] = createSignal(false)
 
@@ -48,9 +47,7 @@ export default function TextArea(props) {
       <textarea
         readonly={props.readOnly}
         value={props.readOnly ? props.textAreaValue() : null}
-        // eslint-disable-next-line solid/reactivity
-        onChange={handleFunctionOrNull(props.readOnly, handleChange)}
-        // eslint-disable-next-line solid/reactivity
+        onInput={handleFunctionOrNull(props.readOnly, handleChange)}
         onBlur={handleFunctionOrNull(props.readOnly, handleBlur)}
       />
     </Show>
