@@ -1,12 +1,13 @@
 import { createSignal } from 'solid-js'
 import ResultPage from '../page/ResultPage'
+import { getEitherResultValueOrEitherResultToErrorString } from '../../../../preload/monads/either'
 import TextArea from '../TextArea'
 
 export default function ReferencesByUrls(props) {
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [textAreaValue, setTextAreaValue] = createSignal('')
   const [isValid, setIsValid] = createSignal('')
-  const [references, setReferences] = createSignal('')
+  const [eitherResultOutput, setEitherResultOutput] = createSignal('')
 
   function handleChange(textAreaValue) {
     setTextAreaValue(textAreaValue)
@@ -23,9 +24,11 @@ export default function ReferencesByUrls(props) {
   }
 
   async function setStateWithBE() {
-    const result = await window.references.referencesByUrlsBE(textAreaValue())
-    // TODO: either
-    setReferences(result.value)
+    setEitherResultOutput(
+      getEitherResultValueOrEitherResultToErrorString(
+        await window.references.referencesByUrlsBE(textAreaValue())
+      )
+    )
   }
 
   const placeholderContent = (
@@ -48,7 +51,9 @@ export default function ReferencesByUrls(props) {
     </div>
   )
 
-  const outputComponent = <textarea readonly value={references()} class="textarea-height-5" />
+  const outputComponent = (
+    <textarea readonly value={eitherResultOutput()} class="textarea-height-5" />
+  )
 
   return (
     <ResultPage

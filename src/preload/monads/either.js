@@ -47,3 +47,11 @@ export function isEitherRightResult(eitherResult) {
 export function eitherLeftResultToErrorString(eitherResult) {
   return `error: ${eitherResult.value}`
 }
+
+export function getEitherResultValueOrEitherResultToErrorString(eitherResult) {
+  if (isEitherRightResult(eitherResult)) {
+    return eitherResult.value
+  } else {
+    return eitherLeftResultToErrorString(eitherResult)
+  }
+}
