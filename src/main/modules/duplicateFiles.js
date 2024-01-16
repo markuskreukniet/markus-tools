@@ -7,6 +7,7 @@ import {
   toResultObjectWithResultStatusOk
 } from '../../preload/modules/resultStatus'
 
+// TODO: this function (and others) does not have to async
 export default async function duplicateFiles(filePathObjects) {
   const filePathObjectsToFileObjectsRO = await filePathObjectsToFileObjects(filePathObjects, true)
   if (!isResultObjectOk(filePathObjectsToFileObjectsRO)) {

@@ -5,7 +5,6 @@ import { removeHtmlCssJavaScriptComments } from './modifyString.js'
 // TODO:
 const endOfLine = '\n'
 
-// TODO: functions this function starting from GUI are still async, which is not needed
 export default function linesOfCode(filePaths) {
   let numberOfLines = 0
   for (const path of filePaths) {

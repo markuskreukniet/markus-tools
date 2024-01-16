@@ -12,6 +12,7 @@ import PageNavigator from './components/PageNavigator'
 // TODO: In JavaScript, when a function modifies an array, it is also modified outside the function, refactor code with this logic.
 // TODO: use batch, untrack, on (with { defer: true }) from import { batch, on, untrack } from "solid-js";?
 // TODO: ImagesToDateRangeFolder: show how many files added/changed/removed
+// TODO: use min-width: 0? https://www.youtube.com/watch?v=cH8VbLM1958&t=4s
 
 // TODO: rename folder to directory
 // TODO: rename files.js to filePath.js
