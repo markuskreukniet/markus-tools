@@ -19,21 +19,12 @@ export default function linesOfCode(filePaths) {
 }
 
 function numberOfFileLinesWithoutCommentsAndEmptyLines(filePath) {
-  let fileContents = ''
+  let content = ''
   try {
-    fileContents = readFileSync(filePath, { encoding: 'utf8' })
+    content = readFileSync(filePath, { encoding: 'utf8' })
   } catch (error) {
     return Either.left(error.message)
   }
-  const code = removeCommentsAndEmptyLines(fileContents)
-  const lines = code.split(endOfLine)
-  return Either.right(lines.length)
-}
-
-function removeCommentsAndEmptyLines(code) {
-  code = removeHtmlCssJavaScriptComments(code)
-  return code
-    .split(endOfLine)
-    .filter((line) => line.trim() !== '')
-    .join(endOfLine)
+  content = removeHtmlCssJavaScriptComments(content)
+  return Either.right(content.split(endOfLine).filter((line) => line.trim() !== '').length)
 }
