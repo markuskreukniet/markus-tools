@@ -2,11 +2,9 @@ import { readFileSync } from 'node:fs'
 import { Either, toEitherLeftResult, toEitherRightResult } from '../../preload/monads/either'
 import { removeHtmlCssJavaScriptComments } from './modifyString.js'
 
-// TODO:
-const endOfLine = '\n'
-
 export default function linesOfCode(filePaths) {
   let numberOfLines = 0
+  // TODO: are not filePaths?
   for (const path of filePaths) {
     const result = numberOfFileLinesWithoutCommentsAndEmptyLines(path.path)
     if (result.isRight()) {
@@ -26,5 +24,5 @@ function numberOfFileLinesWithoutCommentsAndEmptyLines(filePath) {
     return Either.left(error.message)
   }
   content = removeHtmlCssJavaScriptComments(content)
-  return Either.right(content.split(endOfLine).filter((line) => line.trim() !== '').length)
+  return Either.right(content.split('\n').filter((line) => line.trim() !== '').length)
 }
