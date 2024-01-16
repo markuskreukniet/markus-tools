@@ -2,13 +2,12 @@ import { readFileSync } from 'node:fs'
 import { removeHtmlCssJavaScriptComments } from './modifyString.js'
 import { toEitherLeftResult, toEitherRightResult } from '../../preload/monads/either'
 
-export default function linesOfCode(filePaths) {
+export default function linesOfCode(fileSystemNodes) {
   let numberOfLines = 0
-  // TODO: are not filePaths?
-  for (const path of filePaths) {
+  for (const node of fileSystemNodes) {
     let content = ''
     try {
-      content = readFileSync(path.path, { encoding: 'utf8' })
+      content = readFileSync(node.path, { encoding: 'utf8' })
     } catch (error) {
       return toEitherLeftResult(error.message)
     }
