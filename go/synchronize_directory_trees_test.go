@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+// TODO: check testing functions and such things that they return an error instead of using t.Errorf
+
 func testingReadLines(t *testing.T, filePath string) string {
 	file, err := os.Open(filePath)
 	if err != nil {

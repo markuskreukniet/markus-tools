@@ -29,7 +29,7 @@ var (
 	emptyPathEndParts []string
 )
 
-// TODO: move to other util file
+// TODO: move to other util file, or don't return error and use t.Errorf?
 func writeNewlineString(builder *strings.Builder) (int, error) {
 	bytesWritten, err := builder.WriteString("\n")
 	if err != nil {
