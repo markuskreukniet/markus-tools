@@ -38,8 +38,10 @@ func writeNewlineString(builder *strings.Builder) (int, error) {
 	return bytesWritten, nil
 }
 
-func testingWriteFileContentWithContentAndIndex(t *testing.T, filePath string, index int) {
-	testingWriteFileContent(t, filePath, fmt.Sprintf("content %d", index))
+func testingWriteFileContentWithContentAndIndex(t *testing.T, filePath string, index int) string {
+	writtenContent := fmt.Sprintf("content %d", index)
+	testingWriteFileContent(t, filePath, writtenContent)
+	return writtenContent
 }
 
 func testingWriteFileContent(t *testing.T, filePath string, content string) {

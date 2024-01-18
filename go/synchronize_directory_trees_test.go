@@ -123,11 +123,12 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 
 			// Some file systems have a resolution of one second, so we must wait a second.
 			filePathTxtFile4 := ""
+			writtenContent := ""
 			if sourceDirectory != "" && destinationDirectory != "" && testingContainsTxtFile4(tc.SourceFilePathEndParts) && testingContainsTxtFile4(tc.DestinationFilePathEndParts) {
 				filePathTxtFile4 = filepath.Join(destinationDirectory, txtFile4)
 				testingWriteFileContentWithContentAndIndex(t, filePathTxtFile4, 1)
 				time.Sleep(time.Second)
-				testingWriteFileContentWithContentAndIndex(t, filepath.Join(sourceDirectory, txtFile4), 2)
+				writtenContent = testingWriteFileContentWithContentAndIndex(t, filepath.Join(sourceDirectory, txtFile4), 2)
 			}
 
 			// act
@@ -149,10 +150,8 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			if tc.WantSameFilePaths && !haveSameFilePaths {
 				t.Fatalf("The destination and source directory trees do not have the same file paths.")
 			}
-			// TODO: "content 2" should have returned testingWriteFileContentWithContentAndIndex?
-			if filePathTxtFile4 != "" && testingReadLines(t, filePathTxtFile4) != "content 2" {
-				// TODO:
-				t.Fatalf("--- fout ---")
+			if filePathTxtFile4 != "" && testingReadLines(t, filePathTxtFile4) != writtenContent {
+				t.Errorf("The file content is different than expected.")
 			}
 		})
 	}
