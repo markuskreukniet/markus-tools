@@ -1,10 +1,31 @@
 package main
 
 import (
+	"bufio"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
+	"time"
 )
+
+func testingReadLines(t *testing.T, filePath string) string {
+	file, err := os.Open(filePath)
+	if err != nil {
+		t.Errorf("Failed to open file: %v", err)
+	}
+	defer file.Close()
+	var builder strings.Builder
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		testingWriteString(t, scanner.Text(), &builder)
+	}
+	err = scanner.Err()
+	if err != nil {
+		t.Errorf("Failed to read file content: %v", err)
+	}
+	return builder.String()
+}
 
 func testingHaveDirectoryTreesSameFilePathsOrGetFalse(sourceDirectory, destinationDirectory string) (bool, error) {
 	if sourceDirectory == "" || destinationDirectory == "" {
@@ -36,7 +57,15 @@ func testingHaveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirector
 	return haveSameFilePaths, nil
 }
 
-// TODO: test modified files
+func testingContainsTxtFile4(stringSlice []string) bool {
+	for _, item := range stringSlice {
+		if item == txtFile4 {
+			return true
+		}
+	}
+	return false
+}
+
 func TestSynchronizeDirectoryTrees(t *testing.T) {
 	// arrange
 	sourceDirectoryPathEndParts := []string{directoryEmpty, directory1, directory2WithDirectoryEmpty, directory2WithDirectory3}
@@ -92,6 +121,15 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 				}
 			}()
 
+			// Some file systems have a resolution of one second, so we must wait a second.
+			filePathTxtFile4 := ""
+			if sourceDirectory != "" && destinationDirectory != "" && testingContainsTxtFile4(tc.SourceFilePathEndParts) && testingContainsTxtFile4(tc.DestinationFilePathEndParts) {
+				filePathTxtFile4 = filepath.Join(destinationDirectory, txtFile4)
+				testingWriteFileContentWithContentAndIndex(t, filePathTxtFile4, 1)
+				time.Sleep(time.Second)
+				testingWriteFileContentWithContentAndIndex(t, filepath.Join(sourceDirectory, txtFile4), 2)
+			}
+
 			// act
 			err = synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
 
@@ -110,6 +148,11 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			}
 			if tc.WantSameFilePaths && !haveSameFilePaths {
 				t.Fatalf("The destination and source directory trees do not have the same file paths.")
+			}
+			// TODO: "content 2" should have returned testingWriteFileContentWithContentAndIndex?
+			if filePathTxtFile4 != "" && testingReadLines(t, filePathTxtFile4) != "content 2" {
+				// TODO:
+				t.Fatalf("--- fout ---")
 			}
 		})
 	}

@@ -1,16 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
-
-func testingWriteFileContentWithContentAndIndex(t *testing.T, filePath string, index int) {
-	testingWriteFileContent(t, filePath, fmt.Sprintf("content %d", index))
-}
 
 func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	// arrange

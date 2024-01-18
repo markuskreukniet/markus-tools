@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -35,6 +36,10 @@ func writeNewlineString(builder *strings.Builder) (int, error) {
 		return bytesWritten, err
 	}
 	return bytesWritten, nil
+}
+
+func testingWriteFileContentWithContentAndIndex(t *testing.T, filePath string, index int) {
+	testingWriteFileContent(t, filePath, fmt.Sprintf("content %d", index))
 }
 
 func testingWriteFileContent(t *testing.T, filePath string, content string) {
