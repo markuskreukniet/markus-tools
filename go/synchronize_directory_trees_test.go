@@ -29,14 +29,14 @@ func testingReadLines(t *testing.T, filePath string) string {
 	return builder.String()
 }
 
-func testingHaveDirectoryTreesSameFilePathsOrGetFalse(sourceDirectory, destinationDirectory string) (bool, error) {
+func testingHaveDirectoryTreesSameFilePathsOrGetFalse(t *testing.T, sourceDirectory, destinationDirectory string) bool {
 	if sourceDirectory == "" || destinationDirectory == "" {
-		return false, nil
+		return false
 	}
-	return testingHaveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory)
+	return testingHaveDirectoryTreesSameFilePaths(t, sourceDirectory, destinationDirectory)
 }
 
-func testingHaveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirectory string) (bool, error) {
+func testingHaveDirectoryTreesSameFilePaths(t *testing.T, sourceDirectory, destinationDirectory string) bool {
 	haveSameFilePaths := true
 	err := filepath.Walk(sourceDirectory, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -54,9 +54,9 @@ func testingHaveDirectoryTreesSameFilePaths(sourceDirectory, destinationDirector
 		return nil
 	})
 	if err != nil {
-		return false, err
+		t.Errorf("Failed to walk through directory: %v", err)
 	}
-	return haveSameFilePaths, nil
+	return haveSameFilePaths
 }
 
 func testingContainsTxtFile4(stringSlice []string) bool {
@@ -132,17 +132,11 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 
 			// assert
 			testingAssertErrorToWantError(t, err, tc.Metadata.WantErr)
-			haveSameFilePaths, err := testingHaveDirectoryTreesSameFilePathsOrGetFalse(sourceDirectory, destinationDirectory)
-			if err != nil {
-				t.Fatalf("Failed to check if the source and destination directory trees have the same file paths: %v", err)
-			}
+			haveSameFilePaths := testingHaveDirectoryTreesSameFilePathsOrGetFalse(t, sourceDirectory, destinationDirectory)
 			if tc.WantSameFilePaths && !haveSameFilePaths {
 				t.Fatalf("The source and destination directory trees do not have the same file paths.")
 			}
-			haveSameFilePaths, err = testingHaveDirectoryTreesSameFilePathsOrGetFalse(destinationDirectory, sourceDirectory)
-			if err != nil {
-				t.Fatalf("Failed to check if the destination and source directory trees have the same file paths: %v", err)
-			}
+			haveSameFilePaths = testingHaveDirectoryTreesSameFilePathsOrGetFalse(t, destinationDirectory, sourceDirectory)
 			if tc.WantSameFilePaths && !haveSameFilePaths {
 				t.Fatalf("The destination and source directory trees do not have the same file paths.")
 			}
