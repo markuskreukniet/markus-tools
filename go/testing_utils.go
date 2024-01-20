@@ -64,27 +64,28 @@ func testingWriteString(t *testing.T, stringToWrite string, builder *strings.Bui
 	}
 }
 
-func testingCreateTempFileSystemStructureOrGetEmptyString(directoryPathEndParts, filePathEndParts []string) (string, error) {
+func testingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, directoryPathEndParts, filePathEndParts []string) string {
 	if len(directoryPathEndParts) == 0 {
-		return "", nil
+		return ""
 	}
-	return testingCreateTempFileSystemStructure(directoryPathEndParts, filePathEndParts)
+	return testingCreateTempFileSystemStructure(t, directoryPathEndParts, filePathEndParts)
 }
 
-func testingCreateTempFileSystemStructure(directoryPathEndParts, filePathEndParts []string) (string, error) {
+func testingCreateTempFileSystemStructure(t *testing.T, directoryPathEndParts, filePathEndParts []string) string {
 	tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
 	if err != nil {
-		return "", err
+		// TODO: "Failed to create temp dir" exists. Check also for other duplicate strings
+		t.Fatalf("Failed to create the temporary directory: %v", err)
 	}
 	for _, part := range directoryPathEndParts {
 		if err := os.MkdirAll(filepath.Join(tempDirectory, part), 0755); err != nil {
-			return "", err
+			t.Fatalf("Failed to create directory in temporary directory: %v", err)
 		}
 	}
 	for _, part := range filePathEndParts {
 		if err := os.WriteFile(filepath.Join(tempDirectory, part), []byte{}, 0666); err != nil {
-			return "", err
+			t.Fatalf("Failed to create a file: %v", err)
 		}
 	}
-	return tempDirectory, nil
+	return tempDirectory
 }
