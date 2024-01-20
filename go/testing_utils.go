@@ -64,6 +64,7 @@ func testingWriteString(t *testing.T, stringToWrite string, builder *strings.Bui
 	}
 }
 
+// TODO: move this function and other functions to testing_arrage_utils?
 func testingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, directoryPathEndParts, filePathEndParts []string) string {
 	if len(directoryPathEndParts) == 0 {
 		return ""
