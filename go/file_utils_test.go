@@ -6,54 +6,52 @@ import (
 	"testing"
 )
 
-func testingFatalLogIfError(t *testing.T, err error) {
+func testingGetFileDetailFatalLogIfError(t *testing.T, err error) {
+	// TODO: use t.Helper() also on other places?
 	t.Helper()
 	if err != nil {
 		t.Fatalf("getFileDetail() error: %v", err)
 	}
 }
 
+func testingFatalLogIfPathsAreNotEqual(t *testing.T, filePath string, fileDetailFilePath string) {
+	t.Helper()
+	if filePath != fileDetailFilePath {
+		t.Errorf("Want Path %v, got %v", filePath, fileDetailFilePath)
+	}
+}
+
+// TODO: change this test to a similar version as other tests
 func TestGetFileDetail(t *testing.T) {
-	const testText string = "test text"
+	// arrange
+	directoryPathEndParts := []string{directory1}
+	filePathEndParts := []string{txtFile1}
 
-	// Arrange
-	tempDir, err := os.MkdirTemp("", "testTempDir")
-	if err != nil {
-		t.Fatalf("Failed to create temp dir: %v", err)
-	}
-	defer os.RemoveAll(tempDir)
+	// arrange and tear down
+	directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, directoryPathEndParts, filePathEndParts)
+	defer func() {
+		if err := os.RemoveAll(directory); err != nil {
+			t.Errorf("Failed to remove the temporary directory: %v", err)
+		}
+	}()
+	fullFilePath := filepath.Join(directory, filePathEndParts[0])
+	writtenContent := testingWriteFileContentWithContentAndIndex(t, fullFilePath, 0)
+	nonExistentFilePath := filepath.Join(directory, txtFileNonExistent1)
 
-	filePath := filepath.Join(tempDir, "testFile.txt")
-	err = os.WriteFile(filePath, []byte(testText), 0666)
-	if err != nil {
-		t.Fatalf("Failed to write to temp file: %v", err)
-	}
-
-	nonExistentFilePath := filepath.Join(tempDir, "nonExistentFile.txt")
-
-	// Act
-	dirDetail, err := getFileDetail(tempDir)
-	testingFatalLogIfError(t, err)
-
-	fileDetail, err := getFileDetail(filePath)
-	testingFatalLogIfError(t, err)
-
+	// act
+	dirDetail, err := getFileDetail(directory)
+	testingGetFileDetailFatalLogIfError(t, err)
+	fileDetail, err := getFileDetail(fullFilePath)
+	testingGetFileDetailFatalLogIfError(t, err)
 	_, err = getFileDetail(nonExistentFilePath)
 
-	// Assert
-	if dirDetail.Path != tempDir {
-		t.Errorf("Want Path %v, got %v", tempDir, dirDetail.Path)
-	}
-
-	if fileDetail.Path != filePath {
-		t.Errorf("Want Path %v, got %v", filePath, fileDetail.Path)
-	}
-
-	if fileDetail.Size != int64(len(testText)) {
-		t.Errorf("Want Size %v, got %v", len(testText), fileDetail.Size)
-	}
-
-	if err == nil {
+	// assert
+	// TODO: are all fileDetail properties checked?
+	testingFatalLogIfPathsAreNotEqual(t, directory, dirDetail.Path)
+	testingFatalLogIfPathsAreNotEqual(t, fullFilePath, fileDetail.Path)
+	if fileDetail.Size != int64(len(writtenContent)) {
+		t.Errorf("Want Size %v, got %v", len(writtenContent), fileDetail.Size)
+	} else if err == nil {
 		t.Errorf("Want an error when trying to get details of a non-existent file, but got none")
 	}
 }

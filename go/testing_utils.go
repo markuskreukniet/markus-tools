@@ -9,6 +9,7 @@ import (
 )
 
 // TODO: should move to arrange utils?
+// TODO: there are no files in the root (temp dir)
 var (
 	directoryEmpty               = "directory empty"
 	directory1                   = "directory 1"
@@ -25,6 +26,8 @@ var (
 	txtFile6 = filepath.Join(directory2WithDirectory4, "file 6.txt")
 
 	jpgFile4 = filepath.Join(directory1, "file 4.jpg")
+
+	txtFileNonExistent1 = "non existent 1.txt"
 
 	emptyPathEndParts []string
 )
