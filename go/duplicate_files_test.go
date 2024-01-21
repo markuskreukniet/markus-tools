@@ -7,6 +7,14 @@ import (
 	"testing"
 )
 
+func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
+	t.Helper()
+	_, err := writeNewlineString(builder)
+	if err != nil {
+		t.Errorf("writeNewlineString failed: %v", err)
+	}
+}
+
 func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	// arrange
 	directoryPathEndParts := []string{directoryEmpty, directory1, directory2WithDirectoryEmpty, directory2WithDirectory3, directory2WithDirectory4}

@@ -55,14 +55,6 @@ func testingWriteFileContent(t *testing.T, filePath string, content string) {
 	}
 }
 
-func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
-	t.Helper()
-	_, err := writeNewlineString(builder)
-	if err != nil {
-		t.Errorf("writeNewlineString failed: %v", err)
-	}
-}
-
 func testingWriteString(t *testing.T, stringToWrite string, builder *strings.Builder) {
 	t.Helper()
 	_, err := builder.WriteString(stringToWrite)
