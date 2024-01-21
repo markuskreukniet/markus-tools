@@ -34,21 +34,21 @@ func TestGetFileDetail(t *testing.T) {
 			t.Errorf("Failed to remove the temporary directory: %v", err)
 		}
 	}()
-	fullFilePath := filepath.Join(directory, filePathEndParts[0])
-	writtenContent := testingWriteFileContentWithContentAndIndex(t, fullFilePath, 0)
+	fullPath := filepath.Join(directory, filePathEndParts[0])
+	writtenContent := testingWriteFileContentWithContentAndIndex(t, fullPath, 0)
 	nonExistentFilePath := filepath.Join(directory, txtFileNonExistent1)
 
 	// act
 	dirDetail, err := getFileDetail(directory)
 	testingGetFileDetailFatalLogIfError(t, err)
-	fileDetail, err := getFileDetail(fullFilePath)
+	fileDetail, err := getFileDetail(fullPath)
 	testingGetFileDetailFatalLogIfError(t, err)
 	_, err = getFileDetail(nonExistentFilePath)
 
 	// assert
 	// TODO: are all fileDetail properties checked?
 	testingFatalLogIfPathsAreNotEqual(t, directory, dirDetail.Path)
-	testingFatalLogIfPathsAreNotEqual(t, fullFilePath, fileDetail.Path)
+	testingFatalLogIfPathsAreNotEqual(t, fullPath, fileDetail.Path)
 	if fileDetail.Size != int64(len(writtenContent)) {
 		t.Errorf("Want Size %v, got %v", len(writtenContent), fileDetail.Size)
 	} else if err == nil {
