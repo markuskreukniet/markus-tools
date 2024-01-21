@@ -42,18 +42,21 @@ func writeNewlineString(builder *strings.Builder) (int, error) {
 }
 
 func testingWriteFileContentWithContentAndIndex(t *testing.T, filePath string, index int) string {
+	t.Helper()
 	writtenContent := fmt.Sprintf("content %d", index)
 	testingWriteFileContent(t, filePath, writtenContent)
 	return writtenContent
 }
 
 func testingWriteFileContent(t *testing.T, filePath string, content string) {
+	t.Helper()
 	if err := os.WriteFile(filePath, []byte(content), 0666); err != nil {
 		t.Errorf("Failed to write file content: %v", err)
 	}
 }
 
 func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
+	t.Helper()
 	_, err := writeNewlineString(builder)
 	if err != nil {
 		t.Errorf("writeNewlineString failed: %v", err)
@@ -61,6 +64,7 @@ func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
 }
 
 func testingWriteString(t *testing.T, stringToWrite string, builder *strings.Builder) {
+	t.Helper()
 	_, err := builder.WriteString(stringToWrite)
 	if err != nil {
 		t.Errorf("Failed to write string: %v", err)
@@ -69,12 +73,14 @@ func testingWriteString(t *testing.T, stringToWrite string, builder *strings.Bui
 
 // TODO: move this function and other functions to testing_arrage_utils?
 func testingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, directoryPathEndParts, filePathEndParts []string) string {
+	t.Helper()
 	if len(directoryPathEndParts) == 0 {
 		return ""
 	}
 	return testingCreateTempFileSystemStructure(t, directoryPathEndParts, filePathEndParts)
 }
 
+// TODO: useless function?
 func testingCreateTempFileSystemStructure(t *testing.T, directoryPathEndParts, filePathEndParts []string) string {
 	tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
 	if err != nil {

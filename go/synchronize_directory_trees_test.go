@@ -10,6 +10,7 @@ import (
 )
 
 func testingReadLines(t *testing.T, filePath string) string {
+	t.Helper()
 	file, err := os.Open(filePath)
 	if err != nil {
 		t.Errorf("Failed to open file: %v", err)
@@ -28,12 +29,14 @@ func testingReadLines(t *testing.T, filePath string) string {
 }
 
 func testingHaveDirectoryTreesSameFilePathsOrGetFalse(t *testing.T, sourceDirectory, destinationDirectory string) bool {
+	t.Helper()
 	if sourceDirectory == "" || destinationDirectory == "" {
 		return false
 	}
 	return testingHaveDirectoryTreesSameFilePaths(t, sourceDirectory, destinationDirectory)
 }
 
+// TODO: useless function?
 func testingHaveDirectoryTreesSameFilePaths(t *testing.T, sourceDirectory, destinationDirectory string) bool {
 	haveSameFilePaths := true
 	err := filepath.Walk(sourceDirectory, func(path string, info os.FileInfo, err error) error {
