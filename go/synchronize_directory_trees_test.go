@@ -34,11 +34,8 @@ func testingHaveDirectoryTreesSameFilePathsOrGetFalse(t *testing.T, sourceDirect
 	if sourceDirectory == "" || destinationDirectory == "" {
 		return false
 	}
-	return testingHaveDirectoryTreesSameFilePaths(t, sourceDirectory, destinationDirectory)
-}
 
-// TODO: useless function?
-func testingHaveDirectoryTreesSameFilePaths(t *testing.T, sourceDirectory, destinationDirectory string) bool {
+	// Do the directory trees have the same file paths?
 	haveSameFilePaths := true
 	err := filepath.Walk(sourceDirectory, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
