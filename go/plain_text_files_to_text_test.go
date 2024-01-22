@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -56,11 +55,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
 			directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, directoryPathEndParts, filePathEndParts)
-			defer func() {
-				if err := os.RemoveAll(directory); err != nil {
-					t.Errorf("Failed to remove the temporary directory: %v", err)
-				}
-			}()
+			defer testingRemoveDirectoryTree(t, directory)
 			for i := range tc.FileSystemNodes {
 				tc.FileSystemNodes[i].Path = filepath.Join(directory, tc.FileSystemNodes[i].Path)
 			}

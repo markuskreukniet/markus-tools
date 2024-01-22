@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -46,11 +45,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
 			directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, tc.DirectoryPathEndParts, tc.FilePathEndParts)
-			defer func() {
-				if err := os.RemoveAll(directory); err != nil {
-					t.Errorf("Failed to remove the temporary directory: %v", err)
-				}
-			}()
+			defer testingRemoveDirectoryTree(t, directory)
 			var builder strings.Builder
 			if len(tc.DuplicateFilePathEndPartGroups) > 0 {
 				if len(tc.DuplicateFilePathEndPartGroups[0][0]) > 0 {

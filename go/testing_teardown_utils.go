@@ -5,9 +5,9 @@ import (
 	"testing"
 )
 
-func testingRemoveAllDirectory(t *testing.T, directory string) {
+func testingRemoveDirectoryTree(t *testing.T, directory string) {
 	t.Helper()
 	if err := os.RemoveAll(directory); err != nil {
-		t.Errorf("Failed to remove the temporary directory: %v", err)
+		t.Errorf("Failed to remove the directory tree: %v", err)
 	}
 }

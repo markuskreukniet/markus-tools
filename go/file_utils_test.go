@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 )
@@ -29,11 +28,7 @@ func TestGetFileDetail(t *testing.T) {
 
 	// arrange and teardown
 	directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, directoryPathEndParts, filePathEndParts)
-	defer func() {
-		if err := os.RemoveAll(directory); err != nil {
-			t.Errorf("Failed to remove the temporary directory: %v", err)
-		}
-	}()
+	defer testingRemoveDirectoryTree(t, directory)
 	fullPath := filepath.Join(directory, filePathEndParts[0])
 	writtenContent := testingWriteFileContentWithContentAndIndex(t, fullPath, 0)
 	nonExistentFilePath := filepath.Join(directory, txtFileNonExistent1)

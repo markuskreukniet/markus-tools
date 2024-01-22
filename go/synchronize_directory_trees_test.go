@@ -106,17 +106,9 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
 			sourceDirectory := testingCreateTempFileSystemStructureOrGetEmptyString(t, tc.SourceDirectoryPathEndParts, tc.SourceFilePathEndParts)
-			defer func() {
-				if err := os.RemoveAll(sourceDirectory); err != nil {
-					t.Errorf("Failed to remove the temporary source directory: %v", err)
-				}
-			}()
+			defer testingRemoveDirectoryTree(t, sourceDirectory)
 			destinationDirectory := testingCreateTempFileSystemStructureOrGetEmptyString(t, tc.DestinationDirectoryPathEndParts, tc.DestinationFilePathEndParts)
-			defer func() {
-				if err := os.RemoveAll(destinationDirectory); err != nil {
-					t.Errorf("Failed to remove the temporary destination directory: %v", err)
-				}
-			}()
+			defer testingRemoveDirectoryTree(t, destinationDirectory)
 
 			// Some file systems have a resolution of one second, so we must wait a second.
 			filePathTxtFile4 := ""
