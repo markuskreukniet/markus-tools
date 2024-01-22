@@ -104,7 +104,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
-			// arrange and tear down
+			// arrange and teardown
 			sourceDirectory := testingCreateTempFileSystemStructureOrGetEmptyString(t, tc.SourceDirectoryPathEndParts, tc.SourceFilePathEndParts)
 			defer func() {
 				if err := os.RemoveAll(sourceDirectory); err != nil {

@@ -27,7 +27,7 @@ func TestGetFileDetail(t *testing.T) {
 	directoryPathEndParts := []string{directory1}
 	filePathEndParts := []string{txtFile1}
 
-	// arrange and tear down
+	// arrange and teardown
 	directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, directoryPathEndParts, filePathEndParts)
 	defer func() {
 		if err := os.RemoveAll(directory); err != nil {

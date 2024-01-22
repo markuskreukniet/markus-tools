@@ -54,7 +54,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
-			// arrange and tear down
+			// arrange and teardown
 			directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, directoryPathEndParts, filePathEndParts)
 			defer func() {
 				if err := os.RemoveAll(directory); err != nil {
