@@ -69,11 +69,8 @@ func testingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, director
 	if len(directoryPathEndParts) == 0 {
 		return ""
 	}
-	return testingCreateTempFileSystemStructure(t, directoryPathEndParts, filePathEndParts)
-}
 
-// TODO: useless function?
-func testingCreateTempFileSystemStructure(t *testing.T, directoryPathEndParts, filePathEndParts []string) string {
+	// Create a temporary file system structure.
 	tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
 	if err != nil {
 		// TODO: "Failed to create temp dir" exists. Check also for other duplicate strings
