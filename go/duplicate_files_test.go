@@ -81,7 +81,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			outcome, err := getDuplicateFilesAsNewlineSeparatedString(fileSystemNodes)
 
 			// assert
-			testingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.Metadata.WantErr, outcome, builder)
+			testingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.Metadata.WantErr, builder, outcome)
 		})
 	}
 }

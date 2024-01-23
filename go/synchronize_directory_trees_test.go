@@ -131,8 +131,8 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			if tc.WantSameFilePaths && !haveSameFilePaths {
 				t.Errorf("The destination and source directory trees do not have the same file paths.")
 			}
-			if filePathTxtFile4 != "" && testingReadLines(t, filePathTxtFile4) != writtenContent {
-				t.Errorf("The file content is different than expected.")
+			if filePathTxtFile4 != "" {
+				testingAssertEqualStrings(t, testingReadLines(t, filePathTxtFile4), writtenContent)
 			}
 		})
 	}
@@ -185,8 +185,8 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			result, err := joinOutputBasePathWithRelativeInputPath(tc.InputBasePath, tc.InputFullPath, tc.OutputBasePath)
 			testingAssertErrorToWantError(t, err, tc.Metadata.WantErr)
-			if err == nil && result != tc.Want {
-				t.Errorf("want: %s, got %s", tc.Want, result)
+			if err == nil {
+				testingAssertEqualStrings(t, tc.Want, result)
 			}
 		})
 	}
