@@ -5,8 +5,7 @@ import (
 	"testing"
 )
 
-// TODO: rename Fatal also on other places
-func testingGetFileDetailFatalLogIfError(t *testing.T, err error) {
+func testingGetFileDetailLogIfError(t *testing.T, err error) {
 	// TODO: use t.Helper() also on other places?
 	t.Helper()
 	if err != nil {
@@ -29,9 +28,9 @@ func TestGetFileDetail(t *testing.T) {
 
 	// act
 	dirDetail, err := getFileDetail(directory)
-	testingGetFileDetailFatalLogIfError(t, err)
+	testingGetFileDetailLogIfError(t, err)
 	fileDetail, err := getFileDetail(fullPath)
-	testingGetFileDetailFatalLogIfError(t, err)
+	testingGetFileDetailLogIfError(t, err)
 	_, err = getFileDetail(nonExistentFilePath)
 
 	// assert
