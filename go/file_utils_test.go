@@ -5,19 +5,12 @@ import (
 	"testing"
 )
 
+// TODO: rename Fatal also on other places
 func testingGetFileDetailFatalLogIfError(t *testing.T, err error) {
 	// TODO: use t.Helper() also on other places?
 	t.Helper()
 	if err != nil {
 		t.Errorf("getFileDetail() error: %v", err)
-	}
-}
-
-// TODO: rename Fatal also on other places
-func testingFatalLogIfPathsAreNotEqual(t *testing.T, filePath string, fileDetailFilePath string) {
-	t.Helper()
-	if filePath != fileDetailFilePath {
-		t.Errorf("Want Path %v, got %v", filePath, fileDetailFilePath)
 	}
 }
 
@@ -43,8 +36,8 @@ func TestGetFileDetail(t *testing.T) {
 
 	// assert
 	// TODO: are all fileDetail properties checked?
-	testingFatalLogIfPathsAreNotEqual(t, directory, dirDetail.Path)
-	testingFatalLogIfPathsAreNotEqual(t, fullPath, fileDetail.Path)
+	testingAssertEqualStrings(t, directory, dirDetail.Path)
+	testingAssertEqualStrings(t, fullPath, fileDetail.Path)
 	if fileDetail.Size != int64(len(writtenContent)) {
 		t.Errorf("Want Size %v, got %v", len(writtenContent), fileDetail.Size)
 	} else if err == nil {
