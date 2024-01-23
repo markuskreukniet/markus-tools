@@ -13,6 +13,7 @@ func testingGetFileDetailFatalLogIfError(t *testing.T, err error) {
 	}
 }
 
+// TODO: rename Fatal also on other places
 func testingFatalLogIfPathsAreNotEqual(t *testing.T, filePath string, fileDetailFilePath string) {
 	t.Helper()
 	if filePath != fileDetailFilePath {
