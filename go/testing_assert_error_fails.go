@@ -16,6 +16,6 @@ func testingAssertErrorToWantErrorAndOutcomeToBuilderString(t *testing.T, err er
 func testingAssertErrorToWantError(t *testing.T, err error, wantErr bool) {
 	t.Helper()
 	if (err != nil) != wantErr {
-		t.Fatalf("want error: %v, got %v", wantErr, err)
+		t.Errorf("want error: %v, got %v", wantErr, err)
 	}
 }

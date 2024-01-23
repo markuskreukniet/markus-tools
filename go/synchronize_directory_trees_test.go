@@ -125,11 +125,11 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			testingAssertErrorToWantError(t, err, tc.Metadata.WantErr)
 			haveSameFilePaths := testingHaveDirectoryTreesSameFilePathsOrGetFalse(t, sourceDirectory, destinationDirectory)
 			if tc.WantSameFilePaths && !haveSameFilePaths {
-				t.Fatalf("The source and destination directory trees do not have the same file paths.")
+				t.Errorf("The source and destination directory trees do not have the same file paths.")
 			}
 			haveSameFilePaths = testingHaveDirectoryTreesSameFilePathsOrGetFalse(t, destinationDirectory, sourceDirectory)
 			if tc.WantSameFilePaths && !haveSameFilePaths {
-				t.Fatalf("The destination and source directory trees do not have the same file paths.")
+				t.Errorf("The destination and source directory trees do not have the same file paths.")
 			}
 			if filePathTxtFile4 != "" && testingReadLines(t, filePathTxtFile4) != writtenContent {
 				t.Errorf("The file content is different than expected.")
@@ -186,7 +186,7 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 			result, err := joinOutputBasePathWithRelativeInputPath(tc.InputBasePath, tc.InputFullPath, tc.OutputBasePath)
 			testingAssertErrorToWantError(t, err, tc.Metadata.WantErr)
 			if err == nil && result != tc.Want {
-				t.Fatalf("want: %s, got %s", tc.Want, result)
+				t.Errorf("want: %s, got %s", tc.Want, result)
 			}
 		})
 	}
