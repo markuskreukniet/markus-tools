@@ -32,15 +32,6 @@ var (
 	emptyPathEndParts []string
 )
 
-// TODO: move to other util file, or don't return error and use t.Errorf?
-func writeNewlineString(builder *strings.Builder) (int, error) {
-	bytesWritten, err := builder.WriteString("\n")
-	if err != nil {
-		return bytesWritten, err
-	}
-	return bytesWritten, nil
-}
-
 func testingWriteFileContentWithContentAndIndex(t *testing.T, filePath string, index int) string {
 	t.Helper()
 	writtenContent := fmt.Sprintf("content %d", index)
