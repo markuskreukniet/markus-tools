@@ -6,7 +6,6 @@ import (
 )
 
 func testingGetFileDetailLogIfError(t *testing.T, err error) {
-	// TODO: use t.Helper() also on other places?
 	t.Helper()
 	if err != nil {
 		t.Errorf("getFileDetail() error: %v", err)
