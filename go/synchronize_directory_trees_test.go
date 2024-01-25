@@ -121,7 +121,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
 
 			// assert
-			testingAssertErrorToWantError(t, err, tc.Metadata.WantErr)
+			test.TestingAssertErrorToWantError(t, err, tc.Metadata.WantErr)
 			haveSameFilePaths := testingHaveDirectoryTreesSameFilePathsOrGetFalse(t, sourceDirectory, destinationDirectory)
 			if tc.WantSameFilePaths && !haveSameFilePaths {
 				t.Errorf("The source and destination directory trees do not have the same file paths.")
@@ -131,7 +131,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 				t.Errorf("The destination and source directory trees do not have the same file paths.")
 			}
 			if filePathTxtFile4 != "" {
-				testingAssertEqualStrings(t, testingReadLines(t, filePathTxtFile4), writtenContent)
+				test.TestingAssertEqualStrings(t, testingReadLines(t, filePathTxtFile4), writtenContent)
 			}
 		})
 	}
@@ -184,9 +184,9 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			result, err := joinOutputBasePathWithRelativeInputPath(tc.InputBasePath, tc.InputFullPath, tc.OutputBasePath)
-			testingAssertErrorToWantError(t, err, tc.Metadata.WantErr)
+			test.TestingAssertErrorToWantError(t, err, tc.Metadata.WantErr)
 			if err == nil {
-				testingAssertEqualStrings(t, tc.Want, result)
+				test.TestingAssertEqualStrings(t, tc.Want, result)
 			}
 		})
 	}

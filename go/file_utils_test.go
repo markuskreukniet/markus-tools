@@ -38,8 +38,8 @@ func TestGetFileDetail(t *testing.T) {
 
 	// assert
 	// TODO: are all fileDetail properties checked?
-	testingAssertEqualStrings(t, directory, dirDetail.Path)
-	testingAssertEqualStrings(t, fullPath, fileDetail.Path)
+	test.TestingAssertEqualStrings(t, directory, dirDetail.Path)
+	test.TestingAssertEqualStrings(t, fullPath, fileDetail.Path)
 	if fileDetail.Size != int64(len(writtenContent)) {
 		t.Errorf("Want Size %v, got %v", len(writtenContent), fileDetail.Size)
 	} else if err == nil {
