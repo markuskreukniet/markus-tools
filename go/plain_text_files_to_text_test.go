@@ -18,8 +18,10 @@ func testingCreateContentString(filePath string, index int) string {
 // TODO: there are duplicate or useless things, such as statements, strings, and structs, probably also in other tests
 func TestPlainTextFilesToText(t *testing.T) {
 	// arrange
-	directoryPathEndParts := []string{directory1, directory2WithDirectory3, directory2WithDirectory4}
-	filePathEndParts := []string{txtFile1, txtFile3, txtFile6, jpgFile4}
+	fileSystemPathEndParts := FileSystemPathEndParts{
+		DirectoryPathEndParts: []string{directory1, directory2WithDirectory3, directory2WithDirectory4},
+		FilePathEndParts:      []string{txtFile1, txtFile3, txtFile6, jpgFile4},
+	}
 	plainTextFilePathEndParts := []string{txtFile1, txtFile3, txtFile6}
 	fileSystemNodes := []FileSystemNode{
 		{
@@ -53,7 +55,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, directoryPathEndParts, filePathEndParts)
+			directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
 			defer testingRemoveDirectoryTree(t, directory)
 			for i := range tc.FileSystemNodes {
 				tc.FileSystemNodes[i].Path = filepath.Join(directory, tc.FileSystemNodes[i].Path)

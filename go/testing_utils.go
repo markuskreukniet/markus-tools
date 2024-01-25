@@ -31,9 +31,9 @@ func testingWriteString(t *testing.T, stringToWrite string, builder *strings.Bui
 }
 
 // TODO: move this function and other functions to testing_arrage_utils?
-func testingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, directoryPathEndParts, filePathEndParts []string) string {
+func testingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, fileSystemPathEndParts FileSystemPathEndParts) string {
 	t.Helper()
-	if len(directoryPathEndParts) == 0 {
+	if len(fileSystemPathEndParts.DirectoryPathEndParts) == 0 {
 		return ""
 	}
 
@@ -42,12 +42,12 @@ func testingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, director
 	if err != nil {
 		t.Errorf("Failed to create the temporary directory: %v", err)
 	}
-	for _, part := range directoryPathEndParts {
+	for _, part := range fileSystemPathEndParts.DirectoryPathEndParts {
 		if err := os.MkdirAll(filepath.Join(tempDirectory, part), 0755); err != nil {
 			t.Errorf("Failed to create directory in temporary directory: %v", err)
 		}
 	}
-	for _, part := range filePathEndParts {
+	for _, part := range fileSystemPathEndParts.FilePathEndParts {
 		if err := os.WriteFile(filepath.Join(tempDirectory, part), []byte{}, 0666); err != nil {
 			t.Errorf("Failed to create a file: %v", err)
 		}

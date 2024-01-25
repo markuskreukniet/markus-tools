@@ -7,6 +7,11 @@ type TestCaseMetadata struct {
 	WantErr bool
 }
 
+type FileSystemPathEndParts struct {
+	DirectoryPathEndParts []string
+	FilePathEndParts      []string
+}
+
 // TODO: there are no files in the root (temp dir)
 var (
 	directoryEmpty               = "directory empty"
@@ -28,6 +33,11 @@ var (
 	txtFileNonExistent1 = "non existent 1.txt"
 
 	emptyPathEndParts []string
+
+	emptyFileSystemPathEndParts = FileSystemPathEndParts{
+		DirectoryPathEndParts: emptyPathEndParts,
+		FilePathEndParts:      emptyPathEndParts,
+	}
 )
 
 func testingCreateTestCaseMetadata(name string, wantErr bool) TestCaseMetadata {

@@ -15,13 +15,15 @@ func testingGetFileDetailLogIfError(t *testing.T, err error) {
 // TODO: change this test to a similar version as other tests
 func TestGetFileDetail(t *testing.T) {
 	// arrange
-	directoryPathEndParts := []string{directory1}
-	filePathEndParts := []string{txtFile1}
+	fileSystemPathEndParts := FileSystemPathEndParts{
+		DirectoryPathEndParts: []string{directory1},
+		FilePathEndParts:      []string{txtFile1},
+	}
 
 	// arrange and teardown
-	directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, directoryPathEndParts, filePathEndParts)
+	directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
 	defer testingRemoveDirectoryTree(t, directory)
-	fullPath := filepath.Join(directory, filePathEndParts[0])
+	fullPath := filepath.Join(directory, fileSystemPathEndParts.FilePathEndParts[0])
 	writtenContent := testingWriteFileContentWithContentAndIndex(t, fullPath, 0)
 	nonExistentFilePath := filepath.Join(directory, txtFileNonExistent1)
 

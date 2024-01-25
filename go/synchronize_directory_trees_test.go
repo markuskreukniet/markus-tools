@@ -68,49 +68,47 @@ func testingContainsTxtFile4(stringSlice []string) bool {
 
 func TestSynchronizeDirectoryTrees(t *testing.T) {
 	// arrange
-	sourceDirectoryPathEndParts := []string{directoryEmpty, directory1, directory2WithDirectoryEmpty, directory2WithDirectory3}
-	sourceFilePathEndParts := []string{txtFile1, txtFile4, txtFile5}
-	destinationDirectoryPathEndParts := []string{directoryEmpty, directory2WithDirectory3}
-	destinationFilePathEndParts := []string{txtFile3, txtFile4}
+	sourceFileSystemPathEndParts := FileSystemPathEndParts{
+		DirectoryPathEndParts: []string{directoryEmpty, directory1, directory2WithDirectoryEmpty, directory2WithDirectory3},
+		FilePathEndParts:      []string{txtFile1, txtFile4, txtFile5},
+	}
+	destinationFileSystemPathEndParts := FileSystemPathEndParts{
+		DirectoryPathEndParts: []string{directoryEmpty, directory2WithDirectory3},
+		FilePathEndParts:      []string{txtFile3, txtFile4},
+	}
 
 	testCases := []struct {
-		Metadata                         TestCaseMetadata
-		SourceDirectoryPathEndParts      []string
-		SourceFilePathEndParts           []string
-		DestinationDirectoryPathEndParts []string
-		DestinationFilePathEndParts      []string
-		WantSameFilePaths                bool
+		Metadata                          TestCaseMetadata
+		SourceFileSystemPathEndParts      FileSystemPathEndParts
+		DestinationFileSystemPathEndParts FileSystemPathEndParts
+		WantSameFilePaths                 bool
 	}{
 		{
-			Metadata:                         testingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
-			SourceDirectoryPathEndParts:      sourceDirectoryPathEndParts,
-			SourceFilePathEndParts:           sourceFilePathEndParts,
-			DestinationDirectoryPathEndParts: destinationDirectoryPathEndParts,
-			DestinationFilePathEndParts:      destinationFilePathEndParts,
-			WantSameFilePaths:                true,
+			Metadata:                          testingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
+			SourceFileSystemPathEndParts:      sourceFileSystemPathEndParts,
+			DestinationFileSystemPathEndParts: destinationFileSystemPathEndParts,
+			WantSameFilePaths:                 true,
 		},
 		{
-			Metadata:                         testingCreateTestCaseMetadataWithWantErrTrue("Empty DestinationPathEndParts"),
-			SourceDirectoryPathEndParts:      sourceDirectoryPathEndParts,
-			SourceFilePathEndParts:           sourceFilePathEndParts,
-			DestinationDirectoryPathEndParts: emptyPathEndParts,
-			DestinationFilePathEndParts:      emptyPathEndParts,
-			WantSameFilePaths:                false,
+			Metadata:                          testingCreateTestCaseMetadataWithWantErrTrue("Empty DestinationPathEndParts"),
+			SourceFileSystemPathEndParts:      sourceFileSystemPathEndParts,
+			DestinationFileSystemPathEndParts: emptyFileSystemPathEndParts,
+			WantSameFilePaths:                 false,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			sourceDirectory := testingCreateTempFileSystemStructureOrGetEmptyString(t, tc.SourceDirectoryPathEndParts, tc.SourceFilePathEndParts)
+			sourceDirectory := testingCreateTempFileSystemStructureOrGetEmptyString(t, tc.SourceFileSystemPathEndParts)
 			defer testingRemoveDirectoryTree(t, sourceDirectory)
-			destinationDirectory := testingCreateTempFileSystemStructureOrGetEmptyString(t, tc.DestinationDirectoryPathEndParts, tc.DestinationFilePathEndParts)
+			destinationDirectory := testingCreateTempFileSystemStructureOrGetEmptyString(t, tc.DestinationFileSystemPathEndParts)
 			defer testingRemoveDirectoryTree(t, destinationDirectory)
 
 			// Some file systems have a resolution of one second, so we must wait a second.
 			filePathTxtFile4 := ""
 			writtenContent := ""
-			if sourceDirectory != "" && destinationDirectory != "" && testingContainsTxtFile4(tc.SourceFilePathEndParts) && testingContainsTxtFile4(tc.DestinationFilePathEndParts) {
+			if sourceDirectory != "" && destinationDirectory != "" && testingContainsTxtFile4(tc.SourceFileSystemPathEndParts.FilePathEndParts) && testingContainsTxtFile4(tc.DestinationFileSystemPathEndParts.FilePathEndParts) {
 				filePathTxtFile4 = filepath.Join(destinationDirectory, txtFile4)
 				testingWriteFileContentWithContentAndIndex(t, filePathTxtFile4, 1)
 				time.Sleep(time.Second)
@@ -137,6 +135,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 	}
 }
 
+// TODO: use vars from arrange utils?
 func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	const inputBasePath string = "/home/user/source"
 	const inputFullPath string = "/home/user/source/directory/file.txt"
