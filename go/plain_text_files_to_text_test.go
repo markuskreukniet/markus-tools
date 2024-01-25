@@ -58,7 +58,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
 			directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
-			defer test.TestingRemoveDirectoryTree(t, directory)
+			defer test.TestRemoveDirectoryTree(t, directory)
 			for i := range tc.FileSystemNodes {
 				tc.FileSystemNodes[i].Path = filepath.Join(directory, tc.FileSystemNodes[i].Path)
 			}
