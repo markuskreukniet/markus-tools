@@ -3,6 +3,8 @@ package main
 import (
 	"path/filepath"
 	"testing"
+
+	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
 
 func testingGetFileDetailLogIfError(t *testing.T, err error) {
@@ -22,7 +24,7 @@ func TestGetFileDetail(t *testing.T) {
 
 	// arrange and teardown
 	directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
-	defer testingRemoveDirectoryTree(t, directory)
+	defer test.TestingRemoveDirectoryTree(t, directory)
 	fullPath := filepath.Join(directory, fileSystemPathEndParts.FilePathEndParts[0])
 	writtenContent := testingWriteFileContentWithContentAndIndex(t, fullPath, 0)
 	nonExistentFilePath := filepath.Join(directory, txtFileNonExistent1)

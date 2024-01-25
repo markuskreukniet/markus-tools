@@ -4,6 +4,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
 
 func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
@@ -44,7 +46,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
 			directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, tc.FileSystemPathEndParts)
-			defer testingRemoveDirectoryTree(t, directory)
+			defer test.TestingRemoveDirectoryTree(t, directory)
 			var builder strings.Builder
 			if len(tc.DuplicateFilePathEndPartGroups) > 0 {
 				if len(tc.DuplicateFilePathEndPartGroups[0][0]) > 0 {

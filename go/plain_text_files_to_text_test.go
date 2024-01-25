@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
 
 func testingLastPathElementOnNewline(filePath string) string {
@@ -56,7 +58,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
 			directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
-			defer testingRemoveDirectoryTree(t, directory)
+			defer test.TestingRemoveDirectoryTree(t, directory)
 			for i := range tc.FileSystemNodes {
 				tc.FileSystemNodes[i].Path = filepath.Join(directory, tc.FileSystemNodes[i].Path)
 			}
