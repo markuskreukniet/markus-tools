@@ -10,7 +10,7 @@ func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
 	t.Helper()
 	_, err := writeNewlineString(builder)
 	if err != nil {
-		t.Errorf("writeNewlineString failed: %v", err)
+		t.Errorf("writeNewlineString error: %v", err)
 	}
 }
 
