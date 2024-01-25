@@ -103,9 +103,9 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
 			sourceDirectory := testingCreateTempFileSystemStructureOrGetEmptyString(t, tc.SourceFileSystemPathEndParts)
-			defer test.TestRemoveDirectoryTree(t, sourceDirectory)
+			defer test.TestingRemoveDirectoryTree(t, sourceDirectory)
 			destinationDirectory := testingCreateTempFileSystemStructureOrGetEmptyString(t, tc.DestinationFileSystemPathEndParts)
-			defer test.TestRemoveDirectoryTree(t, destinationDirectory)
+			defer test.TestingRemoveDirectoryTree(t, destinationDirectory)
 
 			// Some file systems have a resolution of one second, so we must wait a second.
 			filePathTxtFile4 := ""
