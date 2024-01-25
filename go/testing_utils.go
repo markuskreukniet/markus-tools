@@ -40,7 +40,6 @@ func testingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, director
 	// Create a temporary file system structure.
 	tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
 	if err != nil {
-		// TODO: "Failed to create temp dir" exists. Check also for other duplicate strings
 		t.Errorf("Failed to create the temporary directory: %v", err)
 	}
 	for _, part := range directoryPathEndParts {
