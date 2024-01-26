@@ -13,12 +13,12 @@ type fileDetail struct {
 }
 
 type (
-	FileFilterMode int
-	FileType       int
+	fileFilterMode int
+	fileType       int
 )
 
 const (
-	files FileFilterMode = iota
+	files fileFilterMode = iota
 	filesWithoutZeroByteFiles
 	filesAndDirectories
 	filesAndDirectoriesWithoutZeroByteFiles
@@ -26,7 +26,7 @@ const (
 )
 
 const (
-	allFiles FileType = iota
+	allFiles fileType = iota
 	plainTextFiles
 )
 
@@ -49,7 +49,7 @@ func getFileDetail(filePath string) (fileDetail, error) {
 	}, nil
 }
 
-func walkFileDetails(rootFilePath string, fileFilterMode FileFilterMode, fileType FileType, handler func(fileDetail)) error {
+func walkFileDetails(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(fileDetail)) error {
 	return filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -58,17 +58,17 @@ func walkFileDetails(rootFilePath string, fileFilterMode FileFilterMode, fileTyp
 		isDir := fileInfo.IsDir()
 
 		// is file check
-		if !isDir && fileFilterMode == directories {
+		if !isDir && mode == directories {
 			return nil
 		}
 
 		// is directory check
-		if isDir && (fileFilterMode == files || fileFilterMode == filesWithoutZeroByteFiles) {
+		if isDir && (mode == files || mode == filesWithoutZeroByteFiles) {
 			return nil
 		}
 
 		// zero byte check
-		if size == 0 && (fileFilterMode == filesWithoutZeroByteFiles || fileFilterMode == filesAndDirectoriesWithoutZeroByteFiles) {
+		if size == 0 && (mode == filesWithoutZeroByteFiles || mode == filesAndDirectoriesWithoutZeroByteFiles) {
 			return nil
 		}
 
