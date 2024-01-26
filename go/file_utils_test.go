@@ -17,9 +17,9 @@ func testingGetFileDetailLogIfError(t *testing.T, err error) {
 // TODO: change this test to a similar version as other tests
 func TestGetFileDetail(t *testing.T) {
 	// arrange
-	fileSystemPathEndParts := FileSystemPathEndParts{
-		DirectoryPathEndParts: []string{directory1},
-		FilePathEndParts:      []string{txtFile1},
+	fileSystemPathEndParts := test.FileSystemPathEndParts{
+		DirectoryPathEndParts: []string{test.Directory1},
+		FilePathEndParts:      []string{test.TxtFile1},
 	}
 
 	// arrange and teardown
@@ -27,7 +27,7 @@ func TestGetFileDetail(t *testing.T) {
 	defer test.TestingRemoveDirectoryTree(t, directory)
 	fullPath := filepath.Join(directory, fileSystemPathEndParts.FilePathEndParts[0])
 	writtenContent := testingWriteFileContentWithContentAndIndex(t, fullPath, 0)
-	nonExistentFilePath := filepath.Join(directory, txtFileNonExistent1)
+	nonExistentFilePath := filepath.Join(directory, test.TxtFileNonExistent1)
 
 	// act
 	dirDetail, err := getFileDetail(directory)

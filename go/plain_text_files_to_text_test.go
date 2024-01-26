@@ -20,36 +20,36 @@ func testingCreateContentString(filePath string, index int) string {
 // TODO: there are duplicate or useless things, such as statements, strings, and structs, probably also in other tests
 func TestPlainTextFilesToText(t *testing.T) {
 	// arrange
-	fileSystemPathEndParts := FileSystemPathEndParts{
-		DirectoryPathEndParts: []string{directory1, directory2WithDirectory3, directory2WithDirectory4},
-		FilePathEndParts:      []string{txtFile1, txtFile3, txtFile6, jpgFile4},
+	fileSystemPathEndParts := test.FileSystemPathEndParts{
+		DirectoryPathEndParts: []string{test.Directory1, test.Directory2WithDirectory3, test.Directory2WithDirectory4},
+		FilePathEndParts:      []string{test.TxtFile1, test.TxtFile3, test.TxtFile6, test.JpgFile4},
 	}
-	plainTextFilePathEndParts := []string{txtFile1, txtFile3, txtFile6}
+	plainTextFilePathEndParts := []string{test.TxtFile1, test.TxtFile3, test.TxtFile6}
 	fileSystemNodes := []FileSystemNode{
 		{
-			Path:        txtFile1,
+			Path:        test.TxtFile1,
 			IsDirectory: false,
 		},
 		{
-			Path:        directory2,
+			Path:        test.Directory2,
 			IsDirectory: true,
 		},
 	}
 	var emptyFileSystemNodes []FileSystemNode
 
 	testCases := []struct {
-		Metadata                  TestCaseMetadata
+		Metadata                  test.TestCaseMetadata
 		PlainTextFilePathEndParts []string
 		FileSystemNodes           []FileSystemNode
 	}{
 		{
-			Metadata:                  testingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
+			Metadata:                  test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
 			PlainTextFilePathEndParts: plainTextFilePathEndParts,
 			FileSystemNodes:           fileSystemNodes,
 		},
 		{
-			Metadata:                  testingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse(),
-			PlainTextFilePathEndParts: emptyPathEndParts,
+			Metadata:                  test.TestingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse(),
+			PlainTextFilePathEndParts: test.EmptyPathEndParts,
 			FileSystemNodes:           emptyFileSystemNodes,
 		},
 	}

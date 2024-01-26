@@ -18,26 +18,26 @@ func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
 
 func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	// arrange
-	fileSystemPathEndParts := FileSystemPathEndParts{
-		DirectoryPathEndParts: []string{directoryEmpty, directory1, directory2WithDirectoryEmpty, directory2WithDirectory3, directory2WithDirectory4},
-		FilePathEndParts:      []string{txtFile1, txtFile2, txtFile3, txtFile4, txtFile5, txtFile6},
+	fileSystemPathEndParts := test.FileSystemPathEndParts{
+		DirectoryPathEndParts: []string{test.DirectoryEmpty, test.Directory1, test.Directory2WithDirectoryEmpty, test.Directory2WithDirectory3, test.Directory2WithDirectory4},
+		FilePathEndParts:      []string{test.TxtFile1, test.TxtFile2, test.TxtFile3, test.TxtFile4, test.TxtFile5, test.TxtFile6},
 	}
-	duplicateFilePathEndPartGroups := [][]string{{txtFile2, txtFile3}, {txtFile4, txtFile5, txtFile6}}
+	duplicateFilePathEndPartGroups := [][]string{{test.TxtFile2, test.TxtFile3}, {test.TxtFile4, test.TxtFile5, test.TxtFile6}}
 	var emptyPathEndPartGroups [][]string
 
 	testCases := []struct {
-		Metadata                       TestCaseMetadata
-		FileSystemPathEndParts         FileSystemPathEndParts
+		Metadata                       test.TestCaseMetadata
+		FileSystemPathEndParts         test.FileSystemPathEndParts
 		DuplicateFilePathEndPartGroups [][]string
 	}{
 		{
-			Metadata:                       testingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
+			Metadata:                       test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
 			FileSystemPathEndParts:         fileSystemPathEndParts,
 			DuplicateFilePathEndPartGroups: duplicateFilePathEndPartGroups,
 		},
 		{
-			Metadata:                       testingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse(),
-			FileSystemPathEndParts:         emptyFileSystemPathEndParts,
+			Metadata:                       test.TestingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse(),
+			FileSystemPathEndParts:         test.EmptyFileSystemPathEndParts,
 			DuplicateFilePathEndPartGroups: emptyPathEndPartGroups,
 		},
 	}

@@ -61,7 +61,7 @@ func testingHaveDirectoryTreesSameFilePathsOrGetFalse(t *testing.T, sourceDirect
 
 func testingContainsTxtFile4(stringSlice []string) bool {
 	for _, item := range stringSlice {
-		if item == txtFile4 {
+		if item == test.TxtFile4 {
 			return true
 		}
 	}
@@ -70,31 +70,31 @@ func testingContainsTxtFile4(stringSlice []string) bool {
 
 func TestSynchronizeDirectoryTrees(t *testing.T) {
 	// arrange
-	sourceFileSystemPathEndParts := FileSystemPathEndParts{
-		DirectoryPathEndParts: []string{directoryEmpty, directory1, directory2WithDirectoryEmpty, directory2WithDirectory3},
-		FilePathEndParts:      []string{txtFile1, txtFile4, txtFile5},
+	sourceFileSystemPathEndParts := test.FileSystemPathEndParts{
+		DirectoryPathEndParts: []string{test.DirectoryEmpty, test.Directory1, test.Directory2WithDirectoryEmpty, test.Directory2WithDirectory3},
+		FilePathEndParts:      []string{test.TxtFile1, test.TxtFile4, test.TxtFile5},
 	}
-	destinationFileSystemPathEndParts := FileSystemPathEndParts{
-		DirectoryPathEndParts: []string{directoryEmpty, directory2WithDirectory3},
-		FilePathEndParts:      []string{txtFile3, txtFile4},
+	destinationFileSystemPathEndParts := test.FileSystemPathEndParts{
+		DirectoryPathEndParts: []string{test.DirectoryEmpty, test.Directory2WithDirectory3},
+		FilePathEndParts:      []string{test.TxtFile3, test.TxtFile4},
 	}
 
 	testCases := []struct {
-		Metadata                          TestCaseMetadata
-		SourceFileSystemPathEndParts      FileSystemPathEndParts
-		DestinationFileSystemPathEndParts FileSystemPathEndParts
+		Metadata                          test.TestCaseMetadata
+		SourceFileSystemPathEndParts      test.FileSystemPathEndParts
+		DestinationFileSystemPathEndParts test.FileSystemPathEndParts
 		WantSameFilePaths                 bool
 	}{
 		{
-			Metadata:                          testingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
+			Metadata:                          test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
 			SourceFileSystemPathEndParts:      sourceFileSystemPathEndParts,
 			DestinationFileSystemPathEndParts: destinationFileSystemPathEndParts,
 			WantSameFilePaths:                 true,
 		},
 		{
-			Metadata:                          testingCreateTestCaseMetadataWithWantErrTrue("Empty DestinationPathEndParts"),
+			Metadata:                          test.TestingCreateTestCaseMetadataWithWantErrTrue("Empty DestinationPathEndParts"),
 			SourceFileSystemPathEndParts:      sourceFileSystemPathEndParts,
-			DestinationFileSystemPathEndParts: emptyFileSystemPathEndParts,
+			DestinationFileSystemPathEndParts: test.EmptyFileSystemPathEndParts,
 			WantSameFilePaths:                 false,
 		},
 	}
@@ -111,10 +111,10 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			filePathTxtFile4 := ""
 			writtenContent := ""
 			if sourceDirectory != "" && destinationDirectory != "" && testingContainsTxtFile4(tc.SourceFileSystemPathEndParts.FilePathEndParts) && testingContainsTxtFile4(tc.DestinationFileSystemPathEndParts.FilePathEndParts) {
-				filePathTxtFile4 = filepath.Join(destinationDirectory, txtFile4)
+				filePathTxtFile4 = filepath.Join(destinationDirectory, test.TxtFile4)
 				testingWriteFileContentWithContentAndIndex(t, filePathTxtFile4, 1)
 				time.Sleep(time.Second)
-				writtenContent = testingWriteFileContentWithContentAndIndex(t, filepath.Join(sourceDirectory, txtFile4), 2)
+				writtenContent = testingWriteFileContentWithContentAndIndex(t, filepath.Join(sourceDirectory, test.TxtFile4), 2)
 			}
 
 			// act
@@ -145,35 +145,35 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	const joinedOutputBasePathWithRelativeInputPath string = "/home/user/destination/directory/file.txt"
 
 	testCases := []struct {
-		Metadata       TestCaseMetadata
+		Metadata       test.TestCaseMetadata
 		InputBasePath  string
 		InputFullPath  string
 		OutputBasePath string
 		Want           string
 	}{
 		{
-			Metadata:       testingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
+			Metadata:       test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
 			InputBasePath:  inputBasePath,
 			InputFullPath:  inputFullPath,
 			OutputBasePath: outputBasePath,
 			Want:           filepath.FromSlash(joinedOutputBasePathWithRelativeInputPath),
 		},
 		{
-			Metadata:       testingCreateTestCaseMetadataWithWantErrTrue("Empty InputBasePath"),
+			Metadata:       test.TestingCreateTestCaseMetadataWithWantErrTrue("Empty InputBasePath"),
 			InputBasePath:  "",
 			InputFullPath:  inputFullPath,
 			OutputBasePath: outputBasePath,
 			Want:           "",
 		},
 		{
-			Metadata:       testingCreateTestCaseMetadataWithWantErrTrue("Empty InputFullPath"),
+			Metadata:       test.TestingCreateTestCaseMetadataWithWantErrTrue("Empty InputFullPath"),
 			InputBasePath:  inputBasePath,
 			InputFullPath:  "",
 			OutputBasePath: outputBasePath,
 			Want:           "",
 		},
 		{
-			Metadata:       testingCreateTestCaseMetadata("Equivalent Input Paths", false),
+			Metadata:       test.TestingCreateTestCaseMetadata("Equivalent Input Paths", false),
 			InputBasePath:  inputBasePath,
 			InputFullPath:  inputBasePath,
 			OutputBasePath: outputBasePath,
