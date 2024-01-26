@@ -63,8 +63,8 @@ func plainTextFilesToText(uniqueFileSystemNodes []FileSystemNode) (string, error
 	var filePaths []string
 	for _, node := range uniqueFileSystemNodes {
 		if node.IsDirectory {
-			err := walkFileDetails(node.Path, filesWithoutZeroByteFiles, plainTextFiles, func(fileDetail FileDetail) {
-				filePaths = append(filePaths, fileDetail.Path)
+			err := walkFileDetails(node.Path, filesWithoutZeroByteFiles, plainTextFiles, func(detail fileDetail) {
+				filePaths = append(filePaths, detail.Path)
 			})
 			if err != nil {
 				return "", err

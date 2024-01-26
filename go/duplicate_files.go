@@ -25,10 +25,10 @@ type DuplicateFile struct {
 	Hash string
 }
 
-func appendFileIdentifier(fileIdentifiers *[]FileIdentifier, fileDetail FileDetail) {
+func appendFileIdentifier(fileIdentifiers *[]FileIdentifier, detail fileDetail) {
 	*fileIdentifiers = append(*fileIdentifiers, FileIdentifier{
-		Path: fileDetail.Path,
-		Size: fileDetail.Size,
+		Path: detail.Path,
+		Size: detail.Size,
 		Hash: "",
 	})
 }
@@ -96,8 +96,8 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []FileSyste
 	var fileIdentifiers []FileIdentifier
 	for _, node := range uniqueFileSystemNodes {
 		if node.IsDirectory {
-			err := walkFileDetails(node.Path, filesWithoutZeroByteFiles, allFiles, func(fileDetail FileDetail) {
-				appendFileIdentifier(&fileIdentifiers, fileDetail)
+			err := walkFileDetails(node.Path, filesWithoutZeroByteFiles, allFiles, func(detail fileDetail) {
+				appendFileIdentifier(&fileIdentifiers, detail)
 			})
 			if err != nil {
 				return "", err

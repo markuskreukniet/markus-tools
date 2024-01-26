@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type FileDetail struct {
+type fileDetail struct {
 	Path             string
 	ModificationTime time.Time
 	Size             int64
@@ -30,26 +30,26 @@ const (
 	plainTextFiles
 )
 
-func isFileDetailNonZeroByte(fileDetail FileDetail) bool {
-	if fileDetail.Size > 0 {
+func isFileDetailNonZeroByte(detail fileDetail) bool {
+	if detail.Size > 0 {
 		return true
 	}
 	return false
 }
 
-func getFileDetail(filePath string) (FileDetail, error) {
+func getFileDetail(filePath string) (fileDetail, error) {
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
-		return FileDetail{}, err
+		return fileDetail{}, err
 	}
-	return FileDetail{
+	return fileDetail{
 		Path:             filePath,
 		ModificationTime: fileInfo.ModTime(),
 		Size:             fileInfo.Size(),
 	}, nil
 }
 
-func walkFileDetails(rootFilePath string, fileFilterMode FileFilterMode, fileType FileType, handler func(FileDetail)) error {
+func walkFileDetails(rootFilePath string, fileFilterMode FileFilterMode, fileType FileType, handler func(fileDetail)) error {
 	return filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -80,7 +80,7 @@ func walkFileDetails(rootFilePath string, fileFilterMode FileFilterMode, fileTyp
 			}
 		}
 
-		handler(FileDetail{
+		handler(fileDetail{
 			Path:             filePath,
 			ModificationTime: fileInfo.ModTime(),
 			Size:             size,
