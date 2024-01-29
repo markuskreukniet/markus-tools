@@ -1,6 +1,11 @@
 package test
 
-import "path/filepath"
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"testing"
+)
 
 type TestCaseMetadata struct {
 	Name    string
@@ -57,4 +62,18 @@ func TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse() TestCaseMetadat
 
 func TestingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse() TestCaseMetadata {
 	return TestingCreateTestCaseMetadata("Empty FileSystemNodes", false)
+}
+
+func TestingWriteFileContentWithContentAndIndex(t *testing.T, filePath string, index int) string {
+	t.Helper()
+	writtenContent := fmt.Sprintf("content %d", index)
+	TestingWriteFileContent(t, filePath, writtenContent)
+	return writtenContent
+}
+
+func TestingWriteFileContent(t *testing.T, filePath string, content string) {
+	t.Helper()
+	if err := os.WriteFile(filePath, []byte(content), 0666); err != nil {
+		t.Errorf("Failed to write file content: %v", err)
+	}
 }
