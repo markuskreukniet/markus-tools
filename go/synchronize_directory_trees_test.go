@@ -11,6 +11,7 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
 
+// TODO: useless function???
 func testingReadLines(t *testing.T, filePath string) string {
 	t.Helper()
 	file, err := os.Open(filePath)

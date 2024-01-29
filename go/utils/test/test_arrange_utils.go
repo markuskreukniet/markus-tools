@@ -77,3 +77,27 @@ func TestingWriteFileContent(t *testing.T, filePath string, content string) {
 		t.Errorf("Failed to write file content: %v", err)
 	}
 }
+
+func TestingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, fileSystemPathEndParts FileSystemPathEndParts) string {
+	t.Helper()
+	if len(fileSystemPathEndParts.DirectoryPathEndParts) == 0 {
+		return ""
+	}
+
+	// Create a temporary file system structure.
+	tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
+	if err != nil {
+		t.Errorf("Failed to create the temporary directory: %v", err)
+	}
+	for _, part := range fileSystemPathEndParts.DirectoryPathEndParts {
+		if err := os.MkdirAll(filepath.Join(tempDirectory, part), 0755); err != nil {
+			t.Errorf("Failed to create directory in temporary directory: %v", err)
+		}
+	}
+	for _, part := range fileSystemPathEndParts.FilePathEndParts {
+		if err := os.WriteFile(filepath.Join(tempDirectory, part), []byte{}, 0666); err != nil {
+			t.Errorf("Failed to create a file: %v", err)
+		}
+	}
+	return tempDirectory
+}
