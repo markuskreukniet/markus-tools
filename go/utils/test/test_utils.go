@@ -30,7 +30,6 @@ func TestingWriteString(t *testing.T, stringToWrite string, builder *strings.Bui
 	}
 }
 
-// TODO: rename testing to test
 // TODO: check if the logic with starting with and without capitals is correct, for example for the functions and vars
 // TODO: move this function and other functions to testing_arrange_utils?
 func TestingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, fileSystemPathEndParts FileSystemPathEndParts) string {
