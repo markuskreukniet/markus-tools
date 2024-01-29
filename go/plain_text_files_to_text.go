@@ -17,7 +17,7 @@ func readLinesAddToBuilder(filePath string, builder *strings.Builder) error {
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		_, err := writeNewlineString(builder)
+		_, err := utils.WriteNewlineString(builder)
 		if err != nil {
 			return err
 		}

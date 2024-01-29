@@ -68,12 +68,12 @@ func duplicateFilesToNewlineSeparatedString(duplicateFiles []DuplicateFile) (str
 		return "", err
 	}
 	for i := 1; i < len(duplicateFiles); i++ {
-		_, err = writeNewlineString(&result)
+		_, err = utils.WriteNewlineString(&result)
 		if err != nil {
 			return "", err
 		}
 		if duplicateFiles[i].Hash != duplicateFiles[i-1].Hash {
-			_, err = writeNewlineString(&result)
+			_, err = utils.WriteNewlineString(&result)
 			if err != nil {
 				return "", err
 			}

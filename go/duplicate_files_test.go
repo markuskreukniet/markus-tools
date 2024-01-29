@@ -5,12 +5,13 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/markuskreukniet/markus-tools/go/utils"
 	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
 
 func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
 	t.Helper()
-	_, err := writeNewlineString(builder)
+	_, err := utils.WriteNewlineString(builder)
 	if err != nil {
 		t.Errorf("writeNewlineString error: %v", err)
 	}

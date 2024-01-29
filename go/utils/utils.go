@@ -1,10 +1,10 @@
-package main
+package utils
 
 import (
 	"strings"
 )
 
-func writeNewlineString(builder *strings.Builder) (int, error) {
+func WriteNewlineString(builder *strings.Builder) (int, error) {
 	bytesWritten, err := builder.WriteString("\n")
 	if err != nil {
 		return bytesWritten, err
