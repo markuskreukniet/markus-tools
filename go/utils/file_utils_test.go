@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"path/filepath"
@@ -23,18 +23,18 @@ func TestGetFileDetail(t *testing.T) {
 	}
 
 	// arrange and teardown
-	directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
+	directory := test.TestingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
 	defer test.TestingRemoveDirectoryTree(t, directory)
 	fullPath := filepath.Join(directory, fileSystemPathEndParts.FilePathEndParts[0])
-	writtenContent := testingWriteFileContentWithContentAndIndex(t, fullPath, 0)
+	writtenContent := test.TestingWriteFileContentWithContentAndIndex(t, fullPath, 0)
 	nonExistentFilePath := filepath.Join(directory, test.TxtFileNonExistent1)
 
 	// act
-	dirDetail, err := getFileDetail(directory)
+	dirDetail, err := GetFileDetail(directory)
 	testingGetFileDetailLogIfError(t, err)
-	fileDetail, err := getFileDetail(fullPath)
+	fileDetail, err := GetFileDetail(fullPath)
 	testingGetFileDetailLogIfError(t, err)
-	_, err = getFileDetail(nonExistentFilePath)
+	_, err = GetFileDetail(nonExistentFilePath)
 
 	// assert
 	// TODO: are all fileDetail properties checked?

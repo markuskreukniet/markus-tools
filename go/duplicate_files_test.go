@@ -45,28 +45,28 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, tc.FileSystemPathEndParts)
+			directory := test.TestingCreateTempFileSystemStructureOrGetEmptyString(t, tc.FileSystemPathEndParts)
 			defer test.TestingRemoveDirectoryTree(t, directory)
 			var builder strings.Builder
 			if len(tc.DuplicateFilePathEndPartGroups) > 0 {
 				if len(tc.DuplicateFilePathEndPartGroups[0][0]) > 0 {
 					duplicateFilePath := filepath.Join(directory, tc.DuplicateFilePathEndPartGroups[0][0])
-					testingWriteFileContentWithContentAndIndex(t, duplicateFilePath, 0)
-					testingWriteString(t, duplicateFilePath, &builder)
+					test.TestingWriteFileContentWithContentAndIndex(t, duplicateFilePath, 0)
+					test.TestingWriteString(t, duplicateFilePath, &builder)
 				}
 				for i := 1; i < len(tc.DuplicateFilePathEndPartGroups[0]); i++ {
 					testingWriteNewlineString(t, &builder)
 					duplicateFilePath := filepath.Join(directory, tc.DuplicateFilePathEndPartGroups[0][i])
-					testingWriteFileContentWithContentAndIndex(t, duplicateFilePath, 0)
-					testingWriteString(t, duplicateFilePath, &builder)
+					test.TestingWriteFileContentWithContentAndIndex(t, duplicateFilePath, 0)
+					test.TestingWriteString(t, duplicateFilePath, &builder)
 				}
 				for i := 1; i < len(tc.DuplicateFilePathEndPartGroups); i++ {
 					testingWriteNewlineString(t, &builder)
 					for _, duplicateFilePathEndPart := range tc.DuplicateFilePathEndPartGroups[i] {
 						testingWriteNewlineString(t, &builder)
 						duplicateFilePath := filepath.Join(directory, duplicateFilePathEndPart)
-						testingWriteFileContentWithContentAndIndex(t, duplicateFilePath, i)
-						testingWriteString(t, duplicateFilePath, &builder)
+						test.TestingWriteFileContentWithContentAndIndex(t, duplicateFilePath, i)
+						test.TestingWriteString(t, duplicateFilePath, &builder)
 					}
 				}
 			}

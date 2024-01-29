@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
 func synchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory string) string {
@@ -25,7 +27,7 @@ func joinOutputBasePathWithRelativeInputPath(inputBasePath, inputFullPath, outpu
 
 func getFilePathModificationTimeMapFromDirectoryTree(rootFilePath string) (map[string]time.Time, error) {
 	filePathModificationTimeMap := make(map[string]time.Time)
-	err := walkFileDetails(rootFilePath, filesAndDirectories, allFiles, func(detail fileDetail) {
+	err := utils.WalkFileDetails(rootFilePath, utils.FilesAndDirectories, utils.AllFiles, func(detail utils.FileDetail) {
 		filePathModificationTimeMap[detail.Path] = detail.ModificationTime
 	})
 	return filePathModificationTimeMap, err

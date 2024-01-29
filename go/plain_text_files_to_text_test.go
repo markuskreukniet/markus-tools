@@ -57,7 +57,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			directory := testingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
+			directory := test.TestingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
 			defer test.TestingRemoveDirectoryTree(t, directory)
 			for i := range tc.FileSystemNodes {
 				tc.FileSystemNodes[i].Path = filepath.Join(directory, tc.FileSystemNodes[i].Path)
@@ -67,16 +67,16 @@ func TestPlainTextFilesToText(t *testing.T) {
 			if len(tc.PlainTextFilePathEndParts) > 0 {
 				fullPath := filepath.Join(directory, tc.PlainTextFilePathEndParts[0])
 				content := testingCreateContentString(fullPath, 0)
-				testingWriteFileContent(t, fullPath, content)
-				testingWriteString(t, testingLastPathElementOnNewline(tc.PlainTextFilePathEndParts[0]), &builder)
-				testingWriteString(t, content, &builder)
+				test.TestingWriteFileContent(t, fullPath, content)
+				test.TestingWriteString(t, testingLastPathElementOnNewline(tc.PlainTextFilePathEndParts[0]), &builder)
+				test.TestingWriteString(t, content, &builder)
 				for i := 1; i < len(tc.PlainTextFilePathEndParts); i++ {
 					fullPath := filepath.Join(directory, tc.PlainTextFilePathEndParts[i])
 					content := testingCreateContentString(fullPath, i)
-					testingWriteFileContent(t, fullPath, content)
-					testingWriteString(t, "\n\n", &builder)
-					testingWriteString(t, testingLastPathElementOnNewline(tc.PlainTextFilePathEndParts[i]), &builder)
-					testingWriteString(t, content, &builder)
+					test.TestingWriteFileContent(t, fullPath, content)
+					test.TestingWriteString(t, "\n\n", &builder)
+					test.TestingWriteString(t, testingLastPathElementOnNewline(tc.PlainTextFilePathEndParts[i]), &builder)
+					test.TestingWriteString(t, content, &builder)
 				}
 			}
 

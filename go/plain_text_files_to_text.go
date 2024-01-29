@@ -2,33 +2,12 @@ package main
 
 import (
 	"bufio"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
-	"unicode"
+
+	"github.com/markuskreukniet/markus-tools/go/utils"
 )
-
-func isNonZeroByteFileATextFile(filePath string) (bool, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return false, err
-	}
-	defer file.Close()
-
-	// Read the first 512 or less to check for non-text characters. DetectContentType of package 'net/http' works with a similar check.
-	bytes := make([]byte, 512)
-	numberOfBytesRead, err := file.Read(bytes)
-	if err != nil && err != io.EOF {
-		return false, err
-	}
-	for _, byte := range bytes[:numberOfBytesRead] {
-		if !unicode.IsPrint(rune(byte)) && !unicode.IsSpace(rune(byte)) {
-			return false, nil
-		}
-	}
-	return true, nil
-}
 
 func readLinesAddToBuilder(filePath string, builder *strings.Builder) error {
 	file, err := os.Open(filePath)
@@ -63,19 +42,19 @@ func plainTextFilesToText(uniqueFileSystemNodes []FileSystemNode) (string, error
 	var filePaths []string
 	for _, node := range uniqueFileSystemNodes {
 		if node.IsDirectory {
-			err := walkFileDetails(node.Path, filesWithoutZeroByteFiles, plainTextFiles, func(detail fileDetail) {
+			err := utils.WalkFileDetails(node.Path, utils.FilesWithoutZeroByteFiles, utils.PlainTextFiles, func(detail utils.FileDetail) {
 				filePaths = append(filePaths, detail.Path)
 			})
 			if err != nil {
 				return "", err
 			}
 		} else {
-			fileDetail, err := getFileDetail(node.Path)
+			fileDetail, err := utils.GetFileDetail(node.Path)
 			if err != nil {
 				return "", err
 			}
-			if isFileDetailNonZeroByte(fileDetail) {
-				isTextFile, err := isNonZeroByteFileATextFile(fileDetail.Path)
+			if utils.IsFileDetailNonZeroByte(fileDetail) {
+				isTextFile, err := utils.IsNonZeroByteFileATextFile(fileDetail.Path)
 				if err != nil {
 					return "", err
 				}

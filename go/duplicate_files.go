@@ -7,6 +7,8 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
 type FileSystemNode struct {
@@ -25,7 +27,7 @@ type DuplicateFile struct {
 	Hash string
 }
 
-func appendFileIdentifier(fileIdentifiers *[]FileIdentifier, detail fileDetail) {
+func appendFileIdentifier(fileIdentifiers *[]FileIdentifier, detail utils.FileDetail) {
 	*fileIdentifiers = append(*fileIdentifiers, FileIdentifier{
 		Path: detail.Path,
 		Size: detail.Size,
@@ -96,18 +98,18 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []FileSyste
 	var fileIdentifiers []FileIdentifier
 	for _, node := range uniqueFileSystemNodes {
 		if node.IsDirectory {
-			err := walkFileDetails(node.Path, filesWithoutZeroByteFiles, allFiles, func(detail fileDetail) {
+			err := utils.WalkFileDetails(node.Path, utils.FilesWithoutZeroByteFiles, utils.AllFiles, func(detail utils.FileDetail) {
 				appendFileIdentifier(&fileIdentifiers, detail)
 			})
 			if err != nil {
 				return "", err
 			}
 		} else {
-			fileDetail, err := getFileDetail(node.Path)
+			fileDetail, err := utils.GetFileDetail(node.Path)
 			if err != nil {
 				return "", err
 			}
-			if isFileDetailNonZeroByte(fileDetail) {
+			if utils.IsFileDetailNonZeroByte(fileDetail) {
 				appendFileIdentifier(&fileIdentifiers, fileDetail)
 			}
 		}

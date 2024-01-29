@@ -21,7 +21,7 @@ func testingReadLines(t *testing.T, filePath string) string {
 	var builder strings.Builder
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		testingWriteString(t, scanner.Text(), &builder)
+		test.TestingWriteString(t, scanner.Text(), &builder)
 	}
 	err = scanner.Err()
 	if err != nil {
@@ -102,9 +102,9 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			sourceDirectory := testingCreateTempFileSystemStructureOrGetEmptyString(t, tc.SourceFileSystemPathEndParts)
+			sourceDirectory := test.TestingCreateTempFileSystemStructureOrGetEmptyString(t, tc.SourceFileSystemPathEndParts)
 			defer test.TestingRemoveDirectoryTree(t, sourceDirectory)
-			destinationDirectory := testingCreateTempFileSystemStructureOrGetEmptyString(t, tc.DestinationFileSystemPathEndParts)
+			destinationDirectory := test.TestingCreateTempFileSystemStructureOrGetEmptyString(t, tc.DestinationFileSystemPathEndParts)
 			defer test.TestingRemoveDirectoryTree(t, destinationDirectory)
 
 			// Some file systems have a resolution of one second, so we must wait a second.
@@ -112,9 +112,9 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			writtenContent := ""
 			if sourceDirectory != "" && destinationDirectory != "" && testingContainsTxtFile4(tc.SourceFileSystemPathEndParts.FilePathEndParts) && testingContainsTxtFile4(tc.DestinationFileSystemPathEndParts.FilePathEndParts) {
 				filePathTxtFile4 = filepath.Join(destinationDirectory, test.TxtFile4)
-				testingWriteFileContentWithContentAndIndex(t, filePathTxtFile4, 1)
+				test.TestingWriteFileContentWithContentAndIndex(t, filePathTxtFile4, 1)
 				time.Sleep(time.Second)
-				writtenContent = testingWriteFileContentWithContentAndIndex(t, filepath.Join(sourceDirectory, test.TxtFile4), 2)
+				writtenContent = test.TestingWriteFileContentWithContentAndIndex(t, filepath.Join(sourceDirectory, test.TxtFile4), 2)
 			}
 
 			// act

@@ -1,4 +1,4 @@
-package main
+package test
 
 import (
 	"fmt"
@@ -6,25 +6,23 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-
-	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
 
-func testingWriteFileContentWithContentAndIndex(t *testing.T, filePath string, index int) string {
+func TestingWriteFileContentWithContentAndIndex(t *testing.T, filePath string, index int) string {
 	t.Helper()
 	writtenContent := fmt.Sprintf("content %d", index)
-	testingWriteFileContent(t, filePath, writtenContent)
+	TestingWriteFileContent(t, filePath, writtenContent)
 	return writtenContent
 }
 
-func testingWriteFileContent(t *testing.T, filePath string, content string) {
+func TestingWriteFileContent(t *testing.T, filePath string, content string) {
 	t.Helper()
 	if err := os.WriteFile(filePath, []byte(content), 0666); err != nil {
 		t.Errorf("Failed to write file content: %v", err)
 	}
 }
 
-func testingWriteString(t *testing.T, stringToWrite string, builder *strings.Builder) {
+func TestingWriteString(t *testing.T, stringToWrite string, builder *strings.Builder) {
 	t.Helper()
 	_, err := builder.WriteString(stringToWrite)
 	if err != nil {
@@ -35,7 +33,7 @@ func testingWriteString(t *testing.T, stringToWrite string, builder *strings.Bui
 // TODO: rename testing to test
 // TODO: check if the logic with starting with and without capitals is correct, for example for the functions and vars
 // TODO: move this function and other functions to testing_arrange_utils?
-func testingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, fileSystemPathEndParts test.FileSystemPathEndParts) string {
+func TestingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, fileSystemPathEndParts FileSystemPathEndParts) string {
 	t.Helper()
 	if len(fileSystemPathEndParts.DirectoryPathEndParts) == 0 {
 		return ""
