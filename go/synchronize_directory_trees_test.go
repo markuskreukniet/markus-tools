@@ -11,26 +11,6 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
 
-// TODO: useless function???
-func testingReadLines(t *testing.T, filePath string) string {
-	t.Helper()
-	file, err := os.Open(filePath)
-	if err != nil {
-		t.Errorf("Failed to open file: %v", err)
-	}
-	defer file.Close()
-	var builder strings.Builder
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		test.TestingWriteString(t, scanner.Text(), &builder)
-	}
-	err = scanner.Err()
-	if err != nil {
-		t.Errorf("Failed to read file content: %v", err)
-	}
-	return builder.String()
-}
-
 func testingHaveDirectoryTreesSameFilePathsOrGetFalse(t *testing.T, sourceDirectory, destinationDirectory string) bool {
 	t.Helper()
 	if sourceDirectory == "" || destinationDirectory == "" {
@@ -132,7 +112,21 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 				t.Errorf("The destination and source directory trees do not have the same file paths.")
 			}
 			if filePathTxtFile4 != "" {
-				test.TestingAssertEqualStrings(t, testingReadLines(t, filePathTxtFile4), writtenContent)
+				file, err := os.Open(filePathTxtFile4)
+				if err != nil {
+					t.Errorf("Failed to open file: %v", err)
+				}
+				defer file.Close()
+				var builder strings.Builder
+				scanner := bufio.NewScanner(file)
+				for scanner.Scan() {
+					test.TestingWriteString(t, scanner.Text(), &builder)
+				}
+				err = scanner.Err()
+				if err != nil {
+					t.Errorf("Failed to read file content: %v", err)
+				}
+				test.TestingAssertEqualStrings(t, builder.String(), writtenContent)
 			}
 		})
 	}
