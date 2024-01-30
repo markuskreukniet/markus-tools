@@ -3,6 +3,7 @@ package utils
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
@@ -37,12 +38,18 @@ func TestGetFileDetail(t *testing.T) {
 	_, err = GetFileDetail(nonExistentFilePath)
 
 	// assert
-	// TODO: are all fileDetail properties checked?
 	test.TestingAssertEqualStrings(t, directory, dirDetail.Path)
 	test.TestingAssertEqualStrings(t, fullPath, fileDetail.Path)
 	if fileDetail.Size != int64(len(writtenContent)) {
 		t.Errorf("Want Size %v, got %v", len(writtenContent), fileDetail.Size)
-	} else if err == nil {
+	}
+	if err == nil {
 		t.Errorf("Want an error when trying to get details of a non-existent file, but got none")
+	}
+
+	// Check if the file modification time is within the last minute, which is not optimal.
+	currentTime := time.Now()
+	if fileDetail.ModificationTime.Before(currentTime.Add(-time.Minute)) || fileDetail.ModificationTime.After(currentTime) {
+		t.Errorf("Modification time %v is not within the expected range.", fileDetail.ModificationTime)
 	}
 }
