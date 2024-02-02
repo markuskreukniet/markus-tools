@@ -25,7 +25,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 		FilePathEndParts:      []string{test.TxtFile1, test.TxtFile3, test.TxtFile6, test.JpgFile4},
 	}
 	plainTextFilePathEndParts := []string{test.TxtFile1, test.TxtFile3, test.TxtFile6}
-	fileSystemNodes := []FileSystemNode{
+	fileSystemNodes := []fileSystemNode{
 		{
 			Path:        test.TxtFile1,
 			IsDirectory: false,
@@ -35,12 +35,12 @@ func TestPlainTextFilesToText(t *testing.T) {
 			IsDirectory: true,
 		},
 	}
-	var emptyFileSystemNodes []FileSystemNode
+	var emptyFileSystemNodes []fileSystemNode
 
 	testCases := []struct {
 		Metadata                  test.TestCaseMetadata
 		PlainTextFilePathEndParts []string
-		FileSystemNodes           []FileSystemNode
+		FileSystemNodes           []fileSystemNode
 	}{
 		{
 			Metadata:                  test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),

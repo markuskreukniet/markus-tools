@@ -12,7 +12,7 @@ const (
 )
 
 type GetDuplicateFilesAsNewlineSeparatedStringArgument struct {
-	UniqueFileSystemNodes []FileSystemNode `json:"uniqueFileSystemNodes"`
+	UniqueFileSystemNodes []fileSystemNode `json:"uniqueFileSystemNodes"`
 }
 
 type SynchronizeDirectoryTreesArguments struct {

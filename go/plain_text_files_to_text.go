@@ -38,7 +38,7 @@ func addLastPathElementAndAllLinesToBuilder(filePath string, builder *strings.Bu
 }
 
 // Opening a file two times is not the most efficient, but having a separate open file in isNonZeroByteFileATextFile helps with filtering.
-func plainTextFilesToText(uniqueFileSystemNodes []FileSystemNode) (string, error) {
+func plainTextFilesToText(uniqueFileSystemNodes []fileSystemNode) (string, error) {
 	var filePaths []string
 	for _, node := range uniqueFileSystemNodes {
 		if node.IsDirectory {
