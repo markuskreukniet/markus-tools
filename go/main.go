@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+// TODO: there are duplicate or useless things, such as statements, strings, and structs, probably in tests
+
 const (
 	functionCallSynchronizeDirectoryTreesToJSON                 string = "synchronizeDirectoryTreesToJSON"
 	functionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON string = "getDuplicateFilesAsNewlineSeparatedStringToJSON"

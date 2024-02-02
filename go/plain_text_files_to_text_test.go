@@ -17,7 +17,6 @@ func testingCreateContentString(filePath string, index int) string {
 	return fmt.Sprintf("content %s %d 1\ncontent %s %d 2", filePath, index, filePath, index)
 }
 
-// TODO: there are duplicate or useless things, such as statements, strings, and structs, probably also in other tests
 func TestPlainTextFilesToText(t *testing.T) {
 	// arrange
 	fileSystemPathEndParts := test.FileSystemPathEndParts{
