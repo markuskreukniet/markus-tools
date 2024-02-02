@@ -7,15 +7,15 @@ import (
 )
 
 const (
-	FunctionCallSynchronizeDirectoryTreesToJSON                 string = "synchronizeDirectoryTreesToJSON"
-	FunctionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON string = "getDuplicateFilesAsNewlineSeparatedStringToJSON"
+	functionCallSynchronizeDirectoryTreesToJSON                 string = "synchronizeDirectoryTreesToJSON"
+	functionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON string = "getDuplicateFilesAsNewlineSeparatedStringToJSON"
 )
 
-type GetDuplicateFilesAsNewlineSeparatedStringArgument struct {
+type getDuplicateFilesAsNewlineSeparatedStringArgument struct {
 	UniqueFileSystemNodes []fileSystemNode `json:"uniqueFileSystemNodes"`
 }
 
-type SynchronizeDirectoryTreesArguments struct {
+type synchronizeDirectoryTreesArguments struct {
 	SourceDirectory      string `json:"sourceDirectory"`
 	DestinationDirectory string `json:"destinationDirectory"`
 }
@@ -23,13 +23,13 @@ type SynchronizeDirectoryTreesArguments struct {
 func stringsToFunctionCallWithArguments(functionCall, jsonArguments string) string {
 	var err error
 	switch functionCall {
-	case FunctionCallSynchronizeDirectoryTreesToJSON:
-		var arguments SynchronizeDirectoryTreesArguments
+	case functionCallSynchronizeDirectoryTreesToJSON:
+		var arguments synchronizeDirectoryTreesArguments
 		if err = json.Unmarshal([]byte(jsonArguments), &arguments); err == nil {
 			return synchronizeDirectoryTreesToJSON(arguments.SourceDirectory, arguments.DestinationDirectory)
 		}
-	case FunctionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON:
-		var argument GetDuplicateFilesAsNewlineSeparatedStringArgument
+	case functionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON:
+		var argument getDuplicateFilesAsNewlineSeparatedStringArgument
 		if err = json.Unmarshal([]byte(jsonArguments), &argument); err == nil {
 			return getDuplicateFilesAsNewlineSeparatedStringToJSON(argument.UniqueFileSystemNodes)
 		}
