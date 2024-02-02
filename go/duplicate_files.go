@@ -16,7 +16,7 @@ type fileSystemNode struct {
 	IsDirectory bool
 }
 
-type FileIdentifier struct {
+type fileIdentifier struct {
 	Path string
 	Size int64
 	Hash string
@@ -27,15 +27,15 @@ type DuplicateFile struct {
 	Hash string
 }
 
-func appendFileIdentifier(fileIdentifiers *[]FileIdentifier, detail utils.FileDetail) {
-	*fileIdentifiers = append(*fileIdentifiers, FileIdentifier{
+func appendFileIdentifier(fileIdentifiers *[]fileIdentifier, detail utils.FileDetail) {
+	*fileIdentifiers = append(*fileIdentifiers, fileIdentifier{
 		Path: detail.Path,
 		Size: detail.Size,
 		Hash: "",
 	})
 }
 
-func appendDuplicateFile(duplicateFiles *[]DuplicateFile, fileIdentifier FileIdentifier) {
+func appendDuplicateFile(duplicateFiles *[]DuplicateFile, fileIdentifier fileIdentifier) {
 	*duplicateFiles = append(*duplicateFiles, DuplicateFile{
 		Path: fileIdentifier.Path,
 		Hash: fileIdentifier.Hash,
@@ -95,7 +95,7 @@ func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []fil
 }
 
 func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []fileSystemNode) (string, error) {
-	var fileIdentifiers []FileIdentifier
+	var fileIdentifiers []fileIdentifier
 	for _, node := range uniqueFileSystemNodes {
 		if node.IsDirectory {
 			err := utils.WalkFileDetails(node.Path, utils.FilesWithoutZeroByteFiles, utils.AllFiles, func(detail utils.FileDetail) {
