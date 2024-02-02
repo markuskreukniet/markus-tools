@@ -41,7 +41,6 @@ func stringsToFunctionCallWithArguments(functionCall, jsonArguments string) stri
 	return errorMessageToJSONFunctionResult(errorMessage)
 }
 
-// TODO: if if to if else, where it makes sense. It does not make sense with an 'if err != nil' check
 func main() {
 	if len(os.Args) > 2 {
 		fmt.Print(stringsToFunctionCallWithArguments(os.Args[1], os.Args[2]))
