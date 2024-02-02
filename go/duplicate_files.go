@@ -22,7 +22,7 @@ type fileIdentifier struct {
 	Hash string
 }
 
-type DuplicateFile struct {
+type duplicateFile struct {
 	Path string
 	Hash string
 }
@@ -35,8 +35,8 @@ func appendFileIdentifier(fileIdentifiers *[]fileIdentifier, detail utils.FileDe
 	})
 }
 
-func appendDuplicateFile(duplicateFiles *[]DuplicateFile, fileIdentifier fileIdentifier) {
-	*duplicateFiles = append(*duplicateFiles, DuplicateFile{
+func appendDuplicateFile(duplicateFiles *[]duplicateFile, fileIdentifier fileIdentifier) {
+	*duplicateFiles = append(*duplicateFiles, duplicateFile{
 		Path: fileIdentifier.Path,
 		Hash: fileIdentifier.Hash,
 	})
@@ -58,7 +58,7 @@ func getFileHash(filePath string) (string, error) {
 	return hex.EncodeToString(hashGenerator.Sum(nil)), nil
 }
 
-func duplicateFilesToNewlineSeparatedString(duplicateFiles []DuplicateFile) (string, error) {
+func duplicateFilesToNewlineSeparatedString(duplicateFiles []duplicateFile) (string, error) {
 	if len(duplicateFiles) == 0 {
 		return "", nil
 	}
@@ -118,7 +118,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []fileSyste
 		return fileIdentifiers[i].Size < fileIdentifiers[j].Size
 	})
 	// TODO: We can make this function efficient by making from here the newlineSeparatedString, instead of making first the duplicateFiles slice
-	var duplicateFiles []DuplicateFile
+	var duplicateFiles []duplicateFile
 	var lastAppendedIndex = -1
 	for i := 1; i < len(fileIdentifiers); i++ {
 		previousIndex := i - 1
