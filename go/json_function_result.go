@@ -2,13 +2,13 @@ package main
 
 import "encoding/json"
 
-type FunctionResult struct {
+type functionResult struct {
 	Result       any
 	ErrorMessage string
 }
 
-func createFunctionResult(result any, errorMessage string) FunctionResult {
-	return FunctionResult{
+func createFunctionResult(result any, errorMessage string) functionResult {
+	return functionResult{
 		Result:       result,
 		ErrorMessage: errorMessage,
 	}
