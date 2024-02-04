@@ -12,14 +12,10 @@ export default function imagesToDateRangeFolder(props) {
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [hasValidInput, setHasValidInput] = createSignal(false)
 
-  async function setStateWithBE(filePathObjects, path) {
-    // TODO: should come from GUI
-    const useDirectoriesTreeInput = true
-
+  async function setStateWithBE(filePathObjects, filePath) {
     const imagesToDateRangeFolderRO = await window.dateRangeFolder.imagesToDateRangeFolderBE(
       filePathObjects,
-      path,
-      useDirectoriesTreeInput
+      filePath
     )
     // TODO: imagesToDateRangeFolderBE should return eitherResult and should be setEitherResultOutput(result)
     setEitherResultOutput(toEitherRightResult(null))

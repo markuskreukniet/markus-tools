@@ -19,24 +19,15 @@ import {
 } from '../../preload/modules/resultStatus'
 
 // TODO: rename resultStatus file
-// TODO: rename useDirectoriesTreeInput, without use?
-// TODO: remove param useDirectoriesTreeInput
 // TODO: write access check?
-export default async function imagesToDateRangeFolder(
-  filePathObjects,
-  outputPath,
-  useDirectoriesTreeInput
-) {
-  const filePathObjectsToFileObjectsRO = await filePathObjectsToFileObjects(
-    filePathObjects,
-    useDirectoriesTreeInput
-  )
+export default async function imagesToDateRangeFolder(filePathObjects, outputFilePath) {
+  const filePathObjectsToFileObjectsRO = await filePathObjectsToFileObjects(filePathObjects, true)
   if (!isResultObjectOk(filePathObjectsToFileObjectsRO)) {
     return filePathObjectsToFileObjectsRO
   }
 
   const outputImageFileObjectsRO = await getDirectoryImageFileObjectsWithoutZeroByteOnes(
-    outputPath,
+    outputFilePath,
     false
   )
   if (!isResultObjectOk(outputImageFileObjectsRO)) {
@@ -49,7 +40,7 @@ export default async function imagesToDateRangeFolder(
   //   return inputDirectoryFileObjectsTreeRO
   // }
 
-  const outputDirectoryFileObjectsRO = await getDirectoryDirectoryFileObjects(outputPath, false)
+  const outputDirectoryFileObjectsRO = await getDirectoryDirectoryFileObjects(outputFilePath, false)
   if (!isResultObjectOk(outputDirectoryFileObjectsRO)) {
     return outputDirectoryFileObjectsRO
   }
@@ -59,7 +50,7 @@ export default async function imagesToDateRangeFolder(
     ...getDateSubdirectoryFileObjects(outputImageFileObjectsRO.result)
   ])
 
-  const groupsToDirectoriesRO = await groupsToDirectories(groups, outputPath)
+  const groupsToDirectoriesRO = await groupsToDirectories(groups, outputFilePath)
   if (!isResultObjectOk(groupsToDirectoriesRO)) {
     return groupsToDirectoriesRO
   }
@@ -134,7 +125,7 @@ function isWithinThreeDays(date1, date2) {
   return days <= 3
 }
 
-async function groupsToDirectories(groups, outputPath) {
+async function groupsToDirectories(groups, outputFilePath) {
   const errorTracker = new ErrorTracker()
 
   for (const group of groups) {
@@ -143,7 +134,7 @@ async function groupsToDirectories(groups, outputPath) {
     const oldestDate = formatTime(group[0].dateModified)
     const newestDate = formatTime(group[group.length - 1].dateModified)
 
-    let subFolderPath = combinePathParts(outputPath, oldestDate)
+    let subFolderPath = combinePathParts(outputFilePath, oldestDate)
     if (oldestDate !== newestDate) {
       subFolderPath = `${subFolderPath} - ${newestDate}`
     }

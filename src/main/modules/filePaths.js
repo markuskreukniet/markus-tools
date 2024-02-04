@@ -11,6 +11,7 @@ import {
   toResultObjectWithResultStatusOk
 } from '../../preload/modules/resultStatus'
 
+// TODO: useDirectoriesTreeInput is useless?
 export async function filePathObjectsToFileObjects(filePathObjects, useDirectoriesTreeInput) {
   const errorTracker = new ErrorTracker(filePathObjects.length)
 

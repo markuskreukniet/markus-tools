@@ -33,8 +33,8 @@ contextBridge.exposeInMainWorld('references', {
 })
 
 contextBridge.exposeInMainWorld('dateRangeFolder', {
-  imagesToDateRangeFolderBE: (fileSystemNodes, path, useDirectoriesTreeInput) =>
-    ipcRenderer.invoke('imagesToDateRangeFolderBE', fileSystemNodes, path, useDirectoriesTreeInput)
+  imagesToDateRangeFolderBE: (fileSystemNodes, filePath) =>
+    ipcRenderer.invoke('imagesToDateRangeFolderBE', fileSystemNodes, filePath)
 })
 
 contextBridge.exposeInMainWorld('synchronization', {
