@@ -12,7 +12,7 @@ import (
 
 func synchronizeDirectoryTreesToJSON(sourceDirectory, destinationDirectory string) string {
 	if err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory); err != nil {
-		return errorMessageToJSONFunctionResult(err.Error())
+		return errorToJSONFunctionResult(err)
 	}
 	return defaultJSONFunctionResult()
 }

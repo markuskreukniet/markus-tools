@@ -89,7 +89,7 @@ func duplicateFilesToNewlineSeparatedString(duplicateFiles []duplicateFile) (str
 func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []fileSystemNode) string {
 	newlineSeparatedString, err := getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes)
 	if err != nil {
-		return errorMessageToJSONFunctionResult(err.Error())
+		return errorToJSONFunctionResult(err)
 	}
 	return resultToJSONFunctionResult(newlineSeparatedString)
 }

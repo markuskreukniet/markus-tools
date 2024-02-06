@@ -40,8 +40,7 @@ func addLastPathElementAndAllLinesToBuilder(filePath string, builder *strings.Bu
 func plainTextFilesToTextToJSON(uniqueFileSystemNodes []fileSystemNode) string {
 	text, err := plainTextFilesToText(uniqueFileSystemNodes)
 	if err != nil {
-		// TODO: should be errorMessageToJSONFunctionResult(err)?
-		return errorMessageToJSONFunctionResult(err.Error())
+		return errorToJSONFunctionResult(err)
 	}
 	return resultToJSONFunctionResult(text)
 }

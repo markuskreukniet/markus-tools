@@ -22,6 +22,10 @@ func resultToJSONFunctionResult(result any) string {
 	return jsonMarshalWithFallbackJSONError(createFunctionResult(result, ""))
 }
 
+func errorToJSONFunctionResult(err error) string {
+	return jsonMarshalWithFallbackJSONError(createFunctionResult(nil, err.Error()))
+}
+
 func errorMessageToJSONFunctionResult(errorMessage string) string {
 	return jsonMarshalWithFallbackJSONError(createFunctionResult(nil, errorMessage))
 }
