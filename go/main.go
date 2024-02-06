@@ -11,9 +11,10 @@ import (
 const (
 	functionCallSynchronizeDirectoryTreesToJSON                 string = "synchronizeDirectoryTreesToJSON"
 	functionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON string = "getDuplicateFilesAsNewlineSeparatedStringToJSON"
+	functionCallPlainTextFilesToTextToJSON                      string = "functionCallPlainTextFilesToTextToJSON"
 )
 
-type getDuplicateFilesAsNewlineSeparatedStringArgument struct {
+type uniqueFileSystemNodes struct {
 	UniqueFileSystemNodes []fileSystemNode `json:"uniqueFileSystemNodes"`
 }
 
@@ -31,9 +32,14 @@ func stringsToFunctionCallWithArguments(functionCall, jsonArguments string) stri
 			return synchronizeDirectoryTreesToJSON(arguments.SourceDirectory, arguments.DestinationDirectory)
 		}
 	case functionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON:
-		var argument getDuplicateFilesAsNewlineSeparatedStringArgument
+		var argument uniqueFileSystemNodes
 		if err = json.Unmarshal([]byte(jsonArguments), &argument); err == nil {
 			return getDuplicateFilesAsNewlineSeparatedStringToJSON(argument.UniqueFileSystemNodes)
+		}
+	case functionCallPlainTextFilesToTextToJSON:
+		var argument uniqueFileSystemNodes
+		if err = json.Unmarshal([]byte(jsonArguments), &argument); err == nil {
+			return plainTextFilesToTextToJSON(argument.UniqueFileSystemNodes)
 		}
 	}
 	errorMessage := "did not receive a correct function call string"

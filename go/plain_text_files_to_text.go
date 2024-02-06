@@ -37,6 +37,15 @@ func addLastPathElementAndAllLinesToBuilder(filePath string, builder *strings.Bu
 	return readLinesAddToBuilder(filePath, builder)
 }
 
+func plainTextFilesToTextToJSON(uniqueFileSystemNodes []fileSystemNode) string {
+	text, err := plainTextFilesToText(uniqueFileSystemNodes)
+	if err != nil {
+		// TODO: should be errorMessageToJSONFunctionResult(err)?
+		return errorMessageToJSONFunctionResult(err.Error())
+	}
+	return resultToJSONFunctionResult(text)
+}
+
 // Opening a file two times is not the most efficient, but having a separate open file in isNonZeroByteFileATextFile helps with filtering.
 func plainTextFilesToText(uniqueFileSystemNodes []fileSystemNode) (string, error) {
 	var filePaths []string
