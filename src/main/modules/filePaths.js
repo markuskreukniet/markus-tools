@@ -15,8 +15,7 @@ import {
 export async function filePathObjectsToFileObjects(filePathObjects, useDirectoriesTreeInput) {
   const errorTracker = new ErrorTracker(filePathObjects.length)
 
-  // TODO: always ImageFileObjects?
-  const inputImageFileObjects = []
+  const inputFileObjects = []
   for (const filePathObject of filePathObjects) {
     let inputRO = null
 
@@ -32,16 +31,16 @@ export async function filePathObjectsToFileObjects(filePathObjects, useDirectori
 
     if (isResultObjectOk(inputRO)) {
       if (Array.isArray(inputRO.result)) {
-        inputImageFileObjects.push(...inputRO.result)
+        inputFileObjects.push(...inputRO.result)
       } else {
-        inputImageFileObjects.push(inputRO.result)
+        inputFileObjects.push(inputRO.result)
       }
     } else {
       errorTracker.concatErrorMessageOnNewLineAndIncrementErrorCount(inputRO.message)
     }
   }
 
-  return errorTracker.createResultObject(inputImageFileObjects)
+  return errorTracker.createResultObject(inputFileObjects)
 }
 
 async function getFileObject(filePath, isDirectory) {
