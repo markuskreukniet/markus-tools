@@ -27,7 +27,7 @@ async function stringsToGoFunctionCallWithArguments(functionCall, jsonArguments)
     })
 
     // build with: go build -o ../out/go/markus-tools.exe
-    // use this exec
+    // use this exec:
     // const goProcess = exec(
     //   `"${path.join(
     //     __dirname,
