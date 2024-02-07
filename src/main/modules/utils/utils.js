@@ -26,14 +26,29 @@ async function stringsToGoFunctionCallWithArguments(functionCall, jsonArguments)
       cwd: path.join(__dirname, '..', '..', 'go')
     })
 
-    // build with: go build -o ../out/go/markus-tools.exe
+    // build with: go build -o ../out/go/markus-tools-go.exe
     // use this exec:
     // const goProcess = exec(
     //   `"${path.join(
     //     __dirname,
     //     '..',
     //     'go',
-    //     'markus-tools.exe'
+    //     'markus-tools-go.exe'
+    //   )}" "${functionCall}" "${jsonArguments}"`
+    // )
+
+    // add to electron-builder.yml:
+    // asarUnpack:
+    //   - 'out/go/markus-tools-go.exe'
+    // build with: npm run build:win
+    // use this exec:
+    // const goProcess = exec(
+    //   `"${path.join(
+    //     process.resourcesPath,
+    //     'app.asar.unpacked',
+    //     'out',
+    //     'go',
+    //     'markus-tools-go.exe'
     //   )}" "${functionCall}" "${jsonArguments}"`
     // )
 
