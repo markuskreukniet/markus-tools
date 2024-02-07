@@ -25,6 +25,18 @@ async function stringsToGoFunctionCallWithArguments(functionCall, jsonArguments)
     const goProcess = exec(`go run . "${functionCall}" "${jsonArguments}"`, {
       cwd: path.join(__dirname, '..', '..', 'go')
     })
+
+    // build with: go build -o ../out/go/markus-tools.exe
+    // use this exec
+    // const goProcess = exec(
+    //   `"${path.join(
+    //     __dirname,
+    //     '..',
+    //     'go',
+    //     'markus-tools.exe'
+    //   )}" "${functionCall}" "${jsonArguments}"`
+    // )
+
     goProcess.stdout.on('data', (data) => {
       result += data
     })
