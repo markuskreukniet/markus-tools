@@ -27,10 +27,11 @@ export default function DuplicateFiles(props) {
 
   const placeholderContent = (
     <>
-      Add at least two files or a directory with two files and press 'submit.'
+      Select at least two files or a directory with two files and press 'submit.'
       <br />
       <br />
-      Adding a directory also adds the files of its subdirectories (its whole directory tree).
+      Selecting a directory selects the files of its directory and its subdirectories (its whole
+      directory tree).
       <br />
       <br />
       The more files a directory has, or the more files we add, the longer it takes to find
