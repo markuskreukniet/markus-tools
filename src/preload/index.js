@@ -37,13 +37,9 @@ contextBridge.exposeInMainWorld('dateRangeFolder', {
     ipcRenderer.invoke('imagesToDateRangeFolderBE', fileSystemNodes, filePath)
 })
 
-contextBridge.exposeInMainWorld('synchronization', {
-  synchronizeDirectoryTreesBE: (sourceDirectoryFilePath, destinationDirectoryFilePath) =>
-    ipcRenderer.invoke(
-      'synchronizeDirectoryTreesBE',
-      sourceDirectoryFilePath,
-      destinationDirectoryFilePath
-    )
+contextBridge.exposeInMainWorld('goBackend', {
+  goFunctionCallBE: (functionName, argumentObject) =>
+    ipcRenderer.invoke('goFunctionCallBE', functionName, argumentObject)
 })
 
 contextBridge.exposeInMainWorld('dialog', {

@@ -11,10 +11,10 @@ export default function SynchronizeDirectoryTrees(props) {
   const [hasValidInput, setHasValidInput] = createSignal(false)
 
   async function setStateWithBE() {
-    const result = await window.synchronization.synchronizeDirectoryTreesBE(
+    const result = await window.goBackend.goFunctionCallBE('synchronizeDirectoryTreesToJSON', {
       sourceDirectoryFilePath,
       destinationDirectoryFilePath
-    )
+    })
     setEitherResultOutput(result)
   }
 

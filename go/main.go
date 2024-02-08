@@ -19,17 +19,17 @@ type uniqueFileSystemNodes struct {
 }
 
 type synchronizeDirectoryTreesArguments struct {
-	SourceDirectory      string `json:"sourceDirectory"`
-	DestinationDirectory string `json:"destinationDirectory"`
+	SourceDirectoryFilePath      string `json:"sourceDirectoryFilePath"`
+	DestinationDirectoryFilePath string `json:"destinationDirectoryFilePath"`
 }
 
-func stringsToFunctionCallWithArguments(functionCall, jsonArguments string) string {
+func toFunctionCall(functionCall, jsonArguments string) string {
 	var err error
 	switch functionCall {
 	case functionCallSynchronizeDirectoryTreesToJSON:
 		var arguments synchronizeDirectoryTreesArguments
 		if err = json.Unmarshal([]byte(jsonArguments), &arguments); err == nil {
-			return synchronizeDirectoryTreesToJSON(arguments.SourceDirectory, arguments.DestinationDirectory)
+			return synchronizeDirectoryTreesToJSON(arguments.SourceDirectoryFilePath, arguments.DestinationDirectoryFilePath)
 		}
 	case functionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON:
 		var argument uniqueFileSystemNodes
@@ -51,7 +51,7 @@ func stringsToFunctionCallWithArguments(functionCall, jsonArguments string) stri
 
 func main() {
 	if len(os.Args) > 2 {
-		fmt.Print(stringsToFunctionCallWithArguments(os.Args[1], os.Args[2]))
+		fmt.Print(toFunctionCall(os.Args[1], os.Args[2]))
 	} else {
 		fmt.Print(errorMessageToJSONFunctionResult("os.Args did not receive at least three arguments"))
 	}

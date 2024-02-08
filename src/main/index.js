@@ -97,15 +97,11 @@ async function imagesToDateRangeFolderBE(e, fileSystemNodes, filePath) {
 }
 ipcMain.handle('imagesToDateRangeFolderBE', imagesToDateRangeFolderBE)
 
-import synchronizeDirectoryTrees from './modules/synchronizeDirectoryTrees'
-async function synchronizeDirectoryTreesBE(
-  e,
-  sourceDirectoryFilePath,
-  destinationDirectoryFilePath
-) {
-  return synchronizeDirectoryTrees(sourceDirectoryFilePath, destinationDirectoryFilePath)
+import goFunctionCall from './modules/goFunctionCall'
+async function goFunctionCallBE(e, functionName, argumentObject) {
+  return goFunctionCall(functionName, argumentObject)
 }
-ipcMain.handle('synchronizeDirectoryTreesBE', synchronizeDirectoryTreesBE)
+ipcMain.handle('goFunctionCallBE', goFunctionCallBE)
 
 import selectFilePathDialog from './modules/selectFilePathDialog'
 async function selectFilePathDialogBE(e, selectFolder) {
