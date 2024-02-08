@@ -33,8 +33,8 @@ export default function DuplicateFiles(props) {
       Adding a directory also adds the files of its subdirectories (its whole directory tree).
       <br />
       <br />
-      The more files a directory has, the more time it can take to add the files, which can be
-      noticeable. Also, the more files we add, the longer it takes to find duplicate files.
+      The more files a directory has, or the more files we add, the longer it takes to find
+      duplicate files.
     </>
   )
 
