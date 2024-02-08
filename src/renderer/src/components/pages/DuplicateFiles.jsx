@@ -30,7 +30,7 @@ export default function DuplicateFiles(props) {
       Select at least two files or a directory with two files and press 'submit.'
       <br />
       <br />
-      Selecting a directory selects the files of its directory and its subdirectories (its whole
+      Selecting a directory selects the files of the directory and its subdirectories (its whole
       directory tree).
       <br />
       <br />
