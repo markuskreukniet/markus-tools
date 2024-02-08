@@ -34,8 +34,7 @@ export default function DuplicateFiles(props) {
       directory tree).
       <br />
       <br />
-      The more files a directory has, or the more files we add, the longer it takes to find
-      duplicate files.
+      The more files we select, the longer it takes to find duplicate files.
     </>
   )
 
