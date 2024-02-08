@@ -29,6 +29,7 @@ func toFunctionCall(functionCall, jsonArguments string) string {
 	case functionCallSynchronizeDirectoryTreesToJSON:
 		var arguments synchronizeDirectoryTreesArguments
 		if err = json.Unmarshal([]byte(jsonArguments), &arguments); err == nil {
+			// TODO: is SourceDirectoryFilePath good naming? check jsx, js, and go files.
 			return synchronizeDirectoryTreesToJSON(arguments.SourceDirectoryFilePath, arguments.DestinationDirectoryFilePath)
 		}
 	case functionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON:
