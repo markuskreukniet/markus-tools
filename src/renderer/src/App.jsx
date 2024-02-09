@@ -2,6 +2,7 @@ import { createSignal } from 'solid-js'
 import DuplicateFiles from './components/pages/DuplicateFiles'
 import ImagesToDateRangeFolder from './components/pages/ImagesToDateRangeFolder'
 import LinesOfCode from './components/pages/LinesOfCode'
+import PlainTextFilesToText from './components/pages/PlainTextFilesToText'
 import ReferencesByUrls from './components/pages/ReferencesByUrls'
 import SynchronizeDirectoryTrees from './components/pages/SynchronizeDirectoryTrees'
 import Loader from './components/Loader'
@@ -31,7 +32,11 @@ function App() {
     createNavigationBarItemPageCombination(LinesOfCode, 'Lines of Code (LOC)'),
     createNavigationBarItemPageCombination(ReferencesByUrls, 'References by URLs'),
     createNavigationBarItemPageCombination(ImagesToDateRangeFolder, 'Images to Date Range Folder'),
-    createNavigationBarItemPageCombination(SynchronizeDirectoryTrees, 'Synchronize Directory Trees')
+    createNavigationBarItemPageCombination(
+      SynchronizeDirectoryTrees,
+      'Synchronize Directory Trees'
+    ),
+    createNavigationBarItemPageCombination(PlainTextFilesToText, 'Plain Text Files to Text')
   ]
   const activeNavigationBarItem = navigationBarItemPageCombinations[0].navigationBarItem
 

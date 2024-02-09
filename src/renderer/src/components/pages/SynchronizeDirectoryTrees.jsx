@@ -6,6 +6,7 @@ import MaxOneDirectoryInput from '../filePathInput/MaxOneDirectoryInput'
 export default function SynchronizeDirectoryTrees(props) {
   let sourceDirectoryFilePath = ''
   let destinationDirectoryFilePath = ''
+  // TODO: should be '' instead of null?
   const [eitherResultOutput, setEitherResultOutput] = createSignal(null)
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [hasValidInput, setHasValidInput] = createSignal(false)

@@ -11,7 +11,7 @@ import (
 const (
 	functionCallSynchronizeDirectoryTreesToJSON                 string = "synchronizeDirectoryTreesToJSON"
 	functionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON string = "getDuplicateFilesAsNewlineSeparatedStringToJSON"
-	functionCallPlainTextFilesToTextToJSON                      string = "functionCallPlainTextFilesToTextToJSON"
+	functionCallPlainTextFilesToTextToJSON                      string = "plainTextFilesToTextToJSON"
 )
 
 type uniqueFileSystemNodes struct {
