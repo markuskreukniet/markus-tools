@@ -32,6 +32,34 @@ export default function TextArea(props) {
     return !readOnly ? handleFunction : null
   }
 
+  function getPlaceholderContent() {
+    const placeholderContent = (
+      <>
+        Select at least two files or a directory with two files and press 'submit.'
+        <br />
+        <br />
+        Selecting a directory selects the files of the directory and its subdirectories (its whole
+        directory tree).
+      </>
+    )
+
+    if (
+      (props.placeholderContent && props.addToDefaultPlaceholderContent) ||
+      (!props.placeholderContent && !props.addToDefaultPlaceholderContent)
+    ) {
+      return placeholderContent
+    } else if (props.placeholderContent) {
+      return props.placeholderContent
+    } else {
+      return (
+        <>
+          {placeholderContent}
+          {props.addToDefaultPlaceholderContent}
+        </>
+      )
+    }
+  }
+
   return (
     <Show
       when={showTextArea()}
@@ -40,7 +68,7 @@ export default function TextArea(props) {
           class="custom-textarea-placeholder"
           onClick={handleFunctionOrNull(props.readOnly, handleClick)}
         >
-          {props.placeholderContent}
+          {getPlaceholderContent()}
         </div>
       }
     >

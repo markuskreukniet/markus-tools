@@ -35,11 +35,6 @@ export default function PlainTextFilesToText(props) {
 
   const placeholderContent = (
     <>
-      Select at least two files or a directory with two files and press 'submit.'
-      <br />
-      <br />
-      Selecting a directory selects the files of the directory and its subdirectories (its whole
-      directory tree).
       <br />
       <br />
       The more files we select, the longer it takes to show the text.
@@ -47,7 +42,11 @@ export default function PlainTextFilesToText(props) {
   )
 
   const outputComponent = (
-    <TextArea readOnly textAreaValue={eitherResultOutput} placeholderContent={placeholderContent} />
+    <TextArea
+      readOnly
+      textAreaValue={eitherResultOutput}
+      addToDefaultPlaceholderContent={placeholderContent}
+    />
   )
 
   return (

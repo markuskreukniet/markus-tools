@@ -27,11 +27,6 @@ export default function DuplicateFiles(props) {
 
   const placeholderContent = (
     <>
-      Select at least two files or a directory with two files and press 'submit.'
-      <br />
-      <br />
-      Selecting a directory selects the files of the directory and its subdirectories (its whole
-      directory tree).
       <br />
       <br />
       The more files we select, the longer it takes to find duplicate files.
@@ -39,7 +34,7 @@ export default function DuplicateFiles(props) {
   )
 
   const outputComponent = (
-    <TextArea readOnly textAreaValue={result} placeholderContent={placeholderContent} />
+    <TextArea readOnly textAreaValue={result} addToDefaultPlaceholderContent={placeholderContent} />
   )
 
   return (
