@@ -60,16 +60,17 @@ export default function TextArea(props) {
     }
   }
 
+  // TODO: pointer-none class if readonly
   return (
     <Show
       when={showTextArea()}
       fallback={
-        <div
+        <button
           class="custom-textarea-placeholder"
           onClick={handleFunctionOrNull(props.readOnly, handleClick)}
         >
           {getPlaceholderContent()}
-        </div>
+        </button>
       }
     >
       <textarea
