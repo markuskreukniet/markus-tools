@@ -62,7 +62,7 @@ export default function TextArea(props) {
   }
 
   function getClass(readOnly) {
-    let result = 'custom-textarea-placeholder'
+    const result = 'custom-textarea-placeholder'
     if (!readOnly) {
       return result
     } else {
