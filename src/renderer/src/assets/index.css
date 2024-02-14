@@ -91,6 +91,10 @@ button, textarea, #navigation-bar > li, .custom-textarea-placeholder {
   background-color: var(--light-steel-blue);
 }
 
+.cursor-default {
+  cursor: default;
+}
+
 .container {
   display: flex;
   flex-direction: column;

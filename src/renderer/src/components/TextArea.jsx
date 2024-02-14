@@ -32,6 +32,7 @@ export default function TextArea(props) {
     return !readOnly ? handleFunction : null
   }
 
+  // TODO: should receive arguments instead of using props
   function getPlaceholderContent() {
     const placeholderContent = (
       <>
@@ -60,13 +61,23 @@ export default function TextArea(props) {
     }
   }
 
-  // TODO: pointer-none class if readonly
+  function getClass(readOnly) {
+    let result = 'custom-textarea-placeholder'
+    if (!readOnly) {
+      return result
+    } else {
+      return `${result} cursor-default`
+    }
+  }
+
+  // TODO: button disabled if readonly
+  // TODO: reuse the already available button in the code?
   return (
     <Show
       when={showTextArea()}
       fallback={
         <button
-          class="custom-textarea-placeholder"
+          class={getClass(props.readOnly)}
           onClick={handleFunctionOrNull(props.readOnly, handleClick)}
         >
           {getPlaceholderContent()}
