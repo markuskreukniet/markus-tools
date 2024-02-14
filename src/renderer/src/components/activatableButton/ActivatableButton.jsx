@@ -1,5 +1,6 @@
 import { createEffect, createSignal } from 'solid-js'
 
+// TODO: useless component?
 export default function ActivatableButton(props) {
   const [active, setActive] = createSignal(false)
 

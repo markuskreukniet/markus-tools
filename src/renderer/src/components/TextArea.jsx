@@ -70,8 +70,6 @@ export default function TextArea(props) {
     }
   }
 
-  // TODO: button disabled if readonly
-  // TODO: reuse the already available button in the code?
   return (
     <Show
       when={showTextArea()}
@@ -79,6 +77,7 @@ export default function TextArea(props) {
         <button
           class={getClass(props.readOnly)}
           onClick={handleFunctionOrNull(props.readOnly, handleClick)}
+          disabled={props.readOnly}
         >
           {getPlaceholderContent()}
         </button>
