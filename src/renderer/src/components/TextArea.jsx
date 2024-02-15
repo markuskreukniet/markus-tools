@@ -32,7 +32,6 @@ export default function TextArea(props) {
     return !readOnly ? handleFunction : null
   }
 
-  // TODO: should receive arguments instead of using props
   function getPlaceholderContent() {
     const placeholderContent = (
       <>
