@@ -61,26 +61,22 @@ export default function TextArea(props) {
     }
   }
 
-  function getClass(readOnly) {
-    const result = 'custom-textarea-placeholder'
-    if (!readOnly) {
-      return result
-    } else {
-      return `${result} cursor-default`
-    }
-  }
+  const placeholderClass = 'custom-textarea-placeholder'
 
   return (
     <Show
       when={showTextArea()}
       fallback={
-        <button
-          class={getClass(props.readOnly)}
-          onClick={handleFunctionOrNull(props.readOnly, handleClick)}
-          disabled={props.readOnly}
+        <Show
+          when={props.readOnly}
+          fallback={
+            <button class={placeholderClass} onClick={handleClick}>
+              {getPlaceholderContent()}
+            </button>
+          }
         >
-          {getPlaceholderContent()}
-        </button>
+          <p class={placeholderClass}>{getPlaceholderContent()}</p>
+        </Show>
       }
     >
       <textarea
