@@ -11,11 +11,6 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
-type fileSystemNode struct {
-	Path        string
-	IsDirectory bool
-}
-
 type fileIdentifier struct {
 	Path string
 	Size int64
@@ -86,7 +81,7 @@ func duplicateFilesToNewlineSeparatedString(duplicateFiles []duplicateFile) (str
 	return result.String(), nil
 }
 
-func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []fileSystemNode) string {
+func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []utils.FileSystemNode) string {
 	newlineSeparatedString, err := getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes)
 	if err != nil {
 		return errorToJSONFunctionResult(err)
@@ -94,7 +89,7 @@ func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []fil
 	return resultToJSONFunctionResult(newlineSeparatedString)
 }
 
-func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []fileSystemNode) (string, error) {
+func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.FileSystemNode) (string, error) {
 	var fileIdentifiers []fileIdentifier
 	for _, node := range uniqueFileSystemNodes {
 		if node.IsDirectory {

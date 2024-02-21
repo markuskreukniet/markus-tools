@@ -71,9 +71,9 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 					}
 				}
 			}
-			var fileSystemNodes []fileSystemNode
+			var fileSystemNodes []utils.FileSystemNode
 			if directory != "" {
-				fileSystemNodes = append(fileSystemNodes, fileSystemNode{
+				fileSystemNodes = append(fileSystemNodes, utils.FileSystemNode{
 					Path:        directory,
 					IsDirectory: true,
 				})

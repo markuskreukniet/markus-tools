@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+
+	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
 // TODO: there are duplicate or useless things, such as statements, strings, and structs, probably in tests
@@ -15,7 +17,7 @@ const (
 )
 
 type uniqueFileSystemNodes struct {
-	UniqueFileSystemNodes []fileSystemNode `json:"uniqueFileSystemNodes"`
+	UniqueFileSystemNodes []utils.FileSystemNode `json:"uniqueFileSystemNodes"`
 }
 
 type synchronizeDirectoryTreesArguments struct {

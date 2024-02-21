@@ -14,6 +14,11 @@ type FileDetail struct {
 	Size             int64
 }
 
+type FileSystemNode struct {
+	Path        string
+	IsDirectory bool
+}
+
 type (
 	fileFilterMode int
 	fileType       int

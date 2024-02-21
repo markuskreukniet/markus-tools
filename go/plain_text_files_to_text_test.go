@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/markuskreukniet/markus-tools/go/utils"
 	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
 
@@ -24,7 +25,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 		FilePathEndParts:      []string{test.TxtFile1, test.TxtFile3, test.TxtFile6, test.JpgFile4},
 	}
 	plainTextFilePathEndParts := []string{test.TxtFile1, test.TxtFile3, test.TxtFile6}
-	fileSystemNodes := []fileSystemNode{
+	fileSystemNodes := []utils.FileSystemNode{
 		{
 			Path:        test.TxtFile1,
 			IsDirectory: false,
@@ -34,12 +35,12 @@ func TestPlainTextFilesToText(t *testing.T) {
 			IsDirectory: true,
 		},
 	}
-	var emptyFileSystemNodes []fileSystemNode
+	var emptyFileSystemNodes []utils.FileSystemNode
 
 	testCases := []struct {
 		Metadata                  test.TestCaseMetadata
 		PlainTextFilePathEndParts []string
-		FileSystemNodes           []fileSystemNode
+		FileSystemNodes           []utils.FileSystemNode
 	}{
 		{
 			Metadata:                  test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
