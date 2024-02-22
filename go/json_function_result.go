@@ -2,6 +2,7 @@ package main
 
 import "encoding/json"
 
+// TODO: Should this struct have Pascal Case fields?
 type functionResult struct {
 	Result       any
 	ErrorMessage string
