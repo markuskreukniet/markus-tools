@@ -38,53 +38,53 @@ func TestPlainTextFilesToText(t *testing.T) {
 	var emptyFileSystemNodes []utils.FileSystemNode
 
 	testCases := []struct {
-		Metadata                  test.TestCaseMetadata
-		PlainTextFilePathEndParts []string
-		FileSystemNodes           []utils.FileSystemNode
+		metadata                  test.TestCaseMetadata
+		plainTextFilePathEndParts []string
+		fileSystemNodes           []utils.FileSystemNode
 	}{
 		{
-			Metadata:                  test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
-			PlainTextFilePathEndParts: plainTextFilePathEndParts,
-			FileSystemNodes:           fileSystemNodes,
+			metadata:                  test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
+			plainTextFilePathEndParts: plainTextFilePathEndParts,
+			fileSystemNodes:           fileSystemNodes,
 		},
 		{
-			Metadata:                  test.TestingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse(),
-			PlainTextFilePathEndParts: test.EmptyPathEndParts,
-			FileSystemNodes:           emptyFileSystemNodes,
+			metadata:                  test.TestingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse(),
+			plainTextFilePathEndParts: test.EmptyPathEndParts,
+			fileSystemNodes:           emptyFileSystemNodes,
 		},
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.Metadata.Name, func(t *testing.T) {
+		t.Run(tc.metadata.Name, func(t *testing.T) {
 			// arrange and teardown
 			directory := test.TestingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
 			defer test.TestingRemoveDirectoryTree(t, directory)
-			for i := range tc.FileSystemNodes {
-				tc.FileSystemNodes[i].Path = filepath.Join(directory, tc.FileSystemNodes[i].Path)
+			for i := range tc.fileSystemNodes {
+				tc.fileSystemNodes[i].Path = filepath.Join(directory, tc.fileSystemNodes[i].Path)
 			}
 			var builder strings.Builder
 			// TODO: tc.PlainTextFilePathEndParts to full path happens also in testingCreateTempFileSystemStructureOrGetEmptyString?
-			if len(tc.PlainTextFilePathEndParts) > 0 {
-				fullPath := filepath.Join(directory, tc.PlainTextFilePathEndParts[0])
+			if len(tc.plainTextFilePathEndParts) > 0 {
+				fullPath := filepath.Join(directory, tc.plainTextFilePathEndParts[0])
 				content := testingCreateContentString(fullPath, 0)
 				test.TestingWriteFileContent(t, fullPath, content)
-				test.TestingWriteString(t, testingLastPathElementOnNewline(tc.PlainTextFilePathEndParts[0]), &builder)
+				test.TestingWriteString(t, testingLastPathElementOnNewline(tc.plainTextFilePathEndParts[0]), &builder)
 				test.TestingWriteString(t, content, &builder)
-				for i := 1; i < len(tc.PlainTextFilePathEndParts); i++ {
-					fullPath := filepath.Join(directory, tc.PlainTextFilePathEndParts[i])
+				for i := 1; i < len(tc.plainTextFilePathEndParts); i++ {
+					fullPath := filepath.Join(directory, tc.plainTextFilePathEndParts[i])
 					content := testingCreateContentString(fullPath, i)
 					test.TestingWriteFileContent(t, fullPath, content)
 					test.TestingWriteString(t, "\n\n", &builder)
-					test.TestingWriteString(t, testingLastPathElementOnNewline(tc.PlainTextFilePathEndParts[i]), &builder)
+					test.TestingWriteString(t, testingLastPathElementOnNewline(tc.plainTextFilePathEndParts[i]), &builder)
 					test.TestingWriteString(t, content, &builder)
 				}
 			}
 
 			// act
-			outcome, err := plainTextFilesToText(tc.FileSystemNodes)
+			outcome, err := plainTextFilesToText(tc.fileSystemNodes)
 
 			// assert
-			test.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.Metadata.WantErr, builder, outcome)
+			test.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.metadata.WantErr, builder, outcome)
 		})
 	}
 }

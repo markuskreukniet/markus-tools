@@ -27,43 +27,43 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	var emptyPathEndPartGroups [][]string
 
 	testCases := []struct {
-		Metadata                       test.TestCaseMetadata
-		FileSystemPathEndParts         test.FileSystemPathEndParts
-		DuplicateFilePathEndPartGroups [][]string
+		metadata                       test.TestCaseMetadata
+		fileSystemPathEndParts         test.FileSystemPathEndParts
+		duplicateFilePathEndPartGroups [][]string
 	}{
 		{
-			Metadata:                       test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
-			FileSystemPathEndParts:         fileSystemPathEndParts,
-			DuplicateFilePathEndPartGroups: duplicateFilePathEndPartGroups,
+			metadata:                       test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
+			fileSystemPathEndParts:         fileSystemPathEndParts,
+			duplicateFilePathEndPartGroups: duplicateFilePathEndPartGroups,
 		},
 		{
-			Metadata:                       test.TestingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse(),
-			FileSystemPathEndParts:         test.EmptyFileSystemPathEndParts,
-			DuplicateFilePathEndPartGroups: emptyPathEndPartGroups,
+			metadata:                       test.TestingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse(),
+			fileSystemPathEndParts:         test.EmptyFileSystemPathEndParts,
+			duplicateFilePathEndPartGroups: emptyPathEndPartGroups,
 		},
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.Metadata.Name, func(t *testing.T) {
+		t.Run(tc.metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			directory := test.TestingCreateTempFileSystemStructureOrGetEmptyString(t, tc.FileSystemPathEndParts)
+			directory := test.TestingCreateTempFileSystemStructureOrGetEmptyString(t, tc.fileSystemPathEndParts)
 			defer test.TestingRemoveDirectoryTree(t, directory)
 			var builder strings.Builder
-			if len(tc.DuplicateFilePathEndPartGroups) > 0 {
-				if len(tc.DuplicateFilePathEndPartGroups[0][0]) > 0 {
-					duplicateFilePath := filepath.Join(directory, tc.DuplicateFilePathEndPartGroups[0][0])
+			if len(tc.duplicateFilePathEndPartGroups) > 0 {
+				if len(tc.duplicateFilePathEndPartGroups[0][0]) > 0 {
+					duplicateFilePath := filepath.Join(directory, tc.duplicateFilePathEndPartGroups[0][0])
 					test.TestingWriteFileContentWithContentAndIndex(t, duplicateFilePath, 0)
 					test.TestingWriteString(t, duplicateFilePath, &builder)
 				}
-				for i := 1; i < len(tc.DuplicateFilePathEndPartGroups[0]); i++ {
+				for i := 1; i < len(tc.duplicateFilePathEndPartGroups[0]); i++ {
 					testingWriteNewlineString(t, &builder)
-					duplicateFilePath := filepath.Join(directory, tc.DuplicateFilePathEndPartGroups[0][i])
+					duplicateFilePath := filepath.Join(directory, tc.duplicateFilePathEndPartGroups[0][i])
 					test.TestingWriteFileContentWithContentAndIndex(t, duplicateFilePath, 0)
 					test.TestingWriteString(t, duplicateFilePath, &builder)
 				}
-				for i := 1; i < len(tc.DuplicateFilePathEndPartGroups); i++ {
+				for i := 1; i < len(tc.duplicateFilePathEndPartGroups); i++ {
 					testingWriteNewlineString(t, &builder)
-					for _, duplicateFilePathEndPart := range tc.DuplicateFilePathEndPartGroups[i] {
+					for _, duplicateFilePathEndPart := range tc.duplicateFilePathEndPartGroups[i] {
 						testingWriteNewlineString(t, &builder)
 						duplicateFilePath := filepath.Join(directory, duplicateFilePathEndPart)
 						test.TestingWriteFileContentWithContentAndIndex(t, duplicateFilePath, i)
@@ -83,7 +83,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			outcome, err := getDuplicateFilesAsNewlineSeparatedString(fileSystemNodes)
 
 			// assert
-			test.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.Metadata.WantErr, builder, outcome)
+			test.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.metadata.WantErr, builder, outcome)
 		})
 	}
 }

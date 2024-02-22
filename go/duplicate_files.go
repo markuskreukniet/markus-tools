@@ -12,28 +12,28 @@ import (
 )
 
 type fileIdentifier struct {
-	Path string
-	Size int64
-	Hash string
+	path string
+	size int64
+	hash string
 }
 
 type duplicateFile struct {
-	Path string
-	Hash string
+	path string
+	hash string
 }
 
 func appendFileIdentifier(fileIdentifiers *[]fileIdentifier, detail utils.FileDetail) {
 	*fileIdentifiers = append(*fileIdentifiers, fileIdentifier{
-		Path: detail.Path,
-		Size: detail.Size,
-		Hash: "",
+		path: detail.Path,
+		size: detail.Size,
+		hash: "",
 	})
 }
 
 func appendDuplicateFile(duplicateFiles *[]duplicateFile, fileIdentifier fileIdentifier) {
 	*duplicateFiles = append(*duplicateFiles, duplicateFile{
-		Path: fileIdentifier.Path,
-		Hash: fileIdentifier.Hash,
+		path: fileIdentifier.path,
+		hash: fileIdentifier.hash,
 	})
 }
 
@@ -58,7 +58,7 @@ func duplicateFilesToNewlineSeparatedString(duplicateFiles []duplicateFile) (str
 		return "", nil
 	}
 	var result strings.Builder
-	_, err := result.WriteString(duplicateFiles[0].Path)
+	_, err := result.WriteString(duplicateFiles[0].path)
 	if err != nil {
 		return "", err
 	}
@@ -67,13 +67,13 @@ func duplicateFilesToNewlineSeparatedString(duplicateFiles []duplicateFile) (str
 		if err != nil {
 			return "", err
 		}
-		if duplicateFiles[i].Hash != duplicateFiles[i-1].Hash {
+		if duplicateFiles[i].hash != duplicateFiles[i-1].hash {
 			_, err = utils.WriteNewlineString(&result)
 			if err != nil {
 				return "", err
 			}
 		}
-		_, err = result.WriteString(duplicateFiles[i].Path)
+		_, err = result.WriteString(duplicateFiles[i].path)
 		if err != nil {
 			return "", err
 		}
@@ -110,26 +110,26 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 		}
 	}
 	sort.Slice(fileIdentifiers, func(i, j int) bool {
-		return fileIdentifiers[i].Size < fileIdentifiers[j].Size
+		return fileIdentifiers[i].size < fileIdentifiers[j].size
 	})
 	// TODO: We can make this function efficient by making from here the newlineSeparatedString, instead of making first the duplicateFiles slice
 	var duplicateFiles []duplicateFile
 	var lastAppendedIndex = -1
 	for i := 1; i < len(fileIdentifiers); i++ {
 		previousIndex := i - 1
-		if fileIdentifiers[previousIndex].Size == fileIdentifiers[i].Size {
+		if fileIdentifiers[previousIndex].size == fileIdentifiers[i].size {
 			var err error
-			if fileIdentifiers[previousIndex].Hash == "" {
-				fileIdentifiers[previousIndex].Hash, err = getFileHash(fileIdentifiers[previousIndex].Path)
+			if fileIdentifiers[previousIndex].hash == "" {
+				fileIdentifiers[previousIndex].hash, err = getFileHash(fileIdentifiers[previousIndex].path)
 				if err != nil {
 					return "", err
 				}
 			}
-			fileIdentifiers[i].Hash, err = getFileHash(fileIdentifiers[i].Path)
+			fileIdentifiers[i].hash, err = getFileHash(fileIdentifiers[i].path)
 			if err != nil {
 				return "", err
 			}
-			if fileIdentifiers[previousIndex].Hash == fileIdentifiers[i].Hash {
+			if fileIdentifiers[previousIndex].hash == fileIdentifiers[i].hash {
 				if lastAppendedIndex != previousIndex {
 					appendDuplicateFile(&duplicateFiles, fileIdentifiers[previousIndex])
 				}
