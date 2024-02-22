@@ -22,8 +22,13 @@ type duplicateFile struct {
 	hash string
 }
 
-func appendFileIdentifier(fileIdentifiers *[]fileIdentifier, detail utils.FileDetail) {
-	*fileIdentifiers = append(*fileIdentifiers, fileIdentifier{
+// TODO: is this struct needed?
+type appendFileIdentifier struct {
+	fileIdentifiers *[]fileIdentifier
+}
+
+func (identifier *appendFileIdentifier) Append(detail utils.FileDetail) {
+	*identifier.fileIdentifiers = append(*identifier.fileIdentifiers, fileIdentifier{
 		path: detail.Path,
 		size: detail.Size,
 		hash: "",
@@ -91,23 +96,9 @@ func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []uti
 
 func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.FileSystemNode) (string, error) {
 	var fileIdentifiers []fileIdentifier
-	for _, node := range uniqueFileSystemNodes {
-		if node.IsDirectory {
-			err := utils.WalkFileDetails(node.Path, utils.FilesWithoutZeroByteFiles, utils.AllFiles, func(detail utils.FileDetail) {
-				appendFileIdentifier(&fileIdentifiers, detail)
-			})
-			if err != nil {
-				return "", err
-			}
-		} else {
-			fileDetail, err := utils.GetFileDetail(node.Path)
-			if err != nil {
-				return "", err
-			}
-			if utils.IsFileDetailNonZeroByte(fileDetail) {
-				appendFileIdentifier(&fileIdentifiers, fileDetail)
-			}
-		}
+	err := utils.AppendFileDetails(&appendFileIdentifier{fileIdentifiers: &fileIdentifiers}, uniqueFileSystemNodes)
+	if err != nil {
+		return "", err
 	}
 	sort.Slice(fileIdentifiers, func(i, j int) bool {
 		return fileIdentifiers[i].size < fileIdentifiers[j].size

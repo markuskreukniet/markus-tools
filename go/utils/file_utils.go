@@ -116,3 +116,29 @@ func WalkFileDetails(rootFilePath string, mode fileFilterMode, fileType fileType
 		return nil
 	})
 }
+
+type AppendFileDetail interface {
+	Append(detail FileDetail)
+}
+
+func AppendFileDetails(appendFileDetail AppendFileDetail, uniqueFileSystemNodes []FileSystemNode) error {
+	for _, node := range uniqueFileSystemNodes {
+		if node.IsDirectory {
+			err := WalkFileDetails(node.Path, FilesWithoutZeroByteFiles, AllFiles, func(detail FileDetail) {
+				appendFileDetail.Append(detail)
+			})
+			if err != nil {
+				return err
+			}
+		} else {
+			detail, err := GetFileDetail(node.Path)
+			if err != nil {
+				return err
+			}
+			if IsFileDetailNonZeroByte(detail) {
+				appendFileDetail.Append(detail)
+			}
+		}
+	}
+	return nil
+}
