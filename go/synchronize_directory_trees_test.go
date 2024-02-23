@@ -122,6 +122,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 				for scanner.Scan() {
 					test.TestingWriteString(t, scanner.Text(), &builder)
 				}
+				// TODO: if?
 				err = scanner.Err()
 				if err != nil {
 					t.Errorf("Failed to read file content: %v", err)

@@ -7,6 +7,7 @@ import (
 
 func TestingWriteString(t *testing.T, stringToWrite string, builder *strings.Builder) {
 	t.Helper()
+	// TODO: if?
 	_, err := builder.WriteString(stringToWrite)
 	if err != nil {
 		t.Errorf("Failed to write string: %v", err)

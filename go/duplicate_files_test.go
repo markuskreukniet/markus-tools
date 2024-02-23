@@ -11,6 +11,7 @@ import (
 
 func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
 	t.Helper()
+	// TODO: if?
 	_, err := utils.WriteNewlineString(builder)
 	if err != nil {
 		t.Errorf("writeNewlineString error: %v", err)

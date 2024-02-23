@@ -17,10 +17,12 @@ func readLinesAddToBuilder(filePath string, builder *strings.Builder) error {
 	defer file.Close()
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
+		// TODO: if?
 		_, err := utils.WriteNewlineString(builder)
 		if err != nil {
 			return err
 		}
+		// TODO: if?
 		_, err = builder.WriteString(scanner.Text())
 		if err != nil {
 			return err
@@ -30,6 +32,7 @@ func readLinesAddToBuilder(filePath string, builder *strings.Builder) error {
 }
 
 func addLastPathElementAndAllLinesToBuilder(filePath string, builder *strings.Builder) error {
+	// TODO: if?
 	_, err := builder.WriteString(filepath.Base(filePath))
 	if err != nil {
 		return err
@@ -79,10 +82,12 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 			return "", err
 		}
 		for i := 1; i < len(filePaths); i++ {
+			// TODO: if?
 			_, err := result.WriteString("\n\n")
 			if err != nil {
 				return "", err
 			}
+			// TODO: if?
 			err = addLastPathElementAndAllLinesToBuilder(filePaths[i], &result)
 			if err != nil {
 				return "", err
