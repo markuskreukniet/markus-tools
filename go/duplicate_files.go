@@ -50,21 +50,15 @@ func duplicateFilesToNewlineSeparatedString(duplicateFiles []duplicateFile) (str
 		return "", nil
 	}
 	var result strings.Builder
-	// TODO: if?
-	_, err := result.WriteString(duplicateFiles[0].path)
-	if err != nil {
+	if _, err := result.WriteString(duplicateFiles[0].path); err != nil {
 		return "", err
 	}
 	for i := 1; i < len(duplicateFiles); i++ {
-		// TODO: if?
-		_, err = utils.WriteNewlineString(&result)
-		if err != nil {
+		if _, err := utils.WriteNewlineString(&result); err != nil {
 			return "", err
 		}
 		if duplicateFiles[i].hash != duplicateFiles[i-1].hash {
-			// TODO: if?
-			_, err = utils.WriteNewlineString(&result)
-			if err != nil {
+			if _, err := utils.WriteNewlineString(&result); err != nil {
 				return "", err
 			}
 		}
@@ -108,15 +102,11 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 		if fileIdentifiers[previousIndex].size == fileIdentifiers[i].size {
 			var err error
 			if fileIdentifiers[previousIndex].hash == "" {
-				// TODO: if?
-				fileIdentifiers[previousIndex].hash, err = getFileHash(fileIdentifiers[previousIndex].path)
-				if err != nil {
+				if fileIdentifiers[previousIndex].hash, err = getFileHash(fileIdentifiers[previousIndex].path); err != nil {
 					return "", err
 				}
 			}
-			// TODO: if?
-			fileIdentifiers[i].hash, err = getFileHash(fileIdentifiers[i].path)
-			if err != nil {
+			if fileIdentifiers[i].hash, err = getFileHash(fileIdentifiers[i].path); err != nil {
 				return "", err
 			}
 			if fileIdentifiers[previousIndex].hash == fileIdentifiers[i].hash {
