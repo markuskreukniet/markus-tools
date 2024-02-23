@@ -120,10 +120,9 @@ func WalkFileDetails(rootFilePath string, mode fileFilterMode, fileType fileType
 func AppendFileDetails(appendFileDetail func(detail FileDetail), uniqueFileSystemNodes []FileSystemNode) error {
 	for _, node := range uniqueFileSystemNodes {
 		if node.IsDirectory {
-			err := WalkFileDetails(node.Path, FilesWithoutZeroByteFiles, AllFiles, func(detail FileDetail) {
+			if err := WalkFileDetails(node.Path, FilesWithoutZeroByteFiles, AllFiles, func(detail FileDetail) {
 				appendFileDetail(detail)
-			})
-			if err != nil {
+			}); err != nil {
 				return err
 			}
 		} else {
