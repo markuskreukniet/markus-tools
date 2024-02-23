@@ -22,19 +22,6 @@ type duplicateFile struct {
 	hash string
 }
 
-// TODO: is this struct needed?
-type appendFileIdentifier struct {
-	fileIdentifiers *[]fileIdentifier
-}
-
-func (identifier *appendFileIdentifier) Append(detail utils.FileDetail) {
-	*identifier.fileIdentifiers = append(*identifier.fileIdentifiers, fileIdentifier{
-		path: detail.Path,
-		size: detail.Size,
-		hash: "",
-	})
-}
-
 func appendDuplicateFile(duplicateFiles *[]duplicateFile, fileIdentifier fileIdentifier) {
 	*duplicateFiles = append(*duplicateFiles, duplicateFile{
 		path: fileIdentifier.path,
@@ -96,7 +83,15 @@ func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []uti
 
 func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.FileSystemNode) (string, error) {
 	var fileIdentifiers []fileIdentifier
-	err := utils.AppendFileDetails(&appendFileIdentifier{fileIdentifiers: &fileIdentifiers}, uniqueFileSystemNodes)
+	// TODO: if?
+	err := utils.AppendFileDetails(
+		func(detail utils.FileDetail) {
+			fileIdentifiers = append(fileIdentifiers, fileIdentifier{
+				path: detail.Path,
+				size: detail.Size,
+				hash: "",
+			})
+		}, uniqueFileSystemNodes)
 	if err != nil {
 		return "", err
 	}
