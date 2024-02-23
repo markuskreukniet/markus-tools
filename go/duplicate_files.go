@@ -79,16 +79,14 @@ func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []uti
 
 func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.FileSystemNode) (string, error) {
 	var fileIdentifiers []fileIdentifier
-	// TODO: if?
-	err := utils.AppendFileDetails(
+	if err := utils.AppendFileDetails(
 		func(detail utils.FileDetail) {
 			fileIdentifiers = append(fileIdentifiers, fileIdentifier{
 				path: detail.Path,
 				size: detail.Size,
 				hash: "",
 			})
-		}, uniqueFileSystemNodes)
-	if err != nil {
+		}, uniqueFileSystemNodes); err != nil {
 		return "", err
 	}
 	sort.Slice(fileIdentifiers, func(i, j int) bool {
