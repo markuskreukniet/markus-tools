@@ -86,7 +86,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 				size: detail.Size,
 				hash: "",
 			})
-		}, uniqueFileSystemNodes); err != nil {
+		}, uniqueFileSystemNodes, utils.FilesWithoutZeroByteFiles); err != nil {
 		return "", err
 	}
 	sort.Slice(fileIdentifiers, func(i, j int) bool {

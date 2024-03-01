@@ -29,7 +29,7 @@ const (
 	FilesWithoutZeroByteFiles
 	FilesAndDirectories
 	filesAndDirectoriesWithoutZeroByteFiles
-	directories
+	Directories
 )
 
 const (
@@ -86,7 +86,7 @@ func WalkFileDetails(rootFilePath string, mode fileFilterMode, fileType fileType
 		isDir := fileInfo.IsDir()
 
 		// is file check
-		if !isDir && mode == directories {
+		if !isDir && mode == Directories {
 			return nil
 		}
 
@@ -117,10 +117,10 @@ func WalkFileDetails(rootFilePath string, mode fileFilterMode, fileType fileType
 	})
 }
 
-func AppendFileDetails(appendFileDetail func(detail FileDetail), uniqueFileSystemNodes []FileSystemNode) error {
+func AppendFileDetails(appendFileDetail func(detail FileDetail), uniqueFileSystemNodes []FileSystemNode, mode fileFilterMode) error {
 	for _, node := range uniqueFileSystemNodes {
 		if node.IsDirectory {
-			if err := WalkFileDetails(node.Path, FilesWithoutZeroByteFiles, AllFiles, func(detail FileDetail) {
+			if err := WalkFileDetails(node.Path, mode, AllFiles, func(detail FileDetail) {
 				appendFileDetail(detail)
 			}); err != nil {
 				return err
