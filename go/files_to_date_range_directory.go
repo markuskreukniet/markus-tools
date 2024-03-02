@@ -8,9 +8,9 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
-type fileModificationTime struct {
-	path             string
-	modificationTime time.Time
+type fileModifiedFormattedDate struct {
+	path                  string
+	modifiedFormattedDate string
 }
 
 type dateRangeDirectory struct {
@@ -19,12 +19,16 @@ type dateRangeDirectory struct {
 	endDate   string
 }
 
+const dateFormat = "2006-01-02"
+
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
-	// TODO: should be []fileModificationTime
-	var paths []string
+	var fileModifiedFormattedDates []fileModifiedFormattedDate
 	if err := utils.AppendFileDetails(
 		func(detail utils.FileDetail) {
-			paths = append(paths, detail.Path)
+			fileModifiedFormattedDates = append(fileModifiedFormattedDates, fileModifiedFormattedDate{
+				path:                  detail.Path,
+				modifiedFormattedDate: detail.ModificationTime.Format(dateFormat),
+			})
 		}, uniqueFileSystemNodes, utils.FilesWithoutZeroByteFiles); err != nil {
 		return err
 	}
@@ -75,10 +79,19 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		}
 	}
 
+	//
+	// for _, time := range fileModificationTimes {
+	// 	for _, directory := range dateRangeDirectories {
+	// 		if directory.endDate == "" && time. {
+
+	// 		}
+	// 	}
+	// }
+
 	return nil
 }
 
 func isValidDateFormat(date string) bool {
-	_, err := time.Parse("2006-01-02", date)
+	_, err := time.Parse(dateFormat, date)
 	return err == nil
 }
