@@ -25,7 +25,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		return err
 	}
 	var dateRangeDirectoryPaths []string
-	// TODO: AppendFileDetails should now not look into subdirectories.
+	// TODO: AppendFileDetails should now not look into subdirectories???
 	// TODO: utils.Directories is changed from directories
 	if err := utils.AppendFileDetails(
 		func(detail utils.FileDetail) {
