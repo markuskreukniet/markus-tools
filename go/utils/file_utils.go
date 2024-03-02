@@ -8,7 +8,7 @@ import (
 	"unicode"
 )
 
-// TODO: should be TimeModified instead of ModificationTime. Also search in project on ModificationTime for more renaming
+// TODO: should be timeModified instead of ModificationTime. Also search in project on ModificationTime for more renaming
 type FileDetail struct {
 	Path             string
 	ModificationTime time.Time
