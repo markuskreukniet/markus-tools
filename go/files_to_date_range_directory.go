@@ -8,32 +8,23 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
-type fileTimeModified struct {
-	path         string
+type filePathTimeModified struct {
+	filePath     string
 	timeModified time.Time
 }
 
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
-	var filesTimeModified []fileTimeModified
-	if err := utils.AppendFileDetails(
-		func(detail utils.FileDetail) {
-			filesTimeModified = append(filesTimeModified, fileTimeModified{
-				path:         detail.Path,
-				timeModified: detail.ModificationTime,
-			})
-		}, uniqueFileSystemNodes, utils.FilesWithoutZeroByteFiles); err != nil {
+	var filePathsTimeModified []filePathTimeModified
+	if err := appendFilePathsTimeModified(&filePathsTimeModified, uniqueFileSystemNodes); err != nil {
 		return err
 	}
 	var dateRangeDirectoryPaths []string
-	// TODO: AppendFileDetails should now not look into subdirectories???
+	// TODO: AppendFileDetails should now not look into subdirectories
 	// TODO: utils.Directories is changed from directories
 	if err := utils.AppendFileDetails(
 		func(detail utils.FileDetail) {
 			dateRangeDirectoryPaths = append(dateRangeDirectoryPaths, detail.Path)
-		}, []utils.FileSystemNode{{
-			Path:        destinationDirectory,
-			IsDirectory: true,
-		}}, utils.Directories); err != nil {
+		}, createDirectoryFileSystemNodeInSlice(destinationDirectory), utils.Directories); err != nil {
 		return err
 	}
 
@@ -54,19 +45,21 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 			dateRangeDirectoryPaths[i] = dateRangeDirectoryPaths[len(dateRangeDirectoryPaths)-1]
 			dateRangeDirectoryPaths = dateRangeDirectoryPaths[:len(dateRangeDirectoryPaths)-1]
 		} else {
-			// TODO: get all files of that dir
+			if err := appendFilePathsTimeModified(&filePathsTimeModified, createDirectoryFileSystemNodeInSlice(dateRangeDirectoryPaths[i])); err != nil {
+				return err
+			}
 			i++
 		}
 	}
 
-	// TODO: get all files of the dateRangeDirectories and add them to filesTimeModified.
+	// TODO: get all files of the dateRangeDirectories and add them to filePathsTimeModified.
 	// Some dirs might be empty, which we should delete, or add to empty dir slice
 	// for _, directory := range dateRangeDirectories {
 
 	// }
 
-	// TODO: order filesTimeModified
-	// TODO: filesTimeModified to groups
+	// TODO: order filePathsTimeModified
+	// TODO: filePathsTimeModified to groups
 	// TODO: remove dateRangeDirectoryPaths that have a corresponding group
 	// TODO: groups to directories
 	// TODO: groups to files in directories
@@ -75,6 +68,23 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	// might have already overlapping date range dirs
 
 	return nil
+}
+
+func createDirectoryFileSystemNodeInSlice(path string) []utils.FileSystemNode {
+	return []utils.FileSystemNode{{
+		Path:        path,
+		IsDirectory: true,
+	}}
+}
+
+func appendFilePathsTimeModified(filePathsTimeModified *[]filePathTimeModified, uniqueFileSystemNodes []utils.FileSystemNode) error {
+	return utils.AppendFileDetails(
+		func(detail utils.FileDetail) {
+			*filePathsTimeModified = append(*filePathsTimeModified, filePathTimeModified{
+				filePath:     detail.Path,
+				timeModified: detail.ModificationTime,
+			})
+		}, uniqueFileSystemNodes, utils.FilesWithoutZeroByteFiles)
 }
 
 func isValidDateFormat(date string) bool {
