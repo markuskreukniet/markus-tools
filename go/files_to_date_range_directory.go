@@ -29,7 +29,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	}
 
 	// Remove the directories from the slice that are not a date range directory in the destination directory.
-	// Or append filePathsTimeModified.
+	// And possibly append filePathsTimeModified from the destination directory.
 	const spacedHyphen = " - "
 	for i := 0; i < len(dateRangeDirectoryPaths); {
 		base := filepath.Base(dateRangeDirectoryPaths[i])
