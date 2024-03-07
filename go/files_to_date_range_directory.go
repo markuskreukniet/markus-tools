@@ -2,6 +2,7 @@ package main
 
 import (
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -53,13 +54,10 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		}
 	}
 
-	// TODO: get all files of the dateRangeDirectories and add them to filePathsTimeModified.
-	// Some dirs might be empty, which we should delete, or add to empty dir slice
-	// for _, directory := range dateRangeDirectories {
+	sort.Slice(filePathsTimeModified, func(i, j int) bool {
+		return filePathsTimeModified[i].timeModified.Before(filePathsTimeModified[j].timeModified)
+	})
 
-	// }
-
-	// TODO: order filePathsTimeModified
 	// TODO: filePathsTimeModified to groups
 	// TODO: remove dateRangeDirectoryPaths that have a corresponding group
 	// TODO: groups to directories
