@@ -54,9 +54,21 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		}
 	}
 
+	// TODO: if length 0 stop?
+
 	sort.Slice(filePathsTimeModified, func(i, j int) bool {
 		return filePathsTimeModified[i].timeModified.Before(filePathsTimeModified[j].timeModified)
 	})
+	var dateRanges [][]filePathTimeModified
+	dateRange := []filePathTimeModified{filePathsTimeModified[0]}
+	for i := 0; i < len(filePathsTimeModified); i++ {
+		if filePathsTimeModified[i].timeModified.Sub(filePathsTimeModified[i-1].timeModified).Hours() <= 72 {
+			dateRange = append(dateRange, filePathsTimeModified[i])
+		} else {
+			dateRanges = append(dateRanges, dateRange)
+			dateRange = []filePathTimeModified{filePathsTimeModified[i]}
+		}
+	}
 
 	// TODO: filePathsTimeModified to groups
 	// TODO: remove dateRangeDirectoryPaths that have a corresponding group
