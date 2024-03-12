@@ -14,6 +14,8 @@ type filePathTimeModified struct {
 	timeModified time.Time
 }
 
+const dateFormat = "2006-01-02"
+
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
 	var filePathsTimeModified []filePathTimeModified
 	if err := appendFilePathsTimeModified(&filePathsTimeModified, uniqueFileSystemNodes); err != nil {
@@ -69,14 +71,28 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 			dateRange = []filePathTimeModified{filePathsTimeModified[i]}
 		}
 	}
+	dateRanges = append(dateRanges, dateRange)
 
-	// TODO: filePathsTimeModified to groups
-	// TODO: remove dateRangeDirectoryPaths that have a corresponding group
+	for _, dRange := range dateRanges {
+		newest := dRange[len(dRange)-1].timeModified
+		subDirectoryPath := filepath.Join(destinationDirectory, toDateFormat(dRange[0].timeModified))
+		if dRange[0].timeModified != newest {
+			// subDirectoryPath = to toDateFormat(newest) // use ternary?
+		}
+
+		// if dateRangeDirectoryPaths does not contain subDirectoryPath, make dir with subDirectoryPath
+
+		// if dateRangeDirectoryPaths does contain subDirectoryPath, remove subDirectoryPath from dateRangeDirectoryPaths
+		// and remove the filePathsTimeModified of that subDirectoryPath
+
+		// ----- add files to dit
+		// het aanmaken van dateRanges overslaan?
+	}
+
+	// combine both TODOs?
 	// TODO: groups to directories
 	// TODO: groups to files in directories
 	// TODO: remove all directories from dateRangeDirectoryPaths
-
-	// might have already overlapping date range dirs
 
 	return nil
 }
@@ -99,6 +115,10 @@ func appendFilePathsTimeModified(filePathsTimeModified *[]filePathTimeModified, 
 }
 
 func isValidDateFormat(date string) bool {
-	_, err := time.Parse("2006-01-02", date)
+	_, err := time.Parse(dateFormat, date)
 	return err == nil
+}
+
+func toDateFormat(time time.Time) string {
+	return time.Format(dateFormat)
 }
