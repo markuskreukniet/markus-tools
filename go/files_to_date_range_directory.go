@@ -16,82 +16,84 @@ type filePathTimeModified struct {
 
 const dateFormat = "2006-01-02"
 
+func appendDateRangeDirectoryPathsAndFilePathsTimeModified(dateRangeDirectoryPaths *[]string, filePathsTimeModified *[]filePathTimeModified, filePath string) error {
+	*dateRangeDirectoryPaths = append(*dateRangeDirectoryPaths, filePath)
+	if err := appendFilePathsTimeModified(filePathsTimeModified, createDirectoryFileSystemNodeInSlice(filePath)); err != nil {
+		return err
+	}
+	return nil
+}
+
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
 	var filePathsTimeModified []filePathTimeModified
 	if err := appendFilePathsTimeModified(&filePathsTimeModified, uniqueFileSystemNodes); err != nil {
 		return err
 	}
+	const spacedHyphen = " - "
 	var dateRangeDirectoryPaths []string
 	// TODO: AppendFileDetails should now not look into subdirectories
 	// TODO: utils.Directories is changed from directories
+	// TODO: AppendFileDetails is probably wrong naming
+	// TODO: opErr logic
+	var opErr error
 	if err := utils.AppendFileDetails(
 		func(detail utils.FileDetail) {
-			dateRangeDirectoryPaths = append(dateRangeDirectoryPaths, detail.Path)
+			base := filepath.Base(detail.Path)
+			if strings.Contains(base, spacedHyphen) {
+				baseParts := strings.Split(base, spacedHyphen)
+				if isValidDateFormat(baseParts[0]) && isValidDateFormat(baseParts[1]) {
+					opErr = appendDateRangeDirectoryPathsAndFilePathsTimeModified(&dateRangeDirectoryPaths, &filePathsTimeModified, detail.Path)
+				}
+			} else if isValidDateFormat(base) {
+				opErr = appendDateRangeDirectoryPathsAndFilePathsTimeModified(&dateRangeDirectoryPaths, &filePathsTimeModified, detail.Path)
+			}
 		}, createDirectoryFileSystemNodeInSlice(destinationDirectory), utils.Directories); err != nil {
 		return err
 	}
-
-	// Remove the directories from the slice that are not a date range directory in the destination directory.
-	// And append the filePathsTimeModified from a date range directory.
-	const spacedHyphen = " - "
-	for i := 0; i < len(dateRangeDirectoryPaths); {
-		base := filepath.Base(dateRangeDirectoryPaths[i])
-		remove := false
-		if strings.Contains(base, spacedHyphen) {
-			baseParts := strings.Split(base, spacedHyphen)
-			if !isValidDateFormat(baseParts[0]) || !isValidDateFormat(baseParts[1]) {
-				remove = true
-			}
-		} else if !isValidDateFormat(base) {
-			remove = true
-		}
-		if remove {
-			dateRangeDirectoryPaths[i] = dateRangeDirectoryPaths[len(dateRangeDirectoryPaths)-1]
-			dateRangeDirectoryPaths = dateRangeDirectoryPaths[:len(dateRangeDirectoryPaths)-1]
-		} else {
-			if err := appendFilePathsTimeModified(&filePathsTimeModified, createDirectoryFileSystemNodeInSlice(dateRangeDirectoryPaths[i])); err != nil {
-				return err
-			}
-			i++
-		}
+	if opErr != nil {
+		return opErr
 	}
-
-	// TODO: if length 0 stop?
 
 	sort.Slice(filePathsTimeModified, func(i, j int) bool {
 		return filePathsTimeModified[i].timeModified.Before(filePathsTimeModified[j].timeModified)
 	})
-	var dateRanges [][]filePathTimeModified
-	dateRange := []filePathTimeModified{filePathsTimeModified[0]}
-	for i := 0; i < len(filePathsTimeModified); i++ {
-		if filePathsTimeModified[i].timeModified.Sub(filePathsTimeModified[i-1].timeModified).Hours() <= 72 {
-			dateRange = append(dateRange, filePathsTimeModified[i])
-		} else {
-			dateRanges = append(dateRanges, dateRange)
-			dateRange = []filePathTimeModified{filePathsTimeModified[i]}
+
+	startDateRange := 0
+	for i := 0; i < len(filePathsTimeModified)-1; i++ {
+		iPlusOne := i + 1
+		if filePathsTimeModified[iPlusOne].timeModified.Sub(filePathsTimeModified[i].timeModified).Hours() > 72 {
+			var builder strings.Builder
+			if _, err := builder.WriteString(toDateFormat(filePathsTimeModified[startDateRange].timeModified)); err != nil {
+				return err
+			}
+			if filePathsTimeModified[startDateRange].timeModified != filePathsTimeModified[i].timeModified {
+				if _, err := builder.WriteString(spacedHyphen); err != nil {
+					return err
+				}
+				if _, err := builder.WriteString(toDateFormat(filePathsTimeModified[i].timeModified)); err != nil {
+					return err
+				}
+			}
+			subDirectoryPath := filepath.Join(destinationDirectory, builder.String())
+			pathFound := false
+			// TODO: add the missing filePathsTimeModified to the dir and remove subDirectoryPath from dateRangeDirectoryPaths in this loop?
+			for _, path := range dateRangeDirectoryPaths {
+				if path == subDirectoryPath {
+					pathFound = true
+					break
+				}
+			}
+			if pathFound {
+				// add the missing filePathsTimeModified to the dir and remove subDirectoryPath from dateRangeDirectoryPaths
+			} else {
+				// if dateRangeDirectoryPaths does not contain subDirectoryPath, make dir with subDirectoryPath
+				// add the filePathsTimeModified to the dir from subDirectoryPath
+			}
+
+			startDateRange = iPlusOne
 		}
 	}
-	dateRanges = append(dateRanges, dateRange)
 
-	for _, dRange := range dateRanges {
-		newest := dRange[len(dRange)-1].timeModified
-		subDirectoryPath := filepath.Join(destinationDirectory, toDateFormat(dRange[0].timeModified))
-		if dRange[0].timeModified != newest {
-			// subDirectoryPath = to toDateFormat(newest) // use ternary?
-		}
-
-		// if dateRangeDirectoryPaths does not contain subDirectoryPath, make dir with subDirectoryPath
-
-		// if dateRangeDirectoryPaths does contain subDirectoryPath, remove subDirectoryPath from dateRangeDirectoryPaths
-		// and remove the filePathsTimeModified of that subDirectoryPath
-
-		// ----- add files to dit
-		// het aanmaken van dateRanges overslaan?
-	}
-
-	// combine both TODOs?
-	// TODO: groups to directories
-	// TODO: groups to files in directories
 	// TODO: remove all directories from dateRangeDirectoryPaths
 
 	return nil
