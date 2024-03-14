@@ -83,11 +83,11 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 				}
 			}
 			if foundIndex >= 0 {
-				for k := startDateRange; k <= i; k++ {
-					fullFilePath := filepath.Join(subDirectoryPath, filepath.Base(filePathsTimeModified[k].filePath))
+				for j := startDateRange; j <= i; j++ {
+					fullFilePath := filepath.Join(subDirectoryPath, filepath.Base(filePathsTimeModified[j].filePath))
 					if _, err := os.Stat(fullFilePath); err != nil {
 						if os.IsNotExist(err) {
-							if err := os.Rename(filePathsTimeModified[k].filePath, fullFilePath); err != nil {
+							if err := os.Rename(filePathsTimeModified[j].filePath, fullFilePath); err != nil {
 								return err
 							}
 						} else {
