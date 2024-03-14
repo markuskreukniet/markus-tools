@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -53,11 +54,9 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	if opErr != nil {
 		return opErr
 	}
-
 	sort.Slice(filePathsTimeModified, func(i, j int) bool {
 		return filePathsTimeModified[i].timeModified.Before(filePathsTimeModified[j].timeModified)
 	})
-
 	startDateRange := 0
 	for i := 0; i < len(filePathsTimeModified)-1; i++ {
 		iPlusOne := i + 1
@@ -75,27 +74,41 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 				}
 			}
 			subDirectoryPath := filepath.Join(destinationDirectory, builder.String())
-			pathFound := false
+			foundIndex := -1
 			// TODO: add the missing filePathsTimeModified to the dir and remove subDirectoryPath from dateRangeDirectoryPaths in this loop?
-			for _, path := range dateRangeDirectoryPaths {
+			for j, path := range dateRangeDirectoryPaths {
 				if path == subDirectoryPath {
-					pathFound = true
+					foundIndex = j
 					break
 				}
 			}
-			if pathFound {
-				// add the missing filePathsTimeModified to the dir and remove subDirectoryPath from dateRangeDirectoryPaths
+			if foundIndex >= 0 {
+				for k := startDateRange; k <= i; k++ {
+					fullFilePath := filepath.Join(subDirectoryPath, filepath.Base(filePathsTimeModified[k].filePath))
+					if _, err := os.Stat(fullFilePath); err != nil {
+						if os.IsNotExist(err) {
+							if err := os.Rename(filePathsTimeModified[k].filePath, fullFilePath); err != nil {
+								return err
+							}
+						} else {
+							return err
+						}
+					}
+				}
+				dateRangeDirectoryPaths[foundIndex] = dateRangeDirectoryPaths[len(dateRangeDirectoryPaths)-1]
+				dateRangeDirectoryPaths = dateRangeDirectoryPaths[:len(dateRangeDirectoryPaths)-1]
 			} else {
 				// if dateRangeDirectoryPaths does not contain subDirectoryPath, make dir with subDirectoryPath
 				// add the filePathsTimeModified to the dir from subDirectoryPath
 			}
-
 			startDateRange = iPlusOne
 		}
 	}
-
-	// TODO: remove all directories from dateRangeDirectoryPaths
-
+	for _, path := range dateRangeDirectoryPaths {
+		if err := os.Remove(path); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
