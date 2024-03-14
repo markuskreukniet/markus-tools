@@ -83,23 +83,24 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 				}
 			}
 			if foundIndex >= 0 {
-				for j := startDateRange; j <= i; j++ {
-					fullFilePath := filepath.Join(subDirectoryPath, filepath.Base(filePathsTimeModified[j].filePath))
-					if _, err := os.Stat(fullFilePath); err != nil {
-						if os.IsNotExist(err) {
-							if err := os.Rename(filePathsTimeModified[j].filePath, fullFilePath); err != nil {
-								return err
-							}
-						} else {
-							return err
-						}
-					}
-				}
 				dateRangeDirectoryPaths[foundIndex] = dateRangeDirectoryPaths[len(dateRangeDirectoryPaths)-1]
 				dateRangeDirectoryPaths = dateRangeDirectoryPaths[:len(dateRangeDirectoryPaths)-1]
 			} else {
-				// if dateRangeDirectoryPaths does not contain subDirectoryPath, make dir with subDirectoryPath
-				// add the filePathsTimeModified to the dir from subDirectoryPath
+				if err := os.Mkdir(subDirectoryPath, 0755); err != nil {
+					return err
+				}
+			}
+			for j := startDateRange; j <= i; j++ {
+				fullFilePath := filepath.Join(subDirectoryPath, filepath.Base(filePathsTimeModified[j].filePath))
+				if _, err := os.Stat(fullFilePath); err != nil {
+					if os.IsNotExist(err) {
+						if err := os.Rename(filePathsTimeModified[j].filePath, fullFilePath); err != nil {
+							return err
+						}
+					} else {
+						return err
+					}
+				}
 			}
 			startDateRange = iPlusOne
 		}
