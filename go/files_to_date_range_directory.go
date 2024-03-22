@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -90,8 +91,15 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 					return err
 				}
 			}
+			var lastPathElements []string
 			for j := startDateRange; j <= i; j++ {
-				fullFilePath := filepath.Join(subDirectoryPath, filepath.Base(filePathsTimeModified[j].filePath))
+				base := filepath.Base(filePathsTimeModified[j].filePath)
+				for _, element := range lastPathElements {
+					if element == base {
+						return fmt.Errorf("wants to move two files with the same name, '%s' in the directory '%s'", base, subDirectoryPath)
+					}
+				}
+				fullFilePath := filepath.Join(subDirectoryPath, base)
 				if _, err := os.Stat(fullFilePath); err != nil {
 					if os.IsNotExist(err) {
 						if err := os.Rename(filePathsTimeModified[j].filePath, fullFilePath); err != nil {
@@ -100,6 +108,11 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 					} else {
 						return err
 					}
+				}
+				// Removing this check from the loop by extracting code to a function can result in an 'err != null' check in this loop since that function can return an error.
+				// Therefore, this current check results in less code.
+				if j < i {
+					lastPathElements = append(lastPathElements, base)
 				}
 			}
 			startDateRange = iPlusOne
