@@ -139,7 +139,6 @@ func AppendFileDetails(appendFileDetail func(detail FileDetail), uniqueFileSyste
 	return nil
 }
 
-// TODO: rename file to file_directory_utils with test file
 func FileOrDirectoryExists(filePath string) (bool, error) {
 	_, err := os.Stat(filePath)
 	if err == nil {
