@@ -53,3 +53,35 @@ func TestGetFileDetail(t *testing.T) {
 		t.Errorf("Modification time %v is not within the expected range.", fileDetail.ModificationTime)
 	}
 }
+
+// TODO: has copied and duplicate things and test cases are dirty
+func TestFileOrDirectoryExists(t *testing.T) {
+	// arrange
+	fileSystemPathEndParts := test.FileSystemPathEndParts{
+		DirectoryPathEndParts: []string{test.Directory1},
+		FilePathEndParts:      []string{test.TxtFile1},
+	}
+
+	// arrange and teardown
+	directory := test.TestingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
+	defer test.TestingRemoveDirectoryTree(t, directory)
+
+	// act
+	dirExists, err := FileOrDirectoryExists(filepath.Join(directory, test.Directory1))
+	if err != nil {
+		t.Errorf("dirExists error")
+	}
+	fileExists, err := FileOrDirectoryExists(filepath.Join(directory, test.TxtFile1))
+	if err != nil {
+		t.Errorf("fileExists error")
+	}
+	fileDoesNotExists, err := FileOrDirectoryExists(filepath.Join(directory, test.TxtFileNonExistent1))
+	if err != nil {
+		t.Errorf("fileDoesNotExists error")
+	}
+
+	// assert
+	if !dirExists || !fileExists || fileDoesNotExists {
+		t.Errorf("TestFileOrDirectoryExists assert error")
+	}
+}

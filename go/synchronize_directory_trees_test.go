@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/markuskreukniet/markus-tools/go/utils"
 	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
 
@@ -28,9 +29,12 @@ func testingHaveDirectoryTreesSameFilePathsOrGetFalse(t *testing.T, sourceDirect
 			return err
 		}
 		destinationPath := filepath.Join(destinationDirectory, relativePath)
-		if _, err := os.Stat(destinationPath); os.IsNotExist(err) {
-			haveSameFilePaths = false
+		exists, err := utils.FileOrDirectoryExists(destinationPath)
+		if err != nil {
 			return err
+		}
+		if !exists {
+			haveSameFilePaths = false
 		}
 		return nil
 	})

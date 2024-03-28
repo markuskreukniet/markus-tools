@@ -100,15 +100,16 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 					}
 				}
 				fullFilePath := filepath.Join(subDirectoryPath, base)
-				if _, err := os.Stat(fullFilePath); err != nil {
-					if os.IsNotExist(err) {
-						if err := os.Rename(filePathsTimeModified[j].filePath, fullFilePath); err != nil {
-							return err
-						}
-					} else {
+				exists, err := utils.FileOrDirectoryExists(fullFilePath)
+				if err != nil {
+					return err
+				}
+				if !exists {
+					if err := os.Rename(filePathsTimeModified[j].filePath, fullFilePath); err != nil {
 						return err
 					}
 				}
+
 				// Removing this check from the loop by extracting code to a function can result in an 'err != null' check in this loop since that function can return an error.
 				// Therefore, this current check results in less code.
 				if j < i {
