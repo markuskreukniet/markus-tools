@@ -36,13 +36,9 @@ func testingCreateDirectoriesWithOptionalFile(t *testing.T, directoriesWithOptio
 		// TODO: timeModified from string
 		var file *plainTextFile = nil
 		if directoryWithOptionalFileAsStrings[2] != "" {
-			content := ""
-			if directoryWithOptionalFileAsStrings[3] != "" {
-				content = directoryWithOptionalFileAsStrings[3]
-			}
 			file = &plainTextFile{
 				name:    directoryWithOptionalFileAsStrings[2],
-				content: content,
+				content: directoryWithOptionalFileAsStrings[3],
 			}
 		}
 		directoriesWithOptionalFile = append(directoriesWithOptionalFile, directoryWithOptionalFile{
