@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/markuskreukniet/markus-tools/go/utils"
 	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
 
@@ -19,7 +20,7 @@ type directoryWithOptionalFile struct {
 	plainTextFile *plainTextFile
 }
 
-func createDirectoriesWithOptionalFile(directoriesWithOptionalFileAsDelimitedSemicolonString string) []directoryWithOptionalFile {
+func testingCreateDirectoriesWithOptionalFile(t *testing.T, directoriesWithOptionalFileAsDelimitedSemicolonString string) []directoryWithOptionalFile {
 	var directoriesWithOptionalFile []directoryWithOptionalFile
 
 	//
@@ -33,27 +34,36 @@ func createDirectoriesWithOptionalFile(directoriesWithOptionalFileAsDelimitedSem
 		}
 		timeModified := time.Now()
 		// TODO: timeModified from string
-		var plainTextFile *plainTextFile = nil
+		var file *plainTextFile = nil
 		if directoryWithOptionalFileAsStrings[2] != "" {
-			plainTextFile.name = directoryWithOptionalFileAsStrings[2]
-			plainTextFile.content = ""
+			content := ""
 			if directoryWithOptionalFileAsStrings[3] != "" {
-				plainTextFile.content = directoryWithOptionalFileAsStrings[3]
+				content = directoryWithOptionalFileAsStrings[3]
+			}
+			file = &plainTextFile{
+				name:    directoryWithOptionalFileAsStrings[2],
+				content: content,
 			}
 		}
 		directoriesWithOptionalFile = append(directoriesWithOptionalFile, directoryWithOptionalFile{
 			path:          path,
 			timeModified:  timeModified,
-			plainTextFile: plainTextFile,
+			plainTextFile: file,
 		})
 	}
 
 	//
-	// for _, directoryWithOptionalFile := range directoriesWithOptionalFile {
-	// 	if directoryWithOptionalFile.path != "" {
-
-	// 	}
-	// }
+	for _, directoryWithOptionalFile := range directoriesWithOptionalFile {
+		if directoryWithOptionalFile.path != "" {
+			exists, err := utils.FileOrDirectoryExists(directoryWithOptionalFile.path)
+			if err != nil {
+				t.Errorf("Failed to write string: %v", err)
+			}
+			if !exists {
+				//
+			}
+		}
+	}
 
 	return directoriesWithOptionalFile
 }
