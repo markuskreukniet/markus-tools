@@ -57,7 +57,7 @@ func testingCreateDirectoriesWithOptionalFile(t *testing.T, directoriesWithOptio
 		if directoryWithOptionalFile.path != "" {
 			exists, err := utils.FileOrDirectoryExists(directoryWithOptionalFile.path)
 			if err != nil {
-				t.Errorf("Failed to write string: %v", err)
+				t.Errorf("Failed to check if FileOrDirectoryExists: %v", err)
 			}
 			if !exists {
 				//
