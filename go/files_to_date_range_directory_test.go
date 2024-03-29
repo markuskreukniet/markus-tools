@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -20,20 +22,15 @@ type directoryWithOptionalFile struct {
 	plainTextFile *plainTextFile
 }
 
-func testingCreateDirectoriesWithOptionalFile(t *testing.T, directoriesWithOptionalFileAsDelimitedSemicolonString string) []directoryWithOptionalFile {
-	var directoriesWithOptionalFile []directoryWithOptionalFile
+func testingCreateFilesAndDirectories(t *testing.T, directoriesWithOptionalFileAsDelimitedSemicolonString string) string {
+	t.Helper()
 
 	//
+	var directoriesWithOptionalFile []directoryWithOptionalFile
 	directoriesWithOptionalFileAsDelimitedSemicolonString = strings.TrimSuffix(directoriesWithOptionalFileAsDelimitedSemicolonString, ";")
 	directoriesWithOptionalFileAsDelimitedCommaString := strings.Split(directoriesWithOptionalFileAsDelimitedSemicolonString, ";")
 	for _, delimitedCommaString := range directoriesWithOptionalFileAsDelimitedCommaString {
 		directoryWithOptionalFileAsStrings := strings.Split(strings.TrimSpace(delimitedCommaString), ",")
-		path := ""
-		if directoryWithOptionalFileAsStrings[0] != "" {
-			path = directoryWithOptionalFileAsStrings[0]
-		}
-		timeModified := time.Now()
-		// TODO: timeModified from string
 		var file *plainTextFile = nil
 		if directoryWithOptionalFileAsStrings[2] != "" {
 			file = &plainTextFile{
@@ -41,27 +38,45 @@ func testingCreateDirectoriesWithOptionalFile(t *testing.T, directoriesWithOptio
 				content: directoryWithOptionalFileAsStrings[3],
 			}
 		}
+		// TODO: timeModified from string
 		directoriesWithOptionalFile = append(directoriesWithOptionalFile, directoryWithOptionalFile{
-			path:          path,
-			timeModified:  timeModified,
+			path:          directoryWithOptionalFileAsStrings[0],
+			timeModified:  time.Now(),
 			plainTextFile: file,
 		})
 	}
 
 	//
+	if len(directoriesWithOptionalFile) == 0 {
+		return ""
+	}
+	tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
+	if err != nil {
+		t.Errorf("Failed to create a temporary directory: %v", err)
+	}
 	for _, directoryWithOptionalFile := range directoriesWithOptionalFile {
+		filePath := ""
 		if directoryWithOptionalFile.path != "" {
-			exists, err := utils.FileOrDirectoryExists(directoryWithOptionalFile.path)
+			filePath = filepath.Join(tempDirectory, filepath.FromSlash(directoryWithOptionalFile.path))
+			exists, err := utils.FileOrDirectoryExists(filePath)
 			if err != nil {
-				t.Errorf("Failed to check if FileOrDirectoryExists: %v", err)
+				t.Errorf("Failed to check if a file or directory exists: %v", err)
 			}
 			if !exists {
-				//
+				if err := os.MkdirAll(filePath, 0755); err != nil {
+					t.Errorf("Failed to create a directory in the temporary directory: %v", err)
+				}
+			}
+		}
+		if directoryWithOptionalFile.plainTextFile != nil {
+			if err := os.WriteFile(filepath.Join(filePath, directoryWithOptionalFile.plainTextFile.name),
+				[]byte(directoryWithOptionalFile.plainTextFile.content), 0666); err != nil {
+				t.Errorf("Failed to create a file: %v", err)
 			}
 		}
 	}
 
-	return directoriesWithOptionalFile
+	return tempDirectory
 }
 
 func TestFilesToDateRangeDirectory(t *testing.T) {
