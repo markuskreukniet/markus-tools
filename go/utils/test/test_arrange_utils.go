@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
+
+	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
 type TestCaseMetadata struct {
 	Name    string
 	WantErr bool
 }
-
 type FileSystemPathEndParts struct {
 	DirectoryPathEndParts []string
 	FilePathEndParts      []string
@@ -100,4 +102,57 @@ func TestingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, fileSyst
 		}
 	}
 	return tempDirectory
+}
+
+// TODO: comment
+// type plainTextFile struct {
+// 	name    string
+// 	content string
+// }
+// type directoryWithOptionalFile struct {
+// 	path          string
+// 	timeModified  time.Time
+// 	plainTextFile *plainTextFile
+// }
+
+func TestingCreateFilesAndDirectories(t *testing.T, input string) (string, []utils.FileSystemNode) {
+	t.Helper()
+
+	// if empty input string, return empty temporary directory file path and empty FileSystemNode slice
+	if input == "" {
+		return "", nil
+	}
+
+	// create temporary directory tree
+	// return temporary directory file path and FileSystemNode slice
+	tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
+	if err != nil {
+		t.Errorf("Failed to create a temporary directory: %v", err)
+	}
+	var fileSystemNodes []utils.FileSystemNode
+	for _, delimitedCommaString := range strings.Split(strings.TrimSuffix(strings.TrimSpace(input), ";"), ";") {
+		directoryWithOptionalFileAsStrings := strings.Split(strings.TrimSpace(delimitedCommaString), ",")
+		filePath := filepath.Join(tempDirectory, filepath.FromSlash(directoryWithOptionalFileAsStrings[0]))
+		exists, err := utils.FileOrDirectoryExists(filePath)
+		if err != nil {
+			t.Errorf("Failed to check if a file or directory exists: %v", err)
+		}
+		if !exists {
+			if err := os.MkdirAll(filePath, 0755); err != nil {
+				t.Errorf("Failed to create a directory in the temporary directory: %v", err)
+			}
+		}
+		isDirectory := directoryWithOptionalFileAsStrings[2] == ""
+		if !isDirectory {
+			filePath = filepath.Join(filePath, directoryWithOptionalFileAsStrings[2])
+			if err := os.WriteFile(filePath, []byte(directoryWithOptionalFileAsStrings[3]), 0666); err != nil {
+				t.Errorf("Failed to create a file: %v", err)
+			}
+		}
+		fileSystemNodes = append(fileSystemNodes, utils.FileSystemNode{
+			Path:        filePath,
+			IsDirectory: isDirectory,
+		})
+	}
+	return tempDirectory, fileSystemNodes
 }
