@@ -17,12 +17,6 @@ func testingCreateContentString(filePath string, index int) string {
 	return fmt.Sprintf("content %s %d 1\ncontent %s %d 2", filePath, index, filePath, index)
 }
 
-// TODO: naming
-func testingTest(t *testing.T, directoryWithOptionalFileAsStrings []string, builder *strings.Builder) {
-	t.Helper()
-	test.TestingWriteString(t, directoryWithOptionalFileAsStrings[2]+"\n"+directoryWithOptionalFileAsStrings[3], builder)
-}
-
 func TestPlainTextFilesToText(t *testing.T) {
 	// arrange
 	testCases := []struct {
@@ -57,23 +51,21 @@ func TestPlainTextFilesToText(t *testing.T) {
 			defer test.TestingRemoveDirectoryTree(t, directory)
 			var builder strings.Builder
 			if directory != "" {
+				isFirstWrite := true
 				// TODO: duplicate
-				directoriesWithOptionalFileAsDelimitedCommaString := strings.Split(strings.TrimSuffix(strings.TrimSpace(tc.input), ";"), ";")
-				index := 0
-				for i, delimitedCommaString := range directoriesWithOptionalFileAsDelimitedCommaString {
+				for _, delimitedCommaString := range strings.Split(strings.TrimSuffix(strings.TrimSpace(tc.input), ";"), ";") {
 					// TODO: duplicate
 					directoryWithOptionalFileAsStrings := strings.Split(strings.TrimSpace(delimitedCommaString), ",")
 					if directoryWithOptionalFileAsStrings[3] != "" {
-						testingTest(t, directoryWithOptionalFileAsStrings, &builder)
-						index = i + 1
-						break
-					}
-				}
-				for i := index; i < len(directoriesWithOptionalFileAsDelimitedCommaString); i++ {
-					directoryWithOptionalFileAsStrings := strings.Split(directoriesWithOptionalFileAsDelimitedCommaString[i], ",")
-					if directoryWithOptionalFileAsStrings[3] != "" {
-						test.TestingWriteString(t, "\n\n", &builder)
-						testingTest(t, directoryWithOptionalFileAsStrings, &builder)
+
+						// not optimal but probably results in less code, which is fine for testing
+						if isFirstWrite {
+							isFirstWrite = false
+						} else {
+							test.TestingWriteString(t, "\n\n", &builder)
+						}
+
+						test.TestingWriteString(t, directoryWithOptionalFileAsStrings[2]+"\n"+directoryWithOptionalFileAsStrings[3], &builder)
 					}
 				}
 			}
