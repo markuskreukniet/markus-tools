@@ -62,6 +62,7 @@ func TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse() TestCaseMetadat
 	return TestingCreateTestCaseMetadata("Basic", false)
 }
 
+// TODO: rename and use in TestPlainTextFilesToText?
 func TestingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse() TestCaseMetadata {
 	return TestingCreateTestCaseMetadata("Empty FileSystemNodes", false)
 }
