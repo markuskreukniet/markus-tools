@@ -56,7 +56,6 @@ func TestPlainTextFilesToText(t *testing.T) {
 			directory, fileSystemNodes := test.TestingCreateFilesAndDirectories(t, tc.input)
 			defer test.TestingRemoveDirectoryTree(t, directory)
 			var builder strings.Builder
-			// TODO: if
 			if directory != "" {
 				// TODO: duplicate
 				directoriesWithOptionalFileAsDelimitedCommaString := strings.Split(strings.TrimSuffix(strings.TrimSpace(tc.input), ";"), ";")
