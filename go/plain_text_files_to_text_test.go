@@ -58,7 +58,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 					directoryWithOptionalFileAsStrings := strings.Split(strings.TrimSpace(delimitedCommaString), ",")
 					if directoryWithOptionalFileAsStrings[3] != "" {
 
-						// not optimal but probably results in less code, which is fine for testing
+						// probably not optimal but results in less code, which is fine for testing
 						if isFirstWrite {
 							isFirstWrite = false
 						} else {
