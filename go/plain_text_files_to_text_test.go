@@ -54,8 +54,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 				isFirstWrite := true
 				// TODO: duplicate
 				for _, delimitedCommaString := range strings.Split(strings.TrimSuffix(strings.TrimSpace(tc.input), ";"), ";") {
-					// TODO: duplicate
-					directoryWithOptionalFileAsStrings := strings.Split(strings.TrimSpace(delimitedCommaString), ",")
+					directoryWithOptionalFileAsStrings := test.TestingTrimSpaceAndSplitOnComma(delimitedCommaString)
 					if directoryWithOptionalFileAsStrings[3] != "" {
 
 						// probably not optimal but results in less code, which is fine for testing
