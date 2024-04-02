@@ -12,7 +12,7 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
 
-func testingHaveDirectoryTreesSameFilePathsOrGetFalse(t *testing.T, sourceDirectory, destinationDirectory string) bool {
+func testingHaveDirectoryTreesSameFilePaths(t *testing.T, sourceDirectory, destinationDirectory string) bool {
 	t.Helper()
 	if sourceDirectory == "" || destinationDirectory == "" {
 		return false
@@ -52,6 +52,10 @@ func testingContainsTxtFile4(stringSlice []string) bool {
 	}
 	return false
 }
+
+// func TestSynchronizeDirectoryTrees2(t *testing.T) {
+
+// }
 
 func TestSynchronizeDirectoryTrees(t *testing.T) {
 	// arrange
@@ -107,11 +111,11 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 
 			// assert
 			test.TestingAssertErrorToWantError(t, err, tc.metadata.WantErr)
-			haveSameFilePaths := testingHaveDirectoryTreesSameFilePathsOrGetFalse(t, sourceDirectory, destinationDirectory)
+			haveSameFilePaths := testingHaveDirectoryTreesSameFilePaths(t, sourceDirectory, destinationDirectory)
 			if tc.wantSameFilePaths && !haveSameFilePaths {
 				t.Errorf("The source and destination directory trees do not have the same file paths.")
 			}
-			haveSameFilePaths = testingHaveDirectoryTreesSameFilePathsOrGetFalse(t, destinationDirectory, sourceDirectory)
+			haveSameFilePaths = testingHaveDirectoryTreesSameFilePaths(t, destinationDirectory, sourceDirectory)
 			if tc.wantSameFilePaths && !haveSameFilePaths {
 				t.Errorf("The destination and source directory trees do not have the same file paths.")
 			}
