@@ -1,21 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
-
-func testingLastPathElementOnNewline(filePath string) string {
-	return fmt.Sprintf("%s\n", filepath.Base(filePath))
-}
-
-func testingCreateContentString(filePath string, index int) string {
-	return fmt.Sprintf("content %s %d 1\ncontent %s %d 2", filePath, index, filePath, index)
-}
 
 func TestPlainTextFilesToText(t *testing.T) {
 	// arrange
@@ -52,8 +42,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 			var builder strings.Builder
 			if directory != "" {
 				isFirstWrite := true
-				// TODO: duplicate
-				for _, delimitedCommaString := range strings.Split(strings.TrimSuffix(strings.TrimSpace(tc.input), ";"), ";") {
+				for _, delimitedCommaString := range test.TestingTrimSpaceTrimSuffixOnSemicolonAndSplitOnSemicolon(tc.input) {
 					directoryWithOptionalFileAsStrings := test.TestingTrimSpaceAndSplitOnComma(delimitedCommaString)
 					if directoryWithOptionalFileAsStrings[3] != "" {
 
@@ -77,97 +66,3 @@ func TestPlainTextFilesToText(t *testing.T) {
 		})
 	}
 }
-
-// func TestPlainTextFilesToText(t *testing.T) {
-// 	// arrange
-
-// 	Directory1 = "directory 1"
-// 	Directory2 = "directory 2"
-// 	Directory2WithDirectory3 = filepath.Join(Directory2, "directory 2")
-// 	Directory2WithDirectory4 = filepath.Join(Directory2, "directory 4")
-
-// 	TxtFile1 = filepath.Join(Directory1, "file 1.txt")
-// 	TxtFile3 = filepath.Join(Directory2WithDirectory3, "file 3.txt")
-// 	TxtFile6 = filepath.Join(Directory2WithDirectory4, "file 6.txt")
-// 	JpgFile4 = filepath.Join(Directory1, "file 4.jpg")
-
-// 	//
-
-// 	input := `
-// 		directory 1,,txt 1.txt,content directory 1 1\ncontent directory 1 1;
-// 		directory 1,,jpg 1.jpg,;
-// 		directory 2/directory 2,,txt 2-3.txt,content directory 2/directory 2 2-3\ncontent directory 2/directory 2 2-3;
-// 		directory 2/directory 2,,txt 2-3 2.txt,content directory 2/directory 2 2-3 2\ncontent directory 2/directory 2 2-3 2;
-// 	`
-
-// 	TestingCreateFilesAndDirectories
-
-// 	// arrange
-// 	fileSystemPathEndParts := test.FileSystemPathEndParts{
-// 		DirectoryPathEndParts: []string{test.Directory1, test.Directory2WithDirectory3, test.Directory2WithDirectory4},
-// 		FilePathEndParts:      []string{test.TxtFile1, test.TxtFile3, test.TxtFile6, test.JpgFile4},
-// 	}
-// 	plainTextFilePathEndParts := []string{test.TxtFile1, test.TxtFile3, test.TxtFile6}
-// 	fileSystemNodes := []utils.FileSystemNode{
-// 		{
-// 			Path:        test.TxtFile1,
-// 			IsDirectory: false,
-// 		},
-// 		{
-// 			Path:        test.Directory2,
-// 			IsDirectory: true,
-// 		},
-// 	}
-// 	var emptyFileSystemNodes []utils.FileSystemNode
-
-// 	testCases := []struct {
-// 		metadata                  test.TestCaseMetadata
-// 		plainTextFilePathEndParts []string
-// 		fileSystemNodes           []utils.FileSystemNode
-// 	}{
-// 		{
-// 			metadata:                  test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
-// 			plainTextFilePathEndParts: plainTextFilePathEndParts,
-// 			fileSystemNodes:           fileSystemNodes,
-// 		},
-// 		{
-// 			metadata:                  test.TestingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse(),
-// 			plainTextFilePathEndParts: test.EmptyPathEndParts,
-// 			fileSystemNodes:           emptyFileSystemNodes,
-// 		},
-// 	}
-
-// 	for _, tc := range testCases {
-// 		t.Run(tc.metadata.Name, func(t *testing.T) {
-// 			// arrange and teardown
-// 			directory := test.TestingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
-// 			defer test.TestingRemoveDirectoryTree(t, directory)
-// 			for i := range tc.fileSystemNodes {
-// 				tc.fileSystemNodes[i].Path = filepath.Join(directory, tc.fileSystemNodes[i].Path)
-// 			}
-// 			var builder strings.Builder
-// 			// TODO: tc.PlainTextFilePathEndParts to full path happens also in testingCreateTempFileSystemStructureOrGetEmptyString?
-// 			if len(tc.plainTextFilePathEndParts) > 0 {
-// 				fullPath := filepath.Join(directory, tc.plainTextFilePathEndParts[0])
-// 				content := testingCreateContentString(fullPath, 0)
-// 				test.TestingWriteFileContent(t, fullPath, content)
-// 				test.TestingWriteString(t, testingLastPathElementOnNewline(tc.plainTextFilePathEndParts[0]), &builder)
-// 				test.TestingWriteString(t, content, &builder)
-// 				for i := 1; i < len(tc.plainTextFilePathEndParts); i++ {
-// 					fullPath := filepath.Join(directory, tc.plainTextFilePathEndParts[i])
-// 					content := testingCreateContentString(fullPath, i)
-// 					test.TestingWriteFileContent(t, fullPath, content)
-// 					test.TestingWriteString(t, "\n\n", &builder)
-// 					test.TestingWriteString(t, testingLastPathElementOnNewline(tc.plainTextFilePathEndParts[i]), &builder)
-// 					test.TestingWriteString(t, content, &builder)
-// 				}
-// 			}
-
-// 			// act
-// 			outcome, err := plainTextFilesToText(tc.fileSystemNodes)
-
-// 			// assert
-// 			test.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.metadata.WantErr, builder, outcome)
-// 		})
-// 	}
-// }

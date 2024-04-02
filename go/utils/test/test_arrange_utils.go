@@ -116,6 +116,10 @@ func TestingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, fileSyst
 // 	plainTextFile *plainTextFile
 // }
 
+func TestingTrimSpaceTrimSuffixOnSemicolonAndSplitOnSemicolon(delimitedSemicolonString string) []string {
+	return strings.Split(strings.TrimSuffix(strings.TrimSpace(delimitedSemicolonString), ";"), ";")
+}
+
 func TestingTrimSpaceAndSplitOnComma(delimitedCommaString string) []string {
 	return strings.Split(strings.TrimSpace(delimitedCommaString), ",")
 }
@@ -135,7 +139,7 @@ func TestingCreateFilesAndDirectories(t *testing.T, input string) (string, []uti
 		t.Errorf("Failed to create a temporary directory: %v", err)
 	}
 	var fileSystemNodes []utils.FileSystemNode
-	for _, delimitedCommaString := range strings.Split(strings.TrimSuffix(strings.TrimSpace(input), ";"), ";") {
+	for _, delimitedCommaString := range TestingTrimSpaceTrimSuffixOnSemicolonAndSplitOnSemicolon(input) {
 		directoryWithOptionalFileAsStrings := TestingTrimSpaceAndSplitOnComma(delimitedCommaString)
 		filePath := filepath.Join(tempDirectory, filepath.FromSlash(directoryWithOptionalFileAsStrings[0]))
 		exists, err := utils.FileOrDirectoryExists(filePath)
