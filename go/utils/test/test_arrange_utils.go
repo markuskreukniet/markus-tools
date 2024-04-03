@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
@@ -156,6 +157,16 @@ func TestingCreateFilesAndDirectories(t *testing.T, input string) (string, []uti
 			filePath = filepath.Join(filePath, directoryWithOptionalFileAsStrings[2])
 			if err := os.WriteFile(filePath, []byte(directoryWithOptionalFileAsStrings[3]), 0666); err != nil {
 				t.Errorf("Failed to create a file: %v", err)
+			}
+			if directoryWithOptionalFileAsStrings[1] != "" {
+				// 2006-01-02T15:04:05Z is ISO 8601 format
+				timeModified, err := time.Parse("2006-01-02T15:04:05Z", directoryWithOptionalFileAsStrings[1])
+				if err != nil {
+					t.Errorf("Failed to parse time: %v", err)
+				}
+				if os.Chtimes(filePath, time.Now(), timeModified); err != nil {
+					t.Errorf("Failed to change the access and modification times of the file: %v", err)
+				}
 			}
 		}
 		fileSystemNodes = append(fileSystemNodes, utils.FileSystemNode{
