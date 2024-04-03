@@ -20,8 +20,8 @@ func TestPlainTextFilesToText(t *testing.T) {
 				,,jpg 0.jpg,;
 				empty,,,;
 				directory 1/empty,,,;
-				directory 1/directory 2,,txt 1-2.txt,content directory 1/directory 2 1-2\ncontent directory 1/directory 2 1-2;
-				directory 1/directory 2,,txt 1-2 2.txt,content directory 1/directory 2 1-2 2\ncontent directory 1/directory 2 1-2 2;
+				directory 1/directory 2,,txt 1-2.txt,content directory 1/directory\ncontent 2 1-2;
+				directory 1/directory 2,,txt 1-2 2.txt,content directory 1/directory\ncontent 2 1-2 2;
 			`,
 		},
 		{

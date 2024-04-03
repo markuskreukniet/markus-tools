@@ -65,7 +65,7 @@ func TestSynchronizeDirectoryTrees2(t *testing.T) {
 	// directory 2/directory 3,,txt 2-3 3.txt,;
 
 	// Should get updated in destination:
-	// directory 2/directory 3,2020-02-20T20:40:40Z,txt 2-3 2.txt,content directory 2/directory 3 2-3 2 old\ncontent directory 2/directory 3 2-3 2 old;
+	// directory 2/directory 3,2020-02-20T20:40:40Z,txt 2-3 2.txt,content directory 2/directory\ncontent 3 2-3 2 old;
 	sourceInput := `
 		empty,,,;
 		,,txt 0.txt,;
@@ -73,7 +73,7 @@ func TestSynchronizeDirectoryTrees2(t *testing.T) {
 		directory 1,,txt 1.txt,;
 		directory 2/empty,,,;
 		directory 2/directory 3,,txt 2-3.txt,;
-		directory 2/directory 3,2020-02-20T20:40:41Z,txt 2-3 2.txt,content directory 2/directory 3 2-3 2 new\ncontent directory 2/directory 3 2-3 2 new;
+		directory 2/directory 3,2020-02-20T20:40:41Z,txt 2-3 2.txt,content directory 2/directory\ncontent 3 2-3 2 new;
 	`
 	destinationInput := `
 		empty,,,;
@@ -81,7 +81,7 @@ func TestSynchronizeDirectoryTrees2(t *testing.T) {
 		directory 1,,txt 1.txt,;
 		directory 2/directory 3/empty,,,;
 		directory 2/directory 3,,txt 2-3.txt,;
-		directory 2/directory 3,2020-02-20T20:40:40Z,txt 2-3 2.txt,content directory 2/directory 3 2-3 2 old\ncontent directory 2/directory 3 2-3 2 old;
+		directory 2/directory 3,2020-02-20T20:40:40Z,txt 2-3 2.txt,content directory 2/directory\ncontent 3 2-3 2 old;
 		directory 2/directory 3,,txt 2-3 3.txt,;
 	`
 
