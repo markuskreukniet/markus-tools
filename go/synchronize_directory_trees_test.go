@@ -12,6 +12,11 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
 
+type filePathEndPartContent struct {
+	filePathEndPart string
+	content         string
+}
+
 func testingHaveDirectoryTreesSameFilePaths(t *testing.T, sourceDirectory, destinationDirectory string) bool {
 	t.Helper()
 	if sourceDirectory == "" || destinationDirectory == "" {
@@ -90,18 +95,24 @@ func TestSynchronizeDirectoryTrees2(t *testing.T) {
 		metadata          test.TestCaseMetadata
 		sourceInput       string
 		destinationInput  string
+		updatedFile       filePathEndPartContent
 		wantSameFilePaths bool
 	}{
 		{
-			metadata:          test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
-			sourceInput:       sourceInput,
-			destinationInput:  destinationInput,
+			metadata:         test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
+			sourceInput:      sourceInput,
+			destinationInput: destinationInput,
+			updatedFile: filePathEndPartContent{
+				filePathEndPart: "directory 2/directory 3/txt 2-3 2.txt",
+				content:         "content directory 2/directory\ncontent 3 2-3 2 new",
+			},
 			wantSameFilePaths: true,
 		},
 		{
 			metadata:          test.TestingCreateTestCaseMetadataWithWantErrTrue("Empty destinationInput"),
 			sourceInput:       sourceInput,
 			destinationInput:  "",
+			updatedFile:       filePathEndPartContent{},
 			wantSameFilePaths: false,
 		},
 	}
@@ -114,6 +125,13 @@ func TestSynchronizeDirectoryTrees2(t *testing.T) {
 			defer test.TestingRemoveDirectoryTree(t, sourceDirectory)
 			destinationDirectory, _ := test.TestingCreateFilesAndDirectories(t, tc.destinationInput)
 			defer test.TestingRemoveDirectoryTree(t, destinationDirectory)
+
+			// if sourceDirectory != "" &&
+			// 	destinationDirectory != "" &&
+			// 	tc.updatedFile.filePathEndPart != "" &&
+			// 	tc.updatedFile.content != "" {
+
+			// }
 
 			// act
 			// err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)

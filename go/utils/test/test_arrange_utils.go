@@ -117,10 +117,12 @@ func TestingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, fileSyst
 // 	plainTextFile *plainTextFile
 // }
 
+// TODO: is it an arrange function?
 func TestingTrimSpaceTrimSuffixOnSemicolonAndSplitOnSemicolon(delimitedSemicolonString string) []string {
 	return strings.Split(strings.TrimSuffix(strings.TrimSpace(delimitedSemicolonString), ";"), ";")
 }
 
+// TODO: is it an arrange function?
 func TestingTrimSpaceAndSplitOnComma(delimitedCommaString string) []string {
 	return strings.Split(strings.TrimSpace(delimitedCommaString), ",")
 }
