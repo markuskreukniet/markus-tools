@@ -53,9 +53,38 @@ func testingContainsTxtFile4(stringSlice []string) bool {
 	return false
 }
 
-// func TestSynchronizeDirectoryTrees2(t *testing.T) {
+func TestSynchronizeDirectoryTrees2(t *testing.T) {
+	// arrange
 
-// }
+	// Destination misses:
+	// ,,jpg 0.jpg,;
+	// directory 2/empty,,,;
+
+	// Destination should not have:
+	// directory 2/directory 3/empty,,,;
+	// directory 2/directory 3,,txt 2-3 3.txt,;
+
+	// Should get updated in destination:
+	// directory 2/directory 3,,txt 2-3 2.txt,;
+	// sourceInput := `
+	// 	empty,,,;
+	// 	,,txt 0.txt,;
+	// 	,,jpg 0.jpg,;
+	// 	directory 1,,txt 1.txt,;
+	// 	directory 2/empty,,,;
+	// 	directory 2/directory 3,,txt 2-3.txt,;
+	// 	directory 2/directory 3,,txt 2-3 2.txt,; // time
+	// `
+	// destinationInput := `
+	// 	empty,,,;
+	// 	,,txt 0.txt,;
+	// 	directory 1,,txt 1.txt,;
+	// 	directory 2/directory 3/empty,,,;
+	// 	directory 2/directory 3,,txt 2-3.txt,;
+	// 	directory 2/directory 3,,txt 2-3 2.txt,; // time
+	// 	directory 2/directory 3,,txt 2-3 3.txt,;
+	// `
+}
 
 func TestSynchronizeDirectoryTrees(t *testing.T) {
 	// arrange
