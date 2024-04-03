@@ -60,32 +60,19 @@ func testingContainsTxtFile4(stringSlice []string) bool {
 
 func TestSynchronizeDirectoryTrees2(t *testing.T) {
 	// arrange
-
-	// Destination misses:
-	// ,,jpg 0.jpg,;
-	// directory 2/empty,,,;
-
-	// Destination should not have:
-	// directory 2/directory 3/empty,,,;
-	// directory 2/directory 3,,txt 2-3 3.txt,;
-
-	// Should get updated in destination:
-	// directory 2/directory 3,2020-02-20T20:40:40Z,txt 2-3 2.txt,content directory 2/directory\ncontent 3 2-3 2 old;
-	sourceInput := `
+	newContent := "content directory 2/directory\ncontent 3 2-3 2 new"
+	input := `
 		empty,,,;
 		,,txt 0.txt,;
-		,,jpg 0.jpg,;
 		directory 1,,txt 1.txt,;
-		directory 2/empty,,,;
 		directory 2/directory 3,,txt 2-3.txt,;
-		directory 2/directory 3,2020-02-20T20:40:41Z,txt 2-3 2.txt,content directory 2/directory\ncontent 3 2-3 2 new;
 	`
-	destinationInput := `
-		empty,,,;
-		,,txt 0.txt,;
-		directory 1,,txt 1.txt,;
+	sourceInput := input + `
+		,,jpg 0.jpg,;
+		directory 2/empty,,,;
+		directory 2/directory 3,2020-02-20T20:40:41Z,txt 2-3 2.txt,` + newContent + ";"
+	destinationInput := input + `
 		directory 2/directory 3/empty,,,;
-		directory 2/directory 3,,txt 2-3.txt,;
 		directory 2/directory 3,2020-02-20T20:40:40Z,txt 2-3 2.txt,content directory 2/directory\ncontent 3 2-3 2 old;
 		directory 2/directory 3,,txt 2-3 3.txt,;
 	`
@@ -103,8 +90,8 @@ func TestSynchronizeDirectoryTrees2(t *testing.T) {
 			sourceInput:      sourceInput,
 			destinationInput: destinationInput,
 			updatedFile: filePathEndPartContent{
-				filePathEndPart: "directory 2/directory 3/txt 2-3 2.txt",
-				content:         "content directory 2/directory\ncontent 3 2-3 2 new",
+				filePathEndPart: "directory 2/directory 3/txt 2-3 2.txt", // TODO: should be a combination of two vars and "/"?
+				content:         newContent,
 			},
 			wantSameFilePaths: true,
 		},
