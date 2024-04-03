@@ -66,24 +66,61 @@ func TestSynchronizeDirectoryTrees2(t *testing.T) {
 
 	// Should get updated in destination:
 	// directory 2/directory 3,,txt 2-3 2.txt,;
-	// sourceInput := `
-	// 	empty,,,;
-	// 	,,txt 0.txt,;
-	// 	,,jpg 0.jpg,;
-	// 	directory 1,,txt 1.txt,;
-	// 	directory 2/empty,,,;
-	// 	directory 2/directory 3,,txt 2-3.txt,;
-	// 	directory 2/directory 3,,txt 2-3 2.txt,; // time
-	// `
-	// destinationInput := `
-	// 	empty,,,;
-	// 	,,txt 0.txt,;
-	// 	directory 1,,txt 1.txt,;
-	// 	directory 2/directory 3/empty,,,;
-	// 	directory 2/directory 3,,txt 2-3.txt,;
-	// 	directory 2/directory 3,,txt 2-3 2.txt,; // time
-	// 	directory 2/directory 3,,txt 2-3 3.txt,;
-	// `
+	sourceInput := `
+		empty,,,;
+		,,txt 0.txt,;
+		,,jpg 0.jpg,;
+		directory 1,,txt 1.txt,;
+		directory 2/empty,,,;
+		directory 2/directory 3,,txt 2-3.txt,;
+		directory 2/directory 3,2020-02-20T20:40:40Z,txt 2-3 2.txt,;
+	`
+	destinationInput := `
+		empty,,,;
+		,,txt 0.txt,;
+		directory 1,,txt 1.txt,;
+		directory 2/directory 3/empty,,,;
+		directory 2/directory 3,,txt 2-3.txt,;
+		directory 2/directory 3,2020-02-20T20:40:41Z,txt 2-3 2.txt,;
+		directory 2/directory 3,,txt 2-3 3.txt,;
+	`
+
+	// create testCases
+	testCases := []struct {
+		metadata          test.TestCaseMetadata
+		sourceInput       string
+		destinationInput  string
+		wantSameFilePaths bool
+	}{
+		{
+			metadata:          test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
+			sourceInput:       sourceInput,
+			destinationInput:  destinationInput,
+			wantSameFilePaths: true,
+		},
+		{
+			metadata:          test.TestingCreateTestCaseMetadataWithWantErrTrue("Empty destinationInput"),
+			sourceInput:       sourceInput,
+			destinationInput:  "",
+			wantSameFilePaths: false,
+		},
+	}
+
+	// run testCases
+	for _, tc := range testCases {
+		t.Run(tc.metadata.Name, func(t *testing.T) {
+			// arrange and teardown
+			sourceDirectory, _ := test.TestingCreateFilesAndDirectories(t, tc.destinationInput)
+			defer test.TestingRemoveDirectoryTree(t, sourceDirectory)
+			destinationDirectory, _ := test.TestingCreateFilesAndDirectories(t, tc.destinationInput)
+			defer test.TestingRemoveDirectoryTree(t, destinationDirectory)
+
+			// act
+			// err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
+
+			// assert
+		})
+	}
 }
 
 func TestSynchronizeDirectoryTrees(t *testing.T) {
