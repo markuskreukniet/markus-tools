@@ -113,17 +113,22 @@ func TestSynchronizeDirectoryTrees2(t *testing.T) {
 			destinationDirectory, _ := test.TestingCreateFilesAndDirectories(t, tc.destinationInput)
 			defer test.TestingRemoveDirectoryTree(t, destinationDirectory)
 
-			// if sourceDirectory != "" &&
-			// 	destinationDirectory != "" &&
-			// 	tc.updatedFile.filePathEndPart != "" &&
-			// 	tc.updatedFile.content != "" {
-
-			// }
-
 			// act
-			// err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
+			err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
 
 			// assert
+			test.TestingAssertErrorToWantError(t, err, tc.metadata.WantErr)
+			haveSameFilePaths := testingHaveDirectoryTreesSameFilePaths(t, sourceDirectory, destinationDirectory)
+			if tc.wantSameFilePaths && !haveSameFilePaths {
+				t.Errorf("The source and destination directory trees do not have the same file paths.")
+			}
+			haveSameFilePaths = testingHaveDirectoryTreesSameFilePaths(t, destinationDirectory, sourceDirectory)
+			if tc.wantSameFilePaths && !haveSameFilePaths {
+				t.Errorf("The destination and source directory trees do not have the same file paths.")
+			}
+			// if tc.updatedFile.filePathEndPart != "" && tc.updatedFile.content != "" {
+
+			// }
 		})
 	}
 }
