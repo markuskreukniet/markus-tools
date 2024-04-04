@@ -127,6 +127,11 @@ func TestingTrimSpaceAndSplitOnComma(delimitedCommaString string) []string {
 	return strings.Split(strings.TrimSpace(delimitedCommaString), ",")
 }
 
+// TODO: is it an arrange function?
+func ToFilePathFromSlashAndJoin(filePath, filePathEndPart string) string {
+	return filepath.Join(filePath, filepath.FromSlash(filePathEndPart))
+}
+
 func TestingCreateFilesAndDirectories(t *testing.T, input string) (string, []utils.FileSystemNode) {
 	t.Helper()
 
@@ -144,7 +149,7 @@ func TestingCreateFilesAndDirectories(t *testing.T, input string) (string, []uti
 	var fileSystemNodes []utils.FileSystemNode
 	for _, delimitedCommaString := range TestingTrimSpaceTrimSuffixOnSemicolonAndSplitOnSemicolon(input) {
 		directoryWithOptionalFileAsStrings := TestingTrimSpaceAndSplitOnComma(delimitedCommaString)
-		filePath := filepath.Join(tempDirectory, filepath.FromSlash(directoryWithOptionalFileAsStrings[0]))
+		filePath := ToFilePathFromSlashAndJoin(tempDirectory, directoryWithOptionalFileAsStrings[0])
 		exists, err := utils.FileOrDirectoryExists(filePath)
 		if err != nil {
 			t.Errorf("Failed to check if a file or directory exists: %v", err)

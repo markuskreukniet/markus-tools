@@ -108,7 +108,7 @@ func TestSynchronizeDirectoryTrees2(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			sourceDirectory, _ := test.TestingCreateFilesAndDirectories(t, tc.destinationInput)
+			sourceDirectory, _ := test.TestingCreateFilesAndDirectories(t, tc.sourceInput)
 			defer test.TestingRemoveDirectoryTree(t, sourceDirectory)
 			destinationDirectory, _ := test.TestingCreateFilesAndDirectories(t, tc.destinationInput)
 			defer test.TestingRemoveDirectoryTree(t, destinationDirectory)
@@ -126,9 +126,22 @@ func TestSynchronizeDirectoryTrees2(t *testing.T) {
 			if tc.wantSameFilePaths && !haveSameFilePaths {
 				t.Errorf("The destination and source directory trees do not have the same file paths.")
 			}
-			// if tc.updatedFile.filePathEndPart != "" && tc.updatedFile.content != "" {
-
-			// }
+			if tc.updatedFile.filePathEndPart != "" && tc.updatedFile.content != "" {
+				file, err := os.Open(test.ToFilePathFromSlashAndJoin(destinationDirectory, tc.updatedFile.filePathEndPart))
+				if err != nil {
+					t.Errorf("Failed to open file: %v", err)
+				}
+				defer file.Close()
+				var builder strings.Builder
+				scanner := bufio.NewScanner(file)
+				for scanner.Scan() {
+					test.TestingWriteString(t, scanner.Text(), &builder)
+				}
+				if err = scanner.Err(); err != nil {
+					t.Errorf("Failed to read file content: %v", err)
+				}
+				test.TestingAssertEqualStrings(t, builder.String(), tc.updatedFile.content)
+			}
 		})
 	}
 }
