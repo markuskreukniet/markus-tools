@@ -56,7 +56,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 		directory 2/directory 3,,txt 2-3.txt,;
 	`
 
-	// Some file systems have a resolution of one second, so the file should be at least a second newer.
+	// Some file systems have a resolution of one second, so the new file should be at least a second newer.
 	sourceInput := input + `
 		,,jpg 0.jpg,;
 		directory 2/empty,,,;
