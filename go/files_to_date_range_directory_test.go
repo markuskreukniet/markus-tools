@@ -1,10 +1,28 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
+
+func getDirectoryPathsAndNamesFromDirectory(directoryFilePath string) ([]string, []string, error) {
+	entries, err := os.ReadDir(directoryFilePath)
+	if err != nil {
+		return nil, nil, err
+	}
+	var filePaths []string
+	var names []string
+	for _, entry := range entries {
+		if entry.IsDir() {
+			names = append(names, entry.Name())
+			filePaths = append(filePaths, filepath.Join(directoryFilePath, entry.Name()))
+		}
+	}
+	return filePaths, names, nil
+}
 
 func TestFilesToDateRangeDirectory(t *testing.T) {
 	// arrange
