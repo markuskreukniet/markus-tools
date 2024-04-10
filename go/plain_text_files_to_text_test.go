@@ -37,12 +37,13 @@ func TestPlainTextFilesToText(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			directory, fileSystemNodes := test.TestingCreateFilesAndDirectories(t, tc.input)
-			defer test.TestingRemoveDirectoryTree(t, directory)
+			directories, fileSystemNodes := test.TestingCreateFilesAndDirectories2(t, tc.input)
+			defer test.TestingRemoveDirectoryTrees(t, directories)
 			var builder strings.Builder
-			if directory != "" {
+			if len(directories) > 0 {
 				isFirstWrite := true
-				for _, delimitedCommaString := range test.TestingTrimSpaceTrimSuffixOnSemicolonAndSplitOnSemicolon(tc.input) {
+				delimitedCommaStrings := test.TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.input)
+				for _, delimitedCommaString := range delimitedCommaStrings {
 					directoryWithOptionalFileAsStrings := test.TestingTrimSpaceAndSplitOnComma(delimitedCommaString)
 					if directoryWithOptionalFileAsStrings[3] != "" {
 

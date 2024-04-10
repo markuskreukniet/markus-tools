@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -117,7 +118,15 @@ func TestingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, fileSyst
 // 	plainTextFile *plainTextFile
 // }
 
-// TODO: is it an arrange function?
+// TODO: is it an arrange function? Should it be a separate function
+func TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(delimitedSemicolonString string) []string {
+	delimitedCommaStrings := strings.Split(strings.TrimSuffix(strings.TrimSpace(delimitedSemicolonString), ";"), ";")
+	slices.Sort(delimitedCommaStrings)
+	return delimitedCommaStrings
+}
+
+// TODO: is it an arrange function? Should it be a separate function
+// TODO: remove
 func TestingTrimSpaceTrimSuffixOnSemicolonAndSplitOnSemicolon(delimitedSemicolonString string) []string {
 	return strings.Split(strings.TrimSuffix(strings.TrimSpace(delimitedSemicolonString), ";"), ";")
 }
@@ -132,6 +141,77 @@ func ToFilePathFromSlashAndJoin(filePath, filePathEndPart string) string {
 	return filepath.Join(filePath, filepath.FromSlash(filePathEndPart))
 }
 
+// It should not always have to return a slice, but it is fine for testing.
+// And disk I/O operations are significantly slower than in-memory operations.
+func TestingCreateFilesAndDirectories2(t *testing.T, input string) ([]string, []utils.FileSystemNode) {
+	t.Helper()
+
+	// if empty input string, return empty temporary directory file path and empty FileSystemNode slice
+	if input == "" {
+		return nil, nil
+	}
+
+	// create input groups
+	var inputGroups [][][]string
+	delimitedCommaStrings := TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(input)
+	for i := range delimitedCommaStrings {
+		index := len(inputGroups) - 1
+		substrings := TestingTrimSpaceAndSplitOnComma(delimitedCommaStrings[i])
+		if i == 0 || substrings[0] == "" || substrings[0] != inputGroups[index][0][0] {
+			inputGroups = append(inputGroups, [][]string{substrings})
+		} else {
+			inputGroups[index] = append(inputGroups[index], substrings)
+		}
+	}
+
+	// create and return temporary directories
+	// create and return fileSystemNodes
+	var tempDirectories []string
+	var fileSystemNodes []utils.FileSystemNode
+	for _, group := range inputGroups {
+		tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
+		if err != nil {
+			t.Errorf("Failed to create a temporary directory: %v", err)
+		}
+		tempDirectories = append(tempDirectories, tempDirectory)
+		for i, inputLine := range group {
+			filePath := ToFilePathFromSlashAndJoin(tempDirectory, inputLine[0])
+			isDirectory := inputLine[2] == ""
+
+			// probably not optimal but results in less code, which is fine for testing
+			// It should be possible to add more than one empty directory.
+			if i == 0 || isDirectory {
+				if err := os.MkdirAll(filePath, 0755); err != nil {
+					t.Errorf("Failed to create a directory in the temporary directory: %v", err)
+				}
+			}
+			if !isDirectory {
+				filePath = filepath.Join(filePath, inputLine[2])
+				if err := os.WriteFile(filePath, []byte(inputLine[3]), 0666); err != nil {
+					t.Errorf("Failed to create a file: %v", err)
+				}
+				if inputLine[1] != "" {
+					// 2006-01-02T15:04:05Z is ISO 8601 format
+					timeModified, err := time.Parse("2006-01-02T15:04:05Z", inputLine[1])
+					if err != nil {
+						t.Errorf("Failed to parse time: %v", err)
+					}
+					if os.Chtimes(filePath, time.Now(), timeModified); err != nil {
+						t.Errorf("Failed to change the access and modification times of the file: %v", err)
+					}
+				}
+			}
+
+			fileSystemNodes = append(fileSystemNodes, utils.FileSystemNode{
+				Path:        filePath,
+				IsDirectory: isDirectory,
+			})
+		}
+	}
+	return tempDirectories, fileSystemNodes
+}
+
+// TODO: remove and rename TestingCreateFilesAndDirectories2
 // It should not always have to return a slice, but it is fine for testing.
 func TestingCreateFilesAndDirectories(t *testing.T, input string) (string, []utils.FileSystemNode) {
 	t.Helper()

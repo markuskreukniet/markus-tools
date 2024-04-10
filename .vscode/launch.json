@@ -25,6 +25,13 @@
       "presentation": {
         "hidden": true
       }
+    },
+    {
+      "name": "Debug Go Tests in /go Directory",
+      "type": "go",
+      "request": "launch",
+      "mode": "test",
+      "program": "${workspaceFolder}/go"
     }
   ],
   "compounds": [

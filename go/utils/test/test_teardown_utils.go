@@ -11,3 +11,12 @@ func TestingRemoveDirectoryTree(t *testing.T, directory string) {
 		t.Errorf("Failed to remove the directory tree: %v", err)
 	}
 }
+
+// TODO: only this function one should exist?
+func TestingRemoveDirectoryTrees(t *testing.T, directories []string) {
+	t.Helper()
+
+	for _, directory := range directories {
+		TestingRemoveDirectoryTree(t, directory)
+	}
+}
