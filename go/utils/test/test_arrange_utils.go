@@ -211,7 +211,9 @@ func TestingCreateFilesAndDirectories2(t *testing.T, input string) ([]string, []
 	return tempDirectories, fileSystemNodes
 }
 
-// TODO: remove and rename TestingCreateFilesAndDirectories2
+// This function has to stay for synchronizing directory trees.
+// When we add a prefix to all input lines so that TestingCreateFilesAndDirectories2 can be used, all the folders with that prefix are added to the destination directory when syncing.
+// TODO: rename TestingCreateFilesAndDirectories2
 // It should not always have to return a slice, but it is fine for testing.
 func TestingCreateFilesAndDirectories(t *testing.T, input string) (string, []utils.FileSystemNode) {
 	t.Helper()
