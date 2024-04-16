@@ -141,6 +141,36 @@ func ToFilePathFromSlashAndJoin(filePath, filePathEndPart string) string {
 	return filepath.Join(filePath, filepath.FromSlash(filePathEndPart))
 }
 
+func testingCreateDirectoryAll(t *testing.T, filePath string) {
+	if err := os.MkdirAll(filePath, 0755); err != nil {
+		t.Errorf("Failed to create a directory in the temporary directory: %v", err)
+	}
+}
+
+func testingCreateFileAndAppendFileSystemNode(t *testing.T, isDirectory bool, filePath string, inputLine []string, fileSystemNodes *[]utils.FileSystemNode) {
+	if !isDirectory {
+		filePath = filepath.Join(filePath, inputLine[2])
+		if err := os.WriteFile(filePath, []byte(inputLine[3]), 0666); err != nil {
+			t.Errorf("Failed to create a file: %v", err)
+		}
+		if inputLine[1] != "" {
+			// 2006-01-02T15:04:05Z is ISO 8601 format
+			timeModified, err := time.Parse("2006-01-02T15:04:05Z", inputLine[1])
+			if err != nil {
+				t.Errorf("Failed to parse time: %v", err)
+			}
+			if os.Chtimes(filePath, time.Now(), timeModified); err != nil {
+				t.Errorf("Failed to change the access and modification times of the file: %v", err)
+			}
+		}
+	}
+	*fileSystemNodes = append(*fileSystemNodes, utils.FileSystemNode{
+		Path:        filePath,
+		IsDirectory: isDirectory,
+	})
+}
+
+// TODO: maybe using an [][][]string is not needed
 // It should not always have to return a slice, but it is fine for testing.
 // And disk I/O operations are significantly slower than in-memory operations.
 func TestingCreateFilesAndDirectories2(t *testing.T, input string) ([]string, []utils.FileSystemNode) {
@@ -181,31 +211,9 @@ func TestingCreateFilesAndDirectories2(t *testing.T, input string) ([]string, []
 			// probably not optimal but results in less code, which is fine for testing
 			// It should be possible to add more than one empty directory.
 			if i == 0 || isDirectory {
-				if err := os.MkdirAll(filePath, 0755); err != nil {
-					t.Errorf("Failed to create a directory in the temporary directory: %v", err)
-				}
+				testingCreateDirectoryAll(t, filePath)
 			}
-			if !isDirectory {
-				filePath = filepath.Join(filePath, inputLine[2])
-				if err := os.WriteFile(filePath, []byte(inputLine[3]), 0666); err != nil {
-					t.Errorf("Failed to create a file: %v", err)
-				}
-				if inputLine[1] != "" {
-					// 2006-01-02T15:04:05Z is ISO 8601 format
-					timeModified, err := time.Parse("2006-01-02T15:04:05Z", inputLine[1])
-					if err != nil {
-						t.Errorf("Failed to parse time: %v", err)
-					}
-					if os.Chtimes(filePath, time.Now(), timeModified); err != nil {
-						t.Errorf("Failed to change the access and modification times of the file: %v", err)
-					}
-				}
-			}
-
-			fileSystemNodes = append(fileSystemNodes, utils.FileSystemNode{
-				Path:        filePath,
-				IsDirectory: isDirectory,
-			})
+			testingCreateFileAndAppendFileSystemNode(t, inputLine[2] == "", filePath, inputLine, &fileSystemNodes)
 		}
 	}
 	return tempDirectories, fileSystemNodes
@@ -213,56 +221,34 @@ func TestingCreateFilesAndDirectories2(t *testing.T, input string) ([]string, []
 
 // This function has to stay for synchronizing directory trees.
 // When we add a prefix to all input lines so that TestingCreateFilesAndDirectories2 can be used, all the folders with that prefix are added to the destination directory when syncing.
-// TODO: rename TestingCreateFilesAndDirectories2
+// TODO: rename TestingCreateFilesAndDirectories and TestingCreateFilesAndDirectories2
 // It should not always have to return a slice, but it is fine for testing.
 func TestingCreateFilesAndDirectories(t *testing.T, input string) (string, []utils.FileSystemNode) {
 	t.Helper()
 
+	// TODO: duplicate from TestingCreateFilesAndDirectories2
 	// if empty input string, return empty temporary directory file path and empty FileSystemNode slice
 	if input == "" {
 		return "", nil
 	}
 
-	// create temporary directory tree
-	// return temporary directory file path and FileSystemNode slice
+	// TODO: duplicate from TestingCreateFilesAndDirectories2
 	tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
 	if err != nil {
 		t.Errorf("Failed to create a temporary directory: %v", err)
 	}
 	var fileSystemNodes []utils.FileSystemNode
-	for _, delimitedCommaString := range TestingTrimSpaceTrimSuffixOnSemicolonAndSplitOnSemicolon(input) {
-		directoryWithOptionalFileAsStrings := TestingTrimSpaceAndSplitOnComma(delimitedCommaString)
-		filePath := ToFilePathFromSlashAndJoin(tempDirectory, directoryWithOptionalFileAsStrings[0])
-		exists, err := utils.FileOrDirectoryExists(filePath)
-		if err != nil {
-			t.Errorf("Failed to check if a file or directory exists: %v", err)
+	previousDirectoryFilePathPart := ""
+	for _, delimitedCommaString := range TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(input) {
+		inputLine := TestingTrimSpaceAndSplitOnComma(delimitedCommaString)
+		filePath := ToFilePathFromSlashAndJoin(tempDirectory, inputLine[0])
+		if inputLine[0] != previousDirectoryFilePathPart {
+			testingCreateDirectoryAll(t, filePath)
+
+			// probably not optimal but results in less code, which is fine for testing
+			previousDirectoryFilePathPart = inputLine[0]
 		}
-		if !exists {
-			if err := os.MkdirAll(filePath, 0755); err != nil {
-				t.Errorf("Failed to create a directory in the temporary directory: %v", err)
-			}
-		}
-		isDirectory := directoryWithOptionalFileAsStrings[2] == ""
-		if !isDirectory {
-			filePath = filepath.Join(filePath, directoryWithOptionalFileAsStrings[2])
-			if err := os.WriteFile(filePath, []byte(directoryWithOptionalFileAsStrings[3]), 0666); err != nil {
-				t.Errorf("Failed to create a file: %v", err)
-			}
-			if directoryWithOptionalFileAsStrings[1] != "" {
-				// 2006-01-02T15:04:05Z is ISO 8601 format
-				timeModified, err := time.Parse("2006-01-02T15:04:05Z", directoryWithOptionalFileAsStrings[1])
-				if err != nil {
-					t.Errorf("Failed to parse time: %v", err)
-				}
-				if os.Chtimes(filePath, time.Now(), timeModified); err != nil {
-					t.Errorf("Failed to change the access and modification times of the file: %v", err)
-				}
-			}
-		}
-		fileSystemNodes = append(fileSystemNodes, utils.FileSystemNode{
-			Path:        filePath,
-			IsDirectory: isDirectory,
-		})
+		testingCreateFileAndAppendFileSystemNode(t, inputLine[2] == "", filePath, inputLine, &fileSystemNodes)
 	}
 	return tempDirectory, fileSystemNodes
 }
