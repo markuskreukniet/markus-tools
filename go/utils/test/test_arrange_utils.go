@@ -147,7 +147,7 @@ func testingCreateDirectoryAll(t *testing.T, filePath string) {
 	}
 }
 
-func testingCreateFileAndAppendFileSystemNode(t *testing.T, isDirectory bool, filePath string, inputLine []string, fileSystemNodes *[]utils.FileSystemNode) {
+func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, isDirectory bool, filePath string, inputLine []string, fileSystemNodes *[]utils.FileSystemNode) {
 	if !isDirectory {
 		filePath = filepath.Join(filePath, inputLine[2])
 		if err := os.WriteFile(filePath, []byte(inputLine[3]), 0666); err != nil {
@@ -213,7 +213,7 @@ func TestingCreateFilesAndDirectories2(t *testing.T, input string) ([]string, []
 			if i == 0 || isDirectory {
 				testingCreateDirectoryAll(t, filePath)
 			}
-			testingCreateFileAndAppendFileSystemNode(t, inputLine[2] == "", filePath, inputLine, &fileSystemNodes)
+			testingIfFileCreateFileAndAppendFileSystemNode(t, inputLine[2] == "", filePath, inputLine, &fileSystemNodes)
 		}
 	}
 	return tempDirectories, fileSystemNodes
@@ -248,7 +248,7 @@ func TestingCreateFilesAndDirectories(t *testing.T, input string) (string, []uti
 			// probably not optimal but results in less code, which is fine for testing
 			previousDirectoryFilePathPart = inputLine[0]
 		}
-		testingCreateFileAndAppendFileSystemNode(t, inputLine[2] == "", filePath, inputLine, &fileSystemNodes)
+		testingIfFileCreateFileAndAppendFileSystemNode(t, inputLine[2] == "", filePath, inputLine, &fileSystemNodes)
 	}
 	return tempDirectory, fileSystemNodes
 }
