@@ -170,14 +170,17 @@ func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, isDirectory bo
 	})
 }
 
+// if empty input string, return empty temporary directory file path and empty FileSystemNode slice
+func isInputEmpty(input string) bool {
+	return input == ""
+}
+
 // TODO: maybe using an [][][]string is not needed
 // It should not always have to return a slice, but it is fine for testing.
 // And disk I/O operations are significantly slower than in-memory operations.
 func TestingCreateFilesAndDirectories2(t *testing.T, input string) ([]string, []utils.FileSystemNode) {
 	t.Helper()
-
-	// if empty input string, return empty temporary directory file path and empty FileSystemNode slice
-	if input == "" {
+	if isInputEmpty(input) {
 		return nil, nil
 	}
 
@@ -225,10 +228,7 @@ func TestingCreateFilesAndDirectories2(t *testing.T, input string) ([]string, []
 // It should not always have to return a slice, but it is fine for testing.
 func TestingCreateFilesAndDirectories(t *testing.T, input string) (string, []utils.FileSystemNode) {
 	t.Helper()
-
-	// TODO: duplicate from TestingCreateFilesAndDirectories2
-	// if empty input string, return empty temporary directory file path and empty FileSystemNode slice
-	if input == "" {
+	if isInputEmpty(input) {
 		return "", nil
 	}
 
