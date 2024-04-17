@@ -145,6 +145,7 @@ func testingCreateDirectoryAll(t *testing.T, filePath string) {
 }
 
 func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, isDirectory bool, filePath string, inputLine []string, fileSystemNodes *[]utils.FileSystemNode) {
+	t.Helper()
 	if !isDirectory {
 		filePath = filepath.Join(filePath, inputLine[2])
 		if err := os.WriteFile(filePath, []byte(inputLine[3]), 0666); err != nil {
@@ -195,6 +196,8 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 	for i := range delimitedCommaStrings {
 		index := len(inputGroups) - 1
 		substrings := TestingTrimSpaceAndSplitOnComma(delimitedCommaStrings[i])
+
+		// probably not optimal but results in less code, which is fine for testing
 		if i == 0 || substrings[0] == "" || substrings[0] != inputGroups[index][0][0] {
 			inputGroups = append(inputGroups, [][]string{substrings})
 		} else {
