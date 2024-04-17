@@ -98,9 +98,9 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			sourceDirectory, _ := test.TestingCreateFilesAndDirectories(t, tc.sourceInput)
+			sourceDirectory, _ := test.TestingCreateFilesAndDirectoriesByOneInput(t, tc.sourceInput)
 			defer test.TestingRemoveDirectoryTree(t, sourceDirectory)
-			destinationDirectory, _ := test.TestingCreateFilesAndDirectories(t, tc.destinationInput)
+			destinationDirectory, _ := test.TestingCreateFilesAndDirectoriesByOneInput(t, tc.destinationInput)
 			defer test.TestingRemoveDirectoryTree(t, destinationDirectory)
 
 			// act

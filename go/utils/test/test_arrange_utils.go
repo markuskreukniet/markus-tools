@@ -226,9 +226,9 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 
 // This function has to stay for synchronizing directory trees.
 // When we add a prefix to all input lines so that TestingCreateFilesAndDirectoriesByMultipleInputs can be used, all the folders with that prefix are added to the destination directory when syncing.
-// TODO: rename TestingCreateFilesAndDirectories
 // It should not always have to return a slice, but it is fine for testing.
-func TestingCreateFilesAndDirectories(t *testing.T, input string) (string, []utils.FileSystemNode) {
+// And disk I/O operations are significantly slower than in-memory operations.
+func TestingCreateFilesAndDirectoriesByOneInput(t *testing.T, input string) (string, []utils.FileSystemNode) {
 	t.Helper()
 	if isInputEmpty(input) {
 		return "", nil
