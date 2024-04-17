@@ -139,6 +139,7 @@ func ToFilePathFromSlashAndJoin(filePath, filePathEndPart string) string {
 }
 
 func testingCreateDirectoryAll(t *testing.T, filePath string) {
+	t.Helper()
 	if err := os.MkdirAll(filePath, 0755); err != nil {
 		t.Errorf("Failed to create a directory in the temporary directory: %v", err)
 	}
@@ -174,6 +175,7 @@ func isInputEmpty(input string) bool {
 }
 
 func createTemporaryDirectory(t *testing.T) string {
+	t.Helper()
 	temporaryDirectory, err := os.MkdirTemp("", "markus-tools go test")
 	if err != nil {
 		t.Errorf("Failed to create a temporary directory: %v", err)
