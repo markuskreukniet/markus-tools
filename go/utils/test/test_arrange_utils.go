@@ -183,7 +183,7 @@ func createTemporaryDirectory(t *testing.T) string {
 // TODO: maybe using an [][][]string is not needed
 // It should not always have to return a slice, but it is fine for testing.
 // And disk I/O operations are significantly slower than in-memory operations.
-func TestingCreateFilesAndDirectories2(t *testing.T, input string) ([]string, []utils.FileSystemNode) {
+func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string) ([]string, []utils.FileSystemNode) {
 	t.Helper()
 	if isInputEmpty(input) {
 		return nil, nil
@@ -225,8 +225,8 @@ func TestingCreateFilesAndDirectories2(t *testing.T, input string) ([]string, []
 }
 
 // This function has to stay for synchronizing directory trees.
-// When we add a prefix to all input lines so that TestingCreateFilesAndDirectories2 can be used, all the folders with that prefix are added to the destination directory when syncing.
-// TODO: rename TestingCreateFilesAndDirectories and TestingCreateFilesAndDirectories2
+// When we add a prefix to all input lines so that TestingCreateFilesAndDirectoriesByMultipleInputs can be used, all the folders with that prefix are added to the destination directory when syncing.
+// TODO: rename TestingCreateFilesAndDirectories
 // It should not always have to return a slice, but it is fine for testing.
 func TestingCreateFilesAndDirectories(t *testing.T, input string) (string, []utils.FileSystemNode) {
 	t.Helper()

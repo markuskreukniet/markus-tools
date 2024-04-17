@@ -37,7 +37,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			directories, fileSystemNodes := test.TestingCreateFilesAndDirectories2(t, tc.input)
+			directories, fileSystemNodes := test.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.input)
 			defer test.TestingRemoveDirectoryTrees(t, directories)
 			var builder strings.Builder
 			if len(directories) > 0 {
