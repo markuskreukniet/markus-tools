@@ -90,21 +90,18 @@ func TestingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, fileSyst
 	}
 
 	// Create a temporary file system structure.
-	tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
-	if err != nil {
-		t.Errorf("Failed to create the temporary directory: %v", err)
-	}
+	temporaryDirectory := createTemporaryDirectory(t)
 	for _, part := range fileSystemPathEndParts.DirectoryPathEndParts {
-		if err := os.MkdirAll(filepath.Join(tempDirectory, part), 0755); err != nil {
+		if err := os.MkdirAll(filepath.Join(temporaryDirectory, part), 0755); err != nil {
 			t.Errorf("Failed to create directory in temporary directory: %v", err)
 		}
 	}
 	for _, part := range fileSystemPathEndParts.FilePathEndParts {
-		if err := os.WriteFile(filepath.Join(tempDirectory, part), []byte{}, 0666); err != nil {
+		if err := os.WriteFile(filepath.Join(temporaryDirectory, part), []byte{}, 0666); err != nil {
 			t.Errorf("Failed to create a file: %v", err)
 		}
 	}
-	return tempDirectory
+	return temporaryDirectory
 }
 
 // TODO: comment
@@ -175,6 +172,14 @@ func isInputEmpty(input string) bool {
 	return input == ""
 }
 
+func createTemporaryDirectory(t *testing.T) string {
+	temporaryDirectory, err := os.MkdirTemp("", "markus-tools go test")
+	if err != nil {
+		t.Errorf("Failed to create a temporary directory: %v", err)
+	}
+	return temporaryDirectory
+}
+
 // TODO: maybe using an [][][]string is not needed
 // It should not always have to return a slice, but it is fine for testing.
 // And disk I/O operations are significantly slower than in-memory operations.
@@ -202,13 +207,10 @@ func TestingCreateFilesAndDirectories2(t *testing.T, input string) ([]string, []
 	var tempDirectories []string
 	var fileSystemNodes []utils.FileSystemNode
 	for _, group := range inputGroups {
-		tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
-		if err != nil {
-			t.Errorf("Failed to create a temporary directory: %v", err)
-		}
-		tempDirectories = append(tempDirectories, tempDirectory)
+		temporaryDirectory := createTemporaryDirectory(t)
+		tempDirectories = append(tempDirectories, temporaryDirectory)
 		for i, inputLine := range group {
-			filePath := ToFilePathFromSlashAndJoin(tempDirectory, inputLine[0])
+			filePath := ToFilePathFromSlashAndJoin(temporaryDirectory, inputLine[0])
 			isDirectory := inputLine[2] == ""
 
 			// probably not optimal but results in less code, which is fine for testing
@@ -232,16 +234,12 @@ func TestingCreateFilesAndDirectories(t *testing.T, input string) (string, []uti
 		return "", nil
 	}
 
-	// TODO: duplicate from TestingCreateFilesAndDirectories2
-	tempDirectory, err := os.MkdirTemp("", "markus-tools go test")
-	if err != nil {
-		t.Errorf("Failed to create a temporary directory: %v", err)
-	}
+	temporaryDirectory := createTemporaryDirectory(t)
 	var fileSystemNodes []utils.FileSystemNode
 	previousDirectoryFilePathPart := ""
 	for _, delimitedCommaString := range TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(input) {
 		inputLine := TestingTrimSpaceAndSplitOnComma(delimitedCommaString)
-		filePath := ToFilePathFromSlashAndJoin(tempDirectory, inputLine[0])
+		filePath := ToFilePathFromSlashAndJoin(temporaryDirectory, inputLine[0])
 		if inputLine[0] != previousDirectoryFilePathPart {
 			testingCreateDirectoryAll(t, filePath)
 
@@ -250,5 +248,5 @@ func TestingCreateFilesAndDirectories(t *testing.T, input string) (string, []uti
 		}
 		testingIfFileCreateFileAndAppendFileSystemNode(t, inputLine[2] == "", filePath, inputLine, &fileSystemNodes)
 	}
-	return tempDirectory, fileSystemNodes
+	return temporaryDirectory, fileSystemNodes
 }
