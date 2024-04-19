@@ -80,7 +80,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			sourceInput:      sourceInput,
 			destinationInput: destinationInput,
 			updatedFile: filePathEndPartContent{
-				filePathEndPart: "directory 2/directory 3/txt 2-3 2.txt", // TODO: should be a combination of two vars and "/"?
+				filePathEndPart: "directory 2/directory 3/txt 2-3 2.txt", // Do not use variables for this since it will make the inputs unreadable.
 				content:         newContent,
 			},
 			wantSameFilePaths: true,
