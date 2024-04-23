@@ -65,22 +65,17 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			defer test.TestingRemoveDirectoryTree(t, directory)
 			var builder strings.Builder
 			if len(tc.duplicateFilePathEndPartGroups) > 0 {
-				if len(tc.duplicateFilePathEndPartGroups[0][0]) > 0 {
-					duplicateFilePath := filepath.Join(directory, tc.duplicateFilePathEndPartGroups[0][0])
-					test.TestingWriteFileContentWithContentAndIndex(t, duplicateFilePath, 0)
-					test.TestingWriteString(t, duplicateFilePath, &builder)
-				}
-				for i := 1; i < len(tc.duplicateFilePathEndPartGroups[0]); i++ {
-					testingWriteNewlineString(t, &builder)
-					duplicateFilePath := filepath.Join(directory, tc.duplicateFilePathEndPartGroups[0][i])
-					test.TestingWriteFileContentWithContentAndIndex(t, duplicateFilePath, 0)
-					test.TestingWriteString(t, duplicateFilePath, &builder)
-				}
-				for i := 1; i < len(tc.duplicateFilePathEndPartGroups); i++ {
-					testingWriteNewlineString(t, &builder)
-					for _, duplicateFilePathEndPart := range tc.duplicateFilePathEndPartGroups[i] {
-						testingWriteNewlineString(t, &builder)
-						duplicateFilePath := filepath.Join(directory, duplicateFilePathEndPart)
+				// probably not optimal but results in less code, which is fine for testing
+				for i, group := range duplicateFilePathEndPartGroups {
+					for j, part := range group {
+						check := i > 0 && j == 0
+						if check || j > 0 {
+							testingWriteNewlineString(t, &builder)
+							if check {
+								testingWriteNewlineString(t, &builder)
+							}
+						}
+						duplicateFilePath := filepath.Join(directory, part)
 						test.TestingWriteFileContentWithContentAndIndex(t, duplicateFilePath, i)
 						test.TestingWriteString(t, duplicateFilePath, &builder)
 					}
