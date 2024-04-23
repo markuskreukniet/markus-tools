@@ -19,6 +19,20 @@ func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
 }
 
 func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
+	// content := "content 1\ncontent 1"
+	// content2 := "content 2\ncontent 2"
+
+	// input := `
+	// 	empty,,,;
+	// 	directory 1,,txt 1.txt,;
+	// 	directory 1,,txt 1 2.txt,` + content + `;
+	// 	directory 2/empty,,,;
+	// 	directory 2/directory 3,,txt 2-3.txt,` + content + `;
+	// 	directory 2/directory 3,,txt 2-3 2.txt,` + content2 + `;
+	// 	directory 2/directory 3,,txt 2-3 3.txt,` + content2 + `;
+	// 	directory 2/directory 4,,txt 2-4.txt,` + content2 + `;
+	// `
+
 	// arrange
 	fileSystemPathEndParts := test.FileSystemPathEndParts{
 		DirectoryPathEndParts: []string{test.DirectoryEmpty, test.Directory1, test.Directory2WithDirectoryEmpty, test.Directory2WithDirectory3, test.Directory2WithDirectory4},
