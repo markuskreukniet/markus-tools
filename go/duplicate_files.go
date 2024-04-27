@@ -17,16 +17,9 @@ type fileIdentifier struct {
 	hash string
 }
 
-type duplicateFile struct {
-	path string
-	hash string
-}
-
-func appendDuplicateFile(duplicateFiles *[]duplicateFile, fileIdentifier fileIdentifier) {
-	*duplicateFiles = append(*duplicateFiles, duplicateFile{
-		path: fileIdentifier.path,
-		hash: fileIdentifier.hash,
-	})
+type fileGroup struct {
+	hash      string
+	filePaths []string
 }
 
 func getFileHash(filePath string) (string, error) {
@@ -45,41 +38,12 @@ func getFileHash(filePath string) (string, error) {
 	return hex.EncodeToString(hashGenerator.Sum(nil)), nil
 }
 
-func duplicateFilesToNewlineSeparatedString(duplicateFiles []duplicateFile) (string, error) {
-	if len(duplicateFiles) == 0 {
-		return "", nil
-	}
-	var result strings.Builder
-	if _, err := result.WriteString(duplicateFiles[0].path); err != nil {
-		return "", err
-	}
-	for i := 1; i < len(duplicateFiles); i++ {
-		if _, err := utils.WriteNewlineString(&result); err != nil {
-			return "", err
-		}
-		if duplicateFiles[i].hash != duplicateFiles[i-1].hash {
-			if _, err := utils.WriteNewlineString(&result); err != nil {
-				return "", err
-			}
-		}
-		if _, err := result.WriteString(duplicateFiles[i].path); err != nil {
-			return "", err
-		}
-	}
-	return result.String(), nil
-}
-
 func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []utils.FileSystemNode) string {
 	newlineSeparatedString, err := getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes)
 	if err != nil {
 		return errorToJSONFunctionResult(err)
 	}
 	return resultToJSONFunctionResult(newlineSeparatedString)
-}
-
-type fileGroup struct {
-	hash      string
-	filePaths []string
 }
 
 func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.FileSystemNode) (string, error) {
