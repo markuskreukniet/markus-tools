@@ -11,3 +11,11 @@ func WriteNewlineString(builder *strings.Builder) (int, error) {
 	}
 	return bytesWritten, nil
 }
+
+func WriteTwoNewlineStrings(builder *strings.Builder) (int, error) {
+	bytesWritten, err := builder.WriteString("\n\n")
+	if err != nil {
+		return bytesWritten, err
+	}
+	return bytesWritten, nil
+}

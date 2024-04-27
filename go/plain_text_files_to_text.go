@@ -83,9 +83,7 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 			return "", err
 		}
 		for i := 1; i < len(filePaths); i++ {
-			// TODO: if?
-			_, err := result.WriteString("\n\n")
-			if err != nil {
+			if _, err := utils.WriteTwoNewlineStrings(&result); err != nil {
 				return "", err
 			}
 			// TODO: if?

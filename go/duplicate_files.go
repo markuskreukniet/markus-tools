@@ -77,6 +77,11 @@ func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []uti
 	return resultToJSONFunctionResult(newlineSeparatedString)
 }
 
+type fileGroup struct {
+	hash      string
+	filePaths []string
+}
+
 func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.FileSystemNode) (string, error) {
 	var fileIdentifiers []fileIdentifier
 	if err := utils.AppendFileDetails(
@@ -92,9 +97,9 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 	sort.Slice(fileIdentifiers, func(i, j int) bool {
 		return fileIdentifiers[i].size < fileIdentifiers[j].size
 	})
-	// TODO: We can make this function efficient by making from here the newlineSeparatedString, instead of making first the duplicateFiles slice
-	var duplicateFiles []duplicateFile
-	var lastAppendedIndex = -1
+
+	// create duplicate file groups
+	var fileGroups []fileGroup
 	for i := 1; i < len(fileIdentifiers); i++ {
 		previousIndex := i - 1
 		if fileIdentifiers[previousIndex].size == fileIdentifiers[i].size {
@@ -107,18 +112,46 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 			if fileIdentifiers[i].hash, err = getFileHash(fileIdentifiers[i].path); err != nil {
 				return "", err
 			}
-			if fileIdentifiers[previousIndex].hash == fileIdentifiers[i].hash {
-				if lastAppendedIndex != previousIndex {
-					appendDuplicateFile(&duplicateFiles, fileIdentifiers[previousIndex])
+			foundGroup := false
+			for j, group := range fileGroups {
+				if fileIdentifiers[i].hash == group.hash {
+					foundGroup = true
+					fileGroups[j].filePaths = append(fileGroups[j].filePaths, fileIdentifiers[i].path)
+					break
 				}
-				appendDuplicateFile(&duplicateFiles, fileIdentifiers[i])
-				lastAppendedIndex = i
+			}
+			if !foundGroup {
+				for j := 0; j <= previousIndex; j++ {
+					if fileIdentifiers[i].hash == fileIdentifiers[j].hash {
+						fileGroups = append(fileGroups, fileGroup{
+							hash:      fileIdentifiers[i].hash,
+							filePaths: []string{fileIdentifiers[j].path, fileIdentifiers[i].path},
+						})
+						break
+					}
+				}
 			}
 		}
 	}
-	newlineSeparatedString, err := duplicateFilesToNewlineSeparatedString(duplicateFiles)
-	if err != nil {
-		return "", err
+
+	// create and return the result string
+	var result strings.Builder
+	for i, group := range fileGroups {
+		if i != 0 {
+			if _, err := utils.WriteTwoNewlineStrings(&result); err != nil {
+				return "", err
+			}
+		}
+		for j, path := range group.filePaths {
+			if j != 0 {
+				if _, err := utils.WriteNewlineString(&result); err != nil {
+					return "", err
+				}
+			}
+			if _, err := result.WriteString(path); err != nil {
+				return "", err
+			}
+		}
 	}
-	return newlineSeparatedString, nil
+	return result.String(), nil
 }
