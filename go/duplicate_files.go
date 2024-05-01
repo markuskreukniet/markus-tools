@@ -17,6 +17,7 @@ type fileIdentifier struct {
 	hash string
 }
 
+// TODO: rename to duplicateFileGroup
 type fileGroup struct {
 	hash      string
 	filePaths []string
