@@ -14,6 +14,7 @@ import PageNavigator from './components/PageNavigator'
 // TODO: use batch, untrack, on (with { defer: true }) from import { batch, on, untrack } from "solid-js";?
 // TODO: ImagesToDateRangeFolder: show how many files added/changed/removed
 // TODO: use min-width: 0? https://www.youtube.com/watch?v=cH8VbLM1958&t=4s
+// TODO: fix font-size? https://www.youtube.com/watch?v=rg3zgQ3xBRc
 
 // TODO: rename folder to directory
 // TODO: rename files.js to filePath.js
