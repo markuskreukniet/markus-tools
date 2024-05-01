@@ -16,38 +16,6 @@ type TestCaseMetadata struct {
 	Name    string
 	WantErr bool
 }
-type FileSystemPathEndParts struct {
-	DirectoryPathEndParts []string
-	FilePathEndParts      []string
-}
-
-// TODO: there are no files in the root (temp dir)
-var (
-	DirectoryEmpty               = "directory empty"
-	Directory1                   = "directory 1"
-	Directory2                   = "directory 2"
-	Directory2WithDirectoryEmpty = filepath.Join(Directory2, DirectoryEmpty)
-	Directory2WithDirectory3     = filepath.Join(Directory2, "directory 3")
-	Directory2WithDirectory4     = filepath.Join(Directory2, "directory 4")
-
-	TxtFile1 = filepath.Join(Directory1, "file 1.txt")
-	TxtFile2 = filepath.Join(Directory1, "file 2.txt")
-	TxtFile3 = filepath.Join(Directory2WithDirectory3, "file 3.txt")
-	TxtFile4 = filepath.Join(Directory2WithDirectory3, "file 4.txt")
-	TxtFile5 = filepath.Join(Directory2WithDirectory3, "file 5.txt")
-	TxtFile6 = filepath.Join(Directory2WithDirectory4, "file 6.txt")
-
-	JpgFile4 = filepath.Join(Directory1, "file 4.jpg")
-
-	TxtFileNonExistent1 = "non existent 1.txt"
-
-	EmptyPathEndParts []string
-
-	EmptyFileSystemPathEndParts = FileSystemPathEndParts{
-		DirectoryPathEndParts: EmptyPathEndParts,
-		FilePathEndParts:      EmptyPathEndParts,
-	}
-)
 
 func TestingCreateTestCaseMetadata(name string, wantErr bool) TestCaseMetadata {
 	return TestCaseMetadata{
@@ -81,27 +49,6 @@ func TestingWriteFileContent(t *testing.T, filePath string, content string) {
 	if err := os.WriteFile(filePath, []byte(content), 0666); err != nil {
 		t.Errorf("Failed to write file content: %v", err)
 	}
-}
-
-func TestingCreateTempFileSystemStructureOrGetEmptyString(t *testing.T, fileSystemPathEndParts FileSystemPathEndParts) string {
-	t.Helper()
-	if len(fileSystemPathEndParts.DirectoryPathEndParts) == 0 {
-		return ""
-	}
-
-	// Create a temporary file system structure.
-	temporaryDirectory := createTemporaryDirectory(t)
-	for _, part := range fileSystemPathEndParts.DirectoryPathEndParts {
-		if err := os.MkdirAll(filepath.Join(temporaryDirectory, part), 0755); err != nil {
-			t.Errorf("Failed to create directory in temporary directory: %v", err)
-		}
-	}
-	for _, part := range fileSystemPathEndParts.FilePathEndParts {
-		if err := os.WriteFile(filepath.Join(temporaryDirectory, part), []byte{}, 0666); err != nil {
-			t.Errorf("Failed to create a file: %v", err)
-		}
-	}
-	return temporaryDirectory
 }
 
 // TODO: comment
