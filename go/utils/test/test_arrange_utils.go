@@ -17,10 +17,25 @@ type TestCaseMetadata struct {
 	WantErr bool
 }
 
+type TestCaseInput struct {
+	Metadata TestCaseMetadata
+	Input    string
+}
+
 func TestingCreateTestCaseMetadata(name string, wantErr bool) TestCaseMetadata {
 	return TestCaseMetadata{
 		Name:    name,
 		WantErr: wantErr,
+	}
+}
+
+func TestingCreateTestCaseInput(name, input string, wantErr bool) TestCaseInput {
+	return TestCaseInput{
+		Metadata: TestCaseMetadata{
+			Name:    name,
+			WantErr: wantErr,
+		},
+		Input: input,
 	}
 }
 
