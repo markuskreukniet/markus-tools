@@ -15,13 +15,6 @@ type testingDuplicateFileGroup struct {
 	filePaths []string
 }
 
-func testingWriteNewlineString(t *testing.T, builder *strings.Builder) {
-	t.Helper()
-	if _, err := utils.WriteNewlineString(builder); err != nil {
-		t.Errorf("writeNewlineString error: %v", err)
-	}
-}
-
 // TODO: cleaning
 func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	// arrange
@@ -54,7 +47,6 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 
 			// create duplicate file groups
 			var fileGroups []testingDuplicateFileGroup
-			// TODO: needed?
 			if len(directories) > 0 {
 				var directoriesWithFileAsStrings [][]string
 				for _, delimitedCommaString := range test.TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.Input) {
@@ -107,17 +99,18 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 				//var result strings.Builder
 				for i, group := range fileGroups {
 					if i != 0 {
+						// TODO: there is test.TestingWriteString(t, "\n\n", &builder) and utils.WriteTwoNewlineStrings
 						if _, err := utils.WriteTwoNewlineStrings(&builder); err != nil {
-							t.Errorf("TODO")
+							t.Errorf("WriteTwoNewlineStrings error: %v", err)
 						}
 					}
 					for j, path := range group.filePaths {
 						if j != 0 {
-							testingWriteNewlineString(t, &builder)
+							if _, err := utils.WriteNewlineString(&builder); err != nil {
+								t.Errorf("WriteNewlineString error: %v", err)
+							}
 						}
-						if _, err := builder.WriteString(path); err != nil {
-							t.Errorf("TODO")
-						}
+						test.TestingWriteString(t, path, &builder)
 					}
 				}
 			}
