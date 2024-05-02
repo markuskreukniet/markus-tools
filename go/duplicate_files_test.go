@@ -40,27 +40,15 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 		directory 2/directory 3,,txt 2-3 3.txt,` + contents[1] + `;
 		directory 2/directory 4,,txt 2-4.txt,` + contents[1] + `;
 	`
-	testCases := []struct {
-		metadata test.TestCaseMetadata
-		input    string
-		contents []string
-	}{
-		{
-			metadata: test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
-			input:    input,
-			contents: contents,
-		},
-		{
-			metadata: test.TestingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse(),
-			input:    "",
-			contents: make([]string, 0),
-		},
+	testCases := []test.TestCaseInput{
+		test.TestingCreateTestCaseInput("Basic", input, false),
+		test.TestingCreateTestCaseInput("Empty Input", "", false),
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.metadata.Name, func(t *testing.T) {
+		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			directories, fileSystemNodes := test.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.input)
+			directories, fileSystemNodes := test.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.Input)
 			defer test.TestingRemoveDirectoryTrees(t, directories)
 			var builder strings.Builder
 
@@ -69,7 +57,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			// TODO: needed?
 			if len(directories) > 0 {
 				var directoriesWithFileAsStrings [][]string
-				for _, delimitedCommaString := range test.TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.input) {
+				for _, delimitedCommaString := range test.TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.Input) {
 					directoryWithOptionalFileAsStrings := test.TestingTrimSpaceAndSplitOnComma(delimitedCommaString)
 					if directoryWithOptionalFileAsStrings[3] != "" {
 						directoriesWithFileAsStrings = append(directoriesWithFileAsStrings, directoryWithOptionalFileAsStrings)
@@ -125,9 +113,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 					}
 					for j, path := range group.filePaths {
 						if j != 0 {
-							if _, err := utils.WriteNewlineString(&builder); err != nil {
-								t.Errorf("TODO")
-							}
+							testingWriteNewlineString(t, &builder)
 						}
 						if _, err := builder.WriteString(path); err != nil {
 							t.Errorf("TODO")
@@ -140,7 +126,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			outcome, err := getDuplicateFilesAsNewlineSeparatedString(fileSystemNodes)
 
 			// assert
-			test.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.metadata.WantErr, builder, outcome)
+			test.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.Metadata.WantErr, builder, outcome)
 		})
 	}
 }
