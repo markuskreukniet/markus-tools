@@ -17,8 +17,7 @@ type fileIdentifier struct {
 	hash string
 }
 
-// TODO: rename to duplicateFileGroup
-type fileGroup struct {
+type duplicateFileGroup struct {
 	hash      string
 	filePaths []string
 }
@@ -64,7 +63,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 	})
 
 	// create duplicate file groups
-	var fileGroups []fileGroup
+	var duplicateFileGroups []duplicateFileGroup
 	for i := 1; i < len(fileIdentifiers); i++ {
 		previousIndex := i - 1
 		if fileIdentifiers[previousIndex].size == fileIdentifiers[i].size {
@@ -78,17 +77,17 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 				return "", err
 			}
 			foundGroup := false
-			for j, group := range fileGroups {
+			for j, group := range duplicateFileGroups {
 				if fileIdentifiers[i].hash == group.hash {
 					foundGroup = true
-					fileGroups[j].filePaths = append(fileGroups[j].filePaths, fileIdentifiers[i].path)
+					duplicateFileGroups[j].filePaths = append(duplicateFileGroups[j].filePaths, fileIdentifiers[i].path)
 					break
 				}
 			}
 			if !foundGroup {
 				for j := 0; j <= previousIndex; j++ {
 					if fileIdentifiers[i].hash == fileIdentifiers[j].hash {
-						fileGroups = append(fileGroups, fileGroup{
+						duplicateFileGroups = append(duplicateFileGroups, duplicateFileGroup{
 							hash:      fileIdentifiers[i].hash,
 							filePaths: []string{fileIdentifiers[j].path, fileIdentifiers[i].path},
 						})
@@ -101,7 +100,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 
 	// create and return the result string
 	var result strings.Builder
-	for i, group := range fileGroups {
+	for i, group := range duplicateFileGroups {
 		if i != 0 {
 			if _, err := utils.WriteTwoNewlineStrings(&result); err != nil {
 				return "", err
