@@ -9,12 +9,6 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
 
-// TODO: same as fileGroup or duplicateFileGroup from non-test
-type testingDuplicateFileGroup struct {
-	content   string
-	filePaths []string
-}
-
 // TODO: cleaning
 func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	// arrange
@@ -46,7 +40,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			var builder strings.Builder
 
 			// create duplicate file groups
-			var fileGroups []testingDuplicateFileGroup
+			var fileGroups []duplicateFileGroup
 			if len(directories) > 0 {
 				var directoriesWithFileAsStrings [][]string
 				for _, delimitedCommaString := range test.TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.Input) {
@@ -61,7 +55,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 								// TODO: duplicate from non-test
 								foundGroup := false
 								for i, group := range fileGroups {
-									if directoryWithOptionalFileAsStrings[3] == group.content {
+									if directoryWithOptionalFileAsStrings[3] == group.identifier {
 										foundGroup = true
 										fileGroups[i].filePaths = append(fileGroups[i].filePaths, nodeI.Path)
 										break
@@ -75,9 +69,9 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 											for _, nodeJ := range fileSystemNodes {
 												// ?
 												if nodeI.Path != nodeJ.Path && strings.HasSuffix(nodeJ.Path, filepath.Join(directoryWithFileAsStrings[0], directoryWithFileAsStrings[2])) {
-													fileGroups = append(fileGroups, testingDuplicateFileGroup{
-														content:   directoryWithFileAsStrings[3],
-														filePaths: []string{nodeJ.Path, nodeI.Path},
+													fileGroups = append(fileGroups, duplicateFileGroup{
+														identifier: directoryWithFileAsStrings[3],
+														filePaths:  []string{nodeJ.Path, nodeI.Path},
 													})
 													break
 												}

@@ -18,8 +18,8 @@ type fileIdentifier struct {
 }
 
 type duplicateFileGroup struct {
-	hash      string
-	filePaths []string
+	identifier string
+	filePaths  []string
 }
 
 func getFileHash(filePath string) (string, error) {
@@ -78,7 +78,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 			}
 			foundGroup := false
 			for j, group := range duplicateFileGroups {
-				if fileIdentifiers[i].hash == group.hash {
+				if fileIdentifiers[i].hash == group.identifier {
 					foundGroup = true
 					duplicateFileGroups[j].filePaths = append(duplicateFileGroups[j].filePaths, fileIdentifiers[i].path)
 					break
@@ -88,8 +88,8 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 				for j := 0; j <= previousIndex; j++ {
 					if fileIdentifiers[i].hash == fileIdentifiers[j].hash {
 						duplicateFileGroups = append(duplicateFileGroups, duplicateFileGroup{
-							hash:      fileIdentifiers[i].hash,
-							filePaths: []string{fileIdentifiers[j].path, fileIdentifiers[i].path},
+							identifier: fileIdentifiers[i].hash,
+							filePaths:  []string{fileIdentifiers[j].path, fileIdentifiers[i].path},
 						})
 						break
 					}
