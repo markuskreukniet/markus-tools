@@ -93,10 +93,8 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 
 					}
 				}
-				//
 
 				// create and return the result string
-				//var result strings.Builder
 				for i, group := range fileGroups {
 					if i != 0 {
 						// TODO: there is test.TestingWriteString(t, "\n\n", &builder) and utils.WriteTwoNewlineStrings
