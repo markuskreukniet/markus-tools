@@ -40,7 +40,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 						if isFirstWrite {
 							isFirstWrite = false
 						} else {
-							test.TestingWriteString(t, "\n\n", &builder)
+							test.TestingWriteTwoNewlineStrings(t, &builder)
 						}
 
 						test.TestingWriteString(t, directoryWithOptionalFileAsStrings[2]+"\n"+directoryWithOptionalFileAsStrings[3], &builder)

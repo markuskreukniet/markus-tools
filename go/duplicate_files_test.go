@@ -91,13 +91,11 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 				// create and return the result string
 				for i, group := range fileGroups {
 					if i != 0 {
-						// TODO: there is test.TestingWriteString(t, "\n\n", &builder) and utils.WriteTwoNewlineStrings
-						if _, err := utils.WriteTwoNewlineStrings(&builder); err != nil {
-							t.Errorf("WriteTwoNewlineStrings error: %v", err)
-						}
+						test.TestingWriteTwoNewlineStrings(t, &builder)
 					}
 					for j, path := range group.filePaths {
 						if j != 0 {
+							// TODO: should be testing?
 							if _, err := utils.WriteNewlineString(&builder); err != nil {
 								t.Errorf("WriteNewlineString error: %v", err)
 							}
