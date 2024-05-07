@@ -48,10 +48,8 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 					if directoryWithOptionalFileAsStrings[3] != "" {
 						directoriesWithFileAsStrings = append(directoriesWithFileAsStrings, directoryWithOptionalFileAsStrings)
 						filePathPart := filepath.Join(directoryWithOptionalFileAsStrings[0], directoryWithOptionalFileAsStrings[2])
-
 						for _, nodeI := range fileSystemNodes {
 							if strings.HasSuffix(nodeI.Path, filePathPart) {
-
 								// TODO: duplicate from non-test
 								foundGroup := false
 								for i, group := range fileGroups {
@@ -61,13 +59,10 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 										break
 									}
 								}
-
-								// check
 								if !foundGroup {
 									for _, directoryWithFileAsStrings := range directoriesWithFileAsStrings {
 										if directoryWithOptionalFileAsStrings[3] == directoryWithFileAsStrings[3] {
 											for _, nodeJ := range fileSystemNodes {
-												// ?
 												if nodeI.Path != nodeJ.Path && strings.HasSuffix(nodeJ.Path, filepath.Join(directoryWithFileAsStrings[0], directoryWithFileAsStrings[2])) {
 													fileGroups = append(fileGroups, duplicateFileGroup{
 														identifier: directoryWithFileAsStrings[3],
@@ -80,7 +75,6 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 										}
 									}
 								}
-
 								break
 							}
 						}
@@ -95,7 +89,6 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 					}
 					for j, path := range group.filePaths {
 						if j != 0 {
-							// TODO: should be testing?
 							if _, err := utils.WriteNewlineString(&builder); err != nil {
 								t.Errorf("WriteNewlineString error: %v", err)
 							}
