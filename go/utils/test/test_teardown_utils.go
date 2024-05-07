@@ -12,7 +12,6 @@ func TestingRemoveDirectoryTree(t *testing.T, directory string) {
 	}
 }
 
-// TODO: only this function one should exist?
 func TestingRemoveDirectoryTrees(t *testing.T, directories []string) {
 	t.Helper()
 

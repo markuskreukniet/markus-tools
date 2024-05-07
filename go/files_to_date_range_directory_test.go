@@ -61,8 +61,6 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			// directoryTree := test.TestingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
-			// defer test.TestingRemoveDirectoryTree(t, directoryTree)
 
 			// act
 
