@@ -18,14 +18,10 @@ func readLinesAddToBuilder(filePath string, builder *strings.Builder) error {
 	// TODO: os.ReadFile is better?
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		// TODO: if?
-		_, err := utils.WriteNewlineString(builder)
-		if err != nil {
+		if _, err := utils.WriteNewlineString(builder); err != nil {
 			return err
 		}
-		// TODO: if?
-		_, err = builder.WriteString(scanner.Text())
-		if err != nil {
+		if _, err = builder.WriteString(scanner.Text()); err != nil {
 			return err
 		}
 	}
@@ -33,9 +29,7 @@ func readLinesAddToBuilder(filePath string, builder *strings.Builder) error {
 }
 
 func addLastPathElementAndAllLinesToBuilder(filePath string, builder *strings.Builder) error {
-	// TODO: if?
-	_, err := builder.WriteString(filepath.Base(filePath))
-	if err != nil {
+	if _, err := builder.WriteString(filepath.Base(filePath)); err != nil {
 		return err
 	}
 	return readLinesAddToBuilder(filePath, builder)
