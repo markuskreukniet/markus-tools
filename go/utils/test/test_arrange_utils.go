@@ -22,6 +22,28 @@ type TestCaseInput struct {
 	Input    string
 }
 
+type InputLine []string
+
+func (line InputLine) GetDirectory() string {
+	return line[0]
+}
+
+func (line InputLine) GetTimeModified() string {
+	return line[1]
+}
+
+func (line InputLine) GetFileName() string {
+	return line[2]
+}
+
+func (line InputLine) GetContent() string {
+	return line[3]
+}
+
+func CreateInputLine(delimitedCommaString string) InputLine {
+	return strings.Split(strings.TrimSpace(delimitedCommaString), ",")
+}
+
 func TestingCreateTestCaseMetadata(name string, wantErr bool) TestCaseMetadata {
 	return TestCaseMetadata{
 		Name:    name,

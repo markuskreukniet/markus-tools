@@ -33,8 +33,8 @@ func TestPlainTextFilesToText(t *testing.T) {
 				isFirstWrite := true
 				delimitedCommaStrings := test.TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.Input)
 				for _, delimitedCommaString := range delimitedCommaStrings {
-					directoryWithOptionalFileAsStrings := test.TestingTrimSpaceAndSplitOnComma(delimitedCommaString)
-					if directoryWithOptionalFileAsStrings[3] != "" {
+					inputLine := test.CreateInputLine(delimitedCommaString)
+					if inputLine.GetContent() != "" {
 
 						// probably not optimal but results in less code, which is fine for testing
 						if isFirstWrite {
@@ -43,7 +43,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 							test.TestingWriteTwoNewlineStrings(t, &builder)
 						}
 
-						test.TestingWriteString(t, directoryWithOptionalFileAsStrings[2]+"\n"+directoryWithOptionalFileAsStrings[3], &builder)
+						test.TestingWriteString(t, inputLine.GetFileName()+"\n"+inputLine.GetContent(), &builder)
 					}
 				}
 			}
