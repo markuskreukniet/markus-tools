@@ -14,7 +14,6 @@ func TestingRemoveDirectoryTree(t *testing.T, directory string) {
 
 func TestingRemoveDirectoryTrees(t *testing.T, directories []string) {
 	t.Helper()
-
 	for _, directory := range directories {
 		TestingRemoveDirectoryTree(t, directory)
 	}
