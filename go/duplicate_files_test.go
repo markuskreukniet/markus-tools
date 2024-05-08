@@ -76,7 +76,6 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 								break
 							}
 						}
-
 					}
 				}
 
