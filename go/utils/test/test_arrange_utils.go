@@ -44,6 +44,10 @@ func (line InputLine) HasNoContent() bool {
 	return line.GetContent() != ""
 }
 
+func (line InputLine) JoinDirectoryPathPartWithFileName() string {
+	return filepath.Join(line.GetDirectory(), line.GetFileName())
+}
+
 func CreateInputLine(delimitedCommaString string) InputLine {
 	return strings.Split(strings.TrimSpace(delimitedCommaString), ",")
 }

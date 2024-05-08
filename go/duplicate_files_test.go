@@ -47,9 +47,8 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 					inputLine := test.CreateInputLine(delimitedCommaString)
 					if inputLine.HasNoContent() {
 						directoriesWithFileAsStrings = append(directoriesWithFileAsStrings, inputLine)
-						filePathPart := filepath.Join(inputLine[0], inputLine[2])
 						for _, nodeI := range fileSystemNodes {
-							if strings.HasSuffix(nodeI.Path, filePathPart) {
+							if strings.HasSuffix(nodeI.Path, inputLine.JoinDirectoryPathPartWithFileName()) {
 								// TODO: duplicate from non-test
 								foundGroup := false
 								for i, group := range fileGroups {
