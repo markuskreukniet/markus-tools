@@ -24,7 +24,7 @@ type TestCaseInput struct {
 
 type InputLine []string
 
-func (line InputLine) GetDirectory() string {
+func (line InputLine) GetDirectoryPathPart() string {
 	return line[0]
 }
 
@@ -45,7 +45,7 @@ func (line InputLine) HasNoContent() bool {
 }
 
 func (line InputLine) JoinDirectoryPathPartWithFileName() string {
-	return filepath.Join(line.GetDirectory(), line.GetFileName())
+	return filepath.Join(line.GetDirectoryPathPart(), line.GetFileName())
 }
 
 func CreateInputLine(delimitedCommaString string) InputLine {
