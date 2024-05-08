@@ -40,8 +40,8 @@ func (line InputLine) GetContent() string {
 	return line[3]
 }
 
-func (line InputLine) IsContentEmpty() bool {
-	return line.GetContent() == ""
+func (line InputLine) HasNoContent() bool {
+	return line.GetContent() != ""
 }
 
 func CreateInputLine(delimitedCommaString string) InputLine {
@@ -117,11 +117,6 @@ func TestingTrimSpaceTrimSuffixOnSemicolonAndSplitOnSemicolon(delimitedSemicolon
 }
 
 // TODO: is it an arrange function?
-func TestingTrimSpaceAndSplitOnComma(delimitedCommaString string) []string {
-	return strings.Split(strings.TrimSpace(delimitedCommaString), ",")
-}
-
-// TODO: is it an arrange function?
 func ToFilePathFromSlashAndJoin(filePath, filePathEndPart string) string {
 	return filepath.Join(filePath, filepath.FromSlash(filePathEndPart))
 }
@@ -185,13 +180,13 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 	delimitedCommaStrings := TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(input)
 	for i := range delimitedCommaStrings {
 		index := len(inputGroups) - 1
-		substrings := TestingTrimSpaceAndSplitOnComma(delimitedCommaStrings[i])
+		inputLine := CreateInputLine(delimitedCommaStrings[i])
 
 		// probably not optimal but results in less code, which is fine for testing
-		if i == 0 || substrings[0] == "" || substrings[0] != inputGroups[index][0][0] {
-			inputGroups = append(inputGroups, [][]string{substrings})
+		if i == 0 || inputLine[0] == "" || inputLine[0] != inputGroups[index][0][0] {
+			inputGroups = append(inputGroups, [][]string{inputLine})
 		} else {
-			inputGroups[index] = append(inputGroups[index], substrings)
+			inputGroups[index] = append(inputGroups[index], inputLine)
 		}
 	}
 
@@ -231,7 +226,7 @@ func TestingCreateFilesAndDirectoriesByOneInput(t *testing.T, input string) (str
 	var fileSystemNodes []utils.FileSystemNode
 	previousDirectoryFilePathPart := ""
 	for _, delimitedCommaString := range TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(input) {
-		inputLine := TestingTrimSpaceAndSplitOnComma(delimitedCommaString)
+		inputLine := CreateInputLine(delimitedCommaString)
 		filePath := ToFilePathFromSlashAndJoin(temporaryDirectory, inputLine[0])
 		if inputLine[0] != previousDirectoryFilePathPart {
 			testingCreateDirectoryAll(t, filePath)
