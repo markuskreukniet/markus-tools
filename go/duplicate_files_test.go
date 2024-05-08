@@ -1,7 +1,6 @@
 package main
 
 import (
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -42,11 +41,11 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			// create duplicate file groups
 			var fileGroups []duplicateFileGroup
 			if len(directories) > 0 {
-				var directoriesWithFileAsStrings [][]string
+				var inputLines []test.InputLine
 				for _, delimitedCommaString := range test.TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.Input) {
 					inputLine := test.CreateInputLine(delimitedCommaString)
 					if inputLine.HasNoContent() {
-						directoriesWithFileAsStrings = append(directoriesWithFileAsStrings, inputLine)
+						inputLines = append(inputLines, inputLine)
 						for _, nodeI := range fileSystemNodes {
 							if strings.HasSuffix(nodeI.Path, inputLine.JoinDirectoryPathPartWithFileName()) {
 								// TODO: duplicate from non-test
@@ -59,12 +58,12 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 									}
 								}
 								if !foundGroup {
-									for _, directoryWithFileAsStrings := range directoriesWithFileAsStrings {
-										if inputLine.GetContent() == directoryWithFileAsStrings[3] {
+									for _, line := range inputLines {
+										if inputLine.GetContent() == line.GetContent() {
 											for _, nodeJ := range fileSystemNodes {
-												if nodeI.Path != nodeJ.Path && strings.HasSuffix(nodeJ.Path, filepath.Join(directoryWithFileAsStrings[0], directoryWithFileAsStrings[2])) {
+												if nodeI.Path != nodeJ.Path && strings.HasSuffix(nodeJ.Path, line.JoinDirectoryPathPartWithFileName()) {
 													fileGroups = append(fileGroups, duplicateFileGroup{
-														identifier: directoryWithFileAsStrings[3],
+														identifier: line.GetContent(),
 														filePaths:  []string{nodeJ.Path, nodeI.Path},
 													})
 													break
