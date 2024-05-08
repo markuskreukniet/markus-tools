@@ -44,16 +44,16 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			if len(directories) > 0 {
 				var directoriesWithFileAsStrings [][]string
 				for _, delimitedCommaString := range test.TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.Input) {
-					directoryWithOptionalFileAsStrings := test.TestingTrimSpaceAndSplitOnComma(delimitedCommaString)
-					if directoryWithOptionalFileAsStrings[3] != "" {
-						directoriesWithFileAsStrings = append(directoriesWithFileAsStrings, directoryWithOptionalFileAsStrings)
-						filePathPart := filepath.Join(directoryWithOptionalFileAsStrings[0], directoryWithOptionalFileAsStrings[2])
+					inputLine := test.CreateInputLine(delimitedCommaString)
+					if !inputLine.IsContentEmpty() {
+						directoriesWithFileAsStrings = append(directoriesWithFileAsStrings, inputLine)
+						filePathPart := filepath.Join(inputLine[0], inputLine[2])
 						for _, nodeI := range fileSystemNodes {
 							if strings.HasSuffix(nodeI.Path, filePathPart) {
 								// TODO: duplicate from non-test
 								foundGroup := false
 								for i, group := range fileGroups {
-									if directoryWithOptionalFileAsStrings[3] == group.identifier {
+									if inputLine[3] == group.identifier {
 										foundGroup = true
 										fileGroups[i].filePaths = append(fileGroups[i].filePaths, nodeI.Path)
 										break
@@ -61,7 +61,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 								}
 								if !foundGroup {
 									for _, directoryWithFileAsStrings := range directoriesWithFileAsStrings {
-										if directoryWithOptionalFileAsStrings[3] == directoryWithFileAsStrings[3] {
+										if inputLine[3] == directoryWithFileAsStrings[3] {
 											for _, nodeJ := range fileSystemNodes {
 												if nodeI.Path != nodeJ.Path && strings.HasSuffix(nodeJ.Path, filepath.Join(directoryWithFileAsStrings[0], directoryWithFileAsStrings[2])) {
 													fileGroups = append(fileGroups, duplicateFileGroup{

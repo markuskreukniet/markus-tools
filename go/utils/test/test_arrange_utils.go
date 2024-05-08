@@ -40,6 +40,10 @@ func (line InputLine) GetContent() string {
 	return line[3]
 }
 
+func (line InputLine) IsContentEmpty() bool {
+	return line.GetContent() == ""
+}
+
 func CreateInputLine(delimitedCommaString string) InputLine {
 	return strings.Split(strings.TrimSpace(delimitedCommaString), ",")
 }
