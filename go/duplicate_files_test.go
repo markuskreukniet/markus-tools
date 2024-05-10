@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/markuskreukniet/markus-tools/go/utils"
-	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
 
 // TODO: cleaning
@@ -26,24 +25,24 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 		directory 2/directory 3,,txt 2-3 3.txt,` + contents[1] + `;
 		directory 2/directory 4,,txt 2-4.txt,` + contents[1] + `;
 	`
-	testCases := []test.TestCaseInput{
-		test.TestingCreateTestCaseInput("Basic", input, false),
-		test.TestingCreateTestCaseInput("Empty Input", "", false),
+	testCases := []utils.TestCaseInput{
+		utils.TestingCreateTestCaseInput("Basic", input, false),
+		utils.TestingCreateTestCaseInput("Empty Input", "", false),
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			directories, fileSystemNodes := test.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.Input)
-			defer test.TestingRemoveDirectoryTrees(t, directories)
+			directories, fileSystemNodes := utils.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.Input)
+			defer utils.TestingRemoveDirectoryTrees(t, directories)
 			var builder strings.Builder
 
 			// create duplicate file groups
 			var fileGroups []duplicateFileGroup
 			if len(directories) > 0 {
-				var inputLines []test.InputLine
-				for _, delimitedCommaString := range test.TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.Input) {
-					inputLine := test.CreateInputLine(delimitedCommaString)
+				var inputLines []utils.InputLine
+				for _, delimitedCommaString := range utils.TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.Input) {
+					inputLine := utils.CreateInputLine(delimitedCommaString)
 					if inputLine.HasNoContent() {
 						inputLines = append(inputLines, inputLine)
 						for _, nodeI := range fileSystemNodes {
@@ -82,7 +81,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 				// create and return the result string
 				for i, group := range fileGroups {
 					if i != 0 {
-						test.TestingWriteTwoNewlineStrings(t, &builder)
+						utils.TestingWriteTwoNewlineStrings(t, &builder)
 					}
 					for j, path := range group.filePaths {
 						if j != 0 {
@@ -90,7 +89,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 								t.Errorf("WriteNewlineString error: %v", err)
 							}
 						}
-						test.TestingWriteString(t, path, &builder)
+						utils.TestingWriteString(t, path, &builder)
 					}
 				}
 			}
@@ -99,7 +98,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			outcome, err := getDuplicateFilesAsNewlineSeparatedString(fileSystemNodes)
 
 			// assert
-			test.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.Metadata.WantErr, builder, outcome)
+			utils.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.Metadata.WantErr, builder, outcome)
 		})
 	}
 }

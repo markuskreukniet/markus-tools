@@ -1,10 +1,8 @@
-package test
+package utils
 
 import (
 	"strings"
 	"testing"
-
-	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
 func TestingWriteString(t *testing.T, stringToWrite string, builder *strings.Builder) {
@@ -16,7 +14,7 @@ func TestingWriteString(t *testing.T, stringToWrite string, builder *strings.Bui
 
 func TestingWriteTwoNewlineStrings(t *testing.T, builder *strings.Builder) {
 	t.Helper()
-	if _, err := utils.WriteTwoNewlineStrings(builder); err != nil {
+	if _, err := WriteTwoNewlineStrings(builder); err != nil {
 		t.Errorf("WriteTwoNewlineStrings error: %v", err)
 	}
 }

@@ -1,4 +1,4 @@
-package test
+package utils
 
 import (
 	"fmt"
@@ -8,8 +8,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
 type TestCaseMetadata struct {
@@ -132,7 +130,7 @@ func testingCreateDirectoryAll(t *testing.T, filePath string) {
 	}
 }
 
-func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, isDirectory bool, filePath string, inputLine []string, fileSystemNodes *[]utils.FileSystemNode) {
+func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, isDirectory bool, filePath string, inputLine []string, fileSystemNodes *[]FileSystemNode) {
 	t.Helper()
 	if !isDirectory {
 		filePath = filepath.Join(filePath, inputLine[2])
@@ -150,7 +148,7 @@ func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, isDirectory bo
 			}
 		}
 	}
-	*fileSystemNodes = append(*fileSystemNodes, utils.FileSystemNode{
+	*fileSystemNodes = append(*fileSystemNodes, FileSystemNode{
 		Path:        filePath,
 		IsDirectory: isDirectory,
 	})
@@ -173,7 +171,7 @@ func createTemporaryDirectory(t *testing.T) string {
 // TODO: maybe using an [][][]string is not needed
 // It should not always have to return a slice, but it is fine for testing.
 // And disk I/O operations are significantly slower than in-memory operations.
-func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string) ([]string, []utils.FileSystemNode) {
+func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string) ([]string, []FileSystemNode) {
 	t.Helper()
 	if isInputEmpty(input) {
 		return nil, nil
@@ -197,7 +195,7 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 	// create and return temporary directories
 	// create and return fileSystemNodes
 	var tempDirectories []string
-	var fileSystemNodes []utils.FileSystemNode
+	var fileSystemNodes []FileSystemNode
 	for _, group := range inputGroups {
 		temporaryDirectory := createTemporaryDirectory(t)
 		tempDirectories = append(tempDirectories, temporaryDirectory)
@@ -220,14 +218,14 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 // When we add a prefix to all input lines so that TestingCreateFilesAndDirectoriesByMultipleInputs can be used, all the folders with that prefix are added to the destination directory when syncing.
 // It should not always have to return a slice, but it is fine for testing.
 // And disk I/O operations are significantly slower than in-memory operations.
-func TestingCreateFilesAndDirectoriesByOneInput(t *testing.T, input string) (string, []utils.FileSystemNode) {
+func TestingCreateFilesAndDirectoriesByOneInput(t *testing.T, input string) (string, []FileSystemNode) {
 	t.Helper()
 	if isInputEmpty(input) {
 		return "", nil
 	}
 
 	temporaryDirectory := createTemporaryDirectory(t)
-	var fileSystemNodes []utils.FileSystemNode
+	var fileSystemNodes []FileSystemNode
 	previousDirectoryFilePathPart := ""
 	for _, delimitedCommaString := range TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(input) {
 		inputLine := CreateInputLine(delimitedCommaString)

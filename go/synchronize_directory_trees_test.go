@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/markuskreukniet/markus-tools/go/utils"
-	"github.com/markuskreukniet/markus-tools/go/utils/test"
 )
 
 type filePathEndPartContent struct {
@@ -69,14 +68,14 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 
 	// create testCases
 	testCases := []struct {
-		metadata          test.TestCaseMetadata
+		metadata          utils.TestCaseMetadata
 		sourceInput       string
 		destinationInput  string
 		updatedFile       filePathEndPartContent
 		wantSameFilePaths bool
 	}{
 		{
-			metadata:         test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
+			metadata:         utils.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
 			sourceInput:      sourceInput,
 			destinationInput: destinationInput,
 			updatedFile: filePathEndPartContent{
@@ -86,7 +85,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			wantSameFilePaths: true,
 		},
 		{
-			metadata:          test.TestingCreateTestCaseMetadataWithWantErrTrue("Empty destinationInput"),
+			metadata:          utils.TestingCreateTestCaseMetadataWithWantErrTrue("Empty destinationInput"),
 			sourceInput:       sourceInput,
 			destinationInput:  "",
 			updatedFile:       filePathEndPartContent{},
@@ -98,16 +97,16 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			sourceDirectory, _ := test.TestingCreateFilesAndDirectoriesByOneInput(t, tc.sourceInput)
-			defer test.TestingRemoveDirectoryTree(t, sourceDirectory)
-			destinationDirectory, _ := test.TestingCreateFilesAndDirectoriesByOneInput(t, tc.destinationInput)
-			defer test.TestingRemoveDirectoryTree(t, destinationDirectory)
+			sourceDirectory, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, tc.sourceInput)
+			defer utils.TestingRemoveDirectoryTree(t, sourceDirectory)
+			destinationDirectory, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, tc.destinationInput)
+			defer utils.TestingRemoveDirectoryTree(t, destinationDirectory)
 
 			// act
 			err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
 
 			// assert
-			test.TestingAssertErrorToWantError(t, err, tc.metadata.WantErr)
+			utils.TestingAssertErrorToWantError(t, err, tc.metadata.WantErr)
 			haveSameFilePaths := testingHaveDirectoryTreesSameFilePaths(t, sourceDirectory, destinationDirectory)
 			if tc.wantSameFilePaths && !haveSameFilePaths {
 				t.Errorf("The source and destination directory trees do not have the same file paths.")
@@ -117,11 +116,11 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 				t.Errorf("The destination and source directory trees do not have the same file paths.")
 			}
 			if tc.updatedFile.filePathEndPart != "" && tc.updatedFile.content != "" {
-				content, err := os.ReadFile(test.ToFilePathFromSlashAndJoin(destinationDirectory, tc.updatedFile.filePathEndPart))
+				content, err := os.ReadFile(utils.ToFilePathFromSlashAndJoin(destinationDirectory, tc.updatedFile.filePathEndPart))
 				if err != nil {
 					t.Fatalf("Failed to read file: %s", err)
 				}
-				test.TestingAssertEqualStrings(t, string(content), tc.updatedFile.content)
+				utils.TestingAssertEqualStrings(t, string(content), tc.updatedFile.content)
 			}
 		})
 	}
@@ -135,35 +134,35 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	const joinedOutputBasePathWithRelativeInputPath string = "/home/user/destination/directory/file.txt"
 
 	testCases := []struct {
-		metadata       test.TestCaseMetadata
+		metadata       utils.TestCaseMetadata
 		inputBasePath  string
 		inputFullPath  string
 		outputBasePath string
 		want           string
 	}{
 		{
-			metadata:       test.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
+			metadata:       utils.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
 			inputBasePath:  inputBasePath,
 			inputFullPath:  inputFullPath,
 			outputBasePath: outputBasePath,
 			want:           filepath.FromSlash(joinedOutputBasePathWithRelativeInputPath),
 		},
 		{
-			metadata:       test.TestingCreateTestCaseMetadataWithWantErrTrue("Empty InputBasePath"),
+			metadata:       utils.TestingCreateTestCaseMetadataWithWantErrTrue("Empty InputBasePath"),
 			inputBasePath:  "",
 			inputFullPath:  inputFullPath,
 			outputBasePath: outputBasePath,
 			want:           "",
 		},
 		{
-			metadata:       test.TestingCreateTestCaseMetadataWithWantErrTrue("Empty InputFullPath"),
+			metadata:       utils.TestingCreateTestCaseMetadataWithWantErrTrue("Empty InputFullPath"),
 			inputBasePath:  inputBasePath,
 			inputFullPath:  "",
 			outputBasePath: outputBasePath,
 			want:           "",
 		},
 		{
-			metadata:       test.TestingCreateTestCaseMetadata("Equivalent Input Paths", false),
+			metadata:       utils.TestingCreateTestCaseMetadata("Equivalent Input Paths", false),
 			inputBasePath:  inputBasePath,
 			inputFullPath:  inputBasePath,
 			outputBasePath: outputBasePath,
@@ -174,9 +173,9 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.metadata.Name, func(t *testing.T) {
 			result, err := joinOutputBasePathWithRelativeInputPath(tc.inputBasePath, tc.inputFullPath, tc.outputBasePath)
-			test.TestingAssertErrorToWantError(t, err, tc.metadata.WantErr)
+			utils.TestingAssertErrorToWantError(t, err, tc.metadata.WantErr)
 			if err == nil {
-				test.TestingAssertEqualStrings(t, tc.want, result)
+				utils.TestingAssertEqualStrings(t, tc.want, result)
 			}
 		})
 	}

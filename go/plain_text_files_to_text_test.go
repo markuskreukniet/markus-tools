@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/markuskreukniet/markus-tools/go/utils/test"
+	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
 func TestPlainTextFilesToText(t *testing.T) {
@@ -17,33 +17,33 @@ func TestPlainTextFilesToText(t *testing.T) {
 		directory 1/directory 2,,txt 1-2.txt,content directory 1/directory\ncontent 2 1-2;
 		directory 1/directory 2,,txt 1-2 2.txt,content directory 1/directory\ncontent 2 1-2 2;
 	`
-	testCases := []test.TestCaseInput{
-		test.TestingCreateTestCaseInput("Basic", input, false),
-		test.TestingCreateTestCaseInput("Empty Input", "", false),
+	testCases := []utils.TestCaseInput{
+		utils.TestingCreateTestCaseInput("Basic", input, false),
+		utils.TestingCreateTestCaseInput("Empty Input", "", false),
 	}
 
 	// run testCases
 	for _, tc := range testCases {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			directories, fileSystemNodes := test.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.Input)
-			defer test.TestingRemoveDirectoryTrees(t, directories)
+			directories, fileSystemNodes := utils.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.Input)
+			defer utils.TestingRemoveDirectoryTrees(t, directories)
 			var builder strings.Builder
 			if len(directories) > 0 {
 				isFirstWrite := true
-				delimitedCommaStrings := test.TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.Input)
+				delimitedCommaStrings := utils.TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.Input)
 				for _, delimitedCommaString := range delimitedCommaStrings {
-					inputLine := test.CreateInputLine(delimitedCommaString)
+					inputLine := utils.CreateInputLine(delimitedCommaString)
 					if inputLine.HasNoContent() {
 
 						// probably not optimal but results in less code, which is fine for testing
 						if isFirstWrite {
 							isFirstWrite = false
 						} else {
-							test.TestingWriteTwoNewlineStrings(t, &builder)
+							utils.TestingWriteTwoNewlineStrings(t, &builder)
 						}
 
-						test.TestingWriteString(t, inputLine.GetFileName()+"\n"+inputLine.GetContent(), &builder)
+						utils.TestingWriteString(t, inputLine.GetFileName()+"\n"+inputLine.GetContent(), &builder)
 					}
 				}
 			}
@@ -52,7 +52,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 			outcome, err := plainTextFilesToText(fileSystemNodes)
 
 			// assert
-			test.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.Metadata.WantErr, builder, outcome)
+			utils.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.Metadata.WantErr, builder, outcome)
 		})
 	}
 }
