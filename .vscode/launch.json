@@ -32,6 +32,13 @@
       "request": "launch",
       "mode": "test",
       "program": "${workspaceFolder}/go"
+    },
+    {
+      "name": "Debug Go Tests in /go/utils Directory",
+      "type": "go",
+      "request": "launch",
+      "mode": "test",
+      "program": "${workspaceFolder}/go/utils"
     }
   ],
   "compounds": [
@@ -41,6 +48,10 @@
       "presentation": {
         "order": 1
       }
+    },
+    {
+      "name": "Debug Go Tests in Multiple Directories",
+      "configurations": ["Debug Go Tests in /go Directory", "Debug Go Tests in /go/utils Directory"]
     }
   ]
 }
