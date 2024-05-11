@@ -185,7 +185,8 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 		inputLine := CreateInputLine(delimitedCommaStrings[i])
 
 		// probably not optimal but results in less code, which is fine for testing
-		if i == 0 || inputLine[0] == "" || inputLine[0] != inputGroups[index][0][0] {
+		part := inputLine.GetDirectoryPathPart()
+		if i == 0 || part == "" || part != inputGroups[index][0][0] {
 			inputGroups = append(inputGroups, [][]string{inputLine})
 		} else {
 			inputGroups[index] = append(inputGroups[index], inputLine)
