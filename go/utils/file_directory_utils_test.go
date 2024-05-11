@@ -12,7 +12,6 @@ import (
 // 	}
 // }
 
-// TODO: change this test to a similar version as other tests
 // func TestGetFileDetail(t *testing.T) {
 // 	// arrange
 // 	fileSystemPathEndParts := FileSystemPathEndParts{
@@ -51,7 +50,6 @@ import (
 // 	}
 // }
 
-// TODO: has copied and duplicate things and test cases are dirty
 func TestFileOrDirectoryExists(t *testing.T) {
 	// arrange
 	input := `
@@ -60,7 +58,6 @@ func TestFileOrDirectoryExists(t *testing.T) {
 		directory 1/empty,,,;
 		directory 1,,txt 1.txt,;
 	`
-
 	testCases := []struct {
 		testCaseInput    TestCaseInput
 		inputToDirectory bool
