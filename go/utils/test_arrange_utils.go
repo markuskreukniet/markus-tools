@@ -75,11 +75,6 @@ func TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse() TestCaseMetadat
 	return TestingCreateTestCaseMetadata("Basic", false)
 }
 
-// TODO: rename and use in TestPlainTextFilesToText?
-func TestingCreateTestCaseMetadataWithNameEmptyFileSystemNodesAndWantErrFalse() TestCaseMetadata {
-	return TestingCreateTestCaseMetadata("Empty FileSystemNodes", false)
-}
-
 func TestingWriteFileContentWithContentAndIndex(t *testing.T, filePath string, index int) string {
 	t.Helper()
 	writtenContent := fmt.Sprintf("content %d", index)
