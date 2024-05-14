@@ -25,20 +25,23 @@ import (
 
 func TestFilesToDateRangeDirectory(t *testing.T) {
 	// arrange
+	time0240 := "2020-02-20T20:40:40Z"
+	time0241 := "2020-02-20T20:40:41Z"
+	time05 := "2020-05-20T20:40:40Z"
 	input := `
 		,,txt 0.txt,;
 		empty,,,;
-		directory 1,,txt 1.txt,;
+		directory 1,` + time0241 + `,txt 1.txt,;
 		directory 1,,jpg 1.jpg,;
-		directory 2/directory 3,,txt 2 3.txt,;
+		directory 2/directory 3,` + time05 + `,txt 2 3.txt,;
 	`
 	destinationInput := `
 		,,txt 0.txt,;
 		2020-01-20,,,;
-		2020-02-20,,txt 02.txt,;
+		2020-02-20,` + time0240 + `,txt 02.txt,;
 		2020-03-20,,,;
 		2020-04-20 - 2020-04-21,,,;
-		2020-05-20 - 2020-05-21,,txt 05.txt,;
+		2020-05-20 - 2020-05-21,` + time05 + `,txt 05.txt,;
 		2020-06-20 - 2020-06-21,,,;
 	`
 	testCases := []struct {
@@ -58,26 +61,17 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	// run testCases
 	for _, tc := range testCases {
 		t.Run(tc.testCaseInput.Metadata.Name, func(t *testing.T) {
+			// arrange and teardown
 			directories, _ := utils.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.testCaseInput.Input)
+			defer utils.TestingRemoveDirectoryTrees(t, directories)
 			directory, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, tc.destinationInput)
+			defer utils.TestingRemoveDirectoryTree(t, directory)
 
 			log.Println(directories)
 			log.Println(directory)
 		})
 	}
 
-	// destinationInputDirectoriesWithOptionalFile := createDirectoriesWithOptionalFile(destinationInputAsDelimitedString)
-
-	// TODO: duplicate naming of files
-
-	// for _, tc := range testCases {
-	// 	t.Run(tc.metadata.Name, func(t *testing.T) {
-	// 		// arrange and teardown
-
-	// 		// act
-
-	// 		// assert
-
-	// 	})
-	// }
+	// act
+	// assert
 }
