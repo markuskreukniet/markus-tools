@@ -55,9 +55,17 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 		},
 	}
 
-	log.Println(testCases)
+	// run testCases
+	for _, tc := range testCases {
+		t.Run(tc.testCaseInput.Metadata.Name, func(t *testing.T) {
+			directories, _ := utils.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.testCaseInput.Input)
+			directory, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, tc.destinationInput)
 
-	// inputDirectoriesWithOptionalFile := createDirectoriesWithOptionalFile(inputAsDelimitedString)
+			log.Println(directories)
+			log.Println(directory)
+		})
+	}
+
 	// destinationInputDirectoriesWithOptionalFile := createDirectoriesWithOptionalFile(destinationInputAsDelimitedString)
 
 	// TODO: duplicate naming of files
