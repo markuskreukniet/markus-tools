@@ -34,7 +34,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 				delimitedCommaStrings := utils.TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.Input)
 				for _, delimitedCommaString := range delimitedCommaStrings {
 					inputLine := utils.CreateInputLine(delimitedCommaString)
-					if inputLine.HasNoContent() {
+					if inputLine.HasContent() {
 
 						// probably not optimal but results in less code, which is fine for testing
 						if isFirstWrite {

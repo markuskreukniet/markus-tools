@@ -38,7 +38,7 @@ func (line InputLine) GetContent() string {
 	return line[3]
 }
 
-func (line InputLine) HasNoContent() bool {
+func (line InputLine) HasContent() bool {
 	return line.GetContent() != ""
 }
 
