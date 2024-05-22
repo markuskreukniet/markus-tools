@@ -78,11 +78,11 @@ func TestFileOrDirectoryExists(t *testing.T) {
 			// arrange and teardown
 			directory, _ := TestingCreateFilesAndDirectoriesByOneInput(t, tc.testCaseInput.Input)
 			defer TestingRemoveDirectoryTree(t, directory)
-			delimitedCommaStrings := TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.testCaseInput.Input)
-			for _, delimitedCommaString := range delimitedCommaStrings {
+			rawInputLines := CreateSortedRawInputLines(tc.testCaseInput.Input)
+			for _, rawInputLine := range rawInputLines {
 				filePath := directory
 				if directory != "" {
-					filePath = filepath.Join(directory, CreateInputLine(delimitedCommaString).JoinDirectoryPathPartWithFileName())
+					filePath = filepath.Join(directory, CreateInputLine(rawInputLine).JoinDirectoryPathPartWithFileName())
 				}
 
 				// act

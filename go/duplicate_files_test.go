@@ -41,8 +41,8 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			var fileGroups []duplicateFileGroup
 			if len(directories) > 0 {
 				var inputLines []utils.InputLine
-				for _, delimitedCommaString := range utils.TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.Input) {
-					inputLine := utils.CreateInputLine(delimitedCommaString)
+				for _, rawInputLine := range utils.CreateSortedRawInputLines(tc.Input) {
+					inputLine := utils.CreateInputLine(rawInputLine)
 					if inputLine.HasContent() {
 						inputLines = append(inputLines, inputLine)
 						for _, nodeI := range fileSystemNodes {

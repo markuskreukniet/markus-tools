@@ -10,16 +10,7 @@ import (
 	"time"
 )
 
-type TestCaseMetadata struct {
-	Name    string
-	WantErr bool
-}
-
-type TestCaseInput struct {
-	Metadata TestCaseMetadata
-	Input    string
-}
-
+// InputLine
 type InputLine []string
 
 func (line InputLine) GetDirectoryPathPart() string {
@@ -48,6 +39,25 @@ func (line InputLine) JoinDirectoryPathPartWithFileName() string {
 
 func CreateInputLine(delimitedCommaString string) InputLine {
 	return strings.Split(strings.TrimSpace(delimitedCommaString), ",")
+}
+
+// RawInputLines
+type RawInputLines []string
+
+func CreateSortedRawInputLines(delimitedSemicolonString string) RawInputLines {
+	rawInputLines := strings.Split(strings.TrimSuffix(strings.TrimSpace(delimitedSemicolonString), ";"), ";")
+	slices.Sort(rawInputLines)
+	return rawInputLines
+}
+
+type TestCaseMetadata struct {
+	Name    string
+	WantErr bool
+}
+
+type TestCaseInput struct {
+	Metadata TestCaseMetadata
+	Input    string
 }
 
 func TestingCreateTestCaseMetadata(name string, wantErr bool) TestCaseMetadata {
@@ -99,13 +109,6 @@ func TestingWriteFileContent(t *testing.T, filePath string, content string) {
 // 	timeModified  time.Time
 // 	plainTextFile *plainTextFile
 // }
-
-// TODO: is it an arrange function? Should it be a separate function
-func TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(delimitedSemicolonString string) []string {
-	delimitedCommaStrings := strings.Split(strings.TrimSuffix(strings.TrimSpace(delimitedSemicolonString), ";"), ";")
-	slices.Sort(delimitedCommaStrings)
-	return delimitedCommaStrings
-}
 
 // TODO: is it an arrange function? Should it be a separate function
 // TODO: remove
@@ -174,10 +177,10 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 
 	// create input groups
 	var inputGroups [][][]string
-	delimitedCommaStrings := TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(input)
-	for i := range delimitedCommaStrings {
+	rawInputLines := CreateSortedRawInputLines(input)
+	for i := range rawInputLines {
 		index := len(inputGroups) - 1
-		inputLine := CreateInputLine(delimitedCommaStrings[i])
+		inputLine := CreateInputLine(rawInputLines[i])
 
 		// probably not optimal but results in less code, which is fine for testing
 		part := inputLine.GetDirectoryPathPart()
@@ -223,8 +226,8 @@ func TestingCreateFilesAndDirectoriesByOneInput(t *testing.T, input string) (str
 	temporaryDirectory := createTemporaryDirectory(t)
 	var fileSystemNodes []FileSystemNode
 	previousDirectoryFilePathPart := ""
-	for _, delimitedCommaString := range TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(input) {
-		inputLine := CreateInputLine(delimitedCommaString)
+	for _, rawInputLine := range CreateSortedRawInputLines(input) {
+		inputLine := CreateInputLine(rawInputLine)
 		filePath := ToFilePathFromSlashAndJoin(temporaryDirectory, inputLine[0])
 		if inputLine[0] != previousDirectoryFilePathPart {
 			testingCreateDirectoryAll(t, filePath)

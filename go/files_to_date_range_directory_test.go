@@ -182,8 +182,8 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			// create duplicate file groups
 			// var fileGroups []duplicateFileGroup
 			// var inputLines []utils.InputLine
-			// for _, delimitedCommaString := range utils.TestingTrimSpaceTrimSuffixSplitOnSemicolonAndSort(tc.testCaseInput.Input) {
-			// 	inputLine := utils.CreateInputLine(delimitedCommaString)
+			// for _, rawInputLine := range utils.CreateSortedRawInputLines(tc.testCaseInput.Input) {
+			// 	inputLine := utils.CreateInputLine(rawInputLine)
 			// }
 
 			log.Println(directories)
