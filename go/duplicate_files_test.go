@@ -38,52 +38,46 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			var builder strings.Builder
 
 			// create duplicate file groups
-			var fileGroups []duplicateFileGroup
+			var groups utils.DuplicateFileGroups
 			if len(directories) > 0 {
 				var inputLines []utils.InputLine
 				for _, rawInputLine := range utils.CreateSortedRawInputLines(tc.Input) {
 					inputLine := utils.CreateInputLine(rawInputLine)
-					if inputLine.HasContent() {
-						inputLines = append(inputLines, inputLine)
-						for _, nodeI := range fileSystemNodes {
-							if strings.HasSuffix(nodeI.Path, inputLine.JoinDirectoryPathPartWithFileName()) {
-								// TODO: duplicate from non-test
-								foundGroup := false
-								for i, group := range fileGroups {
-									if inputLine.GetContent() == group.identifier {
-										foundGroup = true
-										fileGroups[i].filePaths = append(fileGroups[i].filePaths, nodeI.Path)
+
+					if !inputLine.HasContent() {
+						continue
+					}
+
+					inputLines = append(inputLines, inputLine)
+					for _, nodeI := range fileSystemNodes {
+						if strings.HasSuffix(nodeI.Path, inputLine.JoinDirectoryPathPartWithFileName()) {
+							if !groups.AppendByIdentifier(inputLine.GetContent(), nodeI.Path) {
+								for _, line := range inputLines {
+									if inputLine.GetContent() == line.GetContent() {
+										for _, nodeJ := range fileSystemNodes {
+											if nodeI.Path != nodeJ.Path && strings.HasSuffix(nodeJ.Path, line.JoinDirectoryPathPartWithFileName()) {
+												groups = append(groups, utils.DuplicateFileGroup{
+													Identifier: line.GetContent(),
+													FilePaths:  []string{nodeJ.Path, nodeI.Path},
+												})
+												break
+											}
+										}
 										break
 									}
 								}
-								if !foundGroup {
-									for _, line := range inputLines {
-										if inputLine.GetContent() == line.GetContent() {
-											for _, nodeJ := range fileSystemNodes {
-												if nodeI.Path != nodeJ.Path && strings.HasSuffix(nodeJ.Path, line.JoinDirectoryPathPartWithFileName()) {
-													fileGroups = append(fileGroups, duplicateFileGroup{
-														identifier: line.GetContent(),
-														filePaths:  []string{nodeJ.Path, nodeI.Path},
-													})
-													break
-												}
-											}
-											break
-										}
-									}
-								}
-								break
 							}
+							break
 						}
 					}
 				}
 
 				// create and return the result string
-				for i, group := range fileGroups {
+				for i, group := range groups {
 					if i != 0 {
 						utils.TestingWriteTwoNewlineStrings(t, &builder)
 					}
-					for j, path := range group.filePaths {
+					for j, path := range group.FilePaths {
 						if j != 0 {
 							if _, err := utils.WriteNewlineString(&builder); err != nil {
 								t.Errorf("WriteNewlineString error: %v", err)

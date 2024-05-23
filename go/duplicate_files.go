@@ -63,7 +63,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 	})
 
 	// create duplicate file groups
-	var duplicateFileGroups []duplicateFileGroup
+	var groups utils.DuplicateFileGroups
 	for i := 1; i < len(fileIdentifiers); i++ {
 		previousIndex := i - 1
 		if fileIdentifiers[previousIndex].size == fileIdentifiers[i].size {
@@ -76,20 +76,12 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 			if fileIdentifiers[i].hash, err = getFileHash(fileIdentifiers[i].path); err != nil {
 				return "", err
 			}
-			foundGroup := false
-			for j, group := range duplicateFileGroups {
-				if fileIdentifiers[i].hash == group.identifier {
-					foundGroup = true
-					duplicateFileGroups[j].filePaths = append(duplicateFileGroups[j].filePaths, fileIdentifiers[i].path)
-					break
-				}
-			}
-			if !foundGroup {
+			if !groups.AppendByIdentifier(fileIdentifiers[i].hash, fileIdentifiers[i].path) {
 				for j := 0; j <= previousIndex; j++ {
 					if fileIdentifiers[i].hash == fileIdentifiers[j].hash {
-						duplicateFileGroups = append(duplicateFileGroups, duplicateFileGroup{
-							identifier: fileIdentifiers[i].hash,
-							filePaths:  []string{fileIdentifiers[j].path, fileIdentifiers[i].path},
+						groups = append(groups, utils.DuplicateFileGroup{
+							Identifier: fileIdentifiers[i].hash,
+							FilePaths:  []string{fileIdentifiers[j].path, fileIdentifiers[i].path},
 						})
 						break
 					}
@@ -100,13 +92,13 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 
 	// create and return the result string
 	var result strings.Builder
-	for i, group := range duplicateFileGroups {
+	for i, group := range groups {
 		if i != 0 {
 			if _, err := utils.WriteTwoNewlineStrings(&result); err != nil {
 				return "", err
 			}
 		}
-		for j, path := range group.filePaths {
+		for j, path := range group.FilePaths {
 			if j != 0 {
 				if _, err := utils.WriteNewlineString(&result); err != nil {
 					return "", err

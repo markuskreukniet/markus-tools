@@ -155,7 +155,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	input := ""
 	destinationInput := destinationDuplicateFiles
 
-	// test cases
+	// create testCases
 	testCases := []struct {
 		testCaseInput    utils.TestCaseInput
 		destinationInput string
