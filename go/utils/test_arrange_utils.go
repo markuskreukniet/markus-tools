@@ -157,7 +157,7 @@ func isInputEmpty(input string) bool {
 	return input == ""
 }
 
-func createTemporaryDirectory(t *testing.T) string {
+func CreateTemporaryDirectory(t *testing.T) string {
 	t.Helper()
 	temporaryDirectory, err := os.MkdirTemp("", "markus-tools go test")
 	if err != nil {
@@ -196,7 +196,7 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 	var tempDirectories []string
 	var fileSystemNodes []FileSystemNode
 	for _, group := range inputGroups {
-		temporaryDirectory := createTemporaryDirectory(t)
+		temporaryDirectory := CreateTemporaryDirectory(t)
 		tempDirectories = append(tempDirectories, temporaryDirectory)
 		for i, inputLine := range group {
 			filePath := ToFilePathFromSlashAndJoin(temporaryDirectory, inputLine[0])
@@ -223,7 +223,7 @@ func TestingCreateFilesAndDirectoriesByOneInput(t *testing.T, input string) (str
 		return "", nil
 	}
 
-	temporaryDirectory := createTemporaryDirectory(t)
+	temporaryDirectory := CreateTemporaryDirectory(t)
 	var fileSystemNodes []FileSystemNode
 	previousDirectoryFilePathPart := ""
 	for _, rawInputLine := range CreateSortedRawInputLines(input) {

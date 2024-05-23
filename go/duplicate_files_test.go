@@ -53,6 +53,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 						if strings.HasSuffix(nodeI.Path, inputLine.JoinDirectoryPathPartWithFileName()) {
 							if !groups.AppendByIdentifier(inputLine.GetContent(), nodeI.Path) {
 								for _, line := range inputLines {
+									// TODO: useless check?
 									if inputLine.GetContent() == line.GetContent() {
 										for _, nodeJ := range fileSystemNodes {
 											if nodeI.Path != nodeJ.Path && strings.HasSuffix(nodeJ.Path, line.JoinDirectoryPathPartWithFileName()) {

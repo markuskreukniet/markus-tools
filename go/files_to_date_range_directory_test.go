@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"path/filepath"
 	"testing"
 
 	"github.com/markuskreukniet/markus-tools/go/utils"
@@ -174,23 +174,43 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.testCaseInput.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			directories, _ := utils.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.testCaseInput.Input)
-			defer utils.TestingRemoveDirectoryTrees(t, directories)
-			directory, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, tc.destinationInput)
-			defer utils.TestingRemoveDirectoryTree(t, directory)
+			destination := utils.CreateTemporaryDirectory(t)
+			defer utils.TestingRemoveDirectoryTree(t, destination)
 
 			// create duplicate file groups
-			// var fileGroups []duplicateFileGroup
-			// var inputLines []utils.InputLine
-			// for _, rawInputLine := range utils.CreateSortedRawInputLines(tc.testCaseInput.Input) {
-			// 	inputLine := utils.CreateInputLine(rawInputLine)
-			// }
+			var groups utils.DuplicateFileGroups
+			var unGroupedLines []utils.InputLine
+			for _, rawLine := range utils.CreateSortedRawInputLines(tc.destinationInput) {
+				line := utils.CreateInputLine(rawLine)
 
-			log.Println(directories)
-			log.Println(directory)
+				if !line.HasContent() {
+					continue
+				}
+
+				appended := groups.AppendByIdentifier(line.GetContent(), filepath.Join(destination, line.JoinDirectoryPathPartWithFileName()))
+
+				if appended {
+					continue
+				}
+
+				var paths []string
+				for _, unGroupedLine := range unGroupedLines {
+					if line.GetContent() == unGroupedLine.GetContent() {
+						paths = append(paths, filepath.Join(destination, unGroupedLine.JoinDirectoryPathPartWithFileName()))
+					}
+				}
+				if len(paths) > 0 {
+					groups = append(groups, utils.DuplicateFileGroup{
+						Identifier: line.GetContent(),
+						FilePaths:  paths,
+					})
+				} else {
+					unGroupedLines = append(unGroupedLines, line)
+				}
+			}
+
+			// act
+			// assert
 		})
 	}
-
-	// act
-	// assert
 }
