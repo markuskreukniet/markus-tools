@@ -37,9 +37,9 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			defer utils.TestingRemoveDirectoryTrees(t, directories)
 			var builder strings.Builder
 
-			// create duplicate file groups
-			var groups utils.DuplicateFileGroups
 			if len(directories) > 0 {
+				// create duplicate file groups
+				var groups utils.DuplicateFileGroups
 				var inputLines []utils.InputLine
 				for _, rawInputLine := range utils.CreateSortedRawInputLines(tc.Input) {
 					inputLine := utils.CreateInputLine(rawInputLine)
