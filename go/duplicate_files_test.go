@@ -42,34 +42,36 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 				var groups utils.DuplicateFileGroups
 				var inputLines []utils.InputLine
 				for _, rawInputLine := range utils.CreateSortedRawInputLines(tc.Input) {
-					inputLine := utils.CreateInputLine(rawInputLine)
+					line := utils.CreateInputLine(rawInputLine)
 
-					if !inputLine.HasContent() {
+					if !line.HasContent() {
 						continue
 					}
 
-					inputLines = append(inputLines, inputLine)
+					inputLines = append(inputLines, line)
 					for _, nodeI := range fileSystemNodes {
-						if strings.HasSuffix(nodeI.Path, inputLine.JoinDirectoryPathPartWithFileName()) {
-							if !groups.AppendByIdentifier(inputLine.GetContent(), nodeI.Path) {
-								for _, line := range inputLines {
-									// TODO: useless check?
-									if inputLine.GetContent() == line.GetContent() {
-										for _, nodeJ := range fileSystemNodes {
-											if nodeI.Path != nodeJ.Path && strings.HasSuffix(nodeJ.Path, line.JoinDirectoryPathPartWithFileName()) {
-												groups = append(groups, utils.DuplicateFileGroup{
-													Identifier: line.GetContent(),
-													FilePaths:  []string{nodeJ.Path, nodeI.Path},
-												})
-												break
-											}
+						if !strings.HasSuffix(nodeI.Path, line.JoinDirectoryPathPartWithFileName()) {
+							continue
+						}
+
+						if !groups.AppendByIdentifier(line.GetContent(), nodeI.Path) {
+							for _, lineJ := range inputLines {
+								// TODO: useless check?
+								if line.GetContent() == lineJ.GetContent() {
+									for _, nodeJ := range fileSystemNodes {
+										if nodeI.Path != nodeJ.Path && strings.HasSuffix(nodeJ.Path, lineJ.JoinDirectoryPathPartWithFileName()) {
+											groups = append(groups, utils.DuplicateFileGroup{
+												Identifier: lineJ.GetContent(),
+												FilePaths:  []string{nodeJ.Path, nodeI.Path},
+											})
+											break
 										}
-										break
 									}
+									break
 								}
 							}
-							break
 						}
+						break
 					}
 				}
 

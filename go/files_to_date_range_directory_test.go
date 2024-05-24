@@ -180,6 +180,8 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			// create duplicate file groups
 			var groups utils.DuplicateFileGroups
 			var unGroupedLines []utils.InputLine
+
+			// TODO: deze logica ook doorvoeren in duplicate files test go
 			for _, rawLine := range utils.CreateSortedRawInputLines(tc.destinationInput) {
 				line := utils.CreateInputLine(rawLine)
 
