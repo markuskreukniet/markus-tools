@@ -54,7 +54,13 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 							continue
 						}
 
-						if !groups.AppendByIdentifier(line.GetContent(), nodeI.Path) {
+						appended := groups.AppendByIdentifier(line.GetContent(), nodeI.Path)
+
+						if appended {
+							continue
+						}
+
+						if !appended {
 							for _, lineJ := range inputLines {
 								// TODO: useless check?
 								if line.GetContent() == lineJ.GetContent() {
