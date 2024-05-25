@@ -48,33 +48,32 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 						continue
 					}
 
-					inputLines = append(inputLines, line)
 					for _, nodeI := range fileSystemNodes {
 						if !strings.HasSuffix(nodeI.Path, line.JoinDirectoryPathPartWithFileName()) {
 							continue
 						}
 
 						appended := groups.AppendByIdentifier(line.GetContent(), nodeI.Path)
-
-						// if appended {
-						// 	continue
-						// }
-
 						if !appended {
-							for _, lineJ := range inputLines {
-								// TODO: useless check?
-								if line.GetContent() == lineJ.GetContent() {
+							var paths []string
+							for _, unGroupedLine := range inputLines {
+								if line.GetContent() == unGroupedLine.GetContent() {
 									for _, nodeJ := range fileSystemNodes {
-										if nodeI.Path != nodeJ.Path && strings.HasSuffix(nodeJ.Path, lineJ.JoinDirectoryPathPartWithFileName()) {
-											groups = append(groups, utils.DuplicateFileGroup{
-												Identifier: lineJ.GetContent(),
-												FilePaths:  []string{nodeJ.Path, nodeI.Path},
-											})
+										// TODO: JoinDirectoryPathPartWithFileName should happen only when it is not done before
+										if nodeI.Path != nodeJ.Path && strings.HasSuffix(nodeJ.Path, unGroupedLine.JoinDirectoryPathPartWithFileName()) {
+											paths = append(paths, nodeJ.Path)
 											break
 										}
 									}
-									break
 								}
+							}
+							if len(paths) > 0 {
+								groups = append(groups, utils.DuplicateFileGroup{
+									Identifier: line.GetContent(),
+									FilePaths:  append(paths, []string{nodeI.Path}...),
+								})
+							} else {
+								inputLines = append(inputLines, line)
 							}
 						}
 						break
