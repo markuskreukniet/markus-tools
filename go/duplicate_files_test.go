@@ -40,7 +40,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			if len(directories) > 0 {
 				// create duplicate file groups
 				var groups utils.DuplicateFileGroups
-				var inputLines []utils.InputLine
+				var unGroupedLines []utils.InputLine
 				for _, rawInputLine := range utils.CreateSortedRawInputLines(tc.Input) {
 					line := utils.CreateInputLine(rawInputLine)
 
@@ -56,7 +56,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 						appended := groups.AppendByIdentifier(line.GetContent(), nodeI.Path)
 						if !appended {
 							var paths []string
-							for _, unGroupedLine := range inputLines {
+							for _, unGroupedLine := range unGroupedLines {
 								if line.GetContent() == unGroupedLine.GetContent() {
 									for _, nodeJ := range fileSystemNodes {
 										// TODO: JoinDirectoryPathPartWithFileName should happen only when it is not done before
@@ -73,7 +73,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 									FilePaths:  append(paths, []string{nodeI.Path}...),
 								})
 							} else {
-								inputLines = append(inputLines, line)
+								unGroupedLines = append(unGroupedLines, line)
 							}
 						}
 						break
