@@ -17,11 +17,6 @@ type fileIdentifier struct {
 	hash string
 }
 
-type duplicateFileGroup struct {
-	identifier string
-	filePaths  []string
-}
-
 func getFileHash(filePath string) (string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
