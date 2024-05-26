@@ -39,7 +39,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 
 			if len(directories) > 0 {
 				// create duplicate file groups
-				var groups utils.DuplicateFileGroups
+				var groups duplicateFileGroups
 				var unGroupedLines []utils.InputLine
 				for _, rawInputLine := range utils.CreateSortedRawInputLines(tc.Input) {
 					line := utils.CreateInputLine(rawInputLine)
@@ -67,9 +67,9 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 								}
 							}
 							if len(paths) > 0 {
-								groups = append(groups, utils.DuplicateFileGroup{
-									Identifier: line.GetContent(),
-									FilePaths:  append(paths, []string{nodeI.Path}...),
+								groups = append(groups, duplicateFileGroup{
+									identifier: line.GetContent(),
+									filePaths:  append(paths, []string{nodeI.Path}...),
 								})
 							} else {
 								unGroupedLines = append(unGroupedLines, line)
@@ -84,7 +84,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 					if i != 0 {
 						utils.TestingWriteTwoNewlineStrings(t, &builder)
 					}
-					for j, path := range group.FilePaths {
+					for j, path := range group.filePaths {
 						if j != 0 {
 							if _, err := utils.WriteNewlineString(&builder); err != nil {
 								t.Errorf("WriteNewlineString error: %v", err)

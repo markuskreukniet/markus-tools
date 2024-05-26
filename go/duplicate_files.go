@@ -11,6 +11,24 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
+// duplicateFileGroups
+type duplicateFileGroup struct {
+	identifier string
+	filePaths  []string
+}
+
+type duplicateFileGroups []duplicateFileGroup
+
+func (groups duplicateFileGroups) AppendByIdentifier(identifier, filePath string) bool {
+	for i, group := range groups {
+		if identifier == group.identifier {
+			groups[i].filePaths = append(groups[i].filePaths, filePath)
+			return true
+		}
+	}
+	return false
+}
+
 type fileIdentifier struct {
 	path string
 	size int64
@@ -58,7 +76,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 	})
 
 	// create duplicate file groups
-	var groups utils.DuplicateFileGroups
+	var groups duplicateFileGroups
 	for i := 1; i < len(fileIdentifiers); i++ {
 		previousIndex := i - 1
 		if fileIdentifiers[previousIndex].size == fileIdentifiers[i].size {
@@ -74,9 +92,9 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 			if !groups.AppendByIdentifier(fileIdentifiers[i].hash, fileIdentifiers[i].path) {
 				for j := 0; j <= previousIndex; j++ {
 					if fileIdentifiers[i].hash == fileIdentifiers[j].hash {
-						groups = append(groups, utils.DuplicateFileGroup{
-							Identifier: fileIdentifiers[i].hash,
-							FilePaths:  []string{fileIdentifiers[j].path, fileIdentifiers[i].path},
+						groups = append(groups, duplicateFileGroup{
+							identifier: fileIdentifiers[i].hash,
+							filePaths:  []string{fileIdentifiers[j].path, fileIdentifiers[i].path},
 						})
 						break
 					}
@@ -93,7 +111,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 				return "", err
 			}
 		}
-		for j, path := range group.FilePaths {
+		for j, path := range group.filePaths {
 			if j != 0 {
 				if _, err := utils.WriteNewlineString(&result); err != nil {
 					return "", err

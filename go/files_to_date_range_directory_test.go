@@ -27,6 +27,11 @@ func TestingCreateContent(subContent string) string {
 	return "content" + subContent + "\ncontent" + subContent
 }
 
+type duplicateFileDetailGroup struct {
+	identifier  string
+	fileDetails []utils.FileDetail
+}
+
 func TestFilesToDateRangeDirectory(t *testing.T) {
 	// test:
 	//   removing empty folder in destination
@@ -180,8 +185,6 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			// create duplicate file groups
 			var groups utils.DuplicateFileGroups
 			var unGroupedLines []utils.InputLine
-
-			// TODO: deze logica ook doorvoeren in duplicate files test go
 			for _, rawLine := range utils.CreateSortedRawInputLines(tc.destinationInput) {
 				line := utils.CreateInputLine(rawLine)
 
