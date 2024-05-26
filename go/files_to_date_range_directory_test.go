@@ -183,7 +183,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			defer utils.TestingRemoveDirectoryTree(t, destination)
 
 			// create duplicate file groups
-			var groups utils.DuplicateFileGroups
+			// var groups []duplicateFileDetailGroup
 			var unGroupedLines []utils.InputLine
 			for _, rawLine := range utils.CreateSortedRawInputLines(tc.destinationInput) {
 				line := utils.CreateInputLine(rawLine)
@@ -192,12 +192,12 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 					continue
 				}
 
-				path := filepath.Join(destination, line.GetDirectoryPathPartWithFileName())
-				appended := groups.AppendByIdentifier(line.GetContent(), path)
+				// path := filepath.Join(destination, line.GetDirectoryPathPartWithFileName())
+				// appended := groups.AppendByIdentifier(line.GetContent(), path)
 
-				if appended {
-					continue
-				}
+				// if appended {
+				// 	continue
+				// }
 
 				var paths []string
 				for _, unGroupedLine := range unGroupedLines {
@@ -206,10 +206,10 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 					}
 				}
 				if len(paths) > 0 {
-					groups = append(groups, utils.DuplicateFileGroup{
-						Identifier: line.GetContent(),
-						FilePaths:  append([]string{path}, paths...),
-					})
+					// groups = append(groups, utils.DuplicateFileGroup{
+					// 	Identifier: line.GetContent(),
+					// 	FilePaths:  append([]string{path}, paths...),
+					// })
 				} else {
 					unGroupedLines = append(unGroupedLines, line)
 				}
