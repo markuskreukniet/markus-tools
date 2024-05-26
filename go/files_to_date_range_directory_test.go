@@ -189,7 +189,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 					continue
 				}
 
-				path := filepath.Join(destination, line.JoinDirectoryPathPartWithFileName())
+				path := filepath.Join(destination, line.GetDirectoryPathPartWithFileName())
 				appended := groups.AppendByIdentifier(line.GetContent(), path)
 
 				if appended {
@@ -199,7 +199,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 				var paths []string
 				for _, unGroupedLine := range unGroupedLines {
 					if line.GetContent() == unGroupedLine.GetContent() {
-						paths = append(paths, filepath.Join(destination, unGroupedLine.JoinDirectoryPathPartWithFileName()))
+						paths = append(paths, filepath.Join(destination, unGroupedLine.GetDirectoryPathPartWithFileName()))
 					}
 				}
 				if len(paths) > 0 {

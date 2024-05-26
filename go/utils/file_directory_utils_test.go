@@ -82,7 +82,7 @@ func TestFileOrDirectoryExists(t *testing.T) {
 			for _, rawInputLine := range rawInputLines {
 				filePath := directory
 				if directory != "" {
-					filePath = filepath.Join(directory, CreateInputLine(rawInputLine).JoinDirectoryPathPartWithFileName())
+					filePath = filepath.Join(directory, CreateInputLine(rawInputLine).GetDirectoryPathPartWithFileName())
 				}
 
 				// act

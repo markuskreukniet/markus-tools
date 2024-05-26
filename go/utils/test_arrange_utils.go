@@ -11,34 +11,43 @@ import (
 )
 
 // InputLine
-type InputLine []string
+type InputLine struct {
+	elements                      []string
+	directoryPathPartWithFileName string
+}
 
 func (line InputLine) GetDirectoryPathPart() string {
-	return line[0]
+	return line.elements[0]
 }
 
 func (line InputLine) GetTimeModified() string {
-	return line[1]
+	return line.elements[1]
 }
 
 func (line InputLine) GetFileName() string {
-	return line[2]
+	return line.elements[2]
 }
 
 func (line InputLine) GetContent() string {
-	return line[3]
+	return line.elements[3]
 }
 
 func (line InputLine) HasContent() bool {
 	return line.GetContent() != ""
 }
 
-func (line InputLine) JoinDirectoryPathPartWithFileName() string {
-	return filepath.Join(line.GetDirectoryPathPart(), line.GetFileName())
+func (line InputLine) GetDirectoryPathPartWithFileName() string {
+	if line.directoryPathPartWithFileName == "" {
+		line.directoryPathPartWithFileName = filepath.Join(line.GetDirectoryPathPart(), line.GetFileName())
+	}
+	return line.directoryPathPartWithFileName
 }
 
 func CreateInputLine(delimitedCommaString string) InputLine {
-	return strings.Split(strings.TrimSpace(delimitedCommaString), ",")
+	return InputLine{
+		elements:                      strings.Split(strings.TrimSpace(delimitedCommaString), ","),
+		directoryPathPartWithFileName: "",
+	}
 }
 
 // RawInputLines
@@ -185,9 +194,9 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 		// probably not optimal but results in less code, which is fine for testing
 		part := inputLine.GetDirectoryPathPart()
 		if i == 0 || part == "" || part != inputGroups[index][0][0] {
-			inputGroups = append(inputGroups, [][]string{inputLine})
+			inputGroups = append(inputGroups, [][]string{inputLine.elements})
 		} else {
-			inputGroups[index] = append(inputGroups[index], inputLine)
+			inputGroups[index] = append(inputGroups[index], inputLine.elements)
 		}
 	}
 
@@ -228,14 +237,14 @@ func TestingCreateFilesAndDirectoriesByOneInput(t *testing.T, input string) (str
 	previousDirectoryFilePathPart := ""
 	for _, rawInputLine := range CreateSortedRawInputLines(input) {
 		inputLine := CreateInputLine(rawInputLine)
-		filePath := ToFilePathFromSlashAndJoin(temporaryDirectory, inputLine[0])
-		if inputLine[0] != previousDirectoryFilePathPart {
+		filePath := ToFilePathFromSlashAndJoin(temporaryDirectory, inputLine.elements[0])
+		if inputLine.elements[0] != previousDirectoryFilePathPart {
 			testingCreateDirectoryAll(t, filePath)
 
 			// probably not optimal but results in less code, which is fine for testing
-			previousDirectoryFilePathPart = inputLine[0]
+			previousDirectoryFilePathPart = inputLine.elements[0]
 		}
-		testingIfFileCreateFileAndAppendFileSystemNode(t, inputLine[2] == "", filePath, inputLine, &fileSystemNodes)
+		testingIfFileCreateFileAndAppendFileSystemNode(t, inputLine.elements[2] == "", filePath, inputLine.elements, &fileSystemNodes)
 	}
 	return temporaryDirectory, fileSystemNodes
 }

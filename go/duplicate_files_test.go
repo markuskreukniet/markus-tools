@@ -49,7 +49,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 					}
 
 					for _, nodeI := range fileSystemNodes {
-						if !strings.HasSuffix(nodeI.Path, line.JoinDirectoryPathPartWithFileName()) {
+						if !strings.HasSuffix(nodeI.Path, line.GetDirectoryPathPartWithFileName()) {
 							continue
 						}
 
@@ -59,8 +59,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 							for _, unGroupedLine := range unGroupedLines {
 								if line.GetContent() == unGroupedLine.GetContent() {
 									for _, nodeJ := range fileSystemNodes {
-										// TODO: JoinDirectoryPathPartWithFileName should happen only when it is not done before
-										if nodeI.Path != nodeJ.Path && strings.HasSuffix(nodeJ.Path, unGroupedLine.JoinDirectoryPathPartWithFileName()) {
+										if nodeI.Path != nodeJ.Path && strings.HasSuffix(nodeJ.Path, unGroupedLine.GetDirectoryPathPartWithFileName()) {
 											paths = append(paths, nodeJ.Path)
 											break
 										}
