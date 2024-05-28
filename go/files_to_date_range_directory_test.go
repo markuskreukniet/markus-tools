@@ -247,11 +247,30 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			// 4. keep the newest modification time file
 			// 5. keep the first file of the slice
 
+			var details []utils.FileDetail
 			for _, group := range groups {
-				if len(group.fileDetails) == 0 {
+				if len(group.fileDetails) == 1 {
+					details = append(details, group.fileDetails[0])
 					continue
 				}
 
+				var shortestFileNameDetails []utils.FileDetail
+				var notShortestFileNameDetails []utils.FileDetail
+				var minimumLength int
+				for _, detail := range group.fileDetails {
+					length := len(filepath.Base(detail.Path)) // TODO: is this efficient?
+					if length < minimumLength {
+						minimumLength = length
+
+						// remove the files in shortestFileNameDetails
+
+						shortestFileNameDetails = []utils.FileDetail{detail}
+					} else if length == minimumLength {
+						shortestFileNameDetails = append(shortestFileNameDetails, detail)
+					} else {
+						notShortestFileNameDetails = append(notShortestFileNameDetails, detail)
+					}
+				}
 			}
 
 			// duplicate file groups to date range groups
