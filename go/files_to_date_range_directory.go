@@ -16,8 +16,6 @@ type filePathTimeModified struct {
 	timeModified time.Time
 }
 
-const dateFormat = "2006-01-02"
-
 func appendDateRangeDirectoryPathsAndFilePathsTimeModified(dateRangeDirectoryPaths *[]string, filePathsTimeModified *[]filePathTimeModified, filePath string) error {
 	*dateRangeDirectoryPaths = append(*dateRangeDirectoryPaths, filePath)
 	if err := appendFilePathsTimeModified(filePathsTimeModified, createDirectoryFileSystemNodeInSlice(filePath)); err != nil {
@@ -144,11 +142,15 @@ func appendFilePathsTimeModified(filePathsTimeModified *[]filePathTimeModified, 
 		}, uniqueFileSystemNodes, utils.FilesWithoutZeroByteFiles)
 }
 
+func parseTime(rawTime string) (time.Time, error) {
+	return time.Parse(time.RFC3339, rawTime)
+}
+
 func isValidDateFormat(date string) bool {
-	_, err := time.Parse(dateFormat, date)
+	_, err := parseTime(date)
 	return err == nil
 }
 
 func toDateFormat(time time.Time) string {
-	return time.Format(dateFormat)
+	return time.Format("2006-01-02")
 }
