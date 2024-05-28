@@ -240,6 +240,22 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 				}
 			}
 
+			// Remove duplicate files by this priority:
+			// 1. keep the shortest file name
+			// 2. keep the one in the destination a date directory or date range directory
+			// 3. keep the one in the destination directory
+			// 4. keep the newest modification time file
+			// 5. keep the first file of the slice
+
+			for _, group := range groups {
+				if len(group.fileDetails) == 0 {
+					continue
+				}
+
+			}
+
+			// duplicate file groups to date range groups
+
 			// act
 			// assert
 		})
