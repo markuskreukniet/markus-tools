@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -261,9 +262,11 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 					length := len(filepath.Base(detail.Path)) // TODO: is this efficient?
 					if length < minimumLength {
 						minimumLength = length
-
-						// remove the files in shortestFileNameDetails
-
+						for _, shortestDetail := range shortestFileNameDetails {
+							if err := os.Remove(shortestDetail.Path); err != nil {
+								t.Errorf("os.Remove error: %v", err)
+							}
+						}
 						shortestFileNameDetails = []utils.FileDetail{detail}
 					} else if length == minimumLength {
 						shortestFileNameDetails = append(shortestFileNameDetails, detail)
