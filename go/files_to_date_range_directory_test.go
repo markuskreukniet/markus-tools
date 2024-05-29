@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -241,13 +240,12 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 				}
 			}
 
-			// Remove duplicate files by this priority:
+			// Remove duplicate files (there are no created files yet) by this priority:
 			// 1. keep the shortest file name
 			// 2. keep the one in the destination a date directory or date range directory
 			// 3. keep the one in the destination directory
 			// 4. keep the newest modification time file
 			// 5. keep the first file of the slice
-
 			var details []utils.FileDetail
 			for _, group := range groups {
 				if len(group.fileDetails) == 1 {
@@ -255,23 +253,30 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 					continue
 				}
 
-				var shortestFileNameDetails []utils.FileDetail
-				var notShortestFileNameDetails []utils.FileDetail
+				var filteredDetails []utils.FileDetail
+
+				// filter on shortest file name
 				var minimumLength int
 				for _, detail := range group.fileDetails {
 					length := len(filepath.Base(detail.Path)) // TODO: is this efficient?
 					if length < minimumLength {
 						minimumLength = length
-						for _, shortestDetail := range shortestFileNameDetails {
-							if err := os.Remove(shortestDetail.Path); err != nil {
-								t.Errorf("os.Remove error: %v", err)
-							}
-						}
-						shortestFileNameDetails = []utils.FileDetail{detail}
+						filteredDetails = []utils.FileDetail{detail}
 					} else if length == minimumLength {
-						shortestFileNameDetails = append(shortestFileNameDetails, detail)
-					} else {
-						notShortestFileNameDetails = append(notShortestFileNameDetails, detail)
+						filteredDetails = append(filteredDetails, detail)
+					}
+				}
+
+				// filter on valid name of date directory or date range directory
+				if len(filteredDetails) > 1 {
+					var tempDetails []utils.FileDetail // TODO: should be reusable in other filters
+					for _, detail := range filteredDetails {
+						if isValidDateRangeDirectory(detail.Path) {
+							tempDetails = append(tempDetails, detail)
+						}
+					}
+					if len(tempDetails) > 1 {
+						filteredDetails = tempDetails
 					}
 				}
 			}

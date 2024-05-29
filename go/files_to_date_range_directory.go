@@ -16,6 +16,8 @@ type filePathTimeModified struct {
 	timeModified time.Time
 }
 
+const spacedHyphen = " - "
+
 func appendDateRangeDirectoryPathsAndFilePathsTimeModified(dateRangeDirectoryPaths *[]string, filePathsTimeModified *[]filePathTimeModified, filePath string) error {
 	*dateRangeDirectoryPaths = append(*dateRangeDirectoryPaths, filePath)
 	if err := appendFilePathsTimeModified(filePathsTimeModified, createDirectoryFileSystemNodeInSlice(filePath)); err != nil {
@@ -24,12 +26,25 @@ func appendDateRangeDirectoryPathsAndFilePathsTimeModified(dateRangeDirectoryPat
 	return nil
 }
 
+func isValidDateRangeDirectory(filePath string) bool {
+	base := filepath.Base(filePath)
+	if strings.Contains(base, spacedHyphen) {
+		baseParts := strings.Split(base, spacedHyphen)
+		// TODO: baseParts[1] should be newer than baseParts[0]
+		if isValidDateFormat(baseParts[0]) && isValidDateFormat(baseParts[1]) {
+			return true
+		}
+	} else if isValidDateFormat(base) {
+		return true
+	}
+	return false
+}
+
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
 	var filePathsTimeModified []filePathTimeModified
 	if err := appendFilePathsTimeModified(&filePathsTimeModified, uniqueFileSystemNodes); err != nil {
 		return err
 	}
-	const spacedHyphen = " - "
 	var dateRangeDirectoryPaths []string
 	// TODO: AppendFileDetails should now not look into subdirectories
 	// TODO: utils.Directories is changed from directories
@@ -38,13 +53,8 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	var opErr error
 	if err := utils.AppendFileDetails(
 		func(detail utils.FileDetail) {
-			base := filepath.Base(detail.Path)
-			if strings.Contains(base, spacedHyphen) {
-				baseParts := strings.Split(base, spacedHyphen)
-				if isValidDateFormat(baseParts[0]) && isValidDateFormat(baseParts[1]) {
-					opErr = appendDateRangeDirectoryPathsAndFilePathsTimeModified(&dateRangeDirectoryPaths, &filePathsTimeModified, detail.Path)
-				}
-			} else if isValidDateFormat(base) {
+			if isValidDateRangeDirectory(detail.Path) {
+				// TODO: appendDateRangeDirectoryPathsAndFilePathsTimeModified useless?
 				opErr = appendDateRangeDirectoryPathsAndFilePathsTimeModified(&dateRangeDirectoryPaths, &filePathsTimeModified, detail.Path)
 			}
 		}, createDirectoryFileSystemNodeInSlice(destinationDirectory), utils.Directories); err != nil {
