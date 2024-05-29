@@ -17,7 +17,7 @@ type filePathTimeModified struct {
 }
 
 const spacedHyphen = " - "
-const dateLayout = "2006-01-02"
+const dateLayout = "2006-01-02" // YYYY-MM-DD
 
 func appendDateRangeDirectoryPathsAndFilePathsTimeModified(dateRangeDirectoryPaths *[]string, filePathsTimeModified *[]filePathTimeModified, filePath string) error {
 	*dateRangeDirectoryPaths = append(*dateRangeDirectoryPaths, filePath)
@@ -31,10 +31,19 @@ func isValidDateRangeDirectory(filePath string) bool {
 	base := filepath.Base(filePath)
 	if strings.Contains(base, spacedHyphen) {
 		baseParts := strings.Split(base, spacedHyphen)
-		// TODO: baseParts[1] should be between a day and three days newer than baseParts[0]
-		if isValidDateFormat(baseParts[0]) && isValidDateFormat(baseParts[1]) {
+		firstDate, err := parseDate(baseParts[0])
+		if err != nil {
+			return false
+		}
+		secondDate, err := parseDate(baseParts[1])
+		if err != nil {
+			return false
+		}
+		daysDifference := secondDate.Sub(firstDate).Hours() / 24
+		if daysDifference >= 1 && daysDifference <= 3 {
 			return true
 		}
+		return false
 	} else if isValidDateFormat(base) {
 		return true
 	}
@@ -157,7 +166,15 @@ func toDateFormat(time time.Time) string {
 	return time.Format(dateLayout)
 }
 
-func isValidDateFormat(rawTime string) bool {
-	_, err := time.Parse(dateLayout, rawTime)
+func parseDate(rawDate string) (time.Time, error) {
+	date, err := time.Parse(dateLayout, rawDate)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return date, nil
+}
+
+func isValidDateFormat(rawDate string) bool {
+	_, err := parseDate(rawDate)
 	return err == nil
 }
