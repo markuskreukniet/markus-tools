@@ -43,7 +43,6 @@ func isValidDateRangeDirectory(filePath string) bool {
 		if daysDifference >= 1 && daysDifference <= 3 {
 			return true
 		}
-		return false
 	} else if isValidDateFormat(base) {
 		return true
 	}
