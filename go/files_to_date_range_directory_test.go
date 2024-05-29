@@ -3,6 +3,7 @@ package main
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
@@ -28,9 +29,9 @@ func testingCreateContent(subContent string) string {
 }
 
 func testingCreateFileDetail(t *testing.T, line utils.InputLine, destination string) utils.FileDetail {
-	time, err := parseTime(line.GetTimeModified()) // TODO rename to ModificationTime
+	time, err := time.Parse(time.RFC3339, line.GetTimeModified()) // TODO rename to ModificationTime
 	if err != nil {
-		t.Errorf("parseTime error: %v", err)
+		t.Errorf("time.Parse error: %v", err)
 	}
 
 	return utils.FileDetail{

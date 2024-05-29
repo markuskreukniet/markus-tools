@@ -17,6 +17,7 @@ type filePathTimeModified struct {
 }
 
 const spacedHyphen = " - "
+const dateLayout = "2006-01-02"
 
 func appendDateRangeDirectoryPathsAndFilePathsTimeModified(dateRangeDirectoryPaths *[]string, filePathsTimeModified *[]filePathTimeModified, filePath string) error {
 	*dateRangeDirectoryPaths = append(*dateRangeDirectoryPaths, filePath)
@@ -30,7 +31,7 @@ func isValidDateRangeDirectory(filePath string) bool {
 	base := filepath.Base(filePath)
 	if strings.Contains(base, spacedHyphen) {
 		baseParts := strings.Split(base, spacedHyphen)
-		// TODO: baseParts[1] should be newer than baseParts[0]
+		// TODO: baseParts[1] should be between a day and three days newer than baseParts[0]
 		if isValidDateFormat(baseParts[0]) && isValidDateFormat(baseParts[1]) {
 			return true
 		}
@@ -152,15 +153,11 @@ func appendFilePathsTimeModified(filePathsTimeModified *[]filePathTimeModified, 
 		}, uniqueFileSystemNodes, utils.FilesWithoutZeroByteFiles)
 }
 
-func parseTime(rawTime string) (time.Time, error) {
-	return time.Parse(time.RFC3339, rawTime)
-}
-
-func isValidDateFormat(date string) bool {
-	_, err := parseTime(date)
-	return err == nil
-}
-
 func toDateFormat(time time.Time) string {
-	return time.Format("2006-01-02")
+	return time.Format(dateLayout)
+}
+
+func isValidDateFormat(rawTime string) bool {
+	_, err := time.Parse(dateLayout, rawTime)
+	return err == nil
 }
