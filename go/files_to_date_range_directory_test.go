@@ -255,6 +255,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 				}
 
 				var filteredDetails []utils.FileDetail
+				var tempDetails []utils.FileDetail
 
 				// filter on shortest file name
 				var minimumLength int
@@ -270,12 +271,33 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 
 				// filter on valid name of date directory or date range directory
 				if len(filteredDetails) > 1 {
-					var tempDetails []utils.FileDetail // TODO: should be reusable in other filters
 					for _, detail := range filteredDetails {
 						if isValidDateRangeDirectory(detail.Path) {
 							tempDetails = append(tempDetails, detail)
 						}
 					}
+					if len(tempDetails) > 1 {
+						filteredDetails = tempDetails
+					}
+				}
+
+				// filter on destination directory
+
+				// filter on the newest modification time file
+				if len(filteredDetails) > 1 {
+					filteredDetails = []utils.FileDetail{}
+
+					var newestTime time.Time
+					for _, detail := range filteredDetails {
+						time := detail.ModificationTime
+						if time.After(newestTime) {
+							newestTime = time
+							tempDetails = append(tempDetails, detail)
+						} else if newestTime.Equal(time) {
+							tempDetails = append(tempDetails, detail)
+						}
+					}
+					// TODO: should become reusable function
 					if len(tempDetails) > 1 {
 						filteredDetails = tempDetails
 					}
