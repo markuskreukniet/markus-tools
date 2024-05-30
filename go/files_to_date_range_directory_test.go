@@ -263,20 +263,24 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 					continue
 				}
 
-				var filteredDetails []utils.FileDetail
-				var tempDetails []utils.FileDetail
+				// TODO: not needed?
+				filteredDetails := group.fileDetails
 
 				// filter on shortest file name
-				var minimumLength int
-				for _, detail := range group.fileDetails {
-					length := len(filepath.Base(detail.Path)) // TODO: is this efficient?
-					if length < minimumLength {
-						minimumLength = length
-						filteredDetails = []utils.FileDetail{detail}
-					} else if length == minimumLength {
-						filteredDetails = append(filteredDetails, detail)
+				testingFilterFileDetails(&filteredDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
+					var tempDetails []utils.FileDetail
+					var minimumLength int
+					for _, detail := range unfilteredDetails {
+						length := len(filepath.Base(detail.Path)) // TODO: is this efficient?
+						if length < minimumLength {
+							minimumLength = length
+							tempDetails = []utils.FileDetail{detail}
+						} else if length == minimumLength {
+							tempDetails = append(tempDetails, detail)
+						}
 					}
-				}
+					return tempDetails
+				})
 
 				// filter on valid name of date directory or date range directory
 				testingFilterFileDetails(&filteredDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
@@ -292,24 +296,23 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 				// filter on destination directory
 
 				// filter on the newest modification time file
-				if len(filteredDetails) > 1 {
-					filteredDetails = []utils.FileDetail{}
-
+				testingFilterFileDetails(&filteredDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
+					var tempDetails []utils.FileDetail
 					var newestTime time.Time
-					for _, detail := range filteredDetails {
+					for _, detail := range unfilteredDetails {
 						time := detail.ModificationTime
+
+						if time.Before(newestTime) {
+							continue
+						}
+
 						if time.After(newestTime) {
 							newestTime = time
-							tempDetails = append(tempDetails, detail)
-						} else if newestTime.Equal(time) {
-							tempDetails = append(tempDetails, detail)
 						}
+						tempDetails = append(tempDetails, detail)
 					}
-					// TODO: should become reusable function
-					if len(tempDetails) > 1 {
-						filteredDetails = tempDetails
-					}
-				}
+					return tempDetails
+				})
 			}
 
 			// duplicate file groups to date range groups
