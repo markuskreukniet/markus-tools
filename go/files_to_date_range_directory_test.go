@@ -258,6 +258,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			// 5. keep the first file of the slice
 			var details []utils.FileDetail
 			for _, group := range groups {
+				// TODO: It is possible to clean anonymous functions in testingFilterFileDetails
 				if len(group.fileDetails) > 1 {
 					// TODO: not needed?
 					filteredDetails := group.fileDetails
