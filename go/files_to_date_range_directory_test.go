@@ -301,15 +301,12 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 					var newestTime time.Time
 					for _, detail := range unfilteredDetails {
 						time := detail.ModificationTime
-
-						if time.Before(newestTime) {
-							continue
-						}
-
 						if time.After(newestTime) {
 							newestTime = time
+							tempDetails = []utils.FileDetail{detail}
+						} else if time.Equal(newestTime) {
+							tempDetails = append(tempDetails, detail)
 						}
-						tempDetails = append(tempDetails, detail)
 					}
 					return tempDetails
 				})
