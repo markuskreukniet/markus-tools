@@ -258,58 +258,58 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			// 5. keep the first file of the slice
 			var details []utils.FileDetail
 			for _, group := range groups {
-				if len(group.fileDetails) == 1 {
-					details = append(details, group.fileDetails[0])
-					continue
+				if len(group.fileDetails) > 1 {
+					// TODO: not needed?
+					filteredDetails := group.fileDetails
+
+					// filter on shortest file name
+					testingFilterFileDetails(&filteredDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
+						var tempDetails []utils.FileDetail
+						var minimumLength int
+						for _, detail := range unfilteredDetails {
+							length := len(filepath.Base(detail.Path)) // TODO: is this efficient?
+							if length < minimumLength {
+								minimumLength = length
+								tempDetails = []utils.FileDetail{detail}
+							} else if length == minimumLength {
+								tempDetails = append(tempDetails, detail)
+							}
+						}
+						return tempDetails
+					})
+
+					// filter on valid name of date directory or date range directory
+					testingFilterFileDetails(&filteredDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
+						var tempDetails []utils.FileDetail
+						for _, detail := range unfilteredDetails {
+							if isValidDateRangeDirectory(detail.Path) {
+								tempDetails = append(tempDetails, detail)
+							}
+						}
+						return tempDetails
+					})
+
+					// filter on destination directory
+
+					// filter on the newest modification time file
+					testingFilterFileDetails(&filteredDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
+						var tempDetails []utils.FileDetail
+						var newestTime time.Time
+						for _, detail := range unfilteredDetails {
+							time := detail.ModificationTime
+							if time.After(newestTime) {
+								newestTime = time
+								tempDetails = []utils.FileDetail{detail}
+							} else if time.Equal(newestTime) {
+								tempDetails = append(tempDetails, detail)
+							}
+						}
+						return tempDetails
+					})
 				}
 
-				// TODO: not needed?
-				filteredDetails := group.fileDetails
-
-				// filter on shortest file name
-				testingFilterFileDetails(&filteredDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
-					var tempDetails []utils.FileDetail
-					var minimumLength int
-					for _, detail := range unfilteredDetails {
-						length := len(filepath.Base(detail.Path)) // TODO: is this efficient?
-						if length < minimumLength {
-							minimumLength = length
-							tempDetails = []utils.FileDetail{detail}
-						} else if length == minimumLength {
-							tempDetails = append(tempDetails, detail)
-						}
-					}
-					return tempDetails
-				})
-
-				// filter on valid name of date directory or date range directory
-				testingFilterFileDetails(&filteredDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
-					var tempDetails []utils.FileDetail
-					for _, detail := range unfilteredDetails {
-						if isValidDateRangeDirectory(detail.Path) {
-							tempDetails = append(tempDetails, detail)
-						}
-					}
-					return tempDetails
-				})
-
-				// filter on destination directory
-
-				// filter on the newest modification time file
-				testingFilterFileDetails(&filteredDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
-					var tempDetails []utils.FileDetail
-					var newestTime time.Time
-					for _, detail := range unfilteredDetails {
-						time := detail.ModificationTime
-						if time.After(newestTime) {
-							newestTime = time
-							tempDetails = []utils.FileDetail{detail}
-						} else if time.Equal(newestTime) {
-							tempDetails = append(tempDetails, detail)
-						}
-					}
-					return tempDetails
-				})
+				// keep the first file of the slice
+				details = append(details, group.fileDetails[0])
 			}
 
 			// duplicate file groups to date range groups
