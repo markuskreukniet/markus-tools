@@ -41,6 +41,15 @@ func testingCreateFileDetail(t *testing.T, line utils.InputLine, destination str
 	}
 }
 
+func testingFilterFileDetails(filteredDetails *[]utils.FileDetail, filter func(unfilteredDetails []utils.FileDetail) []utils.FileDetail) {
+	if len(*filteredDetails) > 1 {
+		tempDetails := filter(*filteredDetails)
+		if len(tempDetails) > 1 {
+			*filteredDetails = tempDetails
+		}
+	}
+}
+
 type duplicateFileDetailGroup struct {
 	identifier  string
 	fileDetails []utils.FileDetail
@@ -270,16 +279,15 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 				}
 
 				// filter on valid name of date directory or date range directory
-				if len(filteredDetails) > 1 {
-					for _, detail := range filteredDetails {
+				testingFilterFileDetails(&filteredDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
+					var tempDetails []utils.FileDetail
+					for _, detail := range unfilteredDetails {
 						if isValidDateRangeDirectory(detail.Path) {
 							tempDetails = append(tempDetails, detail)
 						}
 					}
-					if len(tempDetails) > 1 {
-						filteredDetails = tempDetails
-					}
-				}
+					return tempDetails
+				})
 
 				// filter on destination directory
 
