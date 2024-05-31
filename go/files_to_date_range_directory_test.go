@@ -260,11 +260,8 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			for _, group := range groups {
 				// TODO: It is possible to clean the anonymous functions in testingFilterFileDetails
 				if len(group.fileDetails) > 1 {
-					// TODO: not needed?
-					filteredDetails := group.fileDetails
-
 					// filter on shortest file name
-					testingFilterFileDetails(&filteredDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
+					testingFilterFileDetails(&group.fileDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
 						var tempDetails []utils.FileDetail
 						var minimumLength int
 						for _, detail := range unfilteredDetails {
@@ -280,7 +277,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 					})
 
 					// filter on valid name of date directory or date range directory
-					testingFilterFileDetails(&filteredDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
+					testingFilterFileDetails(&group.fileDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
 						var tempDetails []utils.FileDetail
 						for _, detail := range unfilteredDetails {
 							if isValidDateRangeDirectory(detail.Path) {
@@ -293,7 +290,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 					// filter on destination directory
 
 					// filter on the newest modification time file
-					testingFilterFileDetails(&filteredDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
+					testingFilterFileDetails(&group.fileDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
 						var tempDetails []utils.FileDetail
 						var newestTime time.Time
 						for _, detail := range unfilteredDetails {
