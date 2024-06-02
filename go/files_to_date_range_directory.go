@@ -49,6 +49,10 @@ func isValidDateRangeDirectory(filePath string) bool {
 	return false
 }
 
+func isWithinThreeDays(olderTime, newerTime time.Time) bool {
+	return olderTime.Sub(newerTime).Hours() <= 72
+}
+
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
 	var filePathsTimeModified []filePathTimeModified
 	if err := appendFilePathsTimeModified(&filePathsTimeModified, uniqueFileSystemNodes); err != nil {
@@ -78,16 +82,16 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	startDateRange := 0
 	for i := 0; i < len(filePathsTimeModified)-1; i++ {
 		iPlusOne := i + 1
-		if filePathsTimeModified[iPlusOne].timeModified.Sub(filePathsTimeModified[i].timeModified).Hours() > 72 {
+		if isWithinThreeDays(filePathsTimeModified[iPlusOne].timeModified, filePathsTimeModified[i].timeModified) {
 			var builder strings.Builder
-			if _, err := builder.WriteString(toDateFormat(filePathsTimeModified[startDateRange].timeModified)); err != nil {
+			if err := formatDateAndWriteString(&builder, filePathsTimeModified[startDateRange].timeModified); err != nil {
 				return err
 			}
 			if filePathsTimeModified[startDateRange].timeModified != filePathsTimeModified[i].timeModified {
 				if _, err := builder.WriteString(spacedHyphen); err != nil {
 					return err
 				}
-				if _, err := builder.WriteString(toDateFormat(filePathsTimeModified[i].timeModified)); err != nil {
+				if err := formatDateAndWriteString(&builder, filePathsTimeModified[i].timeModified); err != nil {
 					return err
 				}
 			}
@@ -140,6 +144,13 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		if err := os.Remove(path); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func formatDateAndWriteString(builder *strings.Builder, time time.Time) error {
+	if _, err := builder.WriteString(toDateFormat(time)); err != nil {
+		return err
 	}
 	return nil
 }

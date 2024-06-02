@@ -2,6 +2,7 @@ package main
 
 import (
 	"path/filepath"
+	"sort"
 	"testing"
 	"time"
 
@@ -250,7 +251,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 				}
 			}
 
-			// Remove duplicate files (there are no created files yet) by this priority:
+			// Select unique files by first filtering the duplicate ones (there are no created files yet) by this priority:
 			// 1. keep the shortest file name
 			// 2. keep the one in the destination a date directory or date range directory
 			// 3. keep the one in the destination directory
@@ -310,7 +311,22 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 				details = append(details, group.fileDetails[0])
 			}
 
-			// duplicate file groups to date range groups
+			// unique files to date range groups
+			sort.Slice(details, func(i, j int) bool {
+				return details[i].ModificationTime.Before(details[j].ModificationTime)
+			})
+			// startDateRange := 0
+			// isFindingDateRange := false
+			// for i := 1; i < len(details); i++ {
+			// 	if isWithinThreeDays(details[i-1].ModificationTime, details[i].ModificationTime) {
+			// 		isFindingDateRange = true
+			// 	} else {
+			// 		if isFindingDateRange {
+
+			// 		}
+			// 		isFindingDateRange = false
+			// 	}
+			// }
 
 			// act
 			// assert
