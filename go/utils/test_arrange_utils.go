@@ -130,7 +130,7 @@ func ToFilePathFromSlashAndJoin(filePath, filePathEndPart string) string {
 	return filepath.Join(filePath, filepath.FromSlash(filePathEndPart))
 }
 
-func testingCreateDirectoryAll(t *testing.T, filePath string) {
+func TestingCreateDirectoryAll(t *testing.T, filePath string) {
 	t.Helper()
 	if err := os.MkdirAll(filePath, 0755); err != nil {
 		t.Errorf("Failed to create a directory in the temporary directory: %v", err)
@@ -214,7 +214,7 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 			// probably not optimal but results in less code, which is fine for testing
 			// It should be possible to add more than one empty directory.
 			if i == 0 || isDirectory {
-				testingCreateDirectoryAll(t, filePath)
+				TestingCreateDirectoryAll(t, filePath)
 			}
 			testingIfFileCreateFileAndAppendFileSystemNode(t, inputLine[2] == "", filePath, inputLine, &fileSystemNodes)
 		}
@@ -239,7 +239,7 @@ func TestingCreateFilesAndDirectoriesByOneInput(t *testing.T, input string) (str
 		inputLine := CreateInputLine(rawInputLine)
 		filePath := ToFilePathFromSlashAndJoin(temporaryDirectory, inputLine.elements[0])
 		if inputLine.elements[0] != previousDirectoryFilePathPart {
-			testingCreateDirectoryAll(t, filePath)
+			TestingCreateDirectoryAll(t, filePath)
 
 			// probably not optimal but results in less code, which is fine for testing
 			previousDirectoryFilePathPart = inputLine.elements[0]

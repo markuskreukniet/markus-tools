@@ -3,6 +3,7 @@ package main
 import (
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 	"time"
 
@@ -315,21 +316,55 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			sort.Slice(details, func(i, j int) bool {
 				return details[i].ModificationTime.Before(details[j].ModificationTime)
 			})
-			// startDateRange := 0
-			// isFindingDateRange := false
-			// for i := 1; i < len(details); i++ {
-			// 	if isWithinThreeDays(details[i-1].ModificationTime, details[i].ModificationTime) {
-			// 		isFindingDateRange = true
-			// 	} else {
-			// 		if isFindingDateRange {
+			startDateRange := 0
+			isFindingDateRange := false
+			for i := 1; i < len(details); i++ {
+				if isWithinThreeDays(details[i-1].ModificationTime, details[i].ModificationTime) {
+					isFindingDateRange = true
+				} else {
+					var name string
+					if isFindingDateRange {
+						// Declare err separately to avoid shadowing with ':='
+						var err error
+						name, err = createDirectoryDateRangeName(details[startDateRange].ModificationTime, details[i].ModificationTime)
+						if err != nil {
+							t.Errorf("createDirectoryDateRangeName error: %v", err)
+						}
+						isFindingDateRange = false
+						startDateRange = i + 1
+					} else {
+						name = toDateFormat(details[i].ModificationTime)
+						startDateRange++
+					}
 
-			// 		}
-			// 		isFindingDateRange = false
-			// 	}
-			// }
+					// create directory
+
+					utils.TestingCreateDirectoryAll(t, filepath.Join(destination, name))
+
+					// // add files to directory
+					// for j := startDateRange; j <= i; j++ {
+
+					// }
+				}
+			}
 
 			// act
 			// assert
 		})
 	}
+}
+
+// TODO: use also in non test version?
+func createDirectoryDateRangeName(startTime, endTime time.Time) (string, error) {
+	var builder strings.Builder
+	if err := formatDateAndWriteString(&builder, startTime); err != nil {
+		return "", err
+	}
+	if _, err := builder.WriteString(spacedHyphen); err != nil {
+		return "", err
+	}
+	if err := formatDateAndWriteString(&builder, endTime); err != nil {
+		return "", err
+	}
+	return builder.String(), nil
 }
