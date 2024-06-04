@@ -36,6 +36,10 @@ func (line InputLine) HasContent() bool {
 	return line.GetContent() != ""
 }
 
+func (line InputLine) IsDirectory() bool {
+	return line.GetFileName() == "" && !line.HasContent()
+}
+
 func (line InputLine) GetDirectoryPathPartWithFileName() string {
 	if line.directoryPathPartWithFileName == "" {
 		line.directoryPathPartWithFileName = filepath.Join(line.GetDirectoryPathPart(), line.GetFileName())
@@ -229,19 +233,19 @@ func TestingCreateFilesAndDirectoriesByOneInput(t *testing.T, input string) (str
 		return "", nil
 	}
 
-	temporaryDirectory := CreateTemporaryDirectory(t)
-	var fileSystemNodes []FileSystemNode
-	previousDirectoryFilePathPart := ""
-	for _, rawInputLine := range CreateSortedRawInputLines(input) {
-		inputLine := CreateInputLine(rawInputLine)
-		filePath := ToFilePathFromSlashAndJoin(temporaryDirectory, inputLine.elements[0])
-		if inputLine.elements[0] != previousDirectoryFilePathPart {
-			TestingCreateDirectoryAll(t, filePath)
+	directory := CreateTemporaryDirectory(t)
+	var nodes []FileSystemNode
+	var previousPathPart string
+	for _, rawLine := range CreateSortedRawInputLines(input) {
+		line := CreateInputLine(rawLine)
+		path := ToFilePathFromSlashAndJoin(directory, line.GetDirectoryPathPart())
+		if line.GetDirectoryPathPart() != previousPathPart {
+			TestingCreateDirectoryAll(t, path)
 
 			// probably not optimal but results in less code, which is fine for testing
-			previousDirectoryFilePathPart = inputLine.elements[0]
+			previousPathPart = line.GetDirectoryPathPart()
 		}
-		testingIfFileCreateFileAndAppendFileSystemNode(t, inputLine.elements[2] == "", filePath, inputLine.elements, &fileSystemNodes)
+		testingIfFileCreateFileAndAppendFileSystemNode(t, line.IsDirectory(), path, line.elements, &nodes)
 	}
-	return temporaryDirectory, fileSystemNodes
+	return directory, nodes
 }
