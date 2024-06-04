@@ -59,6 +59,7 @@ func CreateSortedRawInputLines(delimitedSemicolonString string) RawInputLines {
 	return rawInputLines
 }
 
+// TestCase
 type TestCaseMetadata struct {
 	Name    string
 	WantErr bool
@@ -94,6 +95,7 @@ func TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse() TestCaseMetadat
 	return TestingCreateTestCaseMetadata("Basic", false)
 }
 
+// TODO: wrong naming
 func TestingWriteFileContentWithContentAndIndex(t *testing.T, filePath string, index int) string {
 	t.Helper()
 	writtenContent := fmt.Sprintf("content %d", index)
@@ -119,13 +121,8 @@ func TestingWriteFileContent(t *testing.T, filePath string, content string) {
 // 	plainTextFile *plainTextFile
 // }
 
-// TODO: is it an arrange function? Should it be a separate function
-// TODO: remove
-func TestingTrimSpaceTrimSuffixOnSemicolonAndSplitOnSemicolon(delimitedSemicolonString string) []string {
-	return strings.Split(strings.TrimSuffix(strings.TrimSpace(delimitedSemicolonString), ";"), ";")
-}
-
 // TODO: is it an arrange function?
+// TODO: wrong naming, testing forgotten
 func ToFilePathFromSlashAndJoin(filePath, filePathEndPart string) string {
 	return filepath.Join(filePath, filepath.FromSlash(filePathEndPart))
 }
