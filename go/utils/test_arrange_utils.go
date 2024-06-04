@@ -138,18 +138,22 @@ func TestingCreateDirectoryAll(t *testing.T, filePath string) {
 	}
 }
 
+func TestingParseTime(t *testing.T, timeString string) time.Time {
+	parsedTime, err := time.Parse(time.RFC3339, timeString)
+	if err != nil {
+		t.Errorf("Failed to parse time: %v", err)
+	}
+	return parsedTime
+}
+
 func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, isDirectory bool, filePath string, inputLine []string, fileSystemNodes *[]FileSystemNode) {
 	t.Helper()
 	if !isDirectory {
 		filePath = filepath.Join(filePath, inputLine[2])
 		TestingWriteFileContent(t, filePath, inputLine[3])
 		if inputLine[1] != "" {
-			// 2006-01-02T15:04:05Z is ISO 8601 format
-			timeModified, err := time.Parse("2006-01-02T15:04:05Z", inputLine[1])
-			if err != nil {
-				t.Errorf("Failed to parse time: %v", err)
-			}
-			if os.Chtimes(filePath, time.Now(), timeModified); err != nil {
+			timeModified := TestingParseTime(t, inputLine[1])
+			if err := os.Chtimes(filePath, time.Now(), timeModified); err != nil {
 				t.Errorf("Failed to change the access and modification times of the file: %v", err)
 			}
 		}

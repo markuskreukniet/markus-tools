@@ -31,14 +31,9 @@ func testingCreateContent(subContent string) string {
 }
 
 func testingCreateFileDetail(t *testing.T, line utils.InputLine, destination string) utils.FileDetail {
-	time, err := time.Parse(time.RFC3339, line.GetTimeModified()) // TODO rename to ModificationTime
-	if err != nil {
-		t.Errorf("time.Parse error: %v", err)
-	}
-
 	return utils.FileDetail{
 		Path:             filepath.Join(destination, line.GetDirectoryPathPartWithFileName()),
-		ModificationTime: time,
+		ModificationTime: utils.TestingParseTime(t, line.GetTimeModified()),
 		Size:             0,
 	}
 }
