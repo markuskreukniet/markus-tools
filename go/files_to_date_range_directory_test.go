@@ -335,16 +335,13 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 						name = toDateFormat(details[i].ModificationTime)
 					}
 
-					// create directory
-
+					// create directory with files
 					utils.TestingCreateDirectoryAll(t, filepath.Join(destination, name))
+					for j := startDateRange; j <= i; j++ {
+						// details[j].Path
+					}
 
 					startDateRange = i + 1
-
-					// // add files to directory
-					// for j := startDateRange; j <= i; j++ {
-
-					// }
 				}
 			}
 
