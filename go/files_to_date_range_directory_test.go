@@ -331,15 +331,15 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 							t.Errorf("createDirectoryDateRangeName error: %v", err)
 						}
 						isFindingDateRange = false
-						startDateRange = i + 1
 					} else {
 						name = toDateFormat(details[i].ModificationTime)
-						startDateRange++
 					}
 
 					// create directory
 
 					utils.TestingCreateDirectoryAll(t, filepath.Join(destination, name))
+
+					startDateRange = i + 1
 
 					// // add files to directory
 					// for j := startDateRange; j <= i; j++ {
