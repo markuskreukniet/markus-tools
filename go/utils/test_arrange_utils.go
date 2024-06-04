@@ -142,9 +142,7 @@ func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, isDirectory bo
 	t.Helper()
 	if !isDirectory {
 		filePath = filepath.Join(filePath, inputLine[2])
-		if err := os.WriteFile(filePath, []byte(inputLine[3]), 0666); err != nil {
-			t.Errorf("Failed to create a file: %v", err)
-		}
+		TestingWriteFileContent(t, filePath, inputLine[3])
 		if inputLine[1] != "" {
 			// 2006-01-02T15:04:05Z is ISO 8601 format
 			timeModified, err := time.Parse("2006-01-02T15:04:05Z", inputLine[1])
