@@ -226,7 +226,7 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 				directoryPathPartWithFileName: "",
 			}
 
-			testingIfFileCreateFileAndAppendFileSystemNode(t, inputLine[2] == "", filePath, line, &fileSystemNodes)
+			testingIfFileCreateFileAndAppendFileSystemNode(t, line.IsDirectory(), filePath, line, &fileSystemNodes)
 		}
 	}
 	return tempDirectories, fileSystemNodes
