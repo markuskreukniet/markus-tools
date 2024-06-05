@@ -75,7 +75,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 		wantSameFilePaths bool
 	}{
 		{
-			metadata:         utils.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
+			metadata:         utils.CreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
 			sourceInput:      sourceInput,
 			destinationInput: destinationInput,
 			updatedFile: filePathEndPartContent{
@@ -85,7 +85,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			wantSameFilePaths: true,
 		},
 		{
-			metadata:          utils.TestingCreateTestCaseMetadataWithWantErrTrue("Empty destinationInput"),
+			metadata:          utils.CreateTestCaseMetadataWithWantErrTrue("Empty destinationInput"),
 			sourceInput:       sourceInput,
 			destinationInput:  "",
 			updatedFile:       filePathEndPartContent{},
@@ -141,28 +141,28 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 		want           string
 	}{
 		{
-			metadata:       utils.TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
+			metadata:       utils.CreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
 			inputBasePath:  inputBasePath,
 			inputFullPath:  inputFullPath,
 			outputBasePath: outputBasePath,
 			want:           filepath.FromSlash(joinedOutputBasePathWithRelativeInputPath),
 		},
 		{
-			metadata:       utils.TestingCreateTestCaseMetadataWithWantErrTrue("Empty InputBasePath"),
+			metadata:       utils.CreateTestCaseMetadataWithWantErrTrue("Empty InputBasePath"),
 			inputBasePath:  "",
 			inputFullPath:  inputFullPath,
 			outputBasePath: outputBasePath,
 			want:           "",
 		},
 		{
-			metadata:       utils.TestingCreateTestCaseMetadataWithWantErrTrue("Empty InputFullPath"),
+			metadata:       utils.CreateTestCaseMetadataWithWantErrTrue("Empty InputFullPath"),
 			inputBasePath:  inputBasePath,
 			inputFullPath:  "",
 			outputBasePath: outputBasePath,
 			want:           "",
 		},
 		{
-			metadata:       utils.TestingCreateTestCaseMetadata("Equivalent Input Paths", false),
+			metadata:       utils.CreateTestCaseMetadata("Equivalent Input Paths", false),
 			inputBasePath:  inputBasePath,
 			inputFullPath:  inputBasePath,
 			outputBasePath: outputBasePath,

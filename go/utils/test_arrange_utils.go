@@ -74,7 +74,7 @@ type TestCaseInput struct {
 	Input    string
 }
 
-func TestingCreateTestCaseMetadata(name string, wantErr bool) TestCaseMetadata {
+func CreateTestCaseMetadata(name string, wantErr bool) TestCaseMetadata {
 	return TestCaseMetadata{
 		Name:    name,
 		WantErr: wantErr,
@@ -91,12 +91,12 @@ func TestingCreateTestCaseInput(name, input string, wantErr bool) TestCaseInput 
 	}
 }
 
-func TestingCreateTestCaseMetadataWithWantErrTrue(name string) TestCaseMetadata {
-	return TestingCreateTestCaseMetadata(name, true)
+func CreateTestCaseMetadataWithWantErrTrue(name string) TestCaseMetadata {
+	return CreateTestCaseMetadata(name, true)
 }
 
-func TestingCreateTestCaseMetadataWithNameBasicAndWantErrFalse() TestCaseMetadata {
-	return TestingCreateTestCaseMetadata("Basic", false)
+func CreateTestCaseMetadataWithNameBasicAndWantErrFalse() TestCaseMetadata {
+	return CreateTestCaseMetadata("Basic", false)
 }
 
 // TODO: wrong naming
@@ -149,10 +149,10 @@ func TestingParseTime(t *testing.T, timeString string) time.Time {
 func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, isDirectory bool, filePath string, line InputLine, fileSystemNodes *[]FileSystemNode) {
 	t.Helper()
 	if !isDirectory {
-		filePath = filepath.Join(filePath, line.elements[2])
-		TestingWriteFileContent(t, filePath, line.elements[3])
-		if line.elements[1] != "" {
-			timeModified := TestingParseTime(t, line.elements[1])
+		filePath = filepath.Join(filePath, line.GetFileName())
+		TestingWriteFileContent(t, filePath, line.GetContent())
+		if line.GetTimeModified() != "" {
+			timeModified := TestingParseTime(t, line.GetTimeModified())
 			if err := os.Chtimes(filePath, time.Now(), timeModified); err != nil {
 				t.Errorf("Failed to change the access and modification times of the file: %v", err)
 			}
