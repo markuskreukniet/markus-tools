@@ -26,8 +26,8 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 		directory 2/directory 4,,txt 2-4.txt,` + contents[1] + `;
 	`
 	testCases := []utils.TestCaseInput{
-		utils.TestingCreateTestCaseInput("Basic", input, false),
-		utils.TestingCreateTestCaseInput("Empty Input", "", false),
+		utils.CreateTestCaseInput("Basic", input, false),
+		utils.CreateTestCaseInput("Empty Input", "", false),
 	}
 
 	for _, tc := range testCases {

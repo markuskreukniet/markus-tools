@@ -81,7 +81,7 @@ func CreateTestCaseMetadata(name string, wantErr bool) TestCaseMetadata {
 	}
 }
 
-func TestingCreateTestCaseInput(name, input string, wantErr bool) TestCaseInput {
+func CreateTestCaseInput(name, input string, wantErr bool) TestCaseInput {
 	return TestCaseInput{
 		Metadata: TestCaseMetadata{
 			Name:    name,

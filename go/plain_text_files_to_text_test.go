@@ -18,8 +18,8 @@ func TestPlainTextFilesToText(t *testing.T) {
 		directory 1/directory 2,,txt 1-2 2.txt,content directory 1/directory\ncontent 2 1-2 2;
 	`
 	testCases := []utils.TestCaseInput{
-		utils.TestingCreateTestCaseInput("Basic", input, false),
-		utils.TestingCreateTestCaseInput("Empty Input", "", false),
+		utils.CreateTestCaseInput("Basic", input, false),
+		utils.CreateTestCaseInput("Empty Input", "", false),
 	}
 
 	// run testCases

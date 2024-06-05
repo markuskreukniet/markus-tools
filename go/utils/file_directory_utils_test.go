@@ -63,11 +63,11 @@ func TestFileOrDirectoryExists(t *testing.T) {
 		inputToDirectory bool
 	}{
 		{
-			testCaseInput:    TestingCreateTestCaseInput("Basic", input, false),
+			testCaseInput:    CreateTestCaseInput("Basic", input, false),
 			inputToDirectory: true,
 		},
 		{
-			testCaseInput:    TestingCreateTestCaseInput("Empty Input", "", false),
+			testCaseInput:    CreateTestCaseInput("Empty Input", "", false),
 			inputToDirectory: false,
 		},
 	}
