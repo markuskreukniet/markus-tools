@@ -139,6 +139,7 @@ func TestingCreateDirectoryAll(t *testing.T, filePath string) {
 }
 
 func TestingParseTime(t *testing.T, timeString string) time.Time {
+	t.Helper()
 	parsedTime, err := time.Parse(time.RFC3339, timeString)
 	if err != nil {
 		t.Errorf("Failed to parse time: %v", err)
