@@ -37,7 +37,7 @@ func (line InputLine) HasContent() bool {
 }
 
 func (line InputLine) IsDirectory() bool {
-	return line.GetFileName() == "" && !line.HasContent()
+	return line.GetFileName() == ""
 }
 
 func (line InputLine) GetDirectoryPathPartWithFileName() string {
@@ -146,9 +146,9 @@ func TestingParseTime(t *testing.T, timeString string) time.Time {
 	return parsedTime
 }
 
-func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, isDirectory bool, filePath string, line InputLine, fileSystemNodes *[]FileSystemNode) {
+func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, filePath string, line InputLine, fileSystemNodes *[]FileSystemNode) {
 	t.Helper()
-	if !isDirectory {
+	if !line.IsDirectory() {
 		filePath = filepath.Join(filePath, line.GetFileName())
 		TestingWriteFileContent(t, filePath, line.GetContent())
 		if line.GetTimeModified() != "" {
@@ -160,7 +160,7 @@ func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, isDirectory bo
 	}
 	*fileSystemNodes = append(*fileSystemNodes, FileSystemNode{
 		Path:        filePath,
-		IsDirectory: isDirectory,
+		IsDirectory: line.IsDirectory(),
 	})
 }
 
@@ -226,7 +226,7 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 				directoryPathPartWithFileName: "",
 			}
 
-			testingIfFileCreateFileAndAppendFileSystemNode(t, line.IsDirectory(), filePath, line, &fileSystemNodes)
+			testingIfFileCreateFileAndAppendFileSystemNode(t, filePath, line, &fileSystemNodes)
 		}
 	}
 	return tempDirectories, fileSystemNodes
@@ -254,7 +254,7 @@ func TestingCreateFilesAndDirectoriesByOneInput(t *testing.T, input string) (str
 			// probably not optimal but results in less code, which is fine for testing
 			previousPathPart = line.GetDirectoryPathPart()
 		}
-		testingIfFileCreateFileAndAppendFileSystemNode(t, line.IsDirectory(), path, line, &nodes)
+		testingIfFileCreateFileAndAppendFileSystemNode(t, path, line, &nodes)
 	}
 	return directory, nodes
 }
