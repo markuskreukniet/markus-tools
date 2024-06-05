@@ -146,13 +146,13 @@ func TestingParseTime(t *testing.T, timeString string) time.Time {
 	return parsedTime
 }
 
-func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, isDirectory bool, filePath string, inputLine []string, fileSystemNodes *[]FileSystemNode) {
+func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, isDirectory bool, filePath string, line InputLine, fileSystemNodes *[]FileSystemNode) {
 	t.Helper()
 	if !isDirectory {
-		filePath = filepath.Join(filePath, inputLine[2])
-		TestingWriteFileContent(t, filePath, inputLine[3])
-		if inputLine[1] != "" {
-			timeModified := TestingParseTime(t, inputLine[1])
+		filePath = filepath.Join(filePath, line.elements[2])
+		TestingWriteFileContent(t, filePath, line.elements[3])
+		if line.elements[1] != "" {
+			timeModified := TestingParseTime(t, line.elements[1])
 			if err := os.Chtimes(filePath, time.Now(), timeModified); err != nil {
 				t.Errorf("Failed to change the access and modification times of the file: %v", err)
 			}
@@ -219,7 +219,14 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 			if i == 0 || isDirectory {
 				TestingCreateDirectoryAll(t, filePath)
 			}
-			testingIfFileCreateFileAndAppendFileSystemNode(t, inputLine[2] == "", filePath, inputLine, &fileSystemNodes)
+
+			// TODO: should have been already an InputLine
+			line := InputLine{
+				elements:                      inputLine,
+				directoryPathPartWithFileName: "",
+			}
+
+			testingIfFileCreateFileAndAppendFileSystemNode(t, inputLine[2] == "", filePath, line, &fileSystemNodes)
 		}
 	}
 	return tempDirectories, fileSystemNodes
@@ -247,7 +254,7 @@ func TestingCreateFilesAndDirectoriesByOneInput(t *testing.T, input string) (str
 			// probably not optimal but results in less code, which is fine for testing
 			previousPathPart = line.GetDirectoryPathPart()
 		}
-		testingIfFileCreateFileAndAppendFileSystemNode(t, line.IsDirectory(), path, line.elements, &nodes)
+		testingIfFileCreateFileAndAppendFileSystemNode(t, line.IsDirectory(), path, line, &nodes)
 	}
 	return directory, nodes
 }
