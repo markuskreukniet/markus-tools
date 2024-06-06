@@ -3,7 +3,6 @@ package main
 import (
 	"path/filepath"
 	"sort"
-	"strings"
 	"testing"
 	"time"
 
@@ -344,19 +343,4 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			// assert
 		})
 	}
-}
-
-// TODO: use also in non test version?
-func createDirectoryDateRangeName(startTime, endTime time.Time) (string, error) {
-	var builder strings.Builder
-	if err := formatDateAndWriteString(&builder, startTime); err != nil {
-		return "", err
-	}
-	if _, err := builder.WriteString(spacedHyphen); err != nil {
-		return "", err
-	}
-	if err := formatDateAndWriteString(&builder, endTime); err != nil {
-		return "", err
-	}
-	return builder.String(), nil
 }

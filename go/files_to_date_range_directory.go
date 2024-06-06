@@ -53,6 +53,20 @@ func isWithinThreeDays(olderTime, newerTime time.Time) bool {
 	return olderTime.Sub(newerTime).Hours() <= 72
 }
 
+func createDirectoryDateRangeName(startTime, endTime time.Time) (string, error) {
+	var builder strings.Builder
+	if err := formatDateAndWriteString(&builder, startTime); err != nil {
+		return "", err
+	}
+	if _, err := builder.WriteString(spacedHyphen); err != nil {
+		return "", err
+	}
+	if err := formatDateAndWriteString(&builder, endTime); err != nil {
+		return "", err
+	}
+	return builder.String(), nil
+}
+
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
 	var filePathsTimeModified []filePathTimeModified
 	if err := appendFilePathsTimeModified(&filePathsTimeModified, uniqueFileSystemNodes); err != nil {
@@ -83,19 +97,11 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	for i := 0; i < len(filePathsTimeModified)-1; i++ {
 		iPlusOne := i + 1
 		if isWithinThreeDays(filePathsTimeModified[iPlusOne].timeModified, filePathsTimeModified[i].timeModified) {
-			var builder strings.Builder
-			if err := formatDateAndWriteString(&builder, filePathsTimeModified[startDateRange].timeModified); err != nil {
+			name, err := createDirectoryDateRangeName(filePathsTimeModified[startDateRange].timeModified, filePathsTimeModified[i].timeModified)
+			if err != nil {
 				return err
 			}
-			if filePathsTimeModified[startDateRange].timeModified != filePathsTimeModified[i].timeModified {
-				if _, err := builder.WriteString(spacedHyphen); err != nil {
-					return err
-				}
-				if err := formatDateAndWriteString(&builder, filePathsTimeModified[i].timeModified); err != nil {
-					return err
-				}
-			}
-			subDirectoryPath := filepath.Join(destinationDirectory, builder.String())
+			subDirectoryPath := filepath.Join(destinationDirectory, name)
 			foundIndex := -1
 			// TODO: add the missing filePathsTimeModified to the dir and remove subDirectoryPath from dateRangeDirectoryPaths in this loop?
 			for j, path := range dateRangeDirectoryPaths {
