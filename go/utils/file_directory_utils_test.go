@@ -23,7 +23,7 @@ import (
 // 	directory := TestingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
 // 	defer TestingRemoveDirectoryTree(t, directory)
 // 	fullPath := filepath.Join(directory, fileSystemPathEndParts.FilePathEndParts[0])
-// 	writtenContent := TestingWriteFileContentWithContentAndIndex(t, fullPath, 0)
+// 	writtenContent := TestingWriteFileWithContentAndIndex(t, fullPath, 0)
 // 	nonExistentFilePath := filepath.Join(directory, TxtFileNonExistent1)
 
 // 	// act

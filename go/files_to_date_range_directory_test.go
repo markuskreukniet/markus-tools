@@ -337,7 +337,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 					// create directory with files
 					utils.TestingCreateDirectoryAll(t, filepath.Join(destination, name))
 					for j := startDateRange; j <= i; j++ {
-						// details[j].Path
+						lines[j].inputLine.GetFileName()
 					}
 
 					startDateRange = i + 1

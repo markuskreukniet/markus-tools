@@ -100,14 +100,14 @@ func CreateTestCaseMetadataWithNameBasicAndWantErrFalse() TestCaseMetadata {
 }
 
 // TODO: wrong naming
-func TestingWriteFileContentWithContentAndIndex(t *testing.T, filePath string, index int) string {
+func TestingWriteFileWithContentAndIndex(t *testing.T, filePath string, index int) string {
 	t.Helper()
 	writtenContent := fmt.Sprintf("content %d", index)
-	TestingWriteFileContent(t, filePath, writtenContent)
+	TestingWriteFile(t, filePath, writtenContent)
 	return writtenContent
 }
 
-func TestingWriteFileContent(t *testing.T, filePath string, content string) {
+func TestingWriteFile(t *testing.T, filePath string, content string) {
 	t.Helper()
 	if err := os.WriteFile(filePath, []byte(content), 0666); err != nil {
 		t.Errorf("Failed to write file content: %v", err)
@@ -151,7 +151,7 @@ func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, filePath strin
 	t.Helper()
 	if !line.IsDirectory() {
 		filePath = filepath.Join(filePath, line.GetFileName())
-		TestingWriteFileContent(t, filePath, line.GetContent())
+		TestingWriteFile(t, filePath, line.GetContent())
 		if line.GetTimeModified() != "" {
 			timeModified := TestingParseTime(t, line.GetTimeModified())
 			if err := os.Chtimes(filePath, time.Now(), timeModified); err != nil {
