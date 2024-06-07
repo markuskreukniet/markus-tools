@@ -273,8 +273,9 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 						var tempLines []timeInputLine
 						for _, line := range unfilteredLines {
 							part := line.inputLine.GetDirectoryPathPart()
-							if strings.Contains(part, "/") {
-								subStrings := strings.SplitN(part, "/", 2)
+							slash := "/"
+							if strings.Contains(part, slash) {
+								subStrings := strings.SplitN(part, slash, 2)
 								if len(subStrings) > 0 {
 									part = subStrings[0]
 								}
