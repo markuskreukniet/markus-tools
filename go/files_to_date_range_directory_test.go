@@ -3,64 +3,91 @@ package main
 import (
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
-// func getDirectoryPathsAndNamesFromDirectory(directoryFilePath string) ([]string, []string, error) {
-// 	entries, err := os.ReadDir(directoryFilePath)
-// 	if err != nil {
-// 		return nil, nil, err
-// 	}
-// 	var filePaths []string
-// 	var names []string
-// 	for _, entry := range entries {
-// 		if entry.IsDir() {
-// 			names = append(names, entry.Name())
-// 			filePaths = append(filePaths, filepath.Join(directoryFilePath, entry.Name()))
-// 		}
-// 	}
-// 	return filePaths, names, nil
-// }
-
-func testingCreateContent(subContent string) string {
+func createTestContent(subContent string) string {
 	return "content" + subContent + "\ncontent" + subContent
 }
 
-func testingCreateFileDetail(t *testing.T, line utils.InputLine, destination string) utils.FileDetail {
-	return utils.FileDetail{
-		Path:             filepath.Join(destination, line.GetDirectoryPathPartWithFileName()),
-		ModificationTime: utils.TestingParseTime(t, line.GetTimeModified()),
-		Size:             0,
-	}
-}
-
-func testingFilterFileDetails(filteredDetails *[]utils.FileDetail, filter func(unfilteredDetails []utils.FileDetail) []utils.FileDetail) {
-	if len(*filteredDetails) > 1 {
-		tempDetails := filter(*filteredDetails)
-		if len(tempDetails) > 1 {
-			*filteredDetails = tempDetails
+func filterTimeInputLines(filteredLines *[]timeInputLine, filter func(unfilteredLines []timeInputLine) []timeInputLine) {
+	if len(*filteredLines) > 1 {
+		tempLines := filter(*filteredLines)
+		if len(tempLines) > 1 {
+			*filteredLines = tempLines
 		}
 	}
 }
 
-type duplicateFileDetailGroup struct {
-	identifier  string
-	fileDetails []utils.FileDetail
+type timeInputLine struct {
+	time      time.Time
+	inputLine utils.InputLine
 }
 
-type duplicateFileDetailGroups []duplicateFileDetailGroup
+func testingCreateTimeInputLine(t *testing.T, line utils.InputLine) timeInputLine {
+	return timeInputLine{
+		time:      utils.TestingParseTime(t, line.GetTimeModified()),
+		inputLine: line,
+	}
+}
 
-func (groups duplicateFileDetailGroups) appendByIdentifier(identifier string, detail utils.FileDetail) bool {
+type duplicateTimeInputLineGroup struct {
+	identifier     string
+	timeInputLines []timeInputLine
+}
+
+func createDuplicateTimeInputLineGroup(identifier string, lines []timeInputLine) duplicateTimeInputLineGroup {
+	return duplicateTimeInputLineGroup{
+		identifier:     identifier,
+		timeInputLines: lines,
+	}
+}
+
+type duplicateTimeInputLineGroups []duplicateTimeInputLineGroup
+
+func (groups duplicateTimeInputLineGroups) appendByIdentifier(identifier string, line timeInputLine) bool {
 	for i, group := range groups {
 		if identifier == group.identifier {
-			groups[i].fileDetails = append(groups[i].fileDetails, detail)
+			groups[i].timeInputLines = append(groups[i].timeInputLines, line)
 			return true
 		}
 	}
 	return false
+}
+
+// garbage collection: unGroupedLines
+func createDuplicateInputLineFileGroups(t *testing.T, input string) duplicateTimeInputLineGroups {
+	var groups duplicateTimeInputLineGroups
+	var unGroupedLines []timeInputLine
+	for _, rawLine := range utils.CreateSortedRawInputLines(input) {
+		line := utils.CreateInputLine(rawLine)
+
+		if !line.HasContent() {
+			continue
+		}
+
+		timeLine := testingCreateTimeInputLine(t, line)
+		if groups.appendByIdentifier(line.GetContent(), timeLine) {
+			continue
+		}
+
+		var lines []timeInputLine
+		for _, unGroupedLine := range unGroupedLines {
+			if line.GetContent() == unGroupedLine.inputLine.GetContent() {
+				lines = append(lines, unGroupedLine)
+			}
+		}
+		if len(lines) > 0 {
+			groups = append(groups, createDuplicateTimeInputLineGroup(line.GetContent(), append([]timeInputLine{timeLine}, lines...)))
+		} else {
+			unGroupedLines = append(unGroupedLines, timeLine)
+		}
+	}
+	return groups
 }
 
 func TestFilesToDateRangeDirectory(t *testing.T) {
@@ -176,8 +203,8 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	// `
 
 	// V removing duplicate files in destination
-	content12 := testingCreateContent("12")
-	content122 := testingCreateContent("12 2")
+	content12 := createTestContent("12")
+	content122 := createTestContent("12 2")
 	destinationDuplicateFiles := `
 		2020-12-20,2020-12-20T20:40:40Z,txt 12.txt,` + content12 + `;
 		2020-12-20/directory 1,2020-12-20T20:40:40Z,txt 12 1.txt,` + content12 + `;
@@ -213,38 +240,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			destination := utils.CreateTemporaryDirectory(t)
 			defer utils.TestingRemoveDirectoryTree(t, destination)
 
-			// create duplicate file groups
-			var groups duplicateFileDetailGroups
-			var unGroupedLines []utils.InputLine
-			for _, rawLine := range utils.CreateSortedRawInputLines(tc.destinationInput) {
-				line := utils.CreateInputLine(rawLine)
-
-				if !line.HasContent() {
-					continue
-				}
-
-				detail := testingCreateFileDetail(t, line, destination)
-				appended := groups.appendByIdentifier(line.GetContent(), detail)
-
-				if appended {
-					continue
-				}
-
-				var details []utils.FileDetail
-				for _, unGroupedLine := range unGroupedLines {
-					if line.GetContent() == unGroupedLine.GetContent() {
-						details = append(details, testingCreateFileDetail(t, unGroupedLine, destination))
-					}
-				}
-				if len(details) > 0 {
-					groups = append(groups, duplicateFileDetailGroup{
-						identifier:  line.GetContent(),
-						fileDetails: append([]utils.FileDetail{detail}, details...),
-					})
-				} else {
-					unGroupedLines = append(unGroupedLines, line)
-				}
-			}
+			groups := createDuplicateInputLineFileGroups(t, tc.destinationInput)
 
 			// Select unique files by first filtering the duplicate ones (there are no created files yet) by this priority:
 			// 1. keep the shortest file name
@@ -252,81 +248,89 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			// 3. keep the one in the destination directory
 			// 4. keep the newest modification time file
 			// 5. keep the first file of the slice
-			var details []utils.FileDetail
+			var lines []timeInputLine
 			for _, group := range groups {
-				// TODO: It is possible to clean the anonymous functions in testingFilterFileDetails
-				if len(group.fileDetails) > 1 {
+				// TODO: It is possible to clean the anonymous functions in filterTimeInputLines
+				if len(group.timeInputLines) > 1 {
 					// filter on shortest file name
-					testingFilterFileDetails(&group.fileDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
-						var tempDetails []utils.FileDetail
+					filterTimeInputLines(&group.timeInputLines, func(unfilteredLines []timeInputLine) []timeInputLine {
+						var tempLines []timeInputLine
 						var minimumLength int
-						for _, detail := range unfilteredDetails {
-							length := len(filepath.Base(detail.Path)) // TODO: is this efficient?
+						for _, line := range unfilteredLines {
+							length := len(line.inputLine.GetFileName())
 							if length < minimumLength {
 								minimumLength = length
-								tempDetails = []utils.FileDetail{detail}
+								tempLines = []timeInputLine{line}
 							} else if length == minimumLength {
-								tempDetails = append(tempDetails, detail)
+								tempLines = append(tempLines, line)
 							}
 						}
-						return tempDetails
+						return tempLines
 					})
 
 					// filter on valid name of date directory or date range directory
-					testingFilterFileDetails(&group.fileDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
-						var tempDetails []utils.FileDetail
-						for _, detail := range unfilteredDetails {
-							if isValidDateRangeDirectory(detail.Path) {
-								tempDetails = append(tempDetails, detail)
+					filterTimeInputLines(&group.timeInputLines, func(unfilteredLines []timeInputLine) []timeInputLine {
+						var tempLines []timeInputLine
+						for _, line := range unfilteredLines {
+							part := line.inputLine.GetDirectoryPathPart()
+							if strings.Contains(part, "/") {
+								subStrings := strings.SplitN(part, "/", 2)
+								if len(subStrings) > 0 {
+									part = subStrings[0]
+								}
+							}
+
+							// TODO: moet dan wel alleen name versie
+							if isValidDateRangeDirectory(part) {
+								tempLines = append(tempLines, line)
 							}
 						}
-						return tempDetails
+						return tempLines
 					})
 
 					// filter on destination directory
 
 					// filter on the newest modification time file
-					testingFilterFileDetails(&group.fileDetails, func(unfilteredDetails []utils.FileDetail) []utils.FileDetail {
-						var tempDetails []utils.FileDetail
+					filterTimeInputLines(&group.timeInputLines, func(unfilteredLines []timeInputLine) []timeInputLine {
+						var tempLines []timeInputLine
 						var newestTime time.Time
-						for _, detail := range unfilteredDetails {
-							time := detail.ModificationTime
-							if time.After(newestTime) {
-								newestTime = time
-								tempDetails = []utils.FileDetail{detail}
-							} else if time.Equal(newestTime) {
-								tempDetails = append(tempDetails, detail)
+						for _, line := range unfilteredLines {
+							if line.time.After(newestTime) {
+								newestTime = line.time
+								tempLines = []timeInputLine{line}
+							} else if line.time.Equal(newestTime) {
+								tempLines = append(tempLines, line)
 							}
 						}
-						return tempDetails
+						return tempLines
 					})
 				}
 
 				// keep the first file of the slice
-				details = append(details, group.fileDetails[0])
+				lines = append(lines, group.timeInputLines[0])
 			}
 
 			// unique files to date range groups
-			sort.Slice(details, func(i, j int) bool {
-				return details[i].ModificationTime.Before(details[j].ModificationTime)
+			sort.Slice(lines, func(i, j int) bool {
+				return lines[i].time.Before(lines[j].time)
 			})
 			startDateRange := 0
 			isFindingDateRange := false
-			for i := 1; i < len(details); i++ {
-				if isWithinThreeDays(details[i-1].ModificationTime, details[i].ModificationTime) {
+			for i := 1; i < len(lines); i++ {
+				if isWithinThreeDays(lines[i-1].time, lines[i].time) {
 					isFindingDateRange = true
 				} else {
 					var name string
 					if isFindingDateRange {
 						// Declare err separately to avoid shadowing with ':='
 						var err error
-						name, err = createDirectoryDateRangeName(details[startDateRange].ModificationTime, details[i].ModificationTime)
+						name, err = createDirectoryDateRangeName(lines[startDateRange].time, lines[i].time)
 						if err != nil {
 							t.Errorf("createDirectoryDateRangeName error: %v", err)
 						}
 						isFindingDateRange = false
 					} else {
-						name = toDateFormat(details[i].ModificationTime)
+						name = toDateFormat(lines[i].time)
 					}
 
 					// create directory with files
