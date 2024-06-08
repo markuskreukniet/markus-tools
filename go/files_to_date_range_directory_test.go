@@ -280,9 +280,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 									part = subStrings[0]
 								}
 							}
-
-							// TODO: moet dan wel alleen name versie
-							if isValidDateRangeDirectory(part) {
+							if isValidDateRangeDirectoryName(part) {
 								tempLines = append(tempLines, line)
 							}
 						}
@@ -335,9 +333,11 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 					}
 
 					// create directory with files
-					utils.TestingCreateDirectoryAll(t, filepath.Join(destination, name))
+					path := filepath.Join(destination, name)
+					utils.TestingCreateDirectoryAll(t, path)
 					for j := startDateRange; j <= i; j++ {
-						lines[j].inputLine.GetFileName()
+						// TODO: write also time modified?
+						utils.TestingWriteFile(t, filepath.Join(path, lines[j].inputLine.GetFileName()), lines[j].inputLine.GetContent())
 					}
 
 					startDateRange = i + 1

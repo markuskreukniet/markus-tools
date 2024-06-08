@@ -27,10 +27,9 @@ func appendDateRangeDirectoryPathsAndFilePathsTimeModified(dateRangeDirectoryPat
 	return nil
 }
 
-func isValidDateRangeDirectory(filePath string) bool {
-	base := filepath.Base(filePath)
-	if strings.Contains(base, spacedHyphen) {
-		baseParts := strings.Split(base, spacedHyphen)
+func isValidDateRangeDirectoryName(name string) bool {
+	if strings.Contains(name, spacedHyphen) {
+		baseParts := strings.Split(name, spacedHyphen)
 		firstDate, err := parseDate(baseParts[0])
 		if err != nil {
 			return false
@@ -43,10 +42,14 @@ func isValidDateRangeDirectory(filePath string) bool {
 		if daysDifference >= 1 && daysDifference <= 3 {
 			return true
 		}
-	} else if isValidDateFormat(base) {
+	} else if isValidDateFormat(name) {
 		return true
 	}
 	return false
+}
+
+func isValidDateRangeDirectory(filePath string) bool {
+	return isValidDateRangeDirectoryName(filepath.Base(filePath))
 }
 
 func isWithinThreeDays(olderTime, newerTime time.Time) bool {
