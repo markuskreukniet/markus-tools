@@ -19,14 +19,6 @@ type filePathTimeModified struct {
 const spacedHyphen = " - "
 const dateLayout = "2006-01-02" // YYYY-MM-DD
 
-func appendDateRangeDirectoryPathsAndFilePathsTimeModified(dateRangeDirectoryPaths *[]string, filePathsTimeModified *[]filePathTimeModified, filePath string) error {
-	*dateRangeDirectoryPaths = append(*dateRangeDirectoryPaths, filePath)
-	if err := appendFilePathsTimeModified(filePathsTimeModified, createDirectoryFileSystemNodeInSlice(filePath)); err != nil {
-		return err
-	}
-	return nil
-}
-
 func isValidDateRangeDirectoryName(name string) bool {
 	if strings.Contains(name, spacedHyphen) {
 		baseParts := strings.Split(name, spacedHyphen)
@@ -76,7 +68,6 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		return err
 	}
 	var dateRangeDirectoryPaths []string
-	// TODO: AppendFileDetails should now not look into subdirectories
 	// TODO: utils.Directories is changed from directories
 	// TODO: AppendFileDetails is probably wrong naming
 	// TODO: opErr logic
@@ -84,8 +75,8 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	if err := utils.AppendFileDetails(
 		func(detail utils.FileDetail) {
 			if isValidDateRangeDirectory(detail.Path) {
-				// TODO: appendDateRangeDirectoryPathsAndFilePathsTimeModified useless?
-				opErr = appendDateRangeDirectoryPathsAndFilePathsTimeModified(&dateRangeDirectoryPaths, &filePathsTimeModified, detail.Path)
+				dateRangeDirectoryPaths = append(dateRangeDirectoryPaths, detail.Path)
+				opErr = appendFilePathsTimeModified(&filePathsTimeModified, createDirectoryFileSystemNodeInSlice(detail.Path))
 			}
 		}, createDirectoryFileSystemNodeInSlice(destinationDirectory), utils.Directories); err != nil {
 		return err
