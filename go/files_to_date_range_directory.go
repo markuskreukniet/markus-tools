@@ -68,20 +68,23 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		return err
 	}
 	var dateRangeDirectoryPaths []string
-	// TODO: opErr logic
-	var opErr error
-	if err := utils.AppendFileDetails(
+
+	// Two error variables are needed because errJ might become an error while errI does not.
+	var errJ error
+	errI := utils.AppendFileDetails(
 		func(detail utils.FileDetail) {
 			if isValidDateRangeDirectory(detail.Path) {
 				dateRangeDirectoryPaths = append(dateRangeDirectoryPaths, detail.Path)
-				opErr = appendFilePathsTimeModified(&filePathsTimeModified, createDirectoryFileSystemNodeInSlice(detail.Path))
+				errJ = appendFilePathsTimeModified(&filePathsTimeModified, createDirectoryFileSystemNodeInSlice(detail.Path))
 			}
-		}, createDirectoryFileSystemNodeInSlice(destinationDirectory), utils.Directories); err != nil {
-		return err
+		}, createDirectoryFileSystemNodeInSlice(destinationDirectory), utils.Directories)
+	if errI != nil {
+		return errI
 	}
-	if opErr != nil {
-		return opErr
+	if errJ != nil {
+		return errJ
 	}
+
 	sort.Slice(filePathsTimeModified, func(i, j int) bool {
 		return filePathsTimeModified[i].timeModified.Before(filePathsTimeModified[j].timeModified)
 	})
