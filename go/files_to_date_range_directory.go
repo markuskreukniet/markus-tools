@@ -68,8 +68,6 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		return err
 	}
 	var dateRangeDirectoryPaths []string
-	// TODO: utils.Directories is changed from directories
-	// TODO: AppendFileDetails is probably wrong naming
 	// TODO: opErr logic
 	var opErr error
 	if err := utils.AppendFileDetails(
