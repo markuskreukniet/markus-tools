@@ -62,6 +62,38 @@ func createDirectoryDateRangeName(startTime, endTime time.Time) (string, error) 
 	return builder.String(), nil
 }
 
+// TODO: WIP
+// func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
+// 	var details []utils.FileDetail
+// 	var goodDirectoryFilePaths []string
+// 	var badDirectoryFilePaths []string
+
+// 	entries, err := os.ReadDir(destinationDirectory)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	for _, entry := range entries {
+// 		path := filepath.Join(destinationDirectory, entry.Name())
+// 		if entry.IsDir() {
+// 			if isValidDateRangeDirectoryName(entry.Name()) {
+// 				goodDirectoryFilePaths = append(goodDirectoryFilePaths, path)
+// 			} else {
+// 				badDirectoryFilePaths = append(badDirectoryFilePaths, path)
+// 			}
+// 		} else {
+// 			info, err := entry.Info()
+// 			if err != nil {
+// 				return err
+// 			}
+
+// 			details = append(details, utils.CreateFileDetail(path, info.ModTime(), info.Size()))
+// 		}
+// 	}
+
+// 	return nil
+// }
+
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
 	var filePathsTimeModified []filePathTimeModified
 	if err := appendFilePathsTimeModified(&filePathsTimeModified, uniqueFileSystemNodes); err != nil {

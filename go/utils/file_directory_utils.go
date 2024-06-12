@@ -15,6 +15,14 @@ type FileDetail struct {
 	Size             int64
 }
 
+func CreateFileDetail(filePath string, modificationTime time.Time, size int64) FileDetail {
+	return FileDetail{
+		Path:             filePath,
+		ModificationTime: modificationTime,
+		Size:             size,
+	}
+}
+
 type FileSystemNode struct {
 	Path        string
 	IsDirectory bool
@@ -29,7 +37,7 @@ const (
 	files fileFilterMode = iota
 	FilesWithoutZeroByteFiles
 	FilesAndDirectories
-	filesAndDirectoriesWithoutZeroByteFiles
+	FilesAndDirectoriesWithoutZeroByteFiles
 	Directories
 )
 
@@ -71,11 +79,7 @@ func GetFileDetail(filePath string) (FileDetail, error) {
 	if err != nil {
 		return FileDetail{}, err
 	}
-	return FileDetail{
-		Path:             filePath,
-		ModificationTime: fileInfo.ModTime(),
-		Size:             fileInfo.Size(),
-	}, nil
+	return CreateFileDetail(filePath, fileInfo.ModTime(), fileInfo.Size()), nil
 }
 
 func WalkFileDetails(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileDetail)) error {
@@ -97,7 +101,7 @@ func WalkFileDetails(rootFilePath string, mode fileFilterMode, fileType fileType
 		}
 
 		// zero byte check
-		if size == 0 && (mode == FilesWithoutZeroByteFiles || mode == filesAndDirectoriesWithoutZeroByteFiles) {
+		if size == 0 && (mode == FilesWithoutZeroByteFiles || mode == FilesAndDirectoriesWithoutZeroByteFiles) {
 			return nil
 		}
 
@@ -109,11 +113,7 @@ func WalkFileDetails(rootFilePath string, mode fileFilterMode, fileType fileType
 			}
 		}
 
-		handler(FileDetail{
-			Path:             filePath,
-			ModificationTime: fileInfo.ModTime(),
-			Size:             size,
-		})
+		handler(CreateFileDetail(filePath, fileInfo.ModTime(), size))
 		return nil
 	})
 }
@@ -122,6 +122,7 @@ func AppendFileDetails(appendFileDetail func(detail FileDetail), uniqueFileSyste
 	for _, node := range uniqueFileSystemNodes {
 		if node.IsDirectory {
 			if err := WalkFileDetails(node.Path, mode, AllFiles, func(detail FileDetail) {
+				// TODO: appendFileDetailPart is better naming? does this even makes sense?
 				appendFileDetail(detail)
 			}); err != nil {
 				return err
