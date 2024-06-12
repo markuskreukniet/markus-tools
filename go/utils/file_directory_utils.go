@@ -12,7 +12,11 @@ import (
 // The Identifier field can store either the actual content of the file or a hash of it,
 // which makes it useful for various purposes, including as an identifier in unit tests.
 type FileData struct {
-	Identifier       string // Content or hash of the file
+	Identifier   string // Content or hash of the file
+	FileMetadata FileMetadata
+}
+
+type FileMetadata struct {
 	FilePath         string
 	ModificationTime time.Time
 	Size             int64 // Size of the file
