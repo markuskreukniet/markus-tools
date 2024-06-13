@@ -316,50 +316,25 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 				return lines[i].time.Before(lines[j].time)
 			})
 
-			//
-			// startDateRange := 0
-			// isFindingDateRange := false
-			// length := len(lines)
-			// for i := 0; i < length; i++ {
-			// 	if i < length-1 && isWithinThreeDays(lines[i].time, lines[i+1].time) {
-			// 		if !isFindingDateRange {
-			// 			isFindingDateRange = true
-			// 			startDateRange = i
-			// 		}
-			// 	} else {
-			// 		var name string
-			// 		if isFindingDateRange {
-			// 			// Declare err separately to avoid shadowing "name" with ':='
-			// 			var err error
-			// 			name, err = createDirectoryDateRangeName(lines[startDateRange].time, lines[i].time)
-			// 			if err != nil {
-			// 				t.Errorf("createDirectoryDateRangeName error: %v", err)
-			// 			}
-
-			// 			isFindingDateRange = false
-			// 		} else {
-			// 			name = toDateFormat(lines[i].time)
-			// 		}
-			// 		log.Println(name)
-			// 	}
-			// }
-			//
-
 			startDateRange := 0
 			isFindingDateRange := false
-			// TODO: has bug, last index does not get added
-			for i := 1; i < len(lines); i++ {
-				if isWithinThreeDays(lines[i-1].time, lines[i].time) {
-					isFindingDateRange = true
+			length := len(lines)
+			for i := 0; i < length; i++ {
+				if i < length-1 && isWithinThreeDays(lines[i].time, lines[i+1].time) {
+					if !isFindingDateRange {
+						isFindingDateRange = true
+						startDateRange = i
+					}
 				} else {
 					var name string
 					if isFindingDateRange {
-						// Declare err separately to avoid shadowing with ':='
+						// Declare err separately to avoid shadowing "name" with ':='
 						var err error
 						name, err = createDirectoryDateRangeName(lines[startDateRange].time, lines[i].time)
 						if err != nil {
 							t.Errorf("createDirectoryDateRangeName error: %v", err)
 						}
+
 						isFindingDateRange = false
 					} else {
 						name = toDateFormat(lines[i].time)
@@ -372,8 +347,6 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 						// TODO: write also time modified?
 						utils.TestingWriteFile(t, filepath.Join(path, lines[j].inputLine.GetFileName()), lines[j].inputLine.GetContent())
 					}
-
-					startDateRange = i + 1
 				}
 			}
 
