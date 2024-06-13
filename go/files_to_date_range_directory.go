@@ -150,6 +150,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	})
 	startDateRange := 0
 	for i := 0; i < len(filePathsTimeModified)-1; i++ {
+		// TODO: duplicate OR i + 1 or i+1
 		iPlusOne := i + 1
 		if isWithinThreeDays(filePathsTimeModified[iPlusOne].timeModified, filePathsTimeModified[i].timeModified) {
 			name, err := createDirectoryDateRangeName(filePathsTimeModified[startDateRange].timeModified, filePathsTimeModified[i].timeModified)
