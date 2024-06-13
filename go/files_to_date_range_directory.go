@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"sort"
@@ -116,10 +117,32 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 		return filesMetadata[i].ModificationTime.Before(filesMetadata[j].ModificationTime)
 	})
 
-	// startDateRange := 0
-	// for i := 0; i < len(filesMetadata); i++ {
+	startDateRange := 0
+	isFindingDateRange := false
+	length := len(filesMetadata)
+	for i := 0; i < length; i++ {
+		if i < length-1 && isWithinThreeDays(filesMetadata[i].ModificationTime, filesMetadata[i+1].ModificationTime) && !isFindingDateRange {
+			isFindingDateRange = true
+			startDateRange = i
+		} else {
+			var name string
+			if isFindingDateRange {
+				// Declare 'err' separately to avoid shadowing 'name' with ':='
+				var err error
+				name, err = createDirectoryDateRangeName(filesMetadata[startDateRange].ModificationTime, filesMetadata[i].ModificationTime)
+				if err != nil {
+					t.Errorf("createDirectoryDateRangeName error: %v", err)
+				}
 
-	// }
+				isFindingDateRange = false
+			} else {
+				name = toDateFormat(filesMetadata[i].ModificationTime)
+			}
+
+			// TODO:
+			log.Println(name)
+		}
+	}
 
 	return nil
 }

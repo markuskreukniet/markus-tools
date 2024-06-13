@@ -311,11 +311,10 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 				lines = append(lines, group.timeInputLines[0])
 			}
 
-			// unique files to date range groups
+			// create unique files in directories
 			sort.Slice(lines, func(i, j int) bool {
 				return lines[i].time.Before(lines[j].time)
 			})
-
 			startDateRange := 0
 			isFindingDateRange := false
 			length := len(lines)
