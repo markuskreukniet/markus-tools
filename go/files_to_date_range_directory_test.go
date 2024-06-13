@@ -320,11 +320,9 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			isFindingDateRange := false
 			length := len(lines)
 			for i := 0; i < length; i++ {
-				if i < length-1 && isWithinThreeDays(lines[i].time, lines[i+1].time) {
-					if !isFindingDateRange {
-						isFindingDateRange = true
-						startDateRange = i
-					}
+				if i < length-1 && isWithinThreeDays(lines[i].time, lines[i+1].time) && !isFindingDateRange {
+					isFindingDateRange = true
+					startDateRange = i
 				} else {
 					var name string
 					if isFindingDateRange {
