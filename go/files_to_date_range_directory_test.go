@@ -326,7 +326,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 				} else {
 					var name string
 					if isFindingDateRange {
-						// Declare err separately to avoid shadowing "name" with ':='
+						// Declare 'err' separately to avoid shadowing 'name' with ':='
 						var err error
 						name, err = createDirectoryDateRangeName(lines[startDateRange].time, lines[i].time)
 						if err != nil {
