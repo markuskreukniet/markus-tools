@@ -110,12 +110,14 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 		}
 	}
 
+	// TODO: delete duplicate files
+
 	sort.Slice(filesMetadata, func(i, j int) bool {
 		return filesMetadata[i].ModificationTime.Before(filesMetadata[j].ModificationTime)
 	})
 
 	// startDateRange := 0
-	// for i := 1; i < len(filesMetadata); i++ {
+	// for i := 0; i < len(filesMetadata); i++ {
 
 	// }
 
