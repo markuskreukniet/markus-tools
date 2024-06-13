@@ -99,6 +99,8 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	// V add a file from source to destination
 	// V create a new destination folder
 
+	// TODO: should also remove 0 byte files
+
 	//   destination folder should also checks also its sub directory tree
 
 	// add a file with the same file name, but first rename it with 2 postfix. Or replace file if newer

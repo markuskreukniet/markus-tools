@@ -63,36 +63,64 @@ func createDirectoryDateRangeName(startTime, endTime time.Time) (string, error) 
 }
 
 // TODO: WIP
-// func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
-// 	var details []utils.FileDetail
-// 	var goodDirectoryFilePaths []string
-// 	var badDirectoryFilePaths []string
+func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
+	var filesMetadata []utils.FileMetadata
+	var goodDirectoryFilePaths []string
+	var badDirectoryFilePaths []string
 
-// 	entries, err := os.ReadDir(destinationDirectory)
-// 	if err != nil {
-// 		return err
-// 	}
+	entries, err := os.ReadDir(destinationDirectory)
+	if err != nil {
+		return err
+	}
 
-// 	for _, entry := range entries {
-// 		path := filepath.Join(destinationDirectory, entry.Name())
-// 		if entry.IsDir() {
-// 			if isValidDateRangeDirectoryName(entry.Name()) {
-// 				goodDirectoryFilePaths = append(goodDirectoryFilePaths, path)
-// 			} else {
-// 				badDirectoryFilePaths = append(badDirectoryFilePaths, path)
-// 			}
-// 		} else {
-// 			info, err := entry.Info()
-// 			if err != nil {
-// 				return err
-// 			}
+	for _, entry := range entries {
+		path := filepath.Join(destinationDirectory, entry.Name())
+		isDir := entry.IsDir()
+		if isDir {
+			if isValidDateRangeDirectoryName(entry.Name()) {
+				goodDirectoryFilePaths = append(goodDirectoryFilePaths, path)
+			} else {
+				badDirectoryFilePaths = append(badDirectoryFilePaths, path)
+			}
+		} else {
+			info, err := entry.Info()
+			if err != nil {
+				return err
+			}
+			filesMetadata = append(filesMetadata, utils.CreateFileMetadata(path, info.ModTime(), info.Size(), isDir))
+		}
+	}
 
-// 			details = append(details, utils.CreateFileDetail(path, info.ModTime(), info.Size()))
-// 		}
-// 	}
+	handler := func(metadata utils.FileMetadata) {
+		if metadata.IsDirectory {
+			badDirectoryFilePaths = append(badDirectoryFilePaths, metadata.FilePath)
+		} else {
+			filesMetadata = append(filesMetadata, metadata)
+		}
+	}
 
-// 	return nil
-// }
+	for _, path := range goodDirectoryFilePaths {
+		if err := utils.WalkFilterAndHandleFileMetadata(path, utils.FilesAndDirectories, utils.AllFiles, handler); err != nil {
+			return err
+		}
+	}
+	for _, path := range badDirectoryFilePaths {
+		if err := utils.WalkFilterAndHandleFileMetadata(path, utils.FilesAndDirectories, utils.AllFiles, handler); err != nil {
+			return err
+		}
+	}
+
+	sort.Slice(filesMetadata, func(i, j int) bool {
+		return filesMetadata[i].ModificationTime.Before(filesMetadata[j].ModificationTime)
+	})
+
+	// startDateRange := 0
+	// for i := 1; i < len(filesMetadata); i++ {
+
+	// }
+
+	return nil
+}
 
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
 	var filePathsTimeModified []filePathTimeModified
