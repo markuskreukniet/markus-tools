@@ -156,6 +156,8 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 
 				//
 				path := filepath.Join(destinationDirectory, name)
+
+				// TODO: is this useful?
 				goodDirectoryFilePaths = append(goodDirectoryFilePaths, path)
 				if err := utils.CreateDirectory(path); err != nil {
 					return err
