@@ -131,7 +131,7 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 				var err error
 				name, err = createDirectoryDateRangeName(filesMetadata[startDateRange].ModificationTime, filesMetadata[i].ModificationTime)
 				if err != nil {
-					t.Errorf("createDirectoryDateRangeName error: %v", err)
+					return err
 				}
 
 				isFindingDateRange = false
