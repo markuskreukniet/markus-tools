@@ -65,7 +65,7 @@ func createDirectoryDateRangeName(startTime, endTime time.Time) (string, error) 
 
 // TODO: WIP
 func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
-	var filesMetadata []utils.FileMetadata
+	var files []utils.FileMetadata
 	var goodDirectoryFilePaths []string
 	var badDirectoryFilePaths []string
 
@@ -88,7 +88,7 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 			if err != nil {
 				return err
 			}
-			filesMetadata = append(filesMetadata, utils.CreateFileMetadata(path, info.ModTime(), info.Size(), isDir))
+			files = append(files, utils.CreateFileMetadata(path, info.ModTime(), info.Size(), isDir))
 		}
 	}
 
@@ -96,7 +96,7 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 		if metadata.IsDirectory {
 			badDirectoryFilePaths = append(badDirectoryFilePaths, metadata.FilePath)
 		} else {
-			filesMetadata = append(filesMetadata, metadata)
+			files = append(files, metadata)
 		}
 	}
 
@@ -113,15 +113,15 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 
 	// TODO: delete duplicate files
 
-	sort.Slice(filesMetadata, func(i, j int) bool {
-		return filesMetadata[i].ModificationTime.Before(filesMetadata[j].ModificationTime)
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].ModificationTime.Before(files[j].ModificationTime)
 	})
 
 	startDateRange := 0
 	isFindingDateRange := false
-	length := len(filesMetadata)
+	length := len(files)
 	for i := 0; i < length; i++ {
-		if i < length-1 && isWithinThreeDays(filesMetadata[i].ModificationTime, filesMetadata[i+1].ModificationTime) && !isFindingDateRange {
+		if i < length-1 && isWithinThreeDays(files[i].ModificationTime, files[i+1].ModificationTime) && !isFindingDateRange {
 			isFindingDateRange = true
 			startDateRange = i
 		} else {
@@ -129,18 +129,26 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 			if isFindingDateRange {
 				// Declare 'err' separately to avoid shadowing 'name' with ':='
 				var err error
-				name, err = createDirectoryDateRangeName(filesMetadata[startDateRange].ModificationTime, filesMetadata[i].ModificationTime)
+				name, err = createDirectoryDateRangeName(files[startDateRange].ModificationTime, files[i].ModificationTime)
 				if err != nil {
 					return err
 				}
 
 				isFindingDateRange = false
 			} else {
-				name = toDateFormat(filesMetadata[i].ModificationTime)
+				name = toDateFormat(files[i].ModificationTime)
+			}
+
+			index := -1
+			for i, path := range goodDirectoryFilePaths {
+				if strings.HasSuffix(path, name) {
+					index = i
+					break
+				}
 			}
 
 			// TODO:
-			log.Println(name)
+			log.Println(index)
 		}
 	}
 
