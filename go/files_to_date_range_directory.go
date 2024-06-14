@@ -147,8 +147,20 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 				}
 			}
 
-			// TODO:
-			log.Println(index)
+			if index == -1 {
+				badDirectoryFilePaths = append(badDirectoryFilePaths, goodDirectoryFilePaths[index])
+
+				// remove file path from slice
+				goodDirectoryFilePaths[index] = goodDirectoryFilePaths[len(goodDirectoryFilePaths)-1]
+				goodDirectoryFilePaths = goodDirectoryFilePaths[:len(goodDirectoryFilePaths)-1]
+			} else {
+				log.Println(index)
+
+				// TODO: should become createDirectory()
+				// if err := os.Mkdir(subDirectoryPath, 0755); err != nil {
+				// 	return err
+				// }
+			}
 		}
 	}
 
