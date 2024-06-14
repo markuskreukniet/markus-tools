@@ -140,9 +140,9 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 			}
 
 			index := -1
-			for i, path := range goodDirectoryFilePaths {
+			for j, path := range goodDirectoryFilePaths {
 				if strings.HasSuffix(path, name) {
-					index = i
+					index = j
 					break
 				}
 			}
