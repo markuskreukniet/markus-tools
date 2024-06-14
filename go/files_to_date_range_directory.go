@@ -153,14 +153,15 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 				// remove file path from slice
 				goodDirectoryFilePaths[index] = goodDirectoryFilePaths[len(goodDirectoryFilePaths)-1]
 				goodDirectoryFilePaths = goodDirectoryFilePaths[:len(goodDirectoryFilePaths)-1]
-			} else {
-				log.Println(index)
 
+				//
 				path := filepath.Join(destinationDirectory, name)
 				goodDirectoryFilePaths = append(goodDirectoryFilePaths, path)
 				if err := utils.CreateDirectory(path); err != nil {
 					return err
 				}
+			} else {
+				log.Println(index)
 			}
 		}
 	}
