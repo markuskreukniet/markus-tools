@@ -69,6 +69,10 @@ const (
 	PlainTextFiles
 )
 
+func CreateDirectory(filePath string) error {
+	return os.Mkdir(filePath, 0755)
+}
+
 func IsNonZeroByteFileATextFile(filePath string) (bool, error) {
 	file, err := os.Open(filePath)
 	if err != nil {

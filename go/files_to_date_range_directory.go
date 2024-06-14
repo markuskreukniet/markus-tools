@@ -156,10 +156,11 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 			} else {
 				log.Println(index)
 
-				// TODO: should become createDirectory()
-				// if err := os.Mkdir(subDirectoryPath, 0755); err != nil {
-				// 	return err
-				// }
+				path := filepath.Join(destinationDirectory, name)
+				goodDirectoryFilePaths = append(goodDirectoryFilePaths, path)
+				if err := utils.CreateDirectory(path); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -215,7 +216,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 				dateRangeDirectoryPaths[foundIndex] = dateRangeDirectoryPaths[len(dateRangeDirectoryPaths)-1]
 				dateRangeDirectoryPaths = dateRangeDirectoryPaths[:len(dateRangeDirectoryPaths)-1]
 			} else {
-				if err := os.Mkdir(subDirectoryPath, 0755); err != nil {
+				if err := utils.CreateDirectory(subDirectoryPath); err != nil {
 					return err
 				}
 			}
