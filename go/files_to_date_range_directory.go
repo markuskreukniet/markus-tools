@@ -162,8 +162,18 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 				if err := utils.CreateDirectory(path); err != nil {
 					return err
 				}
+
+				// add files
+				for j := startDateRange; j <= i; j++ {
+					if err := os.Rename(files[j].FilePath, path); err != nil {
+						return err
+					}
+				}
 			} else {
-				log.Println(index)
+				path := goodDirectoryFilePaths[index]
+
+				// TODO: add files
+				log.Println(path)
 			}
 		}
 	}
