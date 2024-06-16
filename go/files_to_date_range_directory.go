@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"sort"
@@ -165,20 +164,35 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 
 				// add files
 				for j := startDateRange; j <= i; j++ {
-					if err := os.Rename(files[j].FilePath, path); err != nil {
+					if err := os.Rename(files[j].FilePath, extractBaseAndJoinWithFilePath(files[j].FilePath, path)); err != nil {
 						return err
 					}
 				}
 			} else {
 				path := goodDirectoryFilePaths[index]
 
-				// TODO: add files
-				log.Println(path)
+				// add files
+				for j := startDateRange; j <= i; j++ {
+					fullPath := extractBaseAndJoinWithFilePath(files[j].FilePath, path)
+					exists, err := utils.FileOrDirectoryExists(fullPath)
+					if err != nil {
+						return err
+					}
+					if !exists {
+						if err := os.Rename(files[j].FilePath, fullPath); err != nil {
+							return err
+						}
+					}
+				}
 			}
 		}
 	}
 
 	return nil
+}
+
+func extractBaseAndJoinWithFilePath(filePathWithBase, filePath string) string {
+	return filepath.Join(filePath, filepath.Base(filePathWithBase))
 }
 
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
