@@ -16,6 +16,37 @@ type FileData struct {
 	FileMetadata FileMetadata
 }
 
+func CreateFileData(identifier string, file FileMetadata) FileData {
+	return FileData{
+		Identifier:   identifier,
+		FileMetadata: file,
+	}
+}
+
+type FilesDataGroup struct {
+	Identifier string
+	FilesData  []FileData
+}
+
+func CreateFilesDataGroup(identifier string, files []FileData) FilesDataGroup {
+	return FilesDataGroup{
+		Identifier: identifier,
+		FilesData:  files,
+	}
+}
+
+type FilesDataGroups []FilesDataGroup
+
+func (groups FilesDataGroups) AppendByFileDataIdentifier(file FileData) bool {
+	for i, group := range groups {
+		if file.Identifier == group.Identifier {
+			groups[i].FilesData = append(groups[i].FilesData, file)
+			return true
+		}
+	}
+	return false
+}
+
 type FileMetadata struct {
 	FilePath         string
 	ModificationTime time.Time
@@ -101,6 +132,14 @@ func IsFileDetailNonZeroByte(detail FileDetail) bool {
 	return false
 }
 
+func GetFileMetadata(path string) (FileMetadata, error) {
+	info, err := os.Stat(path)
+	if err != nil {
+		return FileMetadata{}, err
+	}
+	return CreateFileMetadata(path, info.ModTime(), info.Size(), info.IsDir()), nil
+}
+
 func GetFileDetail(filePath string) (FileDetail, error) {
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
@@ -179,6 +218,25 @@ func WalkFileDetails(rootFilePath string, mode fileFilterMode, fileType fileType
 		handler(CreateFileDetail(filePath, fileInfo.ModTime(), size))
 		return nil
 	})
+}
+
+func FilterAndHandleAllNodesFileMetadata(nodes []FileSystemNode, mode fileFilterMode, handler func(FileMetadata)) error {
+	for _, node := range nodes {
+		if node.IsDirectory {
+			if err := WalkFilterAndHandleFileMetadata(node.Path, mode, AllFiles, func(file FileMetadata) {
+				handler(file)
+			}); err != nil {
+				return err
+			}
+		} else {
+			file, err := GetFileMetadata(node.Path)
+			if err != nil {
+				return err
+			}
+			handler(file)
+		}
+	}
+	return nil
 }
 
 func AppendFileDetails(appendFileDetail func(detail FileDetail), uniqueFileSystemNodes []FileSystemNode, mode fileFilterMode) error {

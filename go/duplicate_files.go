@@ -1,11 +1,6 @@
 package main
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
-	"io"
-	"os"
-	"sort"
 	"strings"
 
 	"github.com/markuskreukniet/markus-tools/go/utils"
@@ -35,22 +30,6 @@ type fileIdentifier struct {
 	hash string
 }
 
-func getFileHash(filePath string) (string, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	// sha256 is generally faster and more secure than SHA1
-	// SHA1 is generally faster and more secure than MD5
-	hashGenerator := sha256.New()
-	if _, err := io.Copy(hashGenerator, file); err != nil {
-		return "", err
-	}
-	return hex.EncodeToString(hashGenerator.Sum(nil)), nil
-}
-
 func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []utils.FileSystemNode) string {
 	newlineSeparatedString, err := getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes)
 	if err != nil {
@@ -59,48 +38,17 @@ func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []uti
 	return resultToJSONFunctionResult(newlineSeparatedString)
 }
 
-func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.FileSystemNode) (string, error) {
-	var fileIdentifiers []fileIdentifier
-	if err := utils.AppendFileDetails(
-		func(detail utils.FileDetail) {
-			fileIdentifiers = append(fileIdentifiers, fileIdentifier{
-				path: detail.Path,
-				size: detail.Size,
-				hash: "",
-			})
-		}, uniqueFileSystemNodes, utils.FilesWithoutZeroByteFiles); err != nil {
+func getDuplicateFilesAsNewlineSeparatedString(nodes []utils.FileSystemNode) (string, error) {
+	var files []utils.FileData
+	if err := utils.FilterAndHandleAllNodesFileMetadata(nodes, utils.FilesWithoutZeroByteFiles,
+		func(metadata utils.FileMetadata) {
+			files = append(files, utils.CreateFileData("", metadata))
+		}); err != nil {
 		return "", err
 	}
-	sort.Slice(fileIdentifiers, func(i, j int) bool {
-		return fileIdentifiers[i].size < fileIdentifiers[j].size
-	})
-
-	// create duplicate file groups
-	var groups duplicateFileGroups
-	for i := 1; i < len(fileIdentifiers); i++ {
-		previousIndex := i - 1
-		if fileIdentifiers[previousIndex].size == fileIdentifiers[i].size {
-			var err error
-			if fileIdentifiers[previousIndex].hash == "" {
-				if fileIdentifiers[previousIndex].hash, err = getFileHash(fileIdentifiers[previousIndex].path); err != nil {
-					return "", err
-				}
-			}
-			if fileIdentifiers[i].hash, err = getFileHash(fileIdentifiers[i].path); err != nil {
-				return "", err
-			}
-			if !groups.AppendByIdentifier(fileIdentifiers[i].hash, fileIdentifiers[i].path) {
-				for j := 0; j <= previousIndex; j++ {
-					if fileIdentifiers[i].hash == fileIdentifiers[j].hash {
-						groups = append(groups, duplicateFileGroup{
-							identifier: fileIdentifiers[i].hash,
-							filePaths:  []string{fileIdentifiers[j].path, fileIdentifiers[i].path},
-						})
-						break
-					}
-				}
-			}
-		}
+	groups, err := utils.CreateDuplicateFileGroups(files)
+	if err != nil {
+		return "", err
 	}
 
 	// create and return the result string
@@ -111,13 +59,13 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 				return "", err
 			}
 		}
-		for j, path := range group.filePaths {
+		for j, file := range group.FilesData {
 			if j != 0 {
 				if _, err := utils.WriteNewlineString(&result); err != nil {
 					return "", err
 				}
 			}
-			if _, err := result.WriteString(path); err != nil {
+			if _, err := result.WriteString(file.FileMetadata.FilePath); err != nil {
 				return "", err
 			}
 		}
