@@ -62,6 +62,27 @@ func createDirectoryDateRangeName(startTime, endTime time.Time) (string, error) 
 	return builder.String(), nil
 }
 
+// garbage collection: groups
+func deleteDuplicateFiles(files []utils.FileData) ([]utils.FileData, error) {
+	groups, err := utils.CreateDuplicateFileGroups(files)
+	if err != nil {
+		return nil, err
+	}
+	files = nil
+	for _, group := range groups {
+		if len(group.FilesData) > 1 {
+			//
+
+			// take the first file
+			files = append(files, group.FilesData[0])
+		}
+	}
+
+	// TODO: delete duplicate files
+
+	return files, nil
+}
+
 // TODO: WIP
 func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
 	var files []utils.FileData
@@ -110,12 +131,9 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 		}
 	}
 
-	// groups, err := utils.CreateDuplicateFileGroups(files)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// TODO: delete duplicate files
+	if files, err = deleteDuplicateFiles(files); err != nil {
+		return err
+	}
 
 	sort.Slice(files, func(i, j int) bool {
 		return files[i].FileMetadata.ModificationTime.Before(files[j].FileMetadata.ModificationTime)
@@ -192,6 +210,8 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 			}
 		}
 	}
+
+	// remove bad empty directories
 
 	return nil
 }
