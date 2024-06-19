@@ -24,12 +24,6 @@ func (groups duplicateFileGroups) AppendByIdentifier(identifier, filePath string
 	return false
 }
 
-type fileIdentifier struct {
-	path string
-	size int64
-	hash string
-}
-
 func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []utils.FileSystemNode) string {
 	newlineSeparatedString, err := getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes)
 	if err != nil {
