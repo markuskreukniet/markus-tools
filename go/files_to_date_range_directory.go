@@ -170,13 +170,6 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 			}
 
 			if index == -1 {
-				badDirectoryFilePaths = append(badDirectoryFilePaths, goodDirectoryFilePaths[index])
-
-				// remove file path from slice
-				goodDirectoryFilePaths[index] = goodDirectoryFilePaths[len(goodDirectoryFilePaths)-1]
-				goodDirectoryFilePaths = goodDirectoryFilePaths[:len(goodDirectoryFilePaths)-1]
-
-				//
 				path := filepath.Join(destinationDirectory, name)
 
 				// TODO: is this useful?
@@ -211,7 +204,13 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 		}
 	}
 
-	// remove bad empty directories
+	// Remove the bad empty directories
+	// There is no need to check if the file path exists before attempting removal.
+	for i := len(badDirectoryFilePaths) - 1; i >= 0; i-- {
+		if err := os.Remove(badDirectoryFilePaths[i]); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
