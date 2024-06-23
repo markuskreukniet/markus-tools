@@ -206,6 +206,7 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 
 	// Remove the bad empty directories
 	// There is no need to check if the file path exists before attempting removal.
+	// TODO: some goodDirectoryFilePaths are empty which should be removed
 	for i := len(badDirectoryFilePaths) - 1; i >= 0; i-- {
 		if err := os.Remove(badDirectoryFilePaths[i]); err != nil {
 			return err
