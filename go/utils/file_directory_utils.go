@@ -48,18 +48,20 @@ func (groups FilesDataGroups) AppendByFileDataIdentifier(file FileData) bool {
 }
 
 type FileMetadata struct {
-	FilePath         string
-	ModificationTime time.Time
-	Size             int64 // Size of the file
-	IsDirectory      bool
+	Path         string
+	Name         string
+	TimeModified time.Time
+	Size         int64 // Size of the file
+	IsDirectory  bool
 }
 
-func CreateFileMetadata(filePath string, modificationTime time.Time, size int64, IsDirectory bool) FileMetadata {
+func CreateFileMetadata(path, name string, timeModified time.Time, size int64, isDirectory bool) FileMetadata {
 	return FileMetadata{
-		FilePath:         filePath,
-		ModificationTime: modificationTime,
-		Size:             size,
-		IsDirectory:      IsDirectory,
+		Path:         path,
+		Name:         name,
+		TimeModified: timeModified,
+		Size:         size,
+		IsDirectory:  isDirectory,
 	}
 }
 
@@ -137,7 +139,7 @@ func GetFileMetadata(path string) (FileMetadata, error) {
 	if err != nil {
 		return FileMetadata{}, err
 	}
-	return CreateFileMetadata(path, info.ModTime(), info.Size(), info.IsDir()), nil
+	return CreateFileMetadata(path, info.Name(), info.ModTime(), info.Size(), info.IsDir()), nil
 }
 
 func GetFileDetail(filePath string) (FileDetail, error) {
@@ -179,7 +181,7 @@ func WalkFilterAndHandleFileMetadata(rootFilePath string, mode fileFilterMode, f
 			}
 		}
 
-		handler(CreateFileMetadata(filePath, fileInfo.ModTime(), size, isDir))
+		handler(CreateFileMetadata(filePath, fileInfo.Name(), fileInfo.ModTime(), size, isDir))
 		return nil
 	})
 }

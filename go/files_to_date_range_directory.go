@@ -90,12 +90,12 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 				minimumLength := 0
 				for _, fileI := range unfilteredFiles {
 					// TODO: is this efficient?
-					length := len(filepath.Base(fileI.FileMetadata.FilePath))
+					length := len(filepath.Base(fileI.FileMetadata.Path))
 					if length < minimumLength || minimumLength == 0 {
 						minimumLength = length
 						if len(tempFiles) > 0 {
 							for _, fileJ := range tempFiles {
-								if err := os.Remove(fileJ.FileMetadata.FilePath); err != nil {
+								if err := os.Remove(fileJ.FileMetadata.Path); err != nil {
 									return nil, err
 								}
 							}
@@ -104,7 +104,7 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 					} else if length == minimumLength {
 						tempFiles = append(tempFiles, fileI)
 					} else {
-						if err := os.Remove(fileI.FileMetadata.FilePath); err != nil {
+						if err := os.Remove(fileI.FileMetadata.Path); err != nil {
 							return nil, err
 						}
 					}
@@ -191,13 +191,13 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 			if err != nil {
 				return err
 			}
-			files = append(files, utils.CreateFileData("", utils.CreateFileMetadata(path, info.ModTime(), info.Size(), isDir)))
+			files = append(files, utils.CreateFileData("", utils.CreateFileMetadata(path, info.Name(), info.ModTime(), info.Size(), isDir)))
 		}
 	}
 
 	handler := func(metadata utils.FileMetadata) {
 		if metadata.IsDirectory {
-			badDirectoryFilePaths = append(badDirectoryFilePaths, metadata.FilePath)
+			badDirectoryFilePaths = append(badDirectoryFilePaths, metadata.Path)
 		} else {
 			files = append(files, utils.CreateFileData("", metadata))
 		}
@@ -219,14 +219,14 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 	}
 
 	sort.Slice(files, func(i, j int) bool {
-		return files[i].FileMetadata.ModificationTime.Before(files[j].FileMetadata.ModificationTime)
+		return files[i].FileMetadata.TimeModified.Before(files[j].FileMetadata.TimeModified)
 	})
 
 	startDateRange := 0
 	isFindingDateRange := false
 	length := len(files)
 	for i := 0; i < length; i++ {
-		if i < length-1 && isWithinThreeDays(files[i].FileMetadata.ModificationTime, files[i+1].FileMetadata.ModificationTime) && !isFindingDateRange {
+		if i < length-1 && isWithinThreeDays(files[i].FileMetadata.TimeModified, files[i+1].FileMetadata.TimeModified) && !isFindingDateRange {
 			isFindingDateRange = true
 			startDateRange = i
 		} else {
@@ -234,14 +234,14 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 			if isFindingDateRange {
 				// Declare 'err' separately to avoid shadowing 'name' with ':='
 				var err error
-				name, err = createDirectoryDateRangeName(files[startDateRange].FileMetadata.ModificationTime, files[i].FileMetadata.ModificationTime)
+				name, err = createDirectoryDateRangeName(files[startDateRange].FileMetadata.TimeModified, files[i].FileMetadata.TimeModified)
 				if err != nil {
 					return err
 				}
 
 				isFindingDateRange = false
 			} else {
-				name = toDateFormat(files[i].FileMetadata.ModificationTime)
+				name = toDateFormat(files[i].FileMetadata.TimeModified)
 			}
 
 			index := -1
@@ -260,7 +260,7 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 
 				// add files
 				for j := startDateRange; j <= i; j++ {
-					if err := os.Rename(files[j].FileMetadata.FilePath, extractBaseAndJoinWithFilePath(files[j].FileMetadata.FilePath, path)); err != nil {
+					if err := os.Rename(files[j].FileMetadata.Path, extractBaseAndJoinWithFilePath(files[j].FileMetadata.Path, path)); err != nil {
 						return err
 					}
 				}
@@ -269,13 +269,13 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 
 				// add files
 				for j := startDateRange; j <= i; j++ {
-					fullPath := extractBaseAndJoinWithFilePath(files[j].FileMetadata.FilePath, path)
+					fullPath := extractBaseAndJoinWithFilePath(files[j].FileMetadata.Path, path)
 					exists, err := utils.FileOrDirectoryExists(fullPath)
 					if err != nil {
 						return err
 					}
 					if !exists {
-						if err := os.Rename(files[j].FileMetadata.FilePath, fullPath); err != nil {
+						if err := os.Rename(files[j].FileMetadata.Path, fullPath); err != nil {
 							return err
 						}
 					}
