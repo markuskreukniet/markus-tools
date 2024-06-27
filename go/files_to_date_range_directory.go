@@ -62,8 +62,21 @@ func createDirectoryDateRangeName(startTime, endTime time.Time) (string, error) 
 	return builder.String(), nil
 }
 
+func filterAndDeleteUnfilteredFiles(files *[]utils.FileData, filterAndDelete func(unfilteredFiles []utils.FileData) ([]utils.FileData, error)) error {
+	if len(*files) > 1 {
+		tempFiles, err := filterAndDelete(*files)
+		if err != nil {
+			return err
+		}
+		if len(tempFiles) > 1 {
+			*files = tempFiles
+		}
+	}
+	return nil
+}
+
 // garbage collection: groups
-func deleteDuplicateFiles(files []utils.FileData) ([]utils.FileData, error) {
+func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory string) ([]utils.FileData, error) {
 	groups, err := utils.CreateDuplicateFileGroups(files)
 	if err != nil {
 		return nil, err
@@ -71,7 +84,77 @@ func deleteDuplicateFiles(files []utils.FileData) ([]utils.FileData, error) {
 	files = nil
 	for _, group := range groups {
 		if len(group.FilesData) > 1 {
-			//
+			// shortest file name
+			filterAndDelete := func(unfilteredFiles []utils.FileData) ([]utils.FileData, error) {
+				var tempFiles []utils.FileData
+				minimumLength := 0
+				for _, fileI := range unfilteredFiles {
+					// TODO: is this efficient?
+					length := len(filepath.Base(fileI.FileMetadata.FilePath))
+					if length < minimumLength || minimumLength == 0 {
+						minimumLength = length
+						if len(tempFiles) > 0 {
+							for _, fileJ := range tempFiles {
+								if err := os.Remove(fileJ.FileMetadata.FilePath); err != nil {
+									return nil, err
+								}
+							}
+						}
+						tempFiles = []utils.FileData{fileI}
+					} else if length == minimumLength {
+						tempFiles = append(tempFiles, fileI)
+					} else {
+						if err := os.Remove(fileI.FileMetadata.FilePath); err != nil {
+							return nil, err
+						}
+					}
+				}
+				return tempFiles, nil
+			}
+
+			err := filterAndDeleteUnfilteredFiles(&group.FilesData, filterAndDelete)
+			if err != nil {
+				return nil, err
+			}
+
+			// valid name of date directory or date range directory
+			// filterAndDelete = func(unfilteredFiles []utils.FileData) ([]utils.FileData, error) {
+			// 	var tempFiles []utils.FileData
+			// 	separator := string(filepath.Separator)
+			// 	// TODO: contains is needed? what if C:// is destination?
+			// 	destinationSubstrings := strings.Split(destinationDirectory, separator)
+			// 	for _, file := range unfilteredFiles {
+			// 		// TODO: slash duplicate
+			// 		slash := "/"
+			// 		if strings.Contains(file.FileMetadata.FilePath, destinationDirectory) {
+
+			// 		}
+			// 	}
+			// }
+
+			// err = filterAndDeleteUnfilteredFiles(&group.FilesData, filterAndDelete)
+			// if err != nil {
+			// 	return nil, err
+			// }
+
+			// // filter on valid name of date directory or date range directory
+			// filterTimeInputLines(&group.timeInputLines, func(unfilteredLines []timeInputLine) []timeInputLine {
+			// 	var tempLines []timeInputLine
+			// 	for _, line := range unfilteredLines {
+			// 		part := line.inputLine.GetDirectoryPathPart()
+			// 		slash := "/"
+			// 		if strings.Contains(part, slash) {
+			// 			subStrings := strings.SplitN(part, slash, 2)
+			// 			if len(subStrings) > 0 {
+			// 				part = subStrings[0]
+			// 			}
+			// 		}
+			// 		if isValidDateRangeDirectoryName(part) {
+			// 			tempLines = append(tempLines, line)
+			// 		}
+			// 	}
+			// 	return tempLines
+			// })
 
 			// take the first file
 			files = append(files, group.FilesData[0])
@@ -131,7 +214,7 @@ func filesToDateRangeDirectoryWIP(uniqueFileSystemNodes []utils.FileSystemNode, 
 		}
 	}
 
-	if files, err = deleteDuplicateFiles(files); err != nil {
+	if files, err = filterAndDeleteDuplicateFiles(files, destinationDirectory); err != nil {
 		return err
 	}
 

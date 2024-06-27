@@ -260,7 +260,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 						var minimumLength int
 						for _, line := range unfilteredLines {
 							length := len(line.inputLine.GetFileName())
-							if length < minimumLength {
+							if length < minimumLength || minimumLength == 0 {
 								minimumLength = length
 								tempLines = []timeInputLine{line}
 							} else if length == minimumLength {
@@ -277,6 +277,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 							part := line.inputLine.GetDirectoryPathPart()
 							slash := "/"
 							if strings.Contains(part, slash) {
+								// TODO: is this correct?
 								subStrings := strings.SplitN(part, slash, 2)
 								if len(subStrings) > 0 {
 									part = subStrings[0]
