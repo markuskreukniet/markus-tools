@@ -89,8 +89,7 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 				var tempFiles []utils.FileData
 				minimumLength := 0
 				for _, fileI := range unfilteredFiles {
-					// TODO: is this efficient?
-					length := len(filepath.Base(fileI.FileMetadata.Path))
+					length := len(fileI.FileMetadata.Name)
 					if length < minimumLength || minimumLength == 0 {
 						minimumLength = length
 						if len(tempFiles) > 0 {
@@ -118,43 +117,22 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 			}
 
 			// valid name of date directory or date range directory
-			// filterAndDelete = func(unfilteredFiles []utils.FileData) ([]utils.FileData, error) {
-			// 	var tempFiles []utils.FileData
-			// 	separator := string(filepath.Separator)
-			// 	// TODO: contains is needed? what if C:// is destination?
-			// 	destinationSubstrings := strings.Split(destinationDirectory, separator)
-			// 	for _, file := range unfilteredFiles {
-			// 		// TODO: slash duplicate
-			// 		slash := "/"
-			// 		if strings.Contains(file.FileMetadata.FilePath, destinationDirectory) {
+			filterAndDelete = func(unfilteredFiles []utils.FileData) ([]utils.FileData, error) {
+				var tempFiles []utils.FileData
+				separator := string(filepath.Separator)
+				length := len(strings.Split(destinationDirectory, separator))
+				for _, file := range unfilteredFiles {
+					if length+1 == len(strings.Split(file.FileMetadata.Path, separator)) && isValidDateRangeDirectoryName(file.FileMetadata.Name) {
+						tempFiles = append(tempFiles, file)
+					}
+				}
+				return tempFiles, nil
+			}
 
-			// 		}
-			// 	}
-			// }
+			// err check is not needed
+			filterAndDeleteUnfilteredFiles(&group.FilesData, filterAndDelete)
 
-			// err = filterAndDeleteUnfilteredFiles(&group.FilesData, filterAndDelete)
-			// if err != nil {
-			// 	return nil, err
-			// }
-
-			// // filter on valid name of date directory or date range directory
-			// filterTimeInputLines(&group.timeInputLines, func(unfilteredLines []timeInputLine) []timeInputLine {
-			// 	var tempLines []timeInputLine
-			// 	for _, line := range unfilteredLines {
-			// 		part := line.inputLine.GetDirectoryPathPart()
-			// 		slash := "/"
-			// 		if strings.Contains(part, slash) {
-			// 			subStrings := strings.SplitN(part, slash, 2)
-			// 			if len(subStrings) > 0 {
-			// 				part = subStrings[0]
-			// 			}
-			// 		}
-			// 		if isValidDateRangeDirectoryName(part) {
-			// 			tempLines = append(tempLines, line)
-			// 		}
-			// 	}
-			// 	return tempLines
-			// })
+			// destination directory
 
 			// take the first file
 			files = append(files, group.FilesData[0])
