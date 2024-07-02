@@ -62,6 +62,15 @@ func createDirectoryDateRangeName(startTime, endTime time.Time) (string, error) 
 	return builder.String(), nil
 }
 
+func deleteFiles(files []utils.FileData) error {
+	for _, file := range files {
+		if err := os.Remove(file.FileMetadata.Path); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func filterAndDeleteRemainderFiles(files *[]utils.FileData, toFilteredAndRemainderFiles func([]utils.FileData) ([]utils.FileData, []utils.FileData, error)) error {
 	if len(*files) > 1 {
 		filteredFiles, remainderFiles, err := toFilteredAndRemainderFiles(*files)
@@ -70,10 +79,8 @@ func filterAndDeleteRemainderFiles(files *[]utils.FileData, toFilteredAndRemaind
 		}
 		if len(filteredFiles) > 0 {
 			*files = filteredFiles
-			for _, file := range remainderFiles {
-				if err := os.Remove(file.FileMetadata.Path); err != nil {
-					return err
-				}
+			if err := deleteFiles(remainderFiles); err != nil {
+				return err
 			}
 		}
 	}
@@ -177,13 +184,15 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 			// not needed to err check
 			filterAndDeleteRemainderFiles(&group.FilesData, toFilteredAndRemainderFiles)
 
-			// take the first file
+			// take the first file and the delete other files
 			files = append(files, group.FilesData[0])
+			files[0] = files[len(files)-1]
+			files = files[:len(files)-1]
+			if err := deleteFiles(files); err != nil {
+				return nil, err
+			}
 		}
 	}
-
-	// TODO: delete duplicate files
-
 	return files, nil
 }
 
