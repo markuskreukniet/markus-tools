@@ -14,10 +14,10 @@ func createTestContent(subContent string) string {
 	return "content" + subContent + "\ncontent" + subContent
 }
 
-func filterTimeInputLines(filteredLines *[]timeInputLine, filter func(unfilteredLines []timeInputLine) []timeInputLine) {
+func filterTimeInputLines(filteredLines *[]timeInputLine, filter func([]timeInputLine) []timeInputLine) {
 	if len(*filteredLines) > 1 {
 		tempLines := filter(*filteredLines)
-		if len(tempLines) > 1 {
+		if len(tempLines) > 0 {
 			*filteredLines = tempLines
 		}
 	}

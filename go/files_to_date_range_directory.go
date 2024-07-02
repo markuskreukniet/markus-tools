@@ -62,14 +62,19 @@ func createDirectoryDateRangeName(startTime, endTime time.Time) (string, error) 
 	return builder.String(), nil
 }
 
-func filterAndDeleteUnfilteredFiles(files *[]utils.FileData, filterAndDelete func(unfilteredFiles []utils.FileData) ([]utils.FileData, error)) error {
+func filterAndDeleteRemainderFiles(files *[]utils.FileData, toFilteredAndRemainderFiles func([]utils.FileData) ([]utils.FileData, []utils.FileData, error)) error {
 	if len(*files) > 1 {
-		tempFiles, err := filterAndDelete(*files)
+		filteredFiles, remainderFiles, err := toFilteredAndRemainderFiles(*files)
 		if err != nil {
 			return err
 		}
-		if len(tempFiles) > 1 {
-			*files = tempFiles
+		if len(filteredFiles) > 0 {
+			*files = filteredFiles
+			for _, file := range remainderFiles {
+				if err := os.Remove(file.FileMetadata.Path); err != nil {
+					return err
+				}
+			}
 		}
 	}
 	return nil
@@ -85,54 +90,73 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 	for _, group := range groups {
 		if len(group.FilesData) > 1 {
 			// shortest file name
-			filterAndDelete := func(unfilteredFiles []utils.FileData) ([]utils.FileData, error) {
-				var tempFiles []utils.FileData
+			toFilteredAndRemainderFiles := func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
+				var filteredFiles, remainderFiles []utils.FileData
 				minimumLength := 0
-				for _, fileI := range unfilteredFiles {
-					length := len(fileI.FileMetadata.Name)
+				for _, file := range unfilteredFiles {
+					length := len(file.FileMetadata.Name)
 					if length < minimumLength || minimumLength == 0 {
 						minimumLength = length
-						if len(tempFiles) > 0 {
-							for _, fileJ := range tempFiles {
-								if err := os.Remove(fileJ.FileMetadata.Path); err != nil {
-									return nil, err
-								}
-							}
-						}
-						tempFiles = []utils.FileData{fileI}
+						remainderFiles = append(remainderFiles, filteredFiles...)
+						filteredFiles = []utils.FileData{file}
 					} else if length == minimumLength {
-						tempFiles = append(tempFiles, fileI)
+						filteredFiles = append(filteredFiles, file)
 					} else {
-						if err := os.Remove(fileI.FileMetadata.Path); err != nil {
-							return nil, err
-						}
+						remainderFiles = append(remainderFiles, file)
 					}
 				}
-				return tempFiles, nil
+				return filteredFiles, remainderFiles, nil
 			}
 
-			err := filterAndDeleteUnfilteredFiles(&group.FilesData, filterAndDelete)
+			err := filterAndDeleteRemainderFiles(&group.FilesData, toFilteredAndRemainderFiles)
 			if err != nil {
 				return nil, err
 			}
 
 			// valid name of date directory or date range directory
-			filterAndDelete = func(unfilteredFiles []utils.FileData) ([]utils.FileData, error) {
-				var tempFiles []utils.FileData
-				separator := string(filepath.Separator)
-				length := len(strings.Split(destinationDirectory, separator))
+			toFilteredAndRemainderFiles = func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
+				var filteredFiles, remainderFiles []utils.FileData
 				for _, file := range unfilteredFiles {
-					if length+1 == len(strings.Split(file.FileMetadata.Path, separator)) && isValidDateRangeDirectoryName(file.FileMetadata.Name) {
-						tempFiles = append(tempFiles, file)
+					directory := filepath.Dir(file.FileMetadata.Path)
+					child, err := isDirectoryChild(destinationDirectory, directory)
+					if err != nil {
+						return nil, nil, err
+					}
+					if child && isValidDateRangeDirectoryName(directory) {
+						filteredFiles = append(filteredFiles, file)
+					} else {
+						remainderFiles = append(remainderFiles, file)
 					}
 				}
-				return tempFiles, nil
+				return filteredFiles, remainderFiles, nil
 			}
 
-			// err check is not needed
-			filterAndDeleteUnfilteredFiles(&group.FilesData, filterAndDelete)
+			err = filterAndDeleteRemainderFiles(&group.FilesData, toFilteredAndRemainderFiles)
+			if err != nil {
+				return nil, err
+			}
 
 			// destination directory
+			toFilteredAndRemainderFiles = func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
+				var filteredFiles, remainderFiles []utils.FileData
+				for _, file := range unfilteredFiles {
+					child, err := isDirectoryChild(destinationDirectory, file.FileMetadata.Path)
+					if err != nil {
+						return nil, nil, err
+					}
+					if child {
+						filteredFiles = append(filteredFiles, file)
+					} else {
+						remainderFiles = append(remainderFiles, file)
+					}
+				}
+				return filteredFiles, remainderFiles, nil
+			}
+
+			err = filterAndDeleteRemainderFiles(&group.FilesData, toFilteredAndRemainderFiles)
+			if err != nil {
+				return nil, err
+			}
 
 			// take the first file
 			files = append(files, group.FilesData[0])
@@ -142,6 +166,15 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 	// TODO: delete duplicate files
 
 	return files, nil
+}
+
+func isDirectoryChild(filePath, childFilePath string) (bool, error) {
+	path, err := filepath.Rel(filePath, childFilePath)
+	if err != nil {
+		return false, err
+	}
+	// TODO: string(filepath.Separator) is not efficient when multiple calls to this function?
+	return !strings.HasPrefix(path, "..") && !strings.Contains(path, string(filepath.Separator)), nil
 }
 
 // TODO: WIP
