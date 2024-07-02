@@ -185,9 +185,9 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 
 			// take the first file and the delete other files
 			files = append(files, group.FilesData[0])
-			files[0] = files[len(files)-1]
-			files = files[:len(files)-1]
-			if err := deleteFiles(files); err != nil {
+			group.FilesData[0] = group.FilesData[len(group.FilesData)-1]
+			group.FilesData = group.FilesData[:len(group.FilesData)-1]
+			if err := deleteFiles(group.FilesData); err != nil {
 				return nil, err
 			}
 		}
