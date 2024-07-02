@@ -108,10 +108,8 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 				return filteredFiles, remainderFiles, nil
 			}
 
-			err := filterAndDeleteRemainderFiles(&group.FilesData, toFilteredAndRemainderFiles)
-			if err != nil {
-				return nil, err
-			}
+			// not needed to err check
+			filterAndDeleteRemainderFiles(&group.FilesData, toFilteredAndRemainderFiles)
 
 			// valid name of date directory or date range directory
 			toFilteredAndRemainderFiles = func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
@@ -157,6 +155,27 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 			if err != nil {
 				return nil, err
 			}
+
+			// newest modification time
+			toFilteredAndRemainderFiles = func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
+				var filteredFiles, remainderFiles []utils.FileData
+				var newestTime time.Time
+				for _, file := range unfilteredFiles {
+					if file.FileMetadata.TimeModified.After(newestTime) {
+						newestTime = file.FileMetadata.TimeModified
+						remainderFiles = append(remainderFiles, filteredFiles...)
+						filteredFiles = []utils.FileData{file}
+					} else if file.FileMetadata.TimeModified.Equal(newestTime) {
+						filteredFiles = append(filteredFiles, file)
+					} else {
+						remainderFiles = append(remainderFiles, file)
+					}
+				}
+				return filteredFiles, remainderFiles, nil
+			}
+
+			// not needed to err check
+			filterAndDeleteRemainderFiles(&group.FilesData, toFilteredAndRemainderFiles)
 
 			// take the first file
 			files = append(files, group.FilesData[0])
