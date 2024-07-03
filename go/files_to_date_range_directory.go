@@ -204,11 +204,32 @@ func isDirectoryChild(filePath, childFilePath string) (bool, error) {
 	return !strings.HasPrefix(path, "..") && !strings.Contains(path, string(filepath.Separator)), nil
 }
 
+func appendPathsAndFilesByReadingDirectory(path string, paths *[]string, files *[]utils.FileData) error {
+	entries, err := os.ReadDir(path)
+	if err != nil {
+		return err
+	}
+	for _, entry := range entries {
+		fullPath := filepath.Join(path, entry.Name())
+		if entry.IsDir() {
+			*paths = append(*paths, fullPath)
+		} else {
+			info, err := entry.Info()
+			if err != nil {
+				return err
+			}
+			*files = append(*files, utils.CreateFileData("", utils.CreateFileMetadata(fullPath, info.Name(), info.ModTime(), info.Size(), false)))
+		}
+	}
+	return nil
+}
+
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
 	var files []utils.FileData
 	var goodDirectoryFilePaths []string
 	var badDirectoryFilePaths []string
 
+	// TODO: clean with appendPathsAndFilesByReadingDirectory
 	entries, err := os.ReadDir(destinationDirectory)
 	if err != nil {
 		return err
@@ -216,8 +237,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 
 	for _, entry := range entries {
 		path := filepath.Join(destinationDirectory, entry.Name())
-		isDir := entry.IsDir()
-		if isDir {
+		if entry.IsDir() {
 			if isValidDateRangeDirectoryName(entry.Name()) {
 				goodDirectoryFilePaths = append(goodDirectoryFilePaths, path)
 			} else {
@@ -228,8 +248,15 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 			if err != nil {
 				return err
 			}
-			files = append(files, utils.CreateFileData("", utils.CreateFileMetadata(path, info.Name(), info.ModTime(), info.Size(), isDir)))
+			files = append(files, utils.CreateFileData("", utils.CreateFileMetadata(path, info.Name(), info.ModTime(), info.Size(), false)))
 		}
+	}
+
+	for _, path := range goodDirectoryFilePaths {
+		appendPathsAndFilesByReadingDirectory(path, &badDirectoryFilePaths, &files)
+	}
+	for _, path := range badDirectoryFilePaths {
+		appendPathsAndFilesByReadingDirectory(path, &badDirectoryFilePaths, &files)
 	}
 
 	handler := func(metadata utils.FileMetadata) {
@@ -240,11 +267,6 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		}
 	}
 
-	for _, path := range goodDirectoryFilePaths {
-		if err := utils.WalkFilterAndHandleFileMetadata(path, utils.FilesAndDirectories, utils.AllFiles, handler); err != nil {
-			return err
-		}
-	}
 	for _, path := range badDirectoryFilePaths {
 		if err := utils.WalkFilterAndHandleFileMetadata(path, utils.FilesAndDirectories, utils.AllFiles, handler); err != nil {
 			return err
