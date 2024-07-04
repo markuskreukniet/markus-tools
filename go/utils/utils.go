@@ -36,11 +36,11 @@ func CreateDuplicateFileGroups(files []FileData) (FilesDataGroups, error) {
 		if files[previousIndex].FileMetadata.Size == files[i].FileMetadata.Size {
 			var err error
 			if files[previousIndex].Identifier == "" {
-				if files[previousIndex].Identifier, err = hashFile(files[previousIndex].FileMetadata.Path); err != nil {
+				if files[previousIndex].Identifier, err = HashFile(files[previousIndex].FileMetadata.Path); err != nil {
 					return nil, err
 				}
 			}
-			if files[i].Identifier, err = hashFile(files[i].FileMetadata.Path); err != nil {
+			if files[i].Identifier, err = HashFile(files[i].FileMetadata.Path); err != nil {
 				return nil, err
 			}
 			if !groups.AppendByFileDataIdentifier(files[i]) {
@@ -56,7 +56,7 @@ func CreateDuplicateFileGroups(files []FileData) (FilesDataGroups, error) {
 	return groups, nil
 }
 
-func hashFile(filePath string) (string, error) {
+func HashFile(filePath string) (string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return "", err

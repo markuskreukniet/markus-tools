@@ -1,9 +1,6 @@
 package main
 
 import (
-	"crypto/sha256"
-	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -95,22 +92,6 @@ func createDuplicateInputLineFileGroups(t *testing.T, input string) duplicateTim
 }
 
 // TODO: check and clean
-func hashFile(path string) (string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return "", err
-	}
-	defer file.Close()
-
-	hash := sha256.New()
-	if _, err := io.Copy(hash, file); err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("%x", hash.Sum(nil)), nil
-}
-
-// TODO: check and clean
 func walkDir(dir string) (map[string]string, error) {
 	files := make(map[string]string)
 
@@ -119,7 +100,7 @@ func walkDir(dir string) (map[string]string, error) {
 			return err
 		}
 		if !info.IsDir() {
-			hash, err := hashFile(path)
+			hash, err := utils.HashFile(path)
 			if err != nil {
 				return err
 			}
