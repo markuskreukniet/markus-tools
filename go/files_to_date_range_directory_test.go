@@ -111,6 +111,7 @@ func directoryTreeToFilePathHashes(directory string) (map[string]string, error) 
 	return hashes, err
 }
 
+// TODO: does not checks for similar modification times?
 func areDirectoryTreesTheSame(dir1, dir2 string) (bool, error) {
 	hashes1, err := directoryTreeToFilePathHashes(dir1)
 	if err != nil {
