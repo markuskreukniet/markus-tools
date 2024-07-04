@@ -1,6 +1,10 @@
 package main
 
 import (
+	"crypto/sha256"
+	"fmt"
+	"io"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -89,6 +93,77 @@ func createDuplicateInputLineFileGroups(t *testing.T, input string) duplicateTim
 	}
 	return groups
 }
+
+// TODO: check and clean
+func hashFile(path string) (string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	hash := sha256.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%x", hash.Sum(nil)), nil
+}
+
+// TODO: check and clean
+func walkDir(dir string) (map[string]string, error) {
+	files := make(map[string]string)
+
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			hash, err := hashFile(path)
+			if err != nil {
+				return err
+			}
+			files[path] = hash
+		}
+		return nil
+	})
+
+	return files, err
+}
+
+// TODO: check and clean
+func areDirectoryTreesTheSame(dir1, dir2 string) (bool, error) {
+	files1, err := walkDir(dir1)
+	if err != nil {
+		return false, err
+	}
+
+	files2, err := walkDir(dir2)
+	if err != nil {
+		return false, err
+	}
+
+	for path1, hash1 := range files1 {
+		relativePath, err := filepath.Rel(dir1, path1)
+		if err != nil {
+			return false, err
+		}
+		path2 := filepath.Join(dir2, relativePath)
+		hash2, found := files2[path2]
+		if !found || hash1 != hash2 {
+			return false, nil
+		}
+		delete(files2, path2)
+	}
+
+	if len(files2) > 0 {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+//
 
 func TestFilesToDateRangeDirectory(t *testing.T) {
 	// test:
@@ -239,6 +314,9 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.testCaseInput.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
+			directory, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, tc.destinationInput)
+			defer utils.TestingRemoveDirectoryTree(t, directory)
+
 			destination := utils.CreateTemporaryDirectory(t)
 			defer utils.TestingRemoveDirectoryTree(t, destination)
 
@@ -349,6 +427,15 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			}
 
 			// act
+			if err := filesToDateRangeDirectory(nil, directory); err != nil {
+				t.Errorf("filesToDateRangeDirectory error: %v", err)
+			}
+
+			if same, err := areDirectoryTreesTheSame(directory, destination); err != nil {
+				t.Errorf("compareDirectories error: %v", err)
+				t.Errorf("compareDirectories same: %v", same)
+			}
+
 			// assert
 		})
 	}
