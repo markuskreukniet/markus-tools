@@ -204,15 +204,33 @@ func isDirectoryChild(filePath, childFilePath string) (bool, error) {
 	return !strings.HasPrefix(path, "..") && !strings.Contains(path, string(filepath.Separator)), nil
 }
 
-func appendPathsAndFilesByReadingDirectory(path string, paths *[]string, files *[]utils.FileData) error {
+func appendPathsAndFilesByReadingDirectoryTree(path string, paths *[]string, files *[]utils.FileData) error {
+	handler := func(_, path string, stack *[]string) {
+		*paths = append(*paths, path)
+		*stack = append(*stack, path)
+	}
+
+	stack := []string{path}
+	for len(stack) > 0 {
+		path := stack[len(stack)-1]
+		stack = stack[:len(stack)-1]
+		if err := appendPathsAndFilesByReadingDirectory(path, handler, files, &stack); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func appendPathsAndFilesByReadingDirectory(path string, handler func(string, string, *[]string), files *[]utils.FileData, stack *[]string) error {
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		return err
 	}
 	for _, entry := range entries {
-		fullPath := filepath.Join(path, entry.Name())
+		name := entry.Name()
+		fullPath := filepath.Join(path, name)
 		if entry.IsDir() {
-			*paths = append(*paths, fullPath)
+			handler(name, fullPath, stack)
 		} else {
 			info, err := entry.Info()
 			if err != nil {
@@ -229,51 +247,32 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	var goodDirectoryFilePaths []string
 	var badDirectoryFilePaths []string
 
-	// TODO: clean with appendPathsAndFilesByReadingDirectory
-	entries, err := os.ReadDir(destinationDirectory)
-	if err != nil {
+	handler := func(name, path string, _ *[]string) {
+		if isValidDateRangeDirectoryName(name) {
+			goodDirectoryFilePaths = append(goodDirectoryFilePaths, path)
+		} else {
+			badDirectoryFilePaths = append(badDirectoryFilePaths, path)
+		}
+	}
+
+	if err := appendPathsAndFilesByReadingDirectory(destinationDirectory, handler, &files, nil); err != nil {
 		return err
 	}
 
-	for _, entry := range entries {
-		path := filepath.Join(destinationDirectory, entry.Name())
-		if entry.IsDir() {
-			if isValidDateRangeDirectoryName(entry.Name()) {
-				goodDirectoryFilePaths = append(goodDirectoryFilePaths, path)
-			} else {
-				badDirectoryFilePaths = append(badDirectoryFilePaths, path)
-			}
-		} else {
-			info, err := entry.Info()
-			if err != nil {
-				return err
-			}
-			files = append(files, utils.CreateFileData("", utils.CreateFileMetadata(path, info.Name(), info.ModTime(), info.Size(), false)))
-		}
+	handler = func(_, path string, _ *[]string) {
+		badDirectoryFilePaths = append(badDirectoryFilePaths, path)
 	}
 
 	for _, path := range goodDirectoryFilePaths {
-		appendPathsAndFilesByReadingDirectory(path, &badDirectoryFilePaths, &files)
-	}
-	for _, path := range badDirectoryFilePaths {
-		appendPathsAndFilesByReadingDirectory(path, &badDirectoryFilePaths, &files)
-	}
-
-	handler := func(metadata utils.FileMetadata) {
-		if metadata.IsDirectory {
-			badDirectoryFilePaths = append(badDirectoryFilePaths, metadata.Path)
-		} else {
-			files = append(files, utils.CreateFileData("", metadata))
-		}
+		appendPathsAndFilesByReadingDirectory(path, handler, &files, nil)
 	}
 
 	for _, path := range badDirectoryFilePaths {
-		if err := utils.WalkFilterAndHandleFileMetadata(path, utils.FilesAndDirectories, utils.AllFiles, handler); err != nil {
-			return err
-		}
+		appendPathsAndFilesByReadingDirectoryTree(path, &badDirectoryFilePaths, &files)
 	}
 
-	if files, err = filterAndDeleteDuplicateFiles(files, destinationDirectory); err != nil {
+	files, err := filterAndDeleteDuplicateFiles(files, destinationDirectory)
+	if err != nil {
 		return err
 	}
 
