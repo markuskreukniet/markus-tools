@@ -259,6 +259,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	// `
 
 	// V removing duplicate files in destination
+	// V A three directories deep file improves testing
 	content12 := createTestContent("12")
 	content122 := createTestContent("12 2")
 	destinationDuplicateFiles := `
@@ -267,7 +268,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 
 		directory 1,2020-12-21T20:40:40Z,txt 1.txt,` + content122 + `;
 		2020-12-21,2020-12-21T20:40:40Z,txt 12 2.txt,` + content122 + `;
-		2020-12-21/directory 1,2020-12-22T20:40:40Z,txt 12 1 2.txt,` + content122 + `;
+		2020-12-21/directory 1/directory 2,2020-12-22T20:40:40Z,txt 12 1 2.txt,` + content122 + `;
 		2020-12-22,2020-12-22T20:40:40Z,txt 12 3.txt,` + content122 + `;
 	`
 
