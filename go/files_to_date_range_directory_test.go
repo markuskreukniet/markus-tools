@@ -91,11 +91,10 @@ func createDuplicateInputLineFileGroups(t *testing.T, input string) duplicateTim
 	return groups
 }
 
-// TODO: check and clean
-func walkDir(dir string) (map[string]string, error) {
-	files := make(map[string]string)
+func directoryTreeToFilePathHashes(directory string) (map[string]string, error) {
+	hashes := make(map[string]string)
 
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -104,40 +103,39 @@ func walkDir(dir string) (map[string]string, error) {
 			if err != nil {
 				return err
 			}
-			files[path] = hash
+			hashes[path] = hash
 		}
 		return nil
 	})
 
-	return files, err
+	return hashes, err
 }
 
-// TODO: check and clean
 func areDirectoryTreesTheSame(dir1, dir2 string) (bool, error) {
-	files1, err := walkDir(dir1)
+	hashes1, err := directoryTreeToFilePathHashes(dir1)
 	if err != nil {
 		return false, err
 	}
 
-	files2, err := walkDir(dir2)
+	hashes2, err := directoryTreeToFilePathHashes(dir2)
 	if err != nil {
 		return false, err
 	}
 
-	for path1, hash1 := range files1 {
+	for path1, hash1 := range hashes1 {
 		relativePath, err := filepath.Rel(dir1, path1)
 		if err != nil {
 			return false, err
 		}
 		path2 := filepath.Join(dir2, relativePath)
-		hash2, found := files2[path2]
+		hash2, found := hashes2[path2]
 		if !found || hash1 != hash2 {
 			return false, nil
 		}
-		delete(files2, path2)
+		delete(hashes2, path2)
 	}
 
-	if len(files2) > 0 {
+	if len(hashes2) > 0 {
 		return false, nil
 	}
 
