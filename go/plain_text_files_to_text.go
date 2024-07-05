@@ -56,7 +56,7 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 				return "", err
 			}
 		} else {
-			metadata, err := utils.GetFileMetadata(node.Path)
+			metadata, err := utils.ToFileMetadata(node.Path)
 			if err != nil {
 				return "", err
 			}

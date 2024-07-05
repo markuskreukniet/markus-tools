@@ -117,7 +117,7 @@ func IsNonZeroByteFileATextFile(filePath string) (bool, error) {
 	return true, nil
 }
 
-func GetFileMetadata(filePath string) (FileMetadata, error) {
+func ToFileMetadata(filePath string) (FileMetadata, error) {
 	info, err := os.Stat(filePath)
 	if err != nil {
 		return FileMetadata{}, err
@@ -170,7 +170,7 @@ func FilterAndHandleAllNodesFileMetadata(nodes []FileSystemNode, mode fileFilter
 				return err
 			}
 		} else {
-			file, err := GetFileMetadata(node.Path)
+			file, err := ToFileMetadata(node.Path)
 			if err != nil {
 				return err
 			}
