@@ -127,27 +127,16 @@ func IsNonZeroByteFileATextFile(filePath string) (bool, error) {
 	return true, nil
 }
 
-func IsFileDetailNonZeroByte(detail FileDetail) bool {
-	if detail.Size > 0 {
-		return true
-	}
-	return false
+func IsFileMetadataNonZeroByte(metadata FileMetadata) bool {
+	return metadata.Size > 0
 }
 
-func GetFileMetadata(path string) (FileMetadata, error) {
-	info, err := os.Stat(path)
+func GetFileMetadata(filePath string) (FileMetadata, error) {
+	info, err := os.Stat(filePath)
 	if err != nil {
 		return FileMetadata{}, err
 	}
-	return CreateFileMetadata(path, info.Name(), info.ModTime(), info.Size(), info.IsDir()), nil
-}
-
-func GetFileDetail(filePath string) (FileDetail, error) {
-	fileInfo, err := os.Stat(filePath)
-	if err != nil {
-		return FileDetail{}, err
-	}
-	return CreateFileDetail(filePath, fileInfo.ModTime(), fileInfo.Size()), nil
+	return CreateFileMetadata(filePath, info.Name(), info.ModTime(), info.Size(), info.IsDir()), nil
 }
 
 func WalkFilterAndHandleFileMetadata(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileMetadata)) error {
@@ -236,28 +225,6 @@ func FilterAndHandleAllNodesFileMetadata(nodes []FileSystemNode, mode fileFilter
 				return err
 			}
 			handler(file)
-		}
-	}
-	return nil
-}
-
-func AppendFileDetails(appendFileDetail func(detail FileDetail), uniqueFileSystemNodes []FileSystemNode, mode fileFilterMode) error {
-	for _, node := range uniqueFileSystemNodes {
-		if node.IsDirectory {
-			if err := WalkFileDetails(node.Path, mode, AllFiles, func(detail FileDetail) {
-				// TODO: appendFileDetailPart is better naming? does this even makes sense?
-				appendFileDetail(detail)
-			}); err != nil {
-				return err
-			}
-		} else {
-			detail, err := GetFileDetail(node.Path)
-			if err != nil {
-				return err
-			}
-			if IsFileDetailNonZeroByte(detail) {
-				appendFileDetail(detail)
-			}
 		}
 	}
 	return nil

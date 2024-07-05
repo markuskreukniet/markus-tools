@@ -56,17 +56,17 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 				return "", err
 			}
 		} else {
-			fileDetail, err := utils.GetFileDetail(node.Path)
+			metadata, err := utils.GetFileMetadata(node.Path)
 			if err != nil {
 				return "", err
 			}
-			if utils.IsFileDetailNonZeroByte(fileDetail) {
-				isTextFile, err := utils.IsNonZeroByteFileATextFile(fileDetail.Path)
+			if utils.IsFileMetadataNonZeroByte(metadata) {
+				isTextFile, err := utils.IsNonZeroByteFileATextFile(metadata.Path)
 				if err != nil {
 					return "", err
 				}
 				if isTextFile {
-					filePaths = append(filePaths, fileDetail.Path)
+					filePaths = append(filePaths, metadata.Path)
 				}
 			}
 		}
