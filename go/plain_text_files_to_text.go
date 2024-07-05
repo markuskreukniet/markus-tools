@@ -60,7 +60,7 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 			if err != nil {
 				return "", err
 			}
-			if utils.IsFileMetadataNonZeroByte(metadata) {
+			if metadata.IsNonZeroByte() {
 				isTextFile, err := utils.IsNonZeroByteFileATextFile(metadata.Path)
 				if err != nil {
 					return "", err

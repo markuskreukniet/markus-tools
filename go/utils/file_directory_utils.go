@@ -65,18 +65,14 @@ func CreateFileMetadata(path, name string, timeModified time.Time, size int64, i
 	}
 }
 
+func (metadata FileMetadata) IsNonZeroByte() bool {
+	return metadata.Size > 0
+}
+
 type FileDetail struct {
 	Path             string
 	ModificationTime time.Time
 	Size             int64
-}
-
-func CreateFileDetail(filePath string, modificationTime time.Time, size int64) FileDetail {
-	return FileDetail{
-		Path:             filePath,
-		ModificationTime: modificationTime,
-		Size:             size,
-	}
 }
 
 type FileSystemNode struct {
@@ -127,10 +123,6 @@ func IsNonZeroByteFileATextFile(filePath string) (bool, error) {
 	return true, nil
 }
 
-func IsFileMetadataNonZeroByte(metadata FileMetadata) bool {
-	return metadata.Size > 0
-}
-
 func GetFileMetadata(filePath string) (FileMetadata, error) {
 	info, err := os.Stat(filePath)
 	if err != nil {
@@ -171,42 +163,6 @@ func WalkFilterAndHandleFileMetadata(rootFilePath string, mode fileFilterMode, f
 		}
 
 		handler(CreateFileMetadata(filePath, fileInfo.Name(), fileInfo.ModTime(), size, isDir))
-		return nil
-	})
-}
-
-func WalkFileDetails(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileDetail)) error {
-	return filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		size := fileInfo.Size()
-		isDir := fileInfo.IsDir()
-
-		// is file check
-		if !isDir && mode == Directories {
-			return nil
-		}
-
-		// is directory check
-		if isDir && (mode == files || mode == FilesWithoutZeroByteFiles) {
-			return nil
-		}
-
-		// zero byte check
-		if size == 0 && (mode == FilesWithoutZeroByteFiles || mode == FilesAndDirectoriesWithoutZeroByteFiles) {
-			return nil
-		}
-
-		// file type check
-		if fileType == PlainTextFiles {
-			isTextFile, err := IsNonZeroByteFileATextFile(filePath)
-			if err != nil || !isTextFile {
-				return err
-			}
-		}
-
-		handler(CreateFileDetail(filePath, fileInfo.ModTime(), size))
 		return nil
 	})
 }

@@ -27,9 +27,12 @@ func joinOutputBasePathWithRelativeInputPath(inputBasePath, inputFullPath, outpu
 
 func getFilePathModificationTimeMapFromDirectoryTree(rootFilePath string) (map[string]time.Time, error) {
 	filePathModificationTimeMap := make(map[string]time.Time)
-	err := utils.WalkFileDetails(rootFilePath, utils.FilesAndDirectories, utils.AllFiles, func(detail utils.FileDetail) {
-		filePathModificationTimeMap[detail.Path] = detail.ModificationTime
-	})
+
+	handler := func(metadata utils.FileMetadata) {
+		filePathModificationTimeMap[metadata.Path] = metadata.TimeModified
+	}
+
+	err := utils.WalkFilterAndHandleFileMetadata(rootFilePath, utils.FilesAndDirectories, utils.AllFiles, handler)
 	return filePathModificationTimeMap, err
 }
 
