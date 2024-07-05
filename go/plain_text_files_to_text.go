@@ -48,10 +48,11 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 	var filePaths []string
 	for _, node := range uniqueFileSystemNodes {
 		if node.IsDirectory {
-			err := utils.WalkFileDetails(node.Path, utils.FilesWithoutZeroByteFiles, utils.PlainTextFiles, func(detail utils.FileDetail) {
-				filePaths = append(filePaths, detail.Path)
-			})
-			if err != nil {
+			handler := func(metadata utils.FileMetadata) {
+				filePaths = append(filePaths, metadata.Path)
+			}
+
+			if err := utils.WalkFilterAndHandleFileMetadata(node.Path, utils.FilesWithoutZeroByteFiles, utils.PlainTextFiles, handler); err != nil {
 				return "", err
 			}
 		} else {
