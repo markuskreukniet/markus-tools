@@ -80,9 +80,7 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 			if _, err := utils.WriteTwoNewlineStrings(&result); err != nil {
 				return "", err
 			}
-			// TODO: if?
-			err = addLastPathElementAndAllLinesToBuilder(filePaths[i], &result)
-			if err != nil {
+			if err = addLastPathElementAndAllLinesToBuilder(filePaths[i], &result); err != nil {
 				return "", err
 			}
 		}
