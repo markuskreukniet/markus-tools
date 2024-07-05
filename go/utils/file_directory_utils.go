@@ -55,6 +55,10 @@ type FileMetadata struct {
 	IsDirectory  bool
 }
 
+func (metadata FileMetadata) IsNonZeroByte() bool {
+	return metadata.Size > 0
+}
+
 func CreateFileMetadata(path, name string, timeModified time.Time, size int64, isDirectory bool) FileMetadata {
 	return FileMetadata{
 		Path:         path,
@@ -63,16 +67,6 @@ func CreateFileMetadata(path, name string, timeModified time.Time, size int64, i
 		Size:         size,
 		IsDirectory:  isDirectory,
 	}
-}
-
-func (metadata FileMetadata) IsNonZeroByte() bool {
-	return metadata.Size > 0
-}
-
-type FileDetail struct {
-	Path             string
-	ModificationTime time.Time
-	Size             int64
 }
 
 type FileSystemNode struct {
