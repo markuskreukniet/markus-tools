@@ -8,6 +8,7 @@ import (
 	"unicode"
 )
 
+// TODO: FileData is bad naming. A hash and metadata is not file data.
 // FileData holds comprehensive information about a file or directory.
 // The Identifier field can store either the actual content of the file or a hash of it,
 // which makes it useful for various purposes, including as an identifier in unit tests.
