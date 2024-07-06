@@ -318,7 +318,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 
 				// add files
 				for j := startDateRange; j <= i; j++ {
-					if err := os.Rename(files[j].FileMetadata.Path, extractBaseAndJoinWithFilePath(files[j].FileMetadata.Path, path)); err != nil {
+					if err := os.Rename(files[j].FileMetadata.Path, filepath.Join(path, files[j].FileMetadata.Name)); err != nil {
 						return err
 					}
 				}
@@ -327,7 +327,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 
 				// add files
 				for j := startDateRange; j <= i; j++ {
-					fullPath := extractBaseAndJoinWithFilePath(files[j].FileMetadata.Path, path)
+					fullPath := filepath.Join(path, files[j].FileMetadata.Name)
 					exists, err := utils.FileOrDirectoryExists(fullPath)
 					if err != nil {
 						return err
@@ -360,10 +360,6 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	}
 
 	return nil
-}
-
-func extractBaseAndJoinWithFilePath(filePathWithBase, filePath string) string {
-	return filepath.Join(filePath, filepath.Base(filePathWithBase))
 }
 
 func formatDateAndWriteString(builder *strings.Builder, time time.Time) error {
