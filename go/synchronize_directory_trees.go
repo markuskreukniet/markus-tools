@@ -63,8 +63,8 @@ func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) err
 	if err != nil {
 		return err
 	}
-	// TODO: if?
-	err = filepath.Walk(sourceDirectory, func(sourceFilePath string, fileInfo os.FileInfo, err error) error {
+	// TODO: should use WalkFilterAndHandleFileMetadata?
+	if err = filepath.Walk(sourceDirectory, func(sourceFilePath string, fileInfo os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -83,8 +83,7 @@ func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) err
 			delete(destinationFilePathModificationTimeMap, destinationFilePath)
 		}
 		return err
-	})
-	if err != nil {
+	}); err != nil {
 		return err
 	}
 	for key := range destinationFilePathModificationTimeMap {

@@ -8,7 +8,7 @@ import (
 	"unicode"
 )
 
-// TODO: FileData is bad naming. A hash and metadata is not file data.
+// TODO: FileData is bad naming. A hash and metadata is not file data. // FSFile is better naming
 // FileData holds comprehensive information about a file or directory.
 // The Identifier field can store either the actual content of the file or a hash of it,
 // which makes it useful for various purposes, including as an identifier in unit tests.
@@ -53,8 +53,8 @@ type FileMetadata struct {
 	Path         string
 	Name         string
 	TimeModified time.Time
-	Size         int64 // Size of the file
-	IsDirectory  bool
+	Size         int64
+	IsDirectory  bool // It should be a file type, but there is no use case.
 }
 
 func (metadata FileMetadata) IsNonZeroByte() bool {
