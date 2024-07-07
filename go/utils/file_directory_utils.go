@@ -59,7 +59,7 @@ func (groups FilesDataGroups) AppendByFileDataIdentifier(file FileData) bool {
 	return false
 }
 
-// TODO: For some use cases, FileMetadata has too many fields. Maybe we can use interfaces to solve that problem.
+// TODO: For some use cases, FileMetadata has too many fields. Maybe we can use interfaces to solve that problem. Or maybe use viewModels
 type FileMetadata struct {
 	Path         string
 	Name         string
