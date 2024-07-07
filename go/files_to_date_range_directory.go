@@ -20,12 +20,12 @@ const dateLayout = "2006-01-02" // YYYY-MM-DD
 
 func isValidDateRangeDirectoryName(name string) bool {
 	if strings.Contains(name, spacedHyphen) {
-		baseParts := strings.Split(name, spacedHyphen)
-		firstDate, err := parseDate(baseParts[0])
+		nameParts := strings.Split(name, spacedHyphen)
+		firstDate, err := parseDate(nameParts[0])
 		if err != nil {
 			return false
 		}
-		secondDate, err := parseDate(baseParts[1])
+		secondDate, err := parseDate(nameParts[1])
 		if err != nil {
 			return false
 		}
