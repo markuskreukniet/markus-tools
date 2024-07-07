@@ -15,6 +15,7 @@ import (
 
 // type FileSystemFile struct {
 // 	Data         string
+// 	FilePath     string
 // 	FileMetadata FileMetadata
 // }
 
