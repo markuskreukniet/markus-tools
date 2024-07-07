@@ -8,6 +8,16 @@ import (
 	"unicode"
 )
 
+// type FileSystemFileExtra struct {
+// 	FileSystemFile FileSystemFile
+// 	Hash           string
+// }
+
+// type FileSystemFile struct {
+// 	Data         string
+// 	FileMetadata FileMetadata
+// }
+
 // TODO: FileData is bad naming. A hash and metadata is not file data. // FSFile is better naming // File might become a reserved keyword and it might be already used in Go standard libraries
 // FileData holds comprehensive information about a file or directory.
 // The Identifier field can store either the actual content of the file or a hash of it,
