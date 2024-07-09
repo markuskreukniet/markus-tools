@@ -49,7 +49,7 @@ func CreateFilesDataGroup(identifier string, files []FileData) FilesDataGroup {
 
 type FilesDataGroups []FilesDataGroup
 
-func (groups FilesDataGroups) AppendByFileDataIdentifier(file FileData) bool {
+func (groups FilesDataGroups) DidAppendByFileDataIdentifier(file FileData) bool {
 	for i, group := range groups {
 		if file.Identifier == group.Identifier {
 			groups[i].FilesData = append(groups[i].FilesData, file)
