@@ -86,6 +86,7 @@ func filterAndDeleteRemainderFiles(files *[]utils.FileData, toFilteredAndRemaind
 	return nil
 }
 
+// TODO: not efficient, could result in many useless filterAndDeleteRemainderFiles calls
 // garbage collection: groups
 func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory string) ([]utils.FileData, error) {
 	groups, err := utils.CreateDuplicateFileGroups(files)
@@ -190,6 +191,8 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 			if err := deleteFiles(group.FilesData); err != nil {
 				return nil, err
 			}
+		} else {
+			files = append(files, group.FilesData[0])
 		}
 	}
 	return files, nil
