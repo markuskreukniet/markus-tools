@@ -26,6 +26,63 @@ func WriteTwoNewlineStrings(builder *strings.Builder) (int, error) {
 	return bytesWritten, nil
 }
 
+// TODO: does work, but can be improved. Also, it does now only find duplicates
+func CreateFileHashGroups(files []FileData) (FilesDataGroups, error) {
+	if len(files) == 0 {
+		return nil, nil
+	}
+
+	type filesByFileSize struct {
+		fileSize int64
+		files    []FileData
+	}
+
+	var result FilesDataGroups
+	var groups []filesByFileSize
+	sizeIndex := 0
+
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].FileMetadata.Size < files[j].FileMetadata.Size
+	})
+
+	groups = append(groups, filesByFileSize{
+		fileSize: files[0].FileMetadata.Size,
+		files:    []FileData{files[0]},
+	})
+
+	for i := 1; i < len(files); i++ {
+		if files[i].FileMetadata.Size == groups[sizeIndex].files[0].FileMetadata.Size {
+			groups[sizeIndex].files = append(groups[sizeIndex].files, files[i])
+		} else {
+			groups = append(groups, filesByFileSize{
+				fileSize: files[i].FileMetadata.Size,
+				files:    []FileData{files[i]},
+			})
+			sizeIndex++
+		}
+	}
+
+	for _, group := range groups {
+		if len(group.files) > 1 {
+			hashMap := make(map[string][]FileData)
+			for _, file := range group.files {
+				hash, err := HashFile(file.FileMetadata.Path)
+				if err != nil {
+					return nil, err
+				}
+				hashMap[hash] = append(hashMap[hash], file)
+			}
+			for _, hashedFiles := range hashMap {
+				if len(hashedFiles) > 1 {
+					result = append(result, CreateFilesDataGroup("", hashedFiles))
+				}
+			}
+		}
+	}
+
+	return result, nil
+}
+
 func CreateDuplicateFileGroups(files []FileData) (FilesDataGroups, error) {
 	sort.Slice(files, func(i, j int) bool {
 		return files[i].FileMetadata.Size < files[j].FileMetadata.Size
@@ -55,93 +112,6 @@ func CreateDuplicateFileGroups(files []FileData) (FilesDataGroups, error) {
 	}
 	return groups, nil
 }
-
-// TODO: WIP
-// TODO: Could get more efficient, by not always calculating a hash, but adding i instead
-// func CreateHashFileGroups(files []FileData, onlyDuplicates bool) (FilesDataGroups, error) {
-// 	var groups FilesDataGroups
-
-// 	sort.Slice(files, func(i, j int) bool {
-// 		return files[i].FileMetadata.Size < files[j].FileMetadata.Size
-// 	})
-
-// 	for i := 1; i < len(files); i++ {
-// 		previousIndex := i - 1
-// 		added := false
-// 		if files[previousIndex].FileMetadata.Size == files[i].FileMetadata.Size {
-// 			var err error
-// 			if files[previousIndex].Identifier == "" {
-// 				if files[previousIndex].Identifier, err = HashFile(files[previousIndex].FileMetadata.Path); err != nil {
-// 					return nil, err
-// 				}
-// 			}
-// 			if files[i].Identifier, err = HashFile(files[i].FileMetadata.Path); err != nil {
-// 				return nil, err
-// 			}
-// 			added = groups.DidAppendByFileDataIdentifier(files[i])
-// 			if !added {
-// 				for j := 0; j <= previousIndex; j++ {
-// 					if files[i].Identifier == files[j].Identifier {
-// 						groups = append(groups, CreateFilesDataGroup(files[i].Identifier, []FileData{files[j], files[i]}))
-// 						added = true
-// 						break
-// 					}
-// 				}
-// 			}
-// 		}
-// 		if !added && !onlyDuplicates {
-// 			groups = append(groups, CreateFilesDataGroup(files[previousIndex].Identifier, []FileData{files[previousIndex]}))
-// 			// TODO: len is duplicate
-// 			if i == len(files)-1 {
-// 				groups = append(groups, CreateFilesDataGroup(files[i].Identifier, []FileData{files[i]}))
-// 			}
-// 		}
-// 	}
-
-// 	return groups, nil
-// }
-
-// TODO: WIP
-// func CreateHashFileGroups(files []FileData, onlyDuplicates bool) (FilesDataGroups, error) {
-// 	sort.Slice(files, func(i, j int) bool {
-// 		return files[i].FileMetadata.Size < files[j].FileMetadata.Size
-// 	})
-
-// 	var groups FilesDataGroups
-// 	length := len(files)
-
-// 	for i := 0; i < length-1; i++ {
-// 		nextIndex := i - 1
-// 		if files[i].FileMetadata.Size == files[nextIndex].FileMetadata.Size {
-// 			var err error
-// 			if files[i].Identifier == "" {
-// 				if files[i].Identifier, err = HashFile(files[i].FileMetadata.Path); err != nil {
-// 					return nil, err
-// 				}
-// 			}
-// 			if files[nextIndex].Identifier, err = HashFile(files[nextIndex].FileMetadata.Path); err != nil {
-// 				return nil, err
-// 			}
-// 			if !groups.AppendByFileDataIdentifier(files[nextIndex]) {
-// 				for j := 0; j <= nextIndex; j++ {
-// 					if files[j].Identifier == files[nextIndex].Identifier {
-// 						groups = append(groups, CreateFilesDataGroup(files[nextIndex].Identifier, []FileData{files[j], files[nextIndex]}))
-// 						break
-// 					}
-// 				}
-// 			}
-// 		} else if !onlyDuplicates {
-// 			previousIndex := i - 1
-// 			if i == length-1 ||
-// 				(files[previousIndex].Identifier != files[i].Identifier ||
-// 					(files[previousIndex].Identifier == "" && files[i].Identifier == "")) {
-// 				groups = append(groups, CreateFilesDataGroup(files[i].Identifier, []FileData{files[i]}))
-// 			}
-// 		}
-// 	}
-
-// 	return groups, nil
-// }
 
 func HashFile(filePath string) (string, error) {
 	file, err := os.Open(filePath)
