@@ -26,7 +26,49 @@ func WriteTwoNewlineStrings(builder *strings.Builder) (int, error) {
 	return bytesWritten, nil
 }
 
-// TODO: does work, but can be improved.
+// TODO: is this an improved version? Naming in this function is not that good
+// func CreateFileHashGroups(files []FileData, onlyDuplicates bool) (FilesDataGroups, error) {
+// 	if len(files) == 0 {
+// 		return nil, nil
+// 	}
+
+// 	// Sort files by their size
+// 	sort.Slice(files, func(i, j int) bool {
+// 		return files[i].FileMetadata.Size < files[j].FileMetadata.Size
+// 	})
+
+// 	var result FilesDataGroups
+// 	groupMap := make(map[int64][]FileData)
+
+// 	// Group files by their size
+// 	for _, file := range files {
+// 		groupMap[file.FileMetadata.Size] = append(groupMap[file.FileMetadata.Size], file)
+// 	}
+
+// 	for _, group := range groupMap {
+// 		if len(group) > 1 {
+// 			hashMap := make(map[string][]FileData)
+// 			for _, file := range group {
+// 				hash, err := HashFile(file.FileMetadata.Path)
+// 				if err != nil {
+// 					return nil, err
+// 				}
+// 				hashMap[hash] = append(hashMap[hash], file)
+// 			}
+// 			for _, hashedFiles := range hashMap {
+// 				if len(hashedFiles) > 1 || !onlyDuplicates {
+// 					result = append(result, CreateFilesDataGroup("", hashedFiles))
+// 				}
+// 			}
+// 		} else if !onlyDuplicates {
+// 			result = append(result, CreateFilesDataGroup("", group))
+// 		}
+// 	}
+
+// 	return result, nil
+// }
+
+// TODO: does work, but can be improved with code from above here?
 func CreateFileHashGroups(files []FileData, onlyDuplicates bool) (FilesDataGroups, error) {
 	if len(files) == 0 {
 		return nil, nil
