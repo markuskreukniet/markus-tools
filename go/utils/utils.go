@@ -26,8 +26,8 @@ func WriteTwoNewlineStrings(builder *strings.Builder) (int, error) {
 	return bytesWritten, nil
 }
 
-// TODO: does work, but can be improved. Also, it does now only find duplicates
-func CreateFileHashGroups(files []FileData) (FilesDataGroups, error) {
+// TODO: does work, but can be improved.
+func CreateFileHashGroups(files []FileData, onlyDuplicates bool) (FilesDataGroups, error) {
 	if len(files) == 0 {
 		return nil, nil
 	}
@@ -73,10 +73,12 @@ func CreateFileHashGroups(files []FileData) (FilesDataGroups, error) {
 				hashMap[hash] = append(hashMap[hash], file)
 			}
 			for _, hashedFiles := range hashMap {
-				if len(hashedFiles) > 1 {
+				if len(hashedFiles) > 1 || !onlyDuplicates {
 					result = append(result, CreateFilesDataGroup("", hashedFiles))
 				}
 			}
+		} else if !onlyDuplicates {
+			result = append(result, CreateFilesDataGroup("", group.files))
 		}
 	}
 
