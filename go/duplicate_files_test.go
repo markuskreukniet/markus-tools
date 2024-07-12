@@ -1,6 +1,7 @@
 package main
 
 import (
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -14,16 +15,31 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	contents := []string{
 		"content 1\ncontent 1",
 		"content 2\ncontent 2",
+		"content 3 1\ncontent 3 1",
 	}
+	// TODO: making empty lines in input does not work
 	input := `
 		empty,,,;
+		directory 2/empty,,,;
 		directory 1,,txt 1.txt,;
 		directory 1,,txt 1 2.txt,` + contents[0] + `;
-		directory 2/empty,,,;
 		directory 2/directory 3,,txt 2-3.txt,` + contents[0] + `;
 		directory 2/directory 3,,txt 2-3 2.txt,` + contents[1] + `;
 		directory 2/directory 3,,txt 2-3 3.txt,` + contents[1] + `;
 		directory 2/directory 4,,txt 2-4.txt,` + contents[1] + `;
+		directory 5/directory 6/directory 7,,txt 5-6-7.txt,` + contents[2] + `;
+		directory 8,,txt 8.txt,` + contents[2] + `;
+	`
+	wantedOutcome := `
+		directory 1\txt 1 2.txt
+		directory 2\directory 3\txt 2-3.txt
+
+		directory 2\directory 3\txt 2-3 2.txt
+		directory 2\directory 3\txt 2-3 3.txt
+		directory 2\directory 4\txt 2-4.txt
+
+		directory 5\directory 6\directory 7\txt 5-6-7.txt
+		directory 8\txt 8.txt
 	`
 	testCases := []utils.TestCaseInput{
 		utils.CreateTestCaseInput("Basic", input, false),
@@ -35,71 +51,38 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			// arrange and teardown
 			directories, fileSystemNodes := utils.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.Input)
 			defer utils.TestingRemoveDirectoryTrees(t, directories)
-			var builder strings.Builder
 
-			if len(directories) > 0 {
-				// create duplicate file groups
-				var groups duplicateFileGroups
-				var unGroupedLines []utils.InputLine
-				for _, rawInputLine := range utils.CreateSortedRawInputLines(tc.Input) {
-					line := utils.CreateInputLine(rawInputLine)
-
-					if !line.HasContent() {
-						continue
-					}
-
-					for _, nodeI := range fileSystemNodes {
-						if !strings.HasSuffix(nodeI.Path, line.GetDirectoryPathPartWithFileName()) {
-							continue
-						}
-
-						appended := groups.AppendByIdentifier(line.GetContent(), nodeI.Path)
-						if !appended {
-							var paths []string
-							for _, unGroupedLine := range unGroupedLines {
-								if line.GetContent() == unGroupedLine.GetContent() {
-									for _, nodeJ := range fileSystemNodes {
-										if nodeI.Path != nodeJ.Path && strings.HasSuffix(nodeJ.Path, unGroupedLine.GetDirectoryPathPartWithFileName()) {
-											paths = append(paths, nodeJ.Path)
-											break
-										}
-									}
-								}
-							}
-							if len(paths) > 0 {
-								groups = append(groups, duplicateFileGroup{
-									identifier: line.GetContent(),
-									filePaths:  append(paths, []string{nodeI.Path}...),
-								})
-							} else {
-								unGroupedLines = append(unGroupedLines, line)
-							}
-						}
-						break
-					}
-				}
-
-				// create and return the result string
-				for i, group := range groups {
-					if i != 0 {
-						utils.TestingWriteTwoNewlineStrings(t, &builder)
-					}
-					for j, path := range group.filePaths {
-						if j != 0 {
-							if _, err := utils.WriteNewlineString(&builder); err != nil {
-								t.Errorf("WriteNewlineString error: %v", err)
-							}
-						}
-						utils.TestingWriteString(t, path, &builder)
-					}
-				}
+			lines := strings.Split(wantedOutcome, "\n")
+			start := 0
+			end := len(lines) - 1
+			for start <= end && strings.TrimSpace(lines[start]) == "" {
+				start++
 			}
+			for end >= start && strings.TrimSpace(lines[end]) == "" {
+				end--
+			}
+			for i := start; i <= end; i++ {
+				lines[i] = strings.TrimSpace(lines[i])
+			}
+			wantedOutcome = strings.Join(lines[start:end+1], "\n")
 
 			// act
 			outcome, err := getDuplicateFilesAsNewlineSeparatedString(fileSystemNodes)
+			if err != nil {
+				t.Errorf("getDuplicateFilesAsNewlineSeparatedString err: %v", err)
+			}
 
 			// assert
-			utils.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.Metadata.WantErr, builder, outcome)
+			separator := string(filepath.Separator)
+			for _, directory := range directories {
+				outcome = strings.ReplaceAll(outcome, directory+separator, "")
+			}
+
+			for _, substring := range strings.Split(outcome, "\n\n") {
+				wantedOutcome = strings.Replace(wantedOutcome, substring, "", 1)
+			}
+
+			utils.TestingAssertEqualStrings(t, strings.ReplaceAll(wantedOutcome, "\n\n", ""), "")
 		})
 	}
 }

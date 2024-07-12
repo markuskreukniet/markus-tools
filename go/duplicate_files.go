@@ -6,24 +6,6 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
-// duplicateFileGroups
-type duplicateFileGroup struct {
-	identifier string
-	filePaths  []string
-}
-
-type duplicateFileGroups []duplicateFileGroup
-
-func (groups duplicateFileGroups) AppendByIdentifier(identifier, filePath string) bool {
-	for i, group := range groups {
-		if identifier == group.identifier {
-			groups[i].filePaths = append(groups[i].filePaths, filePath)
-			return true
-		}
-	}
-	return false
-}
-
 func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []utils.FileSystemNode) string {
 	newlineSeparatedString, err := getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes)
 	if err != nil {
