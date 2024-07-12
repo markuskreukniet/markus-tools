@@ -29,24 +29,26 @@ func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []uti
 	if err != nil {
 		return errorToJSONFunctionResult(err)
 	}
+
 	return resultToJSONFunctionResult(newlineSeparatedString)
 }
 
 func getDuplicateFilesAsNewlineSeparatedString(nodes []utils.FileSystemNode) (string, error) {
+	var result strings.Builder
 	var files []utils.FileData
-	if err := utils.FilterAndHandleAllNodesFileMetadata(nodes, utils.FilesWithoutZeroByteFiles,
-		func(metadata utils.FileMetadata) {
-			files = append(files, utils.CreateFileData("", metadata))
-		}); err != nil {
+	handler := func(metadata utils.FileMetadata) {
+		files = append(files, utils.CreateFileData("", metadata))
+	}
+
+	if err := utils.FilterAndHandleAllNodesFileMetadata(nodes, utils.FilesWithoutZeroByteFiles, handler); err != nil {
 		return "", err
 	}
-	groups, err := utils.CreateDuplicateFileGroups(files)
+
+	groups, err := utils.CreateFileHashGroups(files, true)
 	if err != nil {
 		return "", err
 	}
 
-	// create and return the result string
-	var result strings.Builder
 	for i, group := range groups {
 		if i != 0 {
 			if _, err := utils.WriteTwoNewlineStrings(&result); err != nil {
@@ -64,5 +66,6 @@ func getDuplicateFilesAsNewlineSeparatedString(nodes []utils.FileSystemNode) (st
 			}
 		}
 	}
+
 	return result.String(), nil
 }
