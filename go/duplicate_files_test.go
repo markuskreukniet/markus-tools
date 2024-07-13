@@ -11,7 +11,7 @@ import (
 // TODO: cleaning
 func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	// arrange
-	// Two content strings should result in the same file size, and there should be a content string resulting in a different file size.
+	// Two contents should have the same file size and one a different file size.
 	contents := []string{
 		"content 1\ncontent 1",
 		"content 2\ncontent 2",
