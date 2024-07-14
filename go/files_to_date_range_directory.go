@@ -11,11 +11,6 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
-type filePathTimeModified struct {
-	filePath     string
-	timeModified time.Time
-}
-
 const spacedHyphen = " - "
 const dateLayout = "2006-01-02" // YYYY-MM-DD
 
