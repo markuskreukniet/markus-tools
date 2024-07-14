@@ -3,8 +3,6 @@ package main
 import (
 	"os"
 	"path/filepath"
-	"sort"
-	"strings"
 	"testing"
 	"time"
 
@@ -207,9 +205,17 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	// 	directory 1/directory 2,2020-10-20T20:40:40Z,txt d n 1 2.txt,` + contentM101 + `;
 	// `
 
-	// // V trying to add duplicate files to existing directories
-	// content11 := TestingCreateContent("11")
-	// content112 := TestingCreateContent("11 2")
+	// V trying to add duplicate files to existing directories
+	content11 := createTestContent("11")
+	content111 := createTestContent("11 1")
+	content112 := createTestContent("11 2")
+	content1112 := createTestContent("11 1 2")
+	content113 := createTestContent("11 3")
+	content1113 := createTestContent("11 1 3")
+	content114 := createTestContent("11 4")
+	content1114 := createTestContent("11 1 4")
+	content115 := createTestContent("11 5")
+	content116 := createTestContent("11 6")
 	// moveDuplicateFilesToExistingDirectories := `
 	// 	,2020-11-01T20:40:40Z,txt d e 0.txt,` + content11 + `;
 
@@ -234,36 +240,46 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	// 	directory 1/directory 2,2020-11-21T20:40:40Z,txt m e 1 2.txt,` + TestingCreateContent("m e 11 1 2") + `;
 	// `
 
-	// // V removing empty directories and empty directory trees
-	// // V moving files to its parent directory
-	// // V renaming a date directory to a date range directory and a date range directory to a date directory
-	// // V having a date range directory to increase the date range of that directory with a different variable
-	// fixingDestinationBesidesDuplicates := `
-	// 	empty,,,;
-	// 	directory 1/empty,,,;
+	destinationInput := ""
+	wantedOutcome := ""
 
-	// 	2020-11-01,2020-11-01T20:40:40Z,txt 11.txt,` + content11 + `;
-	// 	2020-11-01/directory 1,2020-11-01T20:40:40Z,txt 11 1.txt,` + TestingCreateContent("11 1") + `;
-	// 	2020-11-01/empty,,,;
-
-	// 	2020-11-06 - 2020-11-07,2020-11-06T20:40:40Z,txt 11.txt,` + content112 + `;
-	// 	2020-11-06 - 2020-11-07/directory 1,2020-11-07T20:40:40Z,txt 11 1.txt,` + TestingCreateContent("11 1 2") + `;
-
-	// 	2020-11-11,2020-11-11T20:40:40Z,txt 11.txt,` + TestingCreateContent("11 3") + `;
-	// 	2020-11-11/directory 1,2020-11-12T20:40:40Z,txt 11 1.txt,` + TestingCreateContent("11 1 3") + `;
-
-	// 	2020-11-16 - 2020-11-17,2020-11-16T20:40:40Z,txt 11.txt,` + TestingCreateContent("11 4") + `;
-	// 	2020-11-16 - 2020-11-17/directory 1,2020-11-16T20:40:40Z,txt 11 1.txt,` + TestingCreateContent("11 1 4") + `;
-
-	// 	2020-11-21 - 2020-11-22,2020-11-21T20:40:40Z,txt 11.txt,` + TestingCreateContent("11 5") + `;
-	// 	2020-11-21 - 2020-11-22,2020-11-22T20:40:40Z,txt 11.txt,` + TestingCreateContent("11 6") + `;
-	// `
+	// V removing empty directories and empty directory trees
+	// V moving files to its parent directory
+	// V renaming a date directory to a date range directory and a date range directory to a date directory
+	// V having a date range directory to increase the date range of that directory
+	destinationInput = destinationInput + `
+		empty,,,;
+		directory 1/empty,,,;
+		2020-11-01,2020-11-01T20:40:40Z,txt 11.txt,` + content11 + `;
+		2020-11-01/directory 1,2020-11-01T20:40:40Z,txt 11 1.txt,` + content111 + `;
+		2020-11-01/empty,,,;
+		2020-11-06 - 2020-11-07,2020-11-06T20:40:40Z,txt 11.txt,` + content112 + `;
+		2020-11-06 - 2020-11-07/directory 1,2020-11-07T20:40:40Z,txt 11 1.txt,` + content1112 + `;
+		2020-11-11,2020-11-11T20:40:40Z,txt 11.txt,` + content113 + `;
+		2020-11-11/directory 1,2020-11-12T20:40:40Z,txt 11 1.txt,` + content1113 + `;
+		2020-11-16 - 2020-11-17,2020-11-16T20:40:40Z,txt 11.txt,` + content114 + `;
+		2020-11-16 - 2020-11-17/directory 1/directory 2,2020-11-16T20:40:40Z,txt 11 1.txt,` + content1114 + `;
+		2020-11-21 - 2020-11-22,2020-11-21T20:40:40Z,txt 11.txt,` + content115 + `;
+		2020-11-21 - 2020-11-22,2020-11-23T20:40:40Z,txt 11 2.txt,` + content116 + `;
+	`
+	wantedOutcome = wantedOutcome + `
+		2020-11-01,2020-11-01T20:40:40Z,txt 11.txt,` + content11 + `;
+		2020-11-01,2020-11-01T20:40:40Z,txt 11 1.txt,` + content111 + `;
+		2020-11-06 - 2020-11-07,2020-11-06T20:40:40Z,txt 11.txt,` + content112 + `;
+		2020-11-06 - 2020-11-07,2020-11-07T20:40:40Z,txt 11 1.txt,` + content1112 + `;
+		2020-11-11 - 2020-11-12,2020-11-11T20:40:40Z,txt 11.txt,` + content113 + `;
+		2020-11-11 - 2020-11-12,2020-11-12T20:40:40Z,txt 11 1.txt,` + content1113 + `;
+		2020-11-16,2020-11-16T20:40:40Z,txt 11.txt,` + content114 + `;
+		2020-11-16,2020-11-16T20:40:40Z,txt 11 1.txt,` + content1114 + `;
+		2020-11-21 - 2020-11-23,2020-11-21T20:40:40Z,txt 11.txt,` + content115 + `;
+		2020-11-21 - 2020-11-23,2020-11-23T20:40:40Z,txt 11 2.txt,` + content116 + `;
+	`
 
 	// V removing duplicate files in destination
 	// V A three directories deep file (2020-12-21/directory 1/directory 2) improves testing
 	content12 := createTestContent("12")
 	content122 := createTestContent("12 2")
-	destinationDuplicateFiles := `
+	destinationInput = destinationInput + `
 		2020-12-20,2020-12-20T20:40:40Z,txt 12.txt,` + content12 + `;
 		2020-12-20/directory 1,2020-12-20T20:40:40Z,txt 12 1.txt,` + content12 + `;
 
@@ -272,9 +288,12 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 		2020-12-21/directory 1/directory 2,2020-12-22T20:40:40Z,txt 12 1 2.txt,` + content122 + `;
 		2020-12-22,2020-12-22T20:40:40Z,txt 12 3.txt,` + content122 + `;
 	`
+	wantedOutcome = wantedOutcome + `
+		2020-12-20 - 2020-12-21,,txt 1.txt,` + content122 + `;
+		2020-12-20 - 2020-12-21,,txt 12.txt,` + content12 + `;
+	`
 
 	input := ""
-	destinationInput := destinationDuplicateFiles
 
 	// create testCases
 	testCases := []struct {
@@ -298,114 +317,114 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			directory, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, tc.destinationInput)
 			defer utils.TestingRemoveDirectoryTree(t, directory)
 
-			destination := utils.CreateTemporaryDirectory(t)
+			destination, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, wantedOutcome)
 			defer utils.TestingRemoveDirectoryTree(t, destination)
 
-			groups := createDuplicateInputLineFileGroups(t, tc.destinationInput)
+			// groups := createDuplicateInputLineFileGroups(t, tc.destinationInput)
 
-			// Select unique files by first filtering the duplicate ones (there are no created files yet) by this priority:
-			// 1. keep the shortest file name
-			// 2. keep the one in the destination a date directory or date range directory
-			// 3. keep the one in the destination directory
-			// 4. keep the newest modification time file
-			// 5. keep the first file of the slice
-			var lines []timeInputLine
-			for _, group := range groups {
-				// TODO: It is possible to clean the anonymous functions in filterTimeInputLines
-				if len(group.timeInputLines) > 1 {
-					// filter on shortest file name
-					filterTimeInputLines(&group.timeInputLines, func(unfilteredLines []timeInputLine) []timeInputLine {
-						var tempLines []timeInputLine
-						var minimumLength int
-						for _, line := range unfilteredLines {
-							length := len(line.inputLine.GetFileName())
-							if length < minimumLength || minimumLength == 0 {
-								minimumLength = length
-								tempLines = []timeInputLine{line}
-							} else if length == minimumLength {
-								tempLines = append(tempLines, line)
-							}
-						}
-						return tempLines
-					})
+			// // Select unique files by first filtering the duplicate ones (there are no created files yet) by this priority:
+			// // 1. keep the shortest file name
+			// // 2. keep the one in the destination a date directory or date range directory
+			// // 3. keep the one in the destination directory
+			// // 4. keep the newest modification time file
+			// // 5. keep the first file of the slice
+			// var lines []timeInputLine
+			// for _, group := range groups {
+			// 	// TODO: It is possible to clean the anonymous functions in filterTimeInputLines
+			// 	if len(group.timeInputLines) > 1 {
+			// 		// filter on shortest file name
+			// 		filterTimeInputLines(&group.timeInputLines, func(unfilteredLines []timeInputLine) []timeInputLine {
+			// 			var tempLines []timeInputLine
+			// 			var minimumLength int
+			// 			for _, line := range unfilteredLines {
+			// 				length := len(line.inputLine.GetFileName())
+			// 				if length < minimumLength || minimumLength == 0 {
+			// 					minimumLength = length
+			// 					tempLines = []timeInputLine{line}
+			// 				} else if length == minimumLength {
+			// 					tempLines = append(tempLines, line)
+			// 				}
+			// 			}
+			// 			return tempLines
+			// 		})
 
-					// filter on valid name of date directory or date range directory
-					filterTimeInputLines(&group.timeInputLines, func(unfilteredLines []timeInputLine) []timeInputLine {
-						var tempLines []timeInputLine
-						for _, line := range unfilteredLines {
-							part := line.inputLine.GetDirectoryPathPart()
-							slash := "/"
-							if strings.Contains(part, slash) {
-								// TODO: is this correct?
-								subStrings := strings.SplitN(part, slash, 2)
-								if len(subStrings) > 0 {
-									part = subStrings[0]
-								}
-							}
-							if isValidDateRangeDirectoryName(part) {
-								tempLines = append(tempLines, line)
-							}
-						}
-						return tempLines
-					})
+			// 		// filter on valid name of date directory or date range directory
+			// 		filterTimeInputLines(&group.timeInputLines, func(unfilteredLines []timeInputLine) []timeInputLine {
+			// 			var tempLines []timeInputLine
+			// 			for _, line := range unfilteredLines {
+			// 				part := line.inputLine.GetDirectoryPathPart()
+			// 				slash := "/"
+			// 				if strings.Contains(part, slash) {
+			// 					// TODO: is this correct?
+			// 					subStrings := strings.SplitN(part, slash, 2)
+			// 					if len(subStrings) > 0 {
+			// 						part = subStrings[0]
+			// 					}
+			// 				}
+			// 				if isValidDateRangeDirectoryName(part) {
+			// 					tempLines = append(tempLines, line)
+			// 				}
+			// 			}
+			// 			return tempLines
+			// 		})
 
-					// filter on destination directory
+			// 		// filter on destination directory
 
-					// filter on the newest modification time file
-					filterTimeInputLines(&group.timeInputLines, func(unfilteredLines []timeInputLine) []timeInputLine {
-						var tempLines []timeInputLine
-						var newestTime time.Time
-						for _, line := range unfilteredLines {
-							if line.time.After(newestTime) {
-								newestTime = line.time
-								tempLines = []timeInputLine{line}
-							} else if line.time.Equal(newestTime) {
-								tempLines = append(tempLines, line)
-							}
-						}
-						return tempLines
-					})
-				}
+			// 		// filter on the newest modification time file
+			// 		filterTimeInputLines(&group.timeInputLines, func(unfilteredLines []timeInputLine) []timeInputLine {
+			// 			var tempLines []timeInputLine
+			// 			var newestTime time.Time
+			// 			for _, line := range unfilteredLines {
+			// 				if line.time.After(newestTime) {
+			// 					newestTime = line.time
+			// 					tempLines = []timeInputLine{line}
+			// 				} else if line.time.Equal(newestTime) {
+			// 					tempLines = append(tempLines, line)
+			// 				}
+			// 			}
+			// 			return tempLines
+			// 		})
+			// 	}
 
-				// keep the first file of the slice
-				lines = append(lines, group.timeInputLines[0])
-			}
+			// 	// keep the first file of the slice
+			// 	lines = append(lines, group.timeInputLines[0])
+			// }
 
-			// create unique files in directories
-			sort.Slice(lines, func(i, j int) bool {
-				return lines[i].time.Before(lines[j].time)
-			})
-			startDateRange := 0
-			isFindingDateRange := false
-			length := len(lines)
-			for i := 0; i < length; i++ {
-				if i < length-1 && isWithinThreeDays(lines[i].time, lines[i+1].time) && !isFindingDateRange {
-					isFindingDateRange = true
-					startDateRange = i
-				} else {
-					var name string
-					if isFindingDateRange {
-						// Declare 'err' separately to avoid shadowing 'name' with ':='
-						var err error
-						name, err = createDirectoryDateRangeName(lines[startDateRange].time, lines[i].time)
-						if err != nil {
-							t.Errorf("createDirectoryDateRangeName error: %v", err)
-						}
+			// // create unique files in directories
+			// sort.Slice(lines, func(i, j int) bool {
+			// 	return lines[i].time.Before(lines[j].time)
+			// })
+			// startDateRange := 0
+			// isFindingDateRange := false
+			// length := len(lines)
+			// for i := 0; i < length; i++ {
+			// 	if i < length-1 && isWithinThreeDays(lines[i].time, lines[i+1].time) && !isFindingDateRange {
+			// 		isFindingDateRange = true
+			// 		startDateRange = i
+			// 	} else {
+			// 		var name string
+			// 		if isFindingDateRange {
+			// 			// Declare 'err' separately to avoid shadowing 'name' with ':='
+			// 			var err error
+			// 			name, err = createDirectoryDateRangeName(lines[startDateRange].time, lines[i].time)
+			// 			if err != nil {
+			// 				t.Errorf("createDirectoryDateRangeName error: %v", err)
+			// 			}
 
-						isFindingDateRange = false
-					} else {
-						name = toDateFormat(lines[i].time)
-					}
+			// 			isFindingDateRange = false
+			// 		} else {
+			// 			name = toDateFormat(lines[i].time)
+			// 		}
 
-					// create directory with files
-					path := filepath.Join(destination, name)
-					utils.TestingCreateDirectoryAll(t, path)
-					for j := startDateRange; j <= i; j++ {
-						// TODO: write also time modified?
-						utils.TestingWriteFile(t, filepath.Join(path, lines[j].inputLine.GetFileName()), lines[j].inputLine.GetContent())
-					}
-				}
-			}
+			// 		// create directory with files
+			// 		path := filepath.Join(destination, name)
+			// 		utils.TestingCreateDirectoryAll(t, path)
+			// 		for j := startDateRange; j <= i; j++ {
+			// 			// TODO: write also time modified?
+			// 			utils.TestingWriteFile(t, filepath.Join(path, lines[j].inputLine.GetFileName()), lines[j].inputLine.GetContent())
+			// 		}
+			// 	}
+			// }
 
 			// act
 			if err := filesToDateRangeDirectory(nil, directory); err != nil {

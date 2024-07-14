@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -47,18 +48,14 @@ func isWithinThreeDays(olderTime, newerTime time.Time) bool {
 	return olderTime.Sub(newerTime).Hours() <= 72
 }
 
-func createDirectoryDateRangeName(startTime, endTime time.Time) (string, error) {
-	var builder strings.Builder
-	if err := formatDateAndWriteString(&builder, startTime); err != nil {
-		return "", err
+func createDirectoryDateRangeName(startTime, endTime time.Time) string {
+	start := toDateFormat(startTime)
+	end := toDateFormat(endTime)
+
+	if start == end {
+		return start
 	}
-	if _, err := builder.WriteString(spacedHyphen); err != nil {
-		return "", err
-	}
-	if err := formatDateAndWriteString(&builder, endTime); err != nil {
-		return "", err
-	}
-	return builder.String(), nil
+	return fmt.Sprintf("%s - %s", start, end)
 }
 
 func deleteFiles(files []utils.FileData) error {
@@ -89,7 +86,7 @@ func filterAndDeleteRemainderFiles(files *[]utils.FileData, toFilteredAndRemaind
 // TODO: not efficient, could result in many useless filterAndDeleteRemainderFiles calls
 // garbage collection: groups
 func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory string) ([]utils.FileData, error) {
-	groups, err := utils.CreateDuplicateFileGroups(files)
+	groups, err := utils.CreateFileHashGroups(files, false)
 	if err != nil {
 		return nil, err
 	}
@@ -293,13 +290,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		} else {
 			var name string
 			if isFindingDateRange {
-				// Declare 'err' separately to avoid shadowing 'name' with ':='
-				var err error
-				name, err = createDirectoryDateRangeName(files[startDateRange].FileMetadata.TimeModified, files[i].FileMetadata.TimeModified)
-				if err != nil {
-					return err
-				}
-
+				name = createDirectoryDateRangeName(files[startDateRange].FileMetadata.TimeModified, files[i].FileMetadata.TimeModified)
 				isFindingDateRange = false
 			} else {
 				name = toDateFormat(files[i].FileMetadata.TimeModified)
