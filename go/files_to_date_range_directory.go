@@ -356,13 +356,6 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	return nil
 }
 
-func formatDateAndWriteString(builder *strings.Builder, time time.Time) error {
-	if _, err := builder.WriteString(toDateFormat(time)); err != nil {
-		return err
-	}
-	return nil
-}
-
 func toDateFormat(time time.Time) string {
 	return time.Format(dateLayout)
 }
