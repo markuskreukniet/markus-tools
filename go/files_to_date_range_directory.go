@@ -62,120 +62,123 @@ func deleteFiles(files []utils.FileData) error {
 	return nil
 }
 
-func filterAndDeleteRemainderFiles(files *[]utils.FileData, toFilteredAndRemainderFiles func([]utils.FileData) ([]utils.FileData, []utils.FileData, error)) error {
-	if len(*files) > 1 {
-		filteredFiles, remainderFiles, err := toFilteredAndRemainderFiles(*files)
-		if err != nil {
+func filterAndDeleteRemainderFiles(files *[]utils.FileData, handler func([]utils.FileData) ([]utils.FileData, []utils.FileData, error)) error {
+	filteredFiles, remainderFiles, err := handler(*files)
+	if err != nil {
+		return err
+	}
+
+	if len(filteredFiles) > 0 {
+		*files = filteredFiles
+		if err := deleteFiles(remainderFiles); err != nil {
 			return err
 		}
-		if len(filteredFiles) > 0 {
-			*files = filteredFiles
-			if err := deleteFiles(remainderFiles); err != nil {
-				return err
-			}
-		}
 	}
+
 	return nil
 }
 
-// TODO: not efficient, could result in many useless filterAndDeleteRemainderFiles calls
+// TODO: handler logic might not be efficient
 // garbage collection: groups
 func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory string) ([]utils.FileData, error) {
 	groups, err := utils.CreateFileHashGroups(files, false)
 	if err != nil {
 		return nil, err
 	}
+
 	files = nil
+
+	var handlers []func([]utils.FileData) ([]utils.FileData, []utils.FileData, error)
+
+	// shortest file name
+	handler := func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
+		var filteredFiles, remainderFiles []utils.FileData
+		minimumLength := 0
+		for _, file := range unfilteredFiles {
+			length := len(file.FileMetadata.Name)
+			if length < minimumLength || minimumLength == 0 {
+				minimumLength = length
+				remainderFiles = append(remainderFiles, filteredFiles...)
+				filteredFiles = []utils.FileData{file}
+			} else if length == minimumLength {
+				filteredFiles = append(filteredFiles, file)
+			} else {
+				remainderFiles = append(remainderFiles, file)
+			}
+		}
+		return filteredFiles, remainderFiles, nil
+	}
+	handlers = append(handlers, handler)
+
+	// valid name of date directory or date range directory
+	handler = func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
+		var filteredFiles, remainderFiles []utils.FileData
+		for _, file := range unfilteredFiles {
+			directory := filepath.Dir(file.FileMetadata.Path)
+			child, err := isDirectoryChild(destinationDirectory, directory)
+			if err != nil {
+				return nil, nil, err
+			}
+			if child && isValidDateRangeDirectoryName(directory) {
+				filteredFiles = append(filteredFiles, file)
+			} else {
+				remainderFiles = append(remainderFiles, file)
+			}
+		}
+		return filteredFiles, remainderFiles, nil
+	}
+	handlers = append(handlers, handler)
+
+	// destination directory
+	handler = func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
+		var filteredFiles, remainderFiles []utils.FileData
+		for _, file := range unfilteredFiles {
+			child, err := isDirectoryChild(destinationDirectory, file.FileMetadata.Path)
+			if err != nil {
+				return nil, nil, err
+			}
+			if child {
+				filteredFiles = append(filteredFiles, file)
+			} else {
+				remainderFiles = append(remainderFiles, file)
+			}
+		}
+		return filteredFiles, remainderFiles, nil
+	}
+	handlers = append(handlers, handler)
+
+	// newest modification time
+	handler = func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
+		var filteredFiles, remainderFiles []utils.FileData
+		var newestTime time.Time
+		for _, file := range unfilteredFiles {
+			if file.FileMetadata.TimeModified.After(newestTime) {
+				newestTime = file.FileMetadata.TimeModified
+				remainderFiles = append(remainderFiles, filteredFiles...)
+				filteredFiles = []utils.FileData{file}
+			} else if file.FileMetadata.TimeModified.Equal(newestTime) {
+				filteredFiles = append(filteredFiles, file)
+			} else {
+				remainderFiles = append(remainderFiles, file)
+			}
+		}
+		return filteredFiles, remainderFiles, nil
+	}
+	handlers = append(handlers, handler)
+
 	for _, group := range groups {
+		for _, handler := range handlers {
+			if len(group.FilesData) > 1 {
+				err := filterAndDeleteRemainderFiles(&group.FilesData, handler)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				files = append(files, group.FilesData[0])
+				break
+			}
+		}
 		if len(group.FilesData) > 1 {
-			// shortest file name
-			toFilteredAndRemainderFiles := func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
-				var filteredFiles, remainderFiles []utils.FileData
-				minimumLength := 0
-				for _, file := range unfilteredFiles {
-					length := len(file.FileMetadata.Name)
-					if length < minimumLength || minimumLength == 0 {
-						minimumLength = length
-						remainderFiles = append(remainderFiles, filteredFiles...)
-						filteredFiles = []utils.FileData{file}
-					} else if length == minimumLength {
-						filteredFiles = append(filteredFiles, file)
-					} else {
-						remainderFiles = append(remainderFiles, file)
-					}
-				}
-				return filteredFiles, remainderFiles, nil
-			}
-
-			// not needed to err check
-			filterAndDeleteRemainderFiles(&group.FilesData, toFilteredAndRemainderFiles)
-
-			// valid name of date directory or date range directory
-			toFilteredAndRemainderFiles = func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
-				var filteredFiles, remainderFiles []utils.FileData
-				for _, file := range unfilteredFiles {
-					directory := filepath.Dir(file.FileMetadata.Path)
-					child, err := isDirectoryChild(destinationDirectory, directory)
-					if err != nil {
-						return nil, nil, err
-					}
-					if child && isValidDateRangeDirectoryName(directory) {
-						filteredFiles = append(filteredFiles, file)
-					} else {
-						remainderFiles = append(remainderFiles, file)
-					}
-				}
-				return filteredFiles, remainderFiles, nil
-			}
-
-			err = filterAndDeleteRemainderFiles(&group.FilesData, toFilteredAndRemainderFiles)
-			if err != nil {
-				return nil, err
-			}
-
-			// destination directory
-			toFilteredAndRemainderFiles = func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
-				var filteredFiles, remainderFiles []utils.FileData
-				for _, file := range unfilteredFiles {
-					child, err := isDirectoryChild(destinationDirectory, file.FileMetadata.Path)
-					if err != nil {
-						return nil, nil, err
-					}
-					if child {
-						filteredFiles = append(filteredFiles, file)
-					} else {
-						remainderFiles = append(remainderFiles, file)
-					}
-				}
-				return filteredFiles, remainderFiles, nil
-			}
-
-			err = filterAndDeleteRemainderFiles(&group.FilesData, toFilteredAndRemainderFiles)
-			if err != nil {
-				return nil, err
-			}
-
-			// newest modification time
-			toFilteredAndRemainderFiles = func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
-				var filteredFiles, remainderFiles []utils.FileData
-				var newestTime time.Time
-				for _, file := range unfilteredFiles {
-					if file.FileMetadata.TimeModified.After(newestTime) {
-						newestTime = file.FileMetadata.TimeModified
-						remainderFiles = append(remainderFiles, filteredFiles...)
-						filteredFiles = []utils.FileData{file}
-					} else if file.FileMetadata.TimeModified.Equal(newestTime) {
-						filteredFiles = append(filteredFiles, file)
-					} else {
-						remainderFiles = append(remainderFiles, file)
-					}
-				}
-				return filteredFiles, remainderFiles, nil
-			}
-
-			// not needed to err check
-			filterAndDeleteRemainderFiles(&group.FilesData, toFilteredAndRemainderFiles)
-
 			// take the first file and the delete other files
 			files = append(files, group.FilesData[0])
 			group.FilesData[0] = group.FilesData[len(group.FilesData)-1]
@@ -183,10 +186,9 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 			if err := deleteFiles(group.FilesData); err != nil {
 				return nil, err
 			}
-		} else {
-			files = append(files, group.FilesData[0])
 		}
 	}
+
 	return files, nil
 }
 
