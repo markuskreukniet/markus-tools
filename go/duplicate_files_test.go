@@ -1,7 +1,6 @@
 package main
 
 import (
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -73,9 +72,8 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			}
 
 			// assert
-			separator := string(filepath.Separator)
 			for _, directory := range directories {
-				outcome = strings.ReplaceAll(outcome, directory+separator, "")
+				outcome = strings.ReplaceAll(outcome, directory+utils.FilePathSeparator, "")
 			}
 
 			for _, substring := range strings.Split(outcome, "\n\n") {

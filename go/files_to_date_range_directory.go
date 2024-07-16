@@ -201,8 +201,7 @@ func isDirectoryChild(filePath, childFilePath string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	// TODO: string(filepath.Separator) is not efficient when multiple calls to this function?
-	return !strings.HasPrefix(path, "..") && !strings.Contains(path, string(filepath.Separator)), nil
+	return !strings.HasPrefix(path, "..") && !strings.Contains(path, utils.FilePathSeparator), nil
 }
 
 func appendPathsAndFilesByReadingDirectoryTree(path string, paths *[]string, files *[]utils.FileData) error {

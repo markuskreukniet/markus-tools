@@ -105,6 +105,8 @@ const (
 	PlainTextFiles
 )
 
+const FilePathSeparator = string(filepath.Separator)
+
 func CreateDirectory(filePath string) error {
 	return os.Mkdir(filePath, 0755)
 }
