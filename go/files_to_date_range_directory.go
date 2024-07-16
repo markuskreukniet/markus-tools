@@ -62,8 +62,10 @@ func deleteFiles(files []utils.FileData) error {
 	return nil
 }
 
-func filterAndDeleteRemainderFiles(files *[]utils.FileData, handler func([]utils.FileData) ([]utils.FileData, []utils.FileData, error)) error {
-	filteredFiles, remainderFiles, err := handler(*files)
+func filterAndDeleteRemainderFiles(files *[]utils.FileData, handler func([]utils.FileData, *[]utils.FileData, *[]utils.FileData) error) error {
+	var filteredFiles, remainderFiles []utils.FileData
+
+	err := handler(*files, &filteredFiles, &remainderFiles)
 	if err != nil {
 		return err
 	}
@@ -78,7 +80,7 @@ func filterAndDeleteRemainderFiles(files *[]utils.FileData, handler func([]utils
 	return nil
 }
 
-// TODO: handler logic might not be efficient
+// Each handler loops unfilteredFiles, but the code is clean enough.
 // garbage collection: groups
 func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory string) ([]utils.FileData, error) {
 	groups, err := utils.CreateFileHashGroups(files, false)
@@ -88,81 +90,83 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 
 	files = nil
 
-	var handlers []func([]utils.FileData) ([]utils.FileData, []utils.FileData, error)
+	var handlers []func([]utils.FileData, *[]utils.FileData, *[]utils.FileData) error
 
 	// shortest file name
-	handler := func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
-		var filteredFiles, remainderFiles []utils.FileData
+	handler := func(unfilteredFiles []utils.FileData, filteredFiles, remainderFiles *[]utils.FileData) error {
 		minimumLength := 0
+
 		for _, file := range unfilteredFiles {
 			length := len(file.FileMetadata.Name)
 			if length < minimumLength || minimumLength == 0 {
 				minimumLength = length
-				remainderFiles = append(remainderFiles, filteredFiles...)
-				filteredFiles = []utils.FileData{file}
+				*remainderFiles = append(*remainderFiles, *filteredFiles...)
+				*filteredFiles = []utils.FileData{file}
 			} else if length == minimumLength {
-				filteredFiles = append(filteredFiles, file)
+				*filteredFiles = append(*filteredFiles, file)
 			} else {
-				remainderFiles = append(remainderFiles, file)
+				*remainderFiles = append(*remainderFiles, file)
 			}
 		}
-		return filteredFiles, remainderFiles, nil
+
+		return nil
 	}
 	handlers = append(handlers, handler)
 
 	// valid name of date directory or date range directory
-	handler = func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
-		var filteredFiles, remainderFiles []utils.FileData
+	handler = func(unfilteredFiles []utils.FileData, filteredFiles, remainderFiles *[]utils.FileData) error {
 		for _, file := range unfilteredFiles {
 			directory := filepath.Dir(file.FileMetadata.Path)
 			child, err := isDirectoryChild(destinationDirectory, directory)
 			if err != nil {
-				return nil, nil, err
+				return err
 			}
 			if child && isValidDateRangeDirectoryName(directory) {
-				filteredFiles = append(filteredFiles, file)
+				*filteredFiles = append(*filteredFiles, file)
 			} else {
-				remainderFiles = append(remainderFiles, file)
+				*remainderFiles = append(*remainderFiles, file)
 			}
 		}
-		return filteredFiles, remainderFiles, nil
+
+		return nil
 	}
 	handlers = append(handlers, handler)
 
 	// destination directory
-	handler = func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
-		var filteredFiles, remainderFiles []utils.FileData
+	handler = func(unfilteredFiles []utils.FileData, filteredFiles, remainderFiles *[]utils.FileData) error {
 		for _, file := range unfilteredFiles {
 			child, err := isDirectoryChild(destinationDirectory, file.FileMetadata.Path)
 			if err != nil {
-				return nil, nil, err
+				return err
 			}
 			if child {
-				filteredFiles = append(filteredFiles, file)
+				*filteredFiles = append(*filteredFiles, file)
 			} else {
-				remainderFiles = append(remainderFiles, file)
+				*remainderFiles = append(*remainderFiles, file)
 			}
 		}
-		return filteredFiles, remainderFiles, nil
+
+		return nil
 	}
 	handlers = append(handlers, handler)
 
 	// newest modification time
-	handler = func(unfilteredFiles []utils.FileData) ([]utils.FileData, []utils.FileData, error) {
-		var filteredFiles, remainderFiles []utils.FileData
+	handler = func(unfilteredFiles []utils.FileData, filteredFiles, remainderFiles *[]utils.FileData) error {
 		var newestTime time.Time
+
 		for _, file := range unfilteredFiles {
 			if file.FileMetadata.TimeModified.After(newestTime) {
 				newestTime = file.FileMetadata.TimeModified
-				remainderFiles = append(remainderFiles, filteredFiles...)
-				filteredFiles = []utils.FileData{file}
+				*remainderFiles = append(*remainderFiles, *filteredFiles...)
+				*filteredFiles = []utils.FileData{file}
 			} else if file.FileMetadata.TimeModified.Equal(newestTime) {
-				filteredFiles = append(filteredFiles, file)
+				*filteredFiles = append(*filteredFiles, file)
 			} else {
-				remainderFiles = append(remainderFiles, file)
+				*remainderFiles = append(*remainderFiles, file)
 			}
 		}
-		return filteredFiles, remainderFiles, nil
+
+		return nil
 	}
 	handlers = append(handlers, handler)
 
