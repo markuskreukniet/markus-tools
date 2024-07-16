@@ -35,10 +35,6 @@ func isValidDateRangeDirectoryName(name string) bool {
 	return false
 }
 
-func isValidDateRangeDirectory(filePath string) bool {
-	return isValidDateRangeDirectoryName(filepath.Base(filePath))
-}
-
 func isWithinThreeDays(olderTime, newerTime time.Time) bool {
 	return olderTime.Sub(newerTime).Hours() <= 72
 }
