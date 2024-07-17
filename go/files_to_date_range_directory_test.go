@@ -253,7 +253,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 				t.Errorf("filesToDateRangeDirectory error: %v", err)
 			}
 
-			if same, err := areDirectoryTreesTheSame(destination, wantedOutcomeDestination); err != nil {
+			if same, err := areDirectoryTreesTheSame(destination, wantedOutcomeDestination); err != nil || !same {
 				t.Errorf("compareDirectories error: %v", err)
 				t.Errorf("compareDirectories same: %v", same)
 			}
