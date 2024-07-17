@@ -25,6 +25,7 @@ func appendFileSystemFilesExtra(filePath string, files *[]utils.FileSystemFileEx
 		return nil
 	}
 
+	// TODO: should be FilesAndDirectoriesWithoutZeroByteFiles
 	if err := utils.WalkFilterAndHandleFileMetadataNew(filePath, utils.FilesWithoutZeroByteFiles, utils.AllFiles, handler); err != nil {
 		return err
 	}
@@ -261,6 +262,9 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.testCaseInput.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
+			directories, _ := utils.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.testCaseInput.Input)
+			defer utils.TestingRemoveDirectoryTrees(t, directories)
+
 			destination, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, tc.destinationInput)
 			defer utils.TestingRemoveDirectoryTree(t, destination)
 
