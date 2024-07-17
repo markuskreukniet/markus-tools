@@ -189,8 +189,9 @@ func WalkFilterAndHandleFileMetadataNew(rootFilePath string, mode fileFilterMode
 			}
 		}
 
-		// TODO: err check
-		handler(CreateFileSystemFile("", filePath, CreateFileMetadata("", fileInfo.Name(), fileInfo.ModTime(), size, isDir)))
+		if err := handler(CreateFileSystemFile("", filePath, CreateFileMetadata("", fileInfo.Name(), fileInfo.ModTime(), size, isDir))); err != nil {
+			return err
+		}
 
 		return nil
 	})
