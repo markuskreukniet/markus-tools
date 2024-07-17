@@ -242,18 +242,18 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.testCaseInput.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			directory, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, tc.destinationInput)
-			defer utils.TestingRemoveDirectoryTree(t, directory)
-
-			destination, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, wantedOutcome)
+			destination, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, tc.destinationInput)
 			defer utils.TestingRemoveDirectoryTree(t, destination)
 
+			wantedOutcomeDestination, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, wantedOutcome)
+			defer utils.TestingRemoveDirectoryTree(t, wantedOutcomeDestination)
+
 			// act
-			if err := filesToDateRangeDirectory(nil, directory); err != nil {
+			if err := filesToDateRangeDirectory(nil, destination); err != nil {
 				t.Errorf("filesToDateRangeDirectory error: %v", err)
 			}
 
-			if same, err := areDirectoryTreesTheSame(directory, destination); err != nil {
+			if same, err := areDirectoryTreesTheSame(destination, wantedOutcomeDestination); err != nil {
 				t.Errorf("compareDirectories error: %v", err)
 				t.Errorf("compareDirectories same: %v", same)
 			}
