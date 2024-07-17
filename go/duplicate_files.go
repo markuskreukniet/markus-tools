@@ -15,14 +15,10 @@ func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []uti
 	return resultToJSONFunctionResult(newlineSeparatedString)
 }
 
-func getDuplicateFilesAsNewlineSeparatedString(nodes []utils.FileSystemNode) (string, error) {
+func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.FileSystemNode) (string, error) {
 	var result strings.Builder
 	var files []utils.FileData
-	handler := func(metadata utils.FileMetadata) {
-		files = append(files, utils.CreateFileData("", metadata))
-	}
-
-	if err := utils.FilterAndHandleAllNodesFileMetadata(nodes, utils.FilesWithoutZeroByteFiles, handler); err != nil {
+	if err := utils.AppendNonZeroByteFiles(uniqueFileSystemNodes, &files); err != nil {
 		return "", err
 	}
 

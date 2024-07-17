@@ -206,6 +206,9 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	// `
 
 	// V trying to add duplicate files to existing directories
+	// contentME110 := createTestContent("m e 11 0")
+	// contentME111 := createTestContent("m e 11 1")
+	// contentME1112 := createTestContent("m e 11 1 2")
 	content11 := createTestContent("11")
 	content111 := createTestContent("11 1")
 	content112 := createTestContent("11 2")
@@ -232,16 +235,21 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	// 	directory 1/directory 2,2020-10-22T20:40:40Z,txt m n 1 2.txt,` + TestingCreateContent("m n 10 1 2") + `;
 	// `
 
-	// // V move files to existing directories
-	// moveFilesToExistingDirectories := `
-	// 	,2020-11-10T20:40:40Z,txt m e 0.txt,` + TestingCreateContent("m e 11 0") + `;
-
-	// 	directory 1,2020-11-20T20:40:40Z,txt m e 1.txt,` + TestingCreateContent("m e 11 1") + `;
-	// 	directory 1/directory 2,2020-11-21T20:40:40Z,txt m e 1 2.txt,` + TestingCreateContent("m e 11 1 2") + `;
-	// `
-
+	input := ""
 	destinationInput := ""
 	wantedOutcome := ""
+
+	// X move files to existing directories
+	// input = input + `
+	// 	,2020-11-10T20:40:40Z,txt m e 0.txt,` + contentME110 + `;
+	// 	directory 1,2020-11-20T20:40:40Z,txt m e 1.txt,` + contentME111 + `;
+	// 	directory 1/directory 2,2020-11-21T20:40:40Z,txt m e 1 2.txt,` + contentME1112 + `;
+	// `
+	// wantedOutcome = wantedOutcome + `
+	// 	2020-11-10,2020-11-10T20:40:40Z,txt m e 0.txt,` + contentME110 + `;
+	// 	2020-11-20,2020-11-20T20:40:40Z,txt m e 1.txt,` + contentME111 + `;
+	// 	2020-11-21 - 2020-11-22,2020-11-21T20:40:40Z,txt m e 1 2.txt,` + contentME1112 + `;
+	// `
 
 	// V removing empty directories and empty directory trees
 	// V moving files to its parent directory
@@ -282,7 +290,6 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	destinationInput = destinationInput + `
 		2020-12-20,2020-12-20T20:40:40Z,txt 12.txt,` + content12 + `;
 		2020-12-20/directory 1,2020-12-20T20:40:40Z,txt 12 1.txt,` + content12 + `;
-
 		directory 1,2020-12-21T20:40:40Z,txt 1.txt,` + content122 + `;
 		2020-12-21,2020-12-21T20:40:40Z,txt 12 2.txt,` + content122 + `;
 		2020-12-21/directory 1/directory 2,2020-12-22T20:40:40Z,txt 12 1 2.txt,` + content122 + `;
@@ -292,8 +299,6 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 		2020-12-20 - 2020-12-21,,txt 1.txt,` + content122 + `;
 		2020-12-20 - 2020-12-21,,txt 12.txt,` + content12 + `;
 	`
-
-	input := ""
 
 	// create testCases
 	testCases := []struct {

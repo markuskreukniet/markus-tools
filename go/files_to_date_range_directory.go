@@ -267,6 +267,11 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		appendPathsAndFilesByReadingDirectoryTree(path, &badDirectoryFilePaths, &files)
 	}
 
+	// TODO: is correct?
+	if err := utils.AppendNonZeroByteFiles(uniqueFileSystemNodes, &files); err != nil {
+		return err
+	}
+
 	files, err := filterAndDeleteDuplicateFiles(files, destinationDirectory)
 	if err != nil {
 		return err
