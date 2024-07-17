@@ -22,14 +22,14 @@ func CreateFileSystemFileExtra(hash string, file FileSystemFile) FileSystemFileE
 
 type FileSystemFile struct {
 	Data         string
-	FilePath     string
+	Path         string
 	FileMetadata FileMetadata
 }
 
 func CreateFileSystemFile(data, filePath string, metadata FileMetadata) FileSystemFile {
 	return FileSystemFile{
 		Data:         data,
-		FilePath:     filePath,
+		Path:         filePath,
 		FileMetadata: metadata,
 	}
 }
@@ -75,6 +75,7 @@ func (groups FilesDataGroups) DidAppendByFileDataIdentifier(file FileData) bool 
 }
 
 // TODO: For some use cases, FileMetadata has too many fields. Maybe we can use interfaces to solve that problem. Or maybe use viewModels
+// TODO: FileMetadata should not have Path
 type FileMetadata struct {
 	Path         string
 	Name         string
@@ -154,6 +155,45 @@ func ToFileMetadata(filePath string) (FileMetadata, error) {
 		return FileMetadata{}, err
 	}
 	return CreateFileMetadata(filePath, info.Name(), info.ModTime(), info.Size(), info.IsDir()), nil
+}
+
+func WalkFilterAndHandleFileMetadataNew(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileSystemFile) error) error {
+	return filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		size := fileInfo.Size()
+		isDir := fileInfo.IsDir()
+
+		// is file check
+		if !isDir && mode == Directories {
+			return nil
+		}
+
+		// is directory check
+		if isDir && (mode == files || mode == FilesWithoutZeroByteFiles) {
+			return nil
+		}
+
+		// zero byte check
+		if size == 0 && (mode == FilesWithoutZeroByteFiles || mode == FilesAndDirectoriesWithoutZeroByteFiles) {
+			return nil
+		}
+
+		// file type check
+		if fileType == PlainTextFiles {
+			isTextFile, err := IsNonZeroByteFileATextFile(filePath)
+			if err != nil || !isTextFile {
+				return err
+			}
+		}
+
+		// TODO: err check
+		handler(CreateFileSystemFile("", filePath, CreateFileMetadata("", fileInfo.Name(), fileInfo.ModTime(), size, isDir)))
+
+		return nil
+	})
 }
 
 func WalkFilterAndHandleFileMetadata(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileMetadata)) error {

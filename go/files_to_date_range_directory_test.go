@@ -1,8 +1,7 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
+	"sort"
 	"testing"
 
 	"github.com/markuskreukniet/markus-tools/go/utils"
@@ -12,59 +11,79 @@ func createTestContent(subContent string) string {
 	return "content" + subContent + "\ncontent" + subContent
 }
 
-func directoryTreeToFilePathHashes(directory string) (map[string]string, error) {
-	hashes := make(map[string]string)
-
-	err := filepath.Walk(directory, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() {
-			hash, err := utils.HashFile(path)
+func appendFileSystemFilesExtra(filePath string, files *[]utils.FileSystemFileExtra) error {
+	handler := func(file utils.FileSystemFile) error {
+		hash := ""
+		if !file.FileMetadata.IsDirectory {
+			var err error
+			hash, err = utils.HashFile(file.Path)
 			if err != nil {
 				return err
 			}
-			hashes[path] = hash
 		}
+		*files = append(*files, utils.CreateFileSystemFileExtra(hash, file))
 		return nil
-	})
+	}
 
-	return hashes, err
+	if err := utils.WalkFilterAndHandleFileMetadataNew(filePath, utils.FilesWithoutZeroByteFiles, utils.AllFiles, handler); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-// TODO: does not checks for similar modification times?
-func areDirectoryTreesTheSame(dir1, dir2 string) (bool, error) {
-	hashes1, err := directoryTreeToFilePathHashes(dir1)
-	if err != nil {
+func areFileSystemFilesExtraTheSame(fileI, fileJ utils.FileSystemFileExtra) bool {
+	// FileMetadata
+	// TODO: compare TimeModified
+	if fileI.FileSystemFile.FileMetadata.IsDirectory != fileJ.FileSystemFile.FileMetadata.IsDirectory ||
+		fileI.FileSystemFile.FileMetadata.Name != fileJ.FileSystemFile.FileMetadata.Name ||
+		fileI.FileSystemFile.FileMetadata.Size != fileJ.FileSystemFile.FileMetadata.Size {
+		return false
+	}
+
+	// FileSystemFile and FileSystemFileExtra
+	// TODO: compare filePath
+	if fileI.FileSystemFile.Data != fileJ.FileSystemFile.Data ||
+		fileI.Hash != fileJ.Hash {
+		return false
+	}
+
+	return true
+}
+
+func sortFileSystemFilesExtraOnName(files *[]utils.FileSystemFileExtra) {
+	sort.Slice(*files, func(i, j int) bool {
+		return (*files)[i].FileSystemFile.FileMetadata.Name < (*files)[j].FileSystemFile.FileMetadata.Name
+	})
+}
+
+func areFileTreesTheSame(filePathI, filePathJ string) (bool, error) {
+	var filesI, filesJ []utils.FileSystemFileExtra
+
+	if err := appendFileSystemFilesExtra(filePathI, &filesI); err != nil {
+		return false, err
+	}
+	if err := appendFileSystemFilesExtra(filePathJ, &filesJ); err != nil {
 		return false, err
 	}
 
-	hashes2, err := directoryTreeToFilePathHashes(dir2)
-	if err != nil {
-		return false, err
+	length := len(filesI)
+
+	if length != len(filesJ) {
+		return false, nil
 	}
 
-	for path1, hash1 := range hashes1 {
-		relativePath, err := filepath.Rel(dir1, path1)
-		if err != nil {
-			return false, err
-		}
-		path2 := filepath.Join(dir2, relativePath)
-		hash2, found := hashes2[path2]
-		if !found || hash1 != hash2 {
+	sortFileSystemFilesExtraOnName(&filesI)
+	sortFileSystemFilesExtraOnName(&filesJ)
+
+	for i := 0; i < length; i++ {
+		if !areFileSystemFilesExtraTheSame(filesI[i], filesJ[i]) {
 			return false, nil
 		}
-		delete(hashes2, path2)
-	}
-
-	if len(hashes2) > 0 {
-		return false, nil
 	}
 
 	return true, nil
 }
-
-//
 
 func TestFilesToDateRangeDirectory(t *testing.T) {
 	// test:
@@ -253,9 +272,9 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 				t.Errorf("filesToDateRangeDirectory error: %v", err)
 			}
 
-			if same, err := areDirectoryTreesTheSame(destination, wantedOutcomeDestination); err != nil || !same {
-				t.Errorf("compareDirectories error: %v", err)
-				t.Errorf("compareDirectories same: %v", same)
+			if same, err := areFileTreesTheSame(destination, wantedOutcomeDestination); err != nil || !same {
+				t.Errorf("areFileTreesTheSame error: %v", err)
+				t.Errorf("areFileTreesTheSame same: %v", same)
 			}
 
 			// assert
