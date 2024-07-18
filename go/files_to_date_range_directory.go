@@ -290,7 +290,6 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 			startDateRange = i
 		} else {
 			var name string
-			// TODO: this if else is now useless thx to createDirectoryDateRangeName?
 			if isFindingDateRange {
 				name = createDirectoryDateRangeName(files[startDateRange].FileMetadata.TimeModified, files[i].FileMetadata.TimeModified)
 				isFindingDateRange = false
