@@ -245,7 +245,8 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 	return nil
 }
 
-func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
+// garbage collection: handler
+func createFilesAndDirectoryFilePaths(filePath string) ([]utils.FileData, []string, []string, error) {
 	var files []utils.FileData
 	var goodDirectoryFilePaths []string
 	var badDirectoryFilePaths []string
@@ -258,8 +259,8 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		}
 	}
 
-	if err := appendPathsAndFilesByReadingDirectory(destinationDirectory, handler, &files, nil); err != nil {
-		return err
+	if err := appendPathsAndFilesByReadingDirectory(filePath, handler, &files, nil); err != nil {
+		return nil, nil, nil, err
 	}
 
 	handler = func(_, path string, _ *[]string) {
@@ -267,11 +268,22 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	}
 
 	for _, path := range goodDirectoryFilePaths {
-		appendPathsAndFilesByReadingDirectory(path, handler, &files, nil)
+		if err := appendPathsAndFilesByReadingDirectory(path, handler, &files, nil); err != nil {
+			return nil, nil, nil, err
+		}
 	}
 
 	for _, path := range badDirectoryFilePaths {
 		appendPathsAndFilesByReadingDirectoryTree(path, &badDirectoryFilePaths, &files)
+	}
+
+	return files, goodDirectoryFilePaths, badDirectoryFilePaths, nil
+}
+
+func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
+	files, goodDirectoryFilePaths, badDirectoryFilePaths, err := createFilesAndDirectoryFilePaths(destinationDirectory)
+	if err != nil {
+		return err
 	}
 
 	// TODO: is correct?
@@ -279,7 +291,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		return err
 	}
 
-	files, err := filterAndDeleteDuplicateFiles(files, destinationDirectory)
+	files, err = filterAndDeleteDuplicateFiles(files, destinationDirectory)
 	if err != nil {
 		return err
 	}
