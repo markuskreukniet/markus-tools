@@ -163,8 +163,12 @@ func WalkFilterAndHandleFileMetadataNew(rootFilePath string, mode fileFilterMode
 			return err
 		}
 
-		size := fileInfo.Size()
 		isDir := fileInfo.IsDir()
+
+		var size int64
+		if !isDir {
+			size = fileInfo.Size()
+		}
 
 		// is file check
 		if !isDir && mode == Directories {
@@ -202,8 +206,13 @@ func WalkFilterAndHandleFileMetadata(rootFilePath string, mode fileFilterMode, f
 		if err != nil {
 			return err
 		}
-		size := fileInfo.Size()
+
 		isDir := fileInfo.IsDir()
+
+		var size int64
+		if !isDir {
+			size = fileInfo.Size()
+		}
 
 		// is file check
 		if !isDir && mode == Directories {
