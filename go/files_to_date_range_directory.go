@@ -35,7 +35,7 @@ func isValidDateRangeDirectoryName(name string) bool {
 	return false
 }
 
-func isWithinThreeDays(olderTime, newerTime time.Time) bool {
+func isWithin72Hours(olderTime, newerTime time.Time) bool {
 	return olderTime.Sub(newerTime).Hours() <= 72
 }
 
@@ -285,7 +285,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	isFindingDateRange := false
 	length := len(files)
 	for i := 0; i < length; i++ {
-		if i < length-1 && isWithinThreeDays(files[i].FileMetadata.TimeModified, files[i+1].FileMetadata.TimeModified) && !isFindingDateRange {
+		if i < length-1 && isWithin72Hours(files[i].FileMetadata.TimeModified, files[i+1].FileMetadata.TimeModified) && !isFindingDateRange {
 			isFindingDateRange = true
 			startDateRange = i
 		} else {
