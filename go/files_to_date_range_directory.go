@@ -77,7 +77,7 @@ func filterAndDeleteRemainderFiles(files *[]utils.FileData, handler func([]utils
 }
 
 // garbage collection: handler
-func createFilterAndDeleteRemainderFilesHandlers(filePath string) []func([]utils.FileData, *[]utils.FileData, *[]utils.FileData) error {
+func createFileHandlers(filePath string) []func([]utils.FileData, *[]utils.FileData, *[]utils.FileData) error {
 	var handlers []func([]utils.FileData, *[]utils.FileData, *[]utils.FileData) error
 
 	// shortest file name
@@ -171,7 +171,7 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 
 	files = nil
 
-	handlers := createFilterAndDeleteRemainderFilesHandlers(destinationDirectory)
+	handlers := createFileHandlers(destinationDirectory)
 
 	for _, group := range groups {
 		for _, handler := range handlers {
