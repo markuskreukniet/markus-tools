@@ -274,16 +274,20 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			defer utils.TestingRemoveDirectoryTree(t, wantedOutcomeDestination)
 
 			// act
-			if err := filesToDateRangeDirectory(nil, destination); err != nil {
-				t.Errorf("filesToDateRangeDirectory error: %v", err)
-			}
-
-			if same, err := areFileTreeDescendantsIdentical(destination, wantedOutcomeDestination); err != nil || !same {
-				t.Errorf("areFileTreeDescendantsIdentical error: %v", err)
-				t.Errorf("areFileTreeDescendantsIdentical same: %v", same)
-			}
+			err := filesToDateRangeDirectory(nil, destination)
 
 			// assert
+			// TODO: wantErr check
+
+			areIdentical, err := areFileTreeDescendantsIdentical(destination, wantedOutcomeDestination)
+			if err != nil {
+				t.Errorf("areFileTreeDescendantsIdentical error: %v", err)
+			}
+
+			if !areIdentical {
+				// TODO: message
+				t.Errorf("outcome and wanted outcome are different")
+			}
 		})
 	}
 }
