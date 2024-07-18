@@ -76,16 +76,8 @@ func filterAndDeleteRemainderFiles(files *[]utils.FileData, handler func([]utils
 	return nil
 }
 
-// Each handler loops unfilteredFiles, but the code is clean enough.
-// garbage collection: groups
-func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory string) ([]utils.FileData, error) {
-	groups, err := utils.CreateFileHashGroups(files, false)
-	if err != nil {
-		return nil, err
-	}
-
-	files = nil
-
+// garbage collection: handler
+func createFilterAndDeleteRemainderFilesHandlers(filePath string) []func([]utils.FileData, *[]utils.FileData, *[]utils.FileData) error {
 	var handlers []func([]utils.FileData, *[]utils.FileData, *[]utils.FileData) error
 
 	// shortest file name
@@ -113,7 +105,7 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 	handler = func(unfilteredFiles []utils.FileData, filteredFiles, remainderFiles *[]utils.FileData) error {
 		for _, file := range unfilteredFiles {
 			directory := filepath.Dir(file.FileMetadata.Path)
-			child, err := isDirectoryChild(destinationDirectory, directory)
+			child, err := isDirectoryChild(filePath, directory)
 			if err != nil {
 				return err
 			}
@@ -131,7 +123,7 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 	// destination directory
 	handler = func(unfilteredFiles []utils.FileData, filteredFiles, remainderFiles *[]utils.FileData) error {
 		for _, file := range unfilteredFiles {
-			child, err := isDirectoryChild(destinationDirectory, file.FileMetadata.Path)
+			child, err := isDirectoryChild(filePath, file.FileMetadata.Path)
 			if err != nil {
 				return err
 			}
@@ -165,6 +157,21 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 		return nil
 	}
 	handlers = append(handlers, handler)
+
+	return handlers
+}
+
+// Each handler loops unfilteredFiles, but the code is clean enough.
+// garbage collection: groups
+func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory string) ([]utils.FileData, error) {
+	groups, err := utils.CreateFileHashGroups(files, false)
+	if err != nil {
+		return nil, err
+	}
+
+	files = nil
+
+	handlers := createFilterAndDeleteRemainderFilesHandlers(destinationDirectory)
 
 	for _, group := range groups {
 		for _, handler := range handlers {
