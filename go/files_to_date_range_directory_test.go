@@ -33,7 +33,7 @@ func appendFileSystemFilesExtra(filePath string, files *[]utils.FileSystemFileEx
 	return nil
 }
 
-func areFileSystemFilesExtraTheSame(fileI, fileJ utils.FileSystemFileExtra) bool {
+func areFileSystemFilesExtraIdentical(fileI, fileJ utils.FileSystemFileExtra) bool {
 	// FileMetadata
 	// TODO: compare TimeModified
 	if fileI.FileSystemFile.FileMetadata.IsDirectory != fileJ.FileSystemFile.FileMetadata.IsDirectory ||
@@ -58,7 +58,7 @@ func sortFileSystemFilesExtraOnName(files *[]utils.FileSystemFileExtra) {
 	})
 }
 
-func areFileTreesTheSame(filePathI, filePathJ string) (bool, error) {
+func areFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) {
 	var filesI, filesJ []utils.FileSystemFileExtra
 
 	if err := appendFileSystemFilesExtra(filePathI, &filesI); err != nil {
@@ -74,11 +74,14 @@ func areFileTreesTheSame(filePathI, filePathJ string) (bool, error) {
 		return false, nil
 	}
 
+	filesI[0].FileSystemFile.FileMetadata.Name = ""
+	filesJ[0].FileSystemFile.FileMetadata.Name = ""
+
 	sortFileSystemFilesExtraOnName(&filesI)
 	sortFileSystemFilesExtraOnName(&filesJ)
 
 	for i := 0; i < length; i++ {
-		if !areFileSystemFilesExtraTheSame(filesI[i], filesJ[i]) {
+		if !areFileSystemFilesExtraIdentical(filesI[i], filesJ[i]) {
 			return false, nil
 		}
 	}
@@ -276,9 +279,9 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 				t.Errorf("filesToDateRangeDirectory error: %v", err)
 			}
 
-			if same, err := areFileTreesTheSame(destination, wantedOutcomeDestination); err != nil || !same {
-				t.Errorf("areFileTreesTheSame error: %v", err)
-				t.Errorf("areFileTreesTheSame same: %v", same)
+			if same, err := areFileTreeDescendantsIdentical(destination, wantedOutcomeDestination); err != nil || !same {
+				t.Errorf("areFileTreeDescendantsIdentical error: %v", err)
+				t.Errorf("areFileTreeDescendantsIdentical same: %v", same)
 			}
 
 			// assert
