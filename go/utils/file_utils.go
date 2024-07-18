@@ -176,8 +176,8 @@ func WalkFilterAndHandleFileMetadataNew(rootFilePath string, mode fileFilterMode
 			return nil
 		}
 
-		// zero byte check
-		if size == 0 && (mode == FilesWithoutZeroByteFiles || mode == FilesAndDirectoriesWithoutZeroByteFiles) {
+		// zero byte file check
+		if !isDir && size == 0 && (mode == FilesWithoutZeroByteFiles || mode == FilesAndDirectoriesWithoutZeroByteFiles) {
 			return nil
 		}
 
@@ -215,8 +215,8 @@ func WalkFilterAndHandleFileMetadata(rootFilePath string, mode fileFilterMode, f
 			return nil
 		}
 
-		// zero byte check
-		if size == 0 && (mode == FilesWithoutZeroByteFiles || mode == FilesAndDirectoriesWithoutZeroByteFiles) {
+		// zero byte file check
+		if !isDir && size == 0 && (mode == FilesWithoutZeroByteFiles || mode == FilesAndDirectoriesWithoutZeroByteFiles) {
 			return nil
 		}
 
