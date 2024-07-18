@@ -80,7 +80,7 @@ func areFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) 
 	sortFileSystemFilesExtraOnName(&filesI)
 	sortFileSystemFilesExtraOnName(&filesJ)
 
-	for i := 0; i < length; i++ {
+	for i := 1; i < length; i++ {
 		if !areFileSystemFilesExtraIdentical(filesI[i], filesJ[i]) {
 			return false, nil
 		}
