@@ -280,6 +280,68 @@ func createFilesAndDirectoryFilePaths(filePath string) ([]utils.FileData, []stri
 	return files, goodDirectoryFilePaths, badDirectoryFilePaths, nil
 }
 
+// garbage collection: startDateRange, isFindingDateRange, length
+func moveFilesToDateRangeDirectoriesAndFilterDirectories(files []utils.FileData, filePaths []string, filePath string) ([]string, error) {
+	startDateRange := 0
+	isFindingDateRange := false
+	length := len(files)
+
+	for i := 0; i < length; i++ {
+		if i < length-1 && isWithin72Hours(files[i].FileMetadata.TimeModified, files[i+1].FileMetadata.TimeModified) && !isFindingDateRange {
+			isFindingDateRange = true
+			startDateRange = i
+		} else {
+			var name string
+			if isFindingDateRange {
+				name = createDirectoryDateRangeName(files[startDateRange].FileMetadata.TimeModified, files[i].FileMetadata.TimeModified)
+				isFindingDateRange = false
+			} else {
+				name = toDateFormat(files[i].FileMetadata.TimeModified)
+			}
+			index := -1
+			for j, path := range filePaths {
+				if strings.HasSuffix(path, name) {
+					index = j
+					break
+				}
+			}
+			if index == -1 {
+				path := filepath.Join(filePath, name)
+				if err := utils.CreateDirectory(path); err != nil {
+					return nil, err
+				}
+
+				// add files
+				for j := startDateRange; j <= i; j++ {
+					if err := os.Rename(files[j].FileMetadata.Path, filepath.Join(path, files[j].FileMetadata.Name)); err != nil {
+						return nil, err
+					}
+				}
+			} else {
+				path := filePaths[index]
+
+				// add files
+				for j := startDateRange; j <= i; j++ {
+					fullPath := filepath.Join(path, files[j].FileMetadata.Name)
+					exists, err := utils.FileOrDirectoryExists(fullPath)
+					if err != nil {
+						return nil, err
+					}
+					if !exists {
+						if err := os.Rename(files[j].FileMetadata.Path, fullPath); err != nil {
+							return nil, err
+						}
+					}
+				}
+				filePaths[index] = filePaths[len(filePaths)-1]
+				filePaths = filePaths[:len(filePaths)-1]
+			}
+		}
+	}
+
+	return filePaths, nil
+}
+
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
 	files, goodDirectoryFilePaths, badDirectoryFilePaths, err := createFilesAndDirectoryFilePaths(destinationDirectory)
 	if err != nil {
@@ -300,63 +362,10 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		return files[i].FileMetadata.TimeModified.Before(files[j].FileMetadata.TimeModified)
 	})
 
-	startDateRange := 0
-	isFindingDateRange := false
-	length := len(files)
-	for i := 0; i < length; i++ {
-		if i < length-1 && isWithin72Hours(files[i].FileMetadata.TimeModified, files[i+1].FileMetadata.TimeModified) && !isFindingDateRange {
-			isFindingDateRange = true
-			startDateRange = i
-		} else {
-			var name string
-			if isFindingDateRange {
-				name = createDirectoryDateRangeName(files[startDateRange].FileMetadata.TimeModified, files[i].FileMetadata.TimeModified)
-				isFindingDateRange = false
-			} else {
-				name = toDateFormat(files[i].FileMetadata.TimeModified)
-			}
-
-			index := -1
-			for j, path := range goodDirectoryFilePaths {
-				if strings.HasSuffix(path, name) {
-					index = j
-					break
-				}
-			}
-
-			if index == -1 {
-				path := filepath.Join(destinationDirectory, name)
-				if err := utils.CreateDirectory(path); err != nil {
-					return err
-				}
-
-				// add files
-				for j := startDateRange; j <= i; j++ {
-					if err := os.Rename(files[j].FileMetadata.Path, filepath.Join(path, files[j].FileMetadata.Name)); err != nil {
-						return err
-					}
-				}
-			} else {
-				path := goodDirectoryFilePaths[index]
-
-				// add files
-				for j := startDateRange; j <= i; j++ {
-					fullPath := filepath.Join(path, files[j].FileMetadata.Name)
-					exists, err := utils.FileOrDirectoryExists(fullPath)
-					if err != nil {
-						return err
-					}
-					if !exists {
-						if err := os.Rename(files[j].FileMetadata.Path, fullPath); err != nil {
-							return err
-						}
-					}
-				}
-
-				goodDirectoryFilePaths[index] = goodDirectoryFilePaths[len(goodDirectoryFilePaths)-1]
-				goodDirectoryFilePaths = goodDirectoryFilePaths[:len(goodDirectoryFilePaths)-1]
-			}
-		}
+	// TODO: goodDirectoryFilePaths should work with reference?
+	goodDirectoryFilePaths, err = moveFilesToDateRangeDirectoriesAndFilterDirectories(files, goodDirectoryFilePaths, destinationDirectory)
+	if err != nil {
+		return err
 	}
 
 	// Remove the bad empty directories
