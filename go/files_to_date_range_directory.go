@@ -354,7 +354,6 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		return err
 	}
 
-	// TODO: is correct?
 	if err := utils.AppendNonZeroByteFiles(uniqueFileSystemNodes, &files); err != nil {
 		return err
 	}
