@@ -281,8 +281,8 @@ func createFilesAndDirectoryFilePaths(filePath string) ([]utils.FileData, []stri
 	return files, goodDirectoryFilePaths, badDirectoryFilePaths, nil
 }
 
-// TODO: cleaning
-// garbage collection: startDateRange, isFindingDateRange
+// TODO: Does not work efficient, could be done without making groups?
+// garbage collection: length, groups, groupIndex
 func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.FileData, filePaths []string, filePath string) ([]string, error) {
 	length := len(files)
 
