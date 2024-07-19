@@ -323,7 +323,9 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectoriesNew(files []util
 
 		// TODO: should CreateDirectory create a dir with the same rights as parent dir?
 		if !isDirectoryFound {
-			utils.CreateDirectory(directoryFilePath)
+			if err := utils.CreateDirectory(directoryFilePath); err != nil {
+				return nil, err
+			}
 		}
 
 		// add files
