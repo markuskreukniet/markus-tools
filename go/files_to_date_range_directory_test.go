@@ -58,6 +58,10 @@ func sortFileSystemFilesExtraOnName(files *[]utils.FileSystemFileExtra) {
 }
 
 func areFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) {
+	if filePathI == "" || filePathJ == "" {
+		return false, nil
+	}
+
 	var filesI, filesJ []utils.FileSystemFileExtra
 
 	if err := appendFileSystemFilesExtra(filePathI, &filesI); err != nil {
@@ -249,14 +253,17 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	testCases := []struct {
 		testCaseInput    utils.TestCaseInput
 		destinationInput string
+		wantedOutcome    string
 	}{
 		{
 			testCaseInput:    utils.CreateTestCaseInput("Basic", input, false),
 			destinationInput: destinationInput,
+			wantedOutcome:    wantedOutcome,
 		},
 		{
 			testCaseInput:    utils.CreateTestCaseInput("Empty Input", "", false),
 			destinationInput: destinationInput,
+			wantedOutcome:    "",
 		},
 	}
 
@@ -270,7 +277,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			destination, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, tc.destinationInput)
 			defer utils.TestingRemoveDirectoryTree(t, destination)
 
-			wantedOutcomeDestination, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, wantedOutcome)
+			wantedOutcomeDestination, _ := utils.TestingCreateFilesAndDirectoriesByOneInput(t, tc.wantedOutcome)
 			defer utils.TestingRemoveDirectoryTree(t, wantedOutcomeDestination)
 
 			// act
