@@ -305,7 +305,7 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectoriesNew(files []util
 		length = len(group)
 		lengthMinusOne := length - 1
 		var name string
-		if group[0] == group[lengthMinusOne] {
+		if group[0].FileMetadata.TimeModified == group[lengthMinusOne].FileMetadata.TimeModified {
 			name = toDateFormat(group[0].FileMetadata.TimeModified)
 		} else {
 			name = createDirectoryDateRangeName(group[0].FileMetadata.TimeModified, group[lengthMinusOne].FileMetadata.TimeModified)
@@ -327,14 +327,14 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectoriesNew(files []util
 		}
 
 		// add files
-		for i := 0; i < length; i++ {
-			fullFilePath := filepath.Join(directoryFilePath, group[i].FileMetadata.Name)
+		for _, file := range group {
+			fullFilePath := filepath.Join(directoryFilePath, file.FileMetadata.Name)
 			exists, err := utils.FileOrDirectoryExists(fullFilePath)
 			if err != nil {
 				return nil, err
 			}
 			if !exists {
-				if err := os.Rename(group[i].FileMetadata.Path, fullFilePath); err != nil {
+				if err := os.Rename(file.FileMetadata.Path, fullFilePath); err != nil {
 					return nil, err
 				}
 			}
