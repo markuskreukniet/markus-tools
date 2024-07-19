@@ -192,8 +192,8 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	// `
 	// wantedOutcome = wantedOutcome + `
 	// 	2020-11-10,2020-11-10T20:40:40Z,txt m e 0.txt,` + contentME110 + `;
-	// 	2020-11-20,2020-11-20T20:40:40Z,txt m e 1.txt,` + contentME111 + `;
-	// 	2020-11-21 - 2020-11-22,2020-11-21T20:40:40Z,txt m e 1 2.txt,` + contentME1112 + `;
+	// 	2020-11-20 - 2020-11-22,2020-11-20T20:40:40Z,txt m e 1.txt,` + contentME111 + `;
+	// 	2020-11-20 - 2020-11-22,2020-11-21T20:40:40Z,txt m e 1 2.txt,` + contentME1112 + `;
 	// `
 
 	// V removing empty directories and empty directory trees
