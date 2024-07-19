@@ -281,6 +281,69 @@ func createFilesAndDirectoryFilePaths(filePath string) ([]utils.FileData, []stri
 	return files, goodDirectoryFilePaths, badDirectoryFilePaths, nil
 }
 
+func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectoriesNew(files []utils.FileData, filePaths []string, filePath string) ([]string, error) {
+	length := len(files)
+
+	if length == 0 {
+		return filePaths, nil
+	}
+
+	groups := [][]utils.FileData{{files[0]}}
+	groupIndex := 0
+
+	for i := 1; i < length; i++ {
+		iMinusOne := i - 1
+		if isWithin72Hours(files[iMinusOne].FileMetadata.TimeModified, files[i].FileMetadata.TimeModified) {
+			groups[groupIndex] = append(groups[groupIndex], files[i])
+		} else {
+			groupIndex++
+			groups = append(groups, []utils.FileData{files[i]})
+		}
+	}
+
+	for _, group := range groups {
+		length = len(group)
+		lengthMinusOne := length - 1
+		var name string
+		if group[0] == group[lengthMinusOne] {
+			name = toDateFormat(group[0].FileMetadata.TimeModified)
+		} else {
+			name = createDirectoryDateRangeName(group[0].FileMetadata.TimeModified, group[lengthMinusOne].FileMetadata.TimeModified)
+		}
+		directoryFilePath := filepath.Join(filePath, name)
+		isDirectoryFound := false
+		for j, path := range filePaths {
+			if path == directoryFilePath {
+				isDirectoryFound = true
+				filePaths[j] = filePaths[len(filePaths)-1]
+				filePaths = filePaths[:len(filePaths)-1]
+				break
+			}
+		}
+
+		// TODO: should CreateDirectory create a dir with the same rights as parent dir?
+		if !isDirectoryFound {
+			utils.CreateDirectory(directoryFilePath)
+		}
+
+		// add files
+		for i := 0; i < length; i++ {
+			fullFilePath := filepath.Join(directoryFilePath, group[i].FileMetadata.Name)
+			exists, err := utils.FileOrDirectoryExists(fullFilePath)
+			if err != nil {
+				return nil, err
+			}
+			if !exists {
+				if err := os.Rename(group[i].FileMetadata.Path, fullFilePath); err != nil {
+					return nil, err
+				}
+			}
+		}
+	}
+
+	return filePaths, nil
+}
+
 // TODO: cleaning
 // garbage collection: startDateRange, isFindingDateRange
 func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.FileData, filePaths []string, filePath string) ([]string, error) {
@@ -466,7 +529,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	})
 
 	// TODO: goodDirectoryFilePaths should work with reference?
-	goodDirectoryFilePaths, err = moveFilesToDateRangeDirectoriesAndFilterDirectories(files, goodDirectoryFilePaths, destinationDirectory)
+	goodDirectoryFilePaths, err = moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectoriesNew(files, goodDirectoryFilePaths, destinationDirectory)
 	if err != nil {
 		return err
 	}
