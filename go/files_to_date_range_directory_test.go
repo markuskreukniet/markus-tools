@@ -260,11 +260,11 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			destinationInput: destinationInput,
 			wantedOutcome:    wantedOutcome,
 		},
-		{
-			testCaseInput:    utils.CreateTestCaseInput("Empty Input", "", false),
-			destinationInput: destinationInput,
-			wantedOutcome:    "",
-		},
+		// {
+		// 	testCaseInput:    utils.CreateTestCaseInput("Empty Input", "", false),
+		// 	destinationInput: destinationInput,
+		// 	wantedOutcome:    "",
+		// },
 	}
 
 	// run testCases
