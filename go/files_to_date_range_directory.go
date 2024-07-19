@@ -281,7 +281,9 @@ func createFilesAndDirectoryFilePaths(filePath string) ([]utils.FileData, []stri
 	return files, goodDirectoryFilePaths, badDirectoryFilePaths, nil
 }
 
-func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectoriesNew(files []utils.FileData, filePaths []string, filePath string) ([]string, error) {
+// TODO: cleaning
+// garbage collection: startDateRange, isFindingDateRange
+func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.FileData, filePaths []string, filePath string) ([]string, error) {
 	length := len(files)
 
 	if length == 0 {
@@ -346,170 +348,6 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectoriesNew(files []util
 	return filePaths, nil
 }
 
-// TODO: cleaning
-// garbage collection: startDateRange, isFindingDateRange
-func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.FileData, filePaths []string, filePath string) ([]string, error) {
-	length := len(files)
-	startDateRange := 0
-	isFindingDateRange := true
-
-	if length == 0 {
-		return filePaths, nil
-	}
-
-	for i := 1; i < length; i++ {
-		iMinusOne := i - 1
-		if isWithin72Hours(files[iMinusOne].FileMetadata.TimeModified, files[i].FileMetadata.TimeModified) {
-			if !isFindingDateRange {
-				isFindingDateRange = true
-				startDateRange = iMinusOne
-			}
-			continue
-		}
-
-		var name string
-		if isFindingDateRange {
-			name = createDirectoryDateRangeName(files[startDateRange].FileMetadata.TimeModified, files[i].FileMetadata.TimeModified)
-			isFindingDateRange = false
-		} else {
-			name = toDateFormat(files[i].FileMetadata.TimeModified)
-			startDateRange = i
-		}
-
-		directoryFilePath := filepath.Join(filePath, name)
-
-		isDirectoryFound := false
-
-		for j, path := range filePaths {
-			if path == directoryFilePath {
-				isDirectoryFound = true
-				filePaths[j] = filePaths[len(filePaths)-1]
-				filePaths = filePaths[:len(filePaths)-1]
-				break
-			}
-		}
-
-		// TODO: should CreateDirectory create a dir with the same rights as parent dir?
-		if !isDirectoryFound {
-			utils.CreateDirectory(directoryFilePath)
-		}
-
-		// add files
-		for j := startDateRange; j <= i; j++ {
-			fullFilePath := filepath.Join(directoryFilePath, files[j].FileMetadata.Name)
-			exists, err := utils.FileOrDirectoryExists(fullFilePath)
-			if err != nil {
-				return nil, err
-			}
-			if !exists {
-				if err := os.Rename(files[j].FileMetadata.Path, fullFilePath); err != nil {
-					return nil, err
-				}
-			}
-		}
-	}
-
-	if isFindingDateRange {
-		lengthMinusOne := length - 1
-
-		name := createDirectoryDateRangeName(files[startDateRange].FileMetadata.TimeModified, files[lengthMinusOne].FileMetadata.TimeModified)
-
-		directoryFilePath := filepath.Join(filePath, name)
-
-		isDirectoryFound := false
-
-		for j, path := range filePaths {
-			if path == directoryFilePath {
-				isDirectoryFound = true
-				filePaths[j] = filePaths[len(filePaths)-1]
-				filePaths = filePaths[:len(filePaths)-1]
-				break
-			}
-		}
-
-		// TODO: should CreateDirectory create a dir with the same rights as parent dir?
-		if !isDirectoryFound {
-			utils.CreateDirectory(directoryFilePath)
-		}
-
-		// add files
-		for j := startDateRange; j <= lengthMinusOne; j++ {
-			fullFilePath := filepath.Join(directoryFilePath, files[j].FileMetadata.Name)
-			exists, err := utils.FileOrDirectoryExists(fullFilePath)
-			if err != nil {
-				return nil, err
-			}
-			if !exists {
-				if err := os.Rename(files[j].FileMetadata.Path, fullFilePath); err != nil {
-					return nil, err
-				}
-			}
-		}
-	}
-
-	return filePaths, nil
-}
-
-// TODO: renaming + cleaning
-// garbage collection: startDateRange, isFindingDateRange, length
-func moveFilesToDateRangeDirectoriesAndFilterDirectories(files []utils.FileData, filePaths []string, filePath string) ([]string, error) {
-	startDateRange := 0
-	isFindingDateRange := false
-	length := len(files)
-
-	for i := 0; i < length; i++ {
-		if i < length-1 && isWithin72Hours(files[i].FileMetadata.TimeModified, files[i+1].FileMetadata.TimeModified) && !isFindingDateRange {
-			isFindingDateRange = true
-			startDateRange = i
-		} else {
-			// directory name
-			//TODO: wrong comment
-			var name string
-			if isFindingDateRange {
-				name = createDirectoryDateRangeName(files[startDateRange].FileMetadata.TimeModified, files[i].FileMetadata.TimeModified)
-				isFindingDateRange = false
-			} else {
-				startDateRange = i
-				name = toDateFormat(files[i].FileMetadata.TimeModified)
-			}
-
-			directoryFilePath := filepath.Join(filePath, name)
-
-			isDirectoryFound := false
-
-			for j, path := range filePaths {
-				if path == directoryFilePath {
-					isDirectoryFound = true
-					filePaths[j] = filePaths[len(filePaths)-1]
-					filePaths = filePaths[:len(filePaths)-1]
-					break
-				}
-			}
-
-			// TODO: should CreateDirectory create a dir with the same rights?
-			if !isDirectoryFound {
-				utils.CreateDirectory(directoryFilePath)
-			}
-
-			// add files
-			for j := startDateRange; j <= i; j++ {
-				fullFilePath := filepath.Join(directoryFilePath, files[j].FileMetadata.Name)
-				exists, err := utils.FileOrDirectoryExists(fullFilePath)
-				if err != nil {
-					return nil, err
-				}
-				if !exists {
-					if err := os.Rename(files[j].FileMetadata.Path, fullFilePath); err != nil {
-						return nil, err
-					}
-				}
-			}
-		}
-	}
-
-	return filePaths, nil
-}
-
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
 	files, goodDirectoryFilePaths, badDirectoryFilePaths, err := createFilesAndDirectoryFilePaths(destinationDirectory)
 	if err != nil {
@@ -531,7 +369,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	})
 
 	// TODO: goodDirectoryFilePaths should work with reference?
-	goodDirectoryFilePaths, err = moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectoriesNew(files, goodDirectoryFilePaths, destinationDirectory)
+	goodDirectoryFilePaths, err = moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files, goodDirectoryFilePaths, destinationDirectory)
 	if err != nil {
 		return err
 	}
