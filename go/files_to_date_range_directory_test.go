@@ -157,7 +157,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	// V trying to add duplicate files to existing directories
 	// contentME110 := createTestContent("m e 11 0")
 	contentME111 := createTestContent("m e 11 1")
-	// contentME1112 := createTestContent("m e 11 1 2")
+	contentME1112 := createTestContent("m e 11 1 2")
 	content11 := createTestContent("11")
 	content111 := createTestContent("11 1")
 	content112 := createTestContent("11 2")
@@ -202,9 +202,11 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 
 	input = input + `
 		directory 1,2020-11-20T20:40:40Z,txt m e 1.txt,` + contentME111 + `;
+		directory 1/directory 2,2020-11-21T20:40:40Z,txt m e 1 2.txt,` + contentME1112 + `;
 	`
 	wantedOutcome = wantedOutcome + `
 		2020-11-20 - 2020-11-23,2020-11-20T20:40:40Z,txt m e 1.txt,` + contentME111 + `;
+		2020-11-20 - 2020-11-23,2020-11-21T20:40:40Z,txt m e 1 2.txt,` + contentME1112 + `;
 	`
 
 	// V removing empty directories and empty directory trees
