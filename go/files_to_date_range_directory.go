@@ -337,6 +337,8 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 			if err != nil {
 				return nil, err
 			}
+			// TODO: we can use file.FileMetadata.Path == fullFilePath instead of exists?
+			// TODO: the file name that exists check can be the same file name as a different file with different content
 			if !exists {
 				if err := os.Rename(file.FileMetadata.Path, fullFilePath); err != nil {
 					return nil, err
