@@ -330,6 +330,7 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 			}
 		}
 
+		// TODO clean and make it more efficient
 		// add files
 		for _, file := range group {
 			fullFilePath := filepath.Join(directoryFilePath, file.FileMetadata.Name)
@@ -339,7 +340,29 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 			}
 			// TODO: we can use file.FileMetadata.Path == fullFilePath instead of exists?
 			// TODO: the file name that exists check can be the same file name as a different file with different content
-			if !exists {
+			// It can't be the same file. There are already files removed so that there are no duplicates
+
+			// the file it wants to add can be itself
+			if exists {
+				hashI, err := utils.HashFile(fullFilePath)
+				if err != nil {
+					return nil, err
+				}
+				hashJ, err := utils.HashFile(file.FileMetadata.Path)
+				if err != nil {
+					return nil, err
+				}
+
+				if hashI != hashJ {
+					extension := filepath.Ext(file.FileMetadata.Name)
+					nameWithoutExtension := strings.TrimSuffix(file.FileMetadata.Name, extension)
+					fullFilePath = filepath.Join(directoryFilePath, nameWithoutExtension+" 2"+extension)
+
+					if err := os.Rename(file.FileMetadata.Path, fullFilePath); err != nil {
+						return nil, err
+					}
+				}
+			} else {
 				if err := os.Rename(file.FileMetadata.Path, fullFilePath); err != nil {
 					return nil, err
 				}
