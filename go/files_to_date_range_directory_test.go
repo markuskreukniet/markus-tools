@@ -155,7 +155,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	// `
 
 	// V trying to add duplicate files to existing directories
-	// contentME110 := createTestContent("m e 11 0")
+	contentME110 := createTestContent("m e 11 0")
 	contentME111 := createTestContent("m e 11 1")
 	contentME1112 := createTestContent("m e 11 1 2")
 	content11 := createTestContent("11")
@@ -188,23 +188,14 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	destinationInput := ""
 	wantedOutcome := ""
 
-	// X move files to existing directories
-	// input = input + `
-	// 	,2020-11-10T20:40:40Z,txt m e 0.txt,` + contentME110 + `;
-	// 	directory 1,2020-11-20T20:40:40Z,txt m e 1.txt,` + contentME111 + `;
-	// 	directory 1/directory 2,2020-11-21T20:40:40Z,txt m e 1 2.txt,` + contentME1112 + `;
-	// `
-	// wantedOutcome = wantedOutcome + `
-	// 	2020-11-10,2020-11-10T20:40:40Z,txt m e 0.txt,` + contentME110 + `;
-	// 	2020-11-20 - 2020-11-22,2020-11-20T20:40:40Z,txt m e 1.txt,` + contentME111 + `;
-	// 	2020-11-20 - 2020-11-22,2020-11-21T20:40:40Z,txt m e 1 2.txt,` + contentME1112 + `;
-	// `
-
+	// X? move files to existing directories
 	input = input + `
+		,2020-11-10T20:40:40Z,txt m e 0.txt,` + contentME110 + `;
 		directory 1,2020-11-20T20:40:40Z,txt m e 1.txt,` + contentME111 + `;
 		directory 1/directory 2,2020-11-21T20:40:40Z,txt m e 1 2.txt,` + contentME1112 + `;
 	`
 	wantedOutcome = wantedOutcome + `
+		2020-11-06 - 2020-11-12,2020-11-10T20:40:40Z,txt m e 0.txt,` + contentME110 + `;
 		2020-11-20 - 2020-11-23,2020-11-20T20:40:40Z,txt m e 1.txt,` + contentME111 + `;
 		2020-11-20 - 2020-11-23,2020-11-21T20:40:40Z,txt m e 1 2.txt,` + contentME1112 + `;
 	`
@@ -231,10 +222,10 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	wantedOutcome = wantedOutcome + `
 		2020-11-01,2020-11-01T20:40:40Z,txt 11.txt,` + content11 + `;
 		2020-11-01,2020-11-01T20:40:40Z,txt 11 1.txt,` + content111 + `;
-		2020-11-06 - 2020-11-07,2020-11-06T20:40:40Z,txt 11.txt,` + content112 + `;
-		2020-11-06 - 2020-11-07,2020-11-07T20:40:40Z,txt 11 1.txt,` + content1112 + `;
-		2020-11-11 - 2020-11-12,2020-11-11T20:40:40Z,txt 11.txt,` + content113 + `;
-		2020-11-11 - 2020-11-12,2020-11-12T20:40:40Z,txt 11 1.txt,` + content1113 + `;
+		2020-11-06 - 2020-11-12,2020-11-06T20:40:40Z,txt 11.txt,` + content112 + `;
+		2020-11-06 - 2020-11-12,2020-11-07T20:40:40Z,txt 11 1.txt,` + content1112 + `;
+		2020-11-06 - 2020-11-12,2020-11-11T20:40:40Z,txt 11 2.txt,` + content113 + `;
+		2020-11-06 - 2020-11-12,2020-11-12T20:40:40Z,txt 11 1 2.txt,` + content1113 + `;
 		2020-11-16,2020-11-16T20:40:40Z,txt 11.txt,` + content114 + `;
 		2020-11-16,2020-11-16T20:40:40Z,txt 11 1.txt,` + content1114 + `;
 		2020-11-20 - 2020-11-23,2020-11-21T20:40:40Z,txt 11.txt,` + content115 + `;
