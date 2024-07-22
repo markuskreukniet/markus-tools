@@ -108,11 +108,11 @@ func CreateFileHashGroups(files []FileData, onlyDuplicates bool) (FilesDataGroup
 		if len(group.files) > 1 {
 			hashMap := make(map[string][]FileData)
 			for _, file := range group.files {
-				hash, err := HashFile(file.FileMetadata.Path)
-				if err != nil {
+				var err error
+				if file.Identifier, err = HashFile(file.FileMetadata.Path); err != nil {
 					return nil, err
 				}
-				hashMap[hash] = append(hashMap[hash], file)
+				hashMap[file.Identifier] = append(hashMap[file.Identifier], file)
 			}
 			for _, hashedFiles := range hashMap {
 				if len(hashedFiles) > 1 || !onlyDuplicates {
