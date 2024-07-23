@@ -8,7 +8,7 @@ import (
 	"unicode"
 )
 
-type FilesByHashGroups []FilesByHashGroup
+type FilesByHashGroups []FilesByHash
 
 func (groups FilesByHashGroups) DidAppendByHash(file FileSystemFileExtra) bool {
 	for i, group := range groups {
@@ -21,7 +21,7 @@ func (groups FilesByHashGroups) DidAppendByHash(file FileSystemFileExtra) bool {
 	return false
 }
 
-type FilesByHashGroup struct {
+type FilesByHash struct {
 	Hash                 string
 	FileSystemFilesExtra []FileSystemFileExtra
 }

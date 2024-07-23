@@ -5,7 +5,7 @@ package main
 +------------------------------------------------+
 | FilesByHashGroups                              |
 +------------------------------------------------+
-| + FilesByHashGroup: []FilesByHashGroup         |
+| + FilesByHash: []FilesByHash                   |
 +------------------------------------------------+
 | + DidAppendByHash(FileSystemFileExtra): bool   | // TODO: add dependency to FileSystemFileExtra
 +------------------------------------------------+
@@ -13,7 +13,7 @@ package main
                         | 0..*
                         |
 +------------------------------------------------+
-| FilesByHashGroup                               |
+| FilesByHash                                    |
 +------------------------------------------------+
 | + Hash: string                                 |
 | + FileSystemFilesExtra: []FileSystemFilesExtra |
