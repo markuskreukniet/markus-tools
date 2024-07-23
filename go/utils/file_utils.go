@@ -276,9 +276,9 @@ func WalkFilterAndHandleFileMetadata(rootFilePath string, mode fileFilterMode, f
 	})
 }
 
-func AppendNonZeroByteFilesNew(nodes []FileSystemNode, files *[]FileSystemFile) error {
+func AppendNonZeroByteFilesNew(nodes []FileSystemNode, files *[]FileSystemFileExtra) error {
 	handler := func(file FileSystemFile) error {
-		*files = append(*files, file)
+		*files = append(*files, CreateFileSystemFileExtra("", file))
 		return nil
 	}
 

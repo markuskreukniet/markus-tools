@@ -17,12 +17,12 @@ func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []uti
 
 func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.FileSystemNode) (string, error) {
 	var result strings.Builder
-	var files []utils.FileData
-	if err := utils.AppendNonZeroByteFiles(uniqueFileSystemNodes, &files); err != nil {
+	var files []utils.FileSystemFileExtra
+	if err := utils.AppendNonZeroByteFilesNew(uniqueFileSystemNodes, &files); err != nil {
 		return "", err
 	}
 
-	groups, err := utils.CreateFileHashGroups(files, true)
+	groups, err := utils.CreateFileSystemFileExtraByHashGroups(files, true)
 	if err != nil {
 		return "", err
 	}
@@ -39,7 +39,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 					return "", err
 				}
 			}
-			if _, err := result.WriteString(file.FileMetadata.Path); err != nil {
+			if _, err := result.WriteString(file.FileSystemFile.Path); err != nil {
 				return "", err
 			}
 		}
