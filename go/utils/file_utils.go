@@ -157,7 +157,7 @@ func ToFileMetadata(filePath string) (FileMetadata, error) {
 	return CreateFileMetadata(filePath, info.Name(), info.ModTime(), info.Size(), info.IsDir()), nil
 }
 
-func WalkFilterAndHandleFileMetadataNew(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileSystemFile) error) error {
+func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileSystemFile) error) error {
 	return filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
 		if err != nil {
 			return err
