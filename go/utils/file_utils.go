@@ -26,6 +26,13 @@ type FilesByHash struct {
 	FileSystemFilesExtra []FileSystemFileExtra
 }
 
+func CreateFilesByHash(hash string, files []FileSystemFileExtra) FilesByHash {
+	return FilesByHash{
+		Hash:                 hash,
+		FileSystemFilesExtra: files,
+	}
+}
+
 type FileSystemFileExtra struct {
 	Hash           string
 	FileSystemFile FileSystemFile
