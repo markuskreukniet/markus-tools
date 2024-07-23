@@ -68,6 +68,65 @@ func WriteTwoNewlineStrings(builder *strings.Builder) (int, error) {
 // 	return result, nil
 // }
 
+// // TODO: does work, but can be improved with code from above here?
+// func CreateFileSystemFileExtraGroups(files []FileSystemFileExtra, onlyDuplicates bool) ([][]FileSystemFileExtra, error) {
+// 	if len(files) == 0 {
+// 		return nil, nil
+// 	}
+
+// 	type filesByFileSize struct {
+// 		fileSize int64
+// 		files    []FileSystemFileExtra
+// 	}
+
+// 	var result [][]FileSystemFileExtra
+// 	var groups []filesByFileSize
+// 	sizeIndex := 0
+
+// 	sort.Slice(files, func(i, j int) bool {
+// 		return files[i].FileSystemFile.FileMetadata.Size < files[j].FileSystemFile.FileMetadata.Size
+// 	})
+
+// 	groups = append(groups, filesByFileSize{
+// 		fileSize: files[0].FileSystemFile.FileMetadata.Size,
+// 		files:    []FileSystemFileExtra{files[0]},
+// 	})
+
+// 	for i := 1; i < len(files); i++ {
+// 		if files[i].FileSystemFile.FileMetadata.Size == groups[sizeIndex].files[0].FileSystemFile.FileMetadata.Size {
+// 			groups[sizeIndex].files = append(groups[sizeIndex].files, files[i])
+// 		} else {
+// 			groups = append(groups, filesByFileSize{
+// 				fileSize: files[i].FileSystemFile.FileMetadata.Size,
+// 				files:    []FileSystemFileExtra{files[i]},
+// 			})
+// 			sizeIndex++
+// 		}
+// 	}
+
+// 	for _, group := range groups {
+// 		if len(group.files) > 1 {
+// 			hashMap := make(map[string][]FileSystemFileExtra)
+// 			for _, file := range group.files {
+// 				var err error
+// 				if file.Hash, err = HashFile(file.FileSystemFile.Path); err != nil {
+// 					return nil, err
+// 				}
+// 				hashMap[file.Hash] = append(hashMap[file.Hash], file)
+// 			}
+// 			for _, hashedFiles := range hashMap {
+// 				if len(hashedFiles) > 1 || !onlyDuplicates {
+// 					result = append(result, hashedFiles)
+// 				}
+// 			}
+// 		} else if !onlyDuplicates {
+// 			result = append(result, group.files)
+// 		}
+// 	}
+
+// 	return result, nil
+// }
+
 // TODO: does work, but can be improved with code from above here?
 func CreateFileHashGroups(files []FileData, onlyDuplicates bool) (FilesDataGroups, error) {
 	if len(files) == 0 {
