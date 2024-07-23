@@ -20,6 +20,24 @@ func CreateFileSystemFileExtra(hash string, file FileSystemFile) FileSystemFileE
 	}
 }
 
+type FilesByHashGroup struct {
+	Hash                 string
+	FileSystemFilesExtra []FileSystemFileExtra
+}
+
+type FilesByHashGroups []FilesByHashGroup
+
+func (groups FilesByHashGroups) DidAppendByHash(file FileSystemFileExtra) bool {
+	for i, group := range groups {
+		if file.Hash == group.Hash {
+			groups[i].FileSystemFilesExtra = append(groups[i].FileSystemFilesExtra, file)
+			return true
+		}
+	}
+
+	return false
+}
+
 type FileSystemFile struct {
 	Data         string
 	Path         string
