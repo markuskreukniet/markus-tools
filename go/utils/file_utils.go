@@ -249,9 +249,7 @@ func AppendNonZeroByteFiles(nodes []FileSystemNode, files *[]FileData) error {
 
 	for _, node := range nodes {
 		if node.IsDirectory {
-			if err := WalkFilterAndHandleFileMetadata(node.Path, FilesWithoutZeroByteFiles, AllFiles, func(file FileMetadata) {
-				handler(file)
-			}); err != nil {
+			if err := WalkFilterAndHandleFileMetadata(node.Path, FilesWithoutZeroByteFiles, AllFiles, handler); err != nil {
 				return err
 			}
 		} else {
