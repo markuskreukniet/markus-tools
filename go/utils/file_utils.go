@@ -149,6 +149,15 @@ func IsNonZeroByteFileATextFile(filePath string) (bool, error) {
 	return true, nil
 }
 
+func ToFileSystemFile(filePath string) (FileSystemFile, error) {
+	info, err := os.Stat(filePath)
+	if err != nil {
+		return FileSystemFile{}, err
+	}
+
+	return CreateFileSystemFile("", filePath, CreateFileMetadata(filePath, info.Name(), info.ModTime(), info.Size(), info.IsDir())), nil
+}
+
 func ToFileMetadata(filePath string) (FileMetadata, error) {
 	info, err := os.Stat(filePath)
 	if err != nil {
@@ -240,6 +249,29 @@ func WalkFilterAndHandleFileMetadata(rootFilePath string, mode fileFilterMode, f
 		handler(CreateFileMetadata(filePath, fileInfo.Name(), fileInfo.ModTime(), size, isDir))
 		return nil
 	})
+}
+
+func AppendNonZeroByteFilesNew(nodes []FileSystemNode, files *[]FileSystemFile) error {
+	handler := func(file FileSystemFile) error {
+		*files = append(*files, file)
+		return nil
+	}
+
+	for _, node := range nodes {
+		if node.IsDirectory {
+			if err := WalkFilterAndHandleFileSystemFile(node.Path, FilesWithoutZeroByteFiles, AllFiles, handler); err != nil {
+				return err
+			}
+		} else {
+			file, err := ToFileSystemFile(node.Path)
+			if err != nil {
+				return err
+			}
+			handler(file)
+		}
+	}
+
+	return nil
 }
 
 func AppendNonZeroByteFiles(nodes []FileSystemNode, files *[]FileData) error {
