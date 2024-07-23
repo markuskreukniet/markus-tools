@@ -13,7 +13,7 @@ package main
                         | 0..*
                         |
 +------------------------------------------------+
-| FilesByHash                                    |
+| «struct» FilesByHash                           |
 +------------------------------------------------+
 | + Hash: string                                 |
 | + FileSystemFilesExtra: []FileSystemFilesExtra |
@@ -23,7 +23,7 @@ package main
                         | 0..*
                         |
 +------------------------------------------------+
-| FileSystemFileExtra                            |
+| «struct» FileSystemFileExtra                   |
 +------------------------------------------------+
 | + Hash: string                                 |
 | + FileSystemFile: FileSystemFile               |
@@ -33,7 +33,7 @@ package main
                         | 1
                         |
 +------------------------------------------------+
-| FileSystemFile                                 |
+| «struct» FileSystemFile                        |
 +------------------------------------------------+
 | + Data:         string                         |
 | + Path:         string                         |
@@ -44,7 +44,7 @@ package main
                         | 1
                         |
 +------------------------------------------------+
-| FileMetadata                                   |
+| «struct» FileMetadata                          |
 +------------------------------------------------+
 | + Name:         string                         |
 | + TimeModified: time.Time                      |
