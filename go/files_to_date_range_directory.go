@@ -176,22 +176,22 @@ func filterAndDeleteDuplicateFiles(files []utils.FileData, destinationDirectory 
 
 	for _, group := range groups {
 		for _, handler := range handlers {
-			if len(group.FilesData) > 1 {
-				err := filterAndDeleteRemainderFiles(&group.FilesData, handler)
+			if len(group) > 1 {
+				err := filterAndDeleteRemainderFiles(&group, handler)
 				if err != nil {
 					return nil, err
 				}
 			} else {
-				files = append(files, group.FilesData[0])
+				files = append(files, group[0])
 				break
 			}
 		}
-		if len(group.FilesData) > 1 {
+		if len(group) > 1 {
 			// append first file and the delete other files
-			files = append(files, group.FilesData[0])
-			group.FilesData[0] = group.FilesData[len(group.FilesData)-1]
-			group.FilesData = group.FilesData[:len(group.FilesData)-1]
-			if err := deleteFiles(group.FilesData); err != nil {
+			files = append(files, group[0])
+			group[0] = group[len(group)-1]
+			group = group[:len(group)-1]
+			if err := deleteFiles(group); err != nil {
 				return nil, err
 			}
 		}

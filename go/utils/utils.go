@@ -128,7 +128,7 @@ func WriteTwoNewlineStrings(builder *strings.Builder) (int, error) {
 // }
 
 // TODO: does work, but can be improved with code from above here?
-func CreateFileHashGroups(files []FileData, onlyDuplicates bool) (FilesDataGroups, error) {
+func CreateFileHashGroups(files []FileData, onlyDuplicates bool) ([][]FileData, error) {
 	if len(files) == 0 {
 		return nil, nil
 	}
@@ -138,7 +138,7 @@ func CreateFileHashGroups(files []FileData, onlyDuplicates bool) (FilesDataGroup
 		files    []FileData
 	}
 
-	var result FilesDataGroups
+	var result [][]FileData
 	var groups []filesByFileSize
 	sizeIndex := 0
 
@@ -175,11 +175,11 @@ func CreateFileHashGroups(files []FileData, onlyDuplicates bool) (FilesDataGroup
 			}
 			for _, hashedFiles := range hashMap {
 				if len(hashedFiles) > 1 || !onlyDuplicates {
-					result = append(result, CreateFilesDataGroup("", hashedFiles))
+					result = append(result, hashedFiles)
 				}
 			}
 		} else if !onlyDuplicates {
-			result = append(result, CreateFilesDataGroup("", group.files))
+			result = append(result, group.files)
 		}
 	}
 

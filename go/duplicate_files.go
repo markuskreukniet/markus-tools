@@ -33,7 +33,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 				return "", err
 			}
 		}
-		for j, file := range group.FilesData {
+		for j, file := range group {
 			if j != 0 {
 				if _, err := utils.WriteNewlineString(&result); err != nil {
 					return "", err
