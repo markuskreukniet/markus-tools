@@ -8,23 +8,6 @@ import (
 	"unicode"
 )
 
-type FileSystemFileExtra struct {
-	Hash           string
-	FileSystemFile FileSystemFile
-}
-
-func CreateFileSystemFileExtra(hash string, file FileSystemFile) FileSystemFileExtra {
-	return FileSystemFileExtra{
-		Hash:           hash,
-		FileSystemFile: file,
-	}
-}
-
-type FilesByHashGroup struct {
-	Hash                 string
-	FileSystemFilesExtra []FileSystemFileExtra
-}
-
 type FilesByHashGroups []FilesByHashGroup
 
 func (groups FilesByHashGroups) DidAppendByHash(file FileSystemFileExtra) bool {
@@ -36,6 +19,23 @@ func (groups FilesByHashGroups) DidAppendByHash(file FileSystemFileExtra) bool {
 	}
 
 	return false
+}
+
+type FilesByHashGroup struct {
+	Hash                 string
+	FileSystemFilesExtra []FileSystemFileExtra
+}
+
+type FileSystemFileExtra struct {
+	Hash           string
+	FileSystemFile FileSystemFile
+}
+
+func CreateFileSystemFileExtra(hash string, file FileSystemFile) FileSystemFileExtra {
+	return FileSystemFileExtra{
+		Hash:           hash,
+		FileSystemFile: file,
+	}
 }
 
 type FileSystemFile struct {
