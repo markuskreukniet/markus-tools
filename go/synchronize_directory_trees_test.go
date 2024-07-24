@@ -30,7 +30,7 @@ func testingHaveDirectoryTreesSameFilePaths(t *testing.T, sourceDirectory, desti
 			return err
 		}
 		destinationPath := filepath.Join(destinationDirectory, relativePath)
-		exists, err := utils.FileOrDirectoryExists(destinationPath)
+		exists, err := utils.FileExists(destinationPath)
 		if err != nil {
 			return err
 		}

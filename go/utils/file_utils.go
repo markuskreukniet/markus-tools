@@ -177,7 +177,7 @@ func AppendNonZeroByteFiles(nodes []FileSystemNode, files *[]FileSystemFileExtra
 	return nil
 }
 
-func FileOrDirectoryExists(filePath string) (bool, error) {
+func FileExists(filePath string) (bool, error) {
 	_, err := os.Stat(filePath)
 	if err == nil {
 		return true, nil

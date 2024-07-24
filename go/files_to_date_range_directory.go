@@ -337,7 +337,7 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 		// add files
 		for _, file := range group {
 			fullFilePath := filepath.Join(directoryFilePath, file.FileSystemFile.FileMetadata.Name)
-			exists, err := utils.FileOrDirectoryExists(fullFilePath)
+			exists, err := utils.FileExists(fullFilePath)
 			if err != nil {
 				return nil, err
 			}

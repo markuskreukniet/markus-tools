@@ -50,7 +50,7 @@ import (
 // 	}
 // }
 
-func TestFileOrDirectoryExists(t *testing.T) {
+func TestFileExists(t *testing.T) {
 	// arrange
 	input := `
 		,,txt 0.txt,;
@@ -86,9 +86,9 @@ func TestFileOrDirectoryExists(t *testing.T) {
 				}
 
 				// act
-				exists, err := FileOrDirectoryExists(filePath)
+				exists, err := FileExists(filePath)
 				if err != nil {
-					t.Errorf("FileOrDirectoryExists error")
+					t.Errorf("FileExists error")
 				}
 
 				// assert
