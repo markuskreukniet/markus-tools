@@ -34,42 +34,6 @@ func CreateFileSystemFile(data, filePath string, metadata FileMetadata) FileSyst
 	}
 }
 
-type FileData struct {
-	Identifier   string // Content or hash of the file
-	FileMetadata FileMetadata
-}
-
-func CreateFileData(identifier string, file FileMetadata) FileData {
-	return FileData{
-		Identifier:   identifier,
-		FileMetadata: file,
-	}
-}
-
-type FilesDataGroup struct {
-	Identifier string
-	FilesData  []FileData
-}
-
-func CreateFilesDataGroup(identifier string, files []FileData) FilesDataGroup {
-	return FilesDataGroup{
-		Identifier: identifier,
-		FilesData:  files,
-	}
-}
-
-type FilesDataGroups []FilesDataGroup
-
-func (groups FilesDataGroups) DidAppendByFileDataIdentifier(file FileData) bool {
-	for i, group := range groups {
-		if file.Identifier == group.Identifier {
-			groups[i].FilesData = append(groups[i].FilesData, file)
-			return true
-		}
-	}
-	return false
-}
-
 type FileMetadata struct {
 	Name         string
 	TimeModified time.Time
