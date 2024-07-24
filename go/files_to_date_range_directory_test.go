@@ -25,7 +25,7 @@ func appendFileSystemFilesExtra(filePath string, files *[]utils.FileSystemFileEx
 		return nil
 	}
 
-	if err := utils.WalkFilterAndHandleFileSystemFile(filePath, utils.FilesAndDirectoriesWithoutZeroByteFiles, utils.AllFiles, handler); err != nil {
+	if err := utils.WalkFilterAndHandleFileSystemFile(filePath, utils.NonZeroByteFilesAndDirectories, utils.AllFiles, handler); err != nil {
 		return err
 	}
 

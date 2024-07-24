@@ -60,12 +60,11 @@ type (
 	fileType       int
 )
 
-// TODO: is NonZeroByteFiles and NonZeroByteFilesAndDirectories better naming?
 const (
 	files fileFilterMode = iota
-	FilesWithoutZeroByteFiles
+	NonZeroByteFiles
 	FilesAndDirectories
-	FilesAndDirectoriesWithoutZeroByteFiles
+	NonZeroByteFilesAndDirectories
 	Directories
 )
 
@@ -129,12 +128,12 @@ func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode,
 		}
 
 		// is directory check
-		if isDir && (mode == files || mode == FilesWithoutZeroByteFiles) {
+		if isDir && (mode == files || mode == NonZeroByteFiles) {
 			return nil
 		}
 
 		// zero byte file check
-		if !isDir && size == 0 && (mode == FilesWithoutZeroByteFiles || mode == FilesAndDirectoriesWithoutZeroByteFiles) {
+		if !isDir && size == 0 && (mode == NonZeroByteFiles || mode == NonZeroByteFilesAndDirectories) {
 			return nil
 		}
 
@@ -162,7 +161,7 @@ func AppendNonZeroByteFiles(nodes []FileSystemNode, files *[]FileSystemFileExtra
 
 	for _, node := range nodes {
 		if node.IsDirectory {
-			if err := WalkFilterAndHandleFileSystemFile(node.Path, FilesWithoutZeroByteFiles, AllFiles, handler); err != nil {
+			if err := WalkFilterAndHandleFileSystemFile(node.Path, NonZeroByteFiles, AllFiles, handler); err != nil {
 				return err
 			}
 		} else {

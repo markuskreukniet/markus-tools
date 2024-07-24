@@ -53,7 +53,7 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 				return nil
 			}
 
-			if err := utils.WalkFilterAndHandleFileSystemFile(node.Path, utils.FilesWithoutZeroByteFiles, utils.PlainTextFiles, handler); err != nil {
+			if err := utils.WalkFilterAndHandleFileSystemFile(node.Path, utils.NonZeroByteFiles, utils.PlainTextFiles, handler); err != nil {
 				return "", err
 			}
 		} else {
