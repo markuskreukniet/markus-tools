@@ -1,7 +1,6 @@
 package main
 
 import (
-	"sort"
 	"testing"
 
 	"github.com/markuskreukniet/markus-tools/go/utils"
@@ -9,87 +8,6 @@ import (
 
 func createTestContent(subContent string) string {
 	return "content" + subContent + "\ncontent" + subContent
-}
-
-func appendFileSystemFilesExtra(filePath string, files *[]utils.FileSystemFileExtra) error {
-	handler := func(file utils.FileSystemFile) error {
-		hash := ""
-		if !file.FileMetadata.IsDirectory {
-			var err error
-			hash, err = utils.HashFile(file.Path)
-			if err != nil {
-				return err
-			}
-		}
-		*files = append(*files, utils.CreateFileSystemFileExtra(hash, file))
-		return nil
-	}
-
-	if err := utils.WalkFilterAndHandleFileSystemFile(filePath, utils.NonZeroByteFilesAndDirectories, utils.AllFiles, handler); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func areFileSystemFilesExtraIdentical(fileI, fileJ utils.FileSystemFileExtra) bool {
-	// FileMetadata
-	// TODO: compare TimeModified
-	if fileI.FileSystemFile.FileMetadata.IsDirectory != fileJ.FileSystemFile.FileMetadata.IsDirectory ||
-		fileI.FileSystemFile.FileMetadata.Name != fileJ.FileSystemFile.FileMetadata.Name ||
-		fileI.FileSystemFile.FileMetadata.Size != fileJ.FileSystemFile.FileMetadata.Size {
-		return false
-	}
-
-	// FileSystemFile and FileSystemFileExtra
-	// TODO: compare filePath
-	if fileI.FileSystemFile.Data != fileJ.FileSystemFile.Data ||
-		fileI.Hash != fileJ.Hash {
-		return false
-	}
-
-	return true
-}
-
-func sortFileSystemFilesExtraOnName(files *[]utils.FileSystemFileExtra) {
-	sort.Slice(*files, func(i, j int) bool {
-		return (*files)[i].FileSystemFile.FileMetadata.Name < (*files)[j].FileSystemFile.FileMetadata.Name
-	})
-}
-
-func areFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) {
-	if filePathI == "" || filePathJ == "" {
-		return false, nil
-	}
-
-	var filesI, filesJ []utils.FileSystemFileExtra
-
-	if err := appendFileSystemFilesExtra(filePathI, &filesI); err != nil {
-		return false, err
-	}
-	if err := appendFileSystemFilesExtra(filePathJ, &filesJ); err != nil {
-		return false, err
-	}
-
-	length := len(filesI)
-
-	if length != len(filesJ) {
-		return false, nil
-	}
-
-	filesI[0].FileSystemFile.FileMetadata.Name = ""
-	filesJ[0].FileSystemFile.FileMetadata.Name = ""
-
-	sortFileSystemFilesExtraOnName(&filesI)
-	sortFileSystemFilesExtraOnName(&filesJ)
-
-	for i := 1; i < length; i++ {
-		if !areFileSystemFilesExtraIdentical(filesI[i], filesJ[i]) {
-			return false, nil
-		}
-	}
-
-	return true, nil
 }
 
 func TestFilesToDateRangeDirectory(t *testing.T) {
@@ -286,9 +204,9 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			// assert
 			// TODO: wantErr check
 
-			areIdentical, err := areFileTreeDescendantsIdentical(destination, wantedOutcomeDestination)
+			areIdentical, err := utils.AreFileTreeDescendantsIdentical(destination, wantedOutcomeDestination)
 			if err != nil {
-				t.Errorf("areFileTreeDescendantsIdentical error: %v", err)
+				t.Errorf("AreFileTreeDescendantsIdentical error: %v", err)
 			}
 
 			if !areIdentical {

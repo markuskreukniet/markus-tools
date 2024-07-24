@@ -13,38 +13,6 @@ type filePathEndPartContent struct {
 	content         string
 }
 
-func testingHaveDirectoryTreesSameFilePaths(t *testing.T, sourceDirectory, destinationDirectory string) bool {
-	t.Helper()
-	if sourceDirectory == "" || destinationDirectory == "" {
-		return false
-	}
-
-	// Do the directory trees have the same file paths?
-	haveSameFilePaths := true
-	err := filepath.Walk(sourceDirectory, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		relativePath, err := filepath.Rel(sourceDirectory, path)
-		if err != nil {
-			return err
-		}
-		destinationPath := filepath.Join(destinationDirectory, relativePath)
-		exists, err := utils.FileExists(destinationPath)
-		if err != nil {
-			return err
-		}
-		if !exists {
-			haveSameFilePaths = false
-		}
-		return nil
-	})
-	if err != nil {
-		t.Errorf("Failed to walk through directory: %v", err)
-	}
-	return haveSameFilePaths
-}
-
 func TestSynchronizeDirectoryTrees(t *testing.T) {
 	// arrange
 	newContent := "content directory 2/directory\ncontent 3 2-3 2 new"
@@ -107,14 +75,15 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 
 			// assert
 			utils.TestingAssertErrorToWantError(t, err, tc.metadata.WantErr)
-			haveSameFilePaths := testingHaveDirectoryTreesSameFilePaths(t, sourceDirectory, destinationDirectory)
-			if tc.wantSameFilePaths && !haveSameFilePaths {
-				t.Errorf("The source and destination directory trees do not have the same file paths.")
+
+			areIdentical, err := utils.AreFileTreeDescendantsIdentical(sourceDirectory, destinationDirectory)
+			if err != nil {
+				t.Errorf("AreFileTreeDescendantsIdentical error: %v", err)
 			}
-			haveSameFilePaths = testingHaveDirectoryTreesSameFilePaths(t, destinationDirectory, sourceDirectory)
-			if tc.wantSameFilePaths && !haveSameFilePaths {
-				t.Errorf("The destination and source directory trees do not have the same file paths.")
+			if tc.wantSameFilePaths && !areIdentical {
+				t.Errorf("tc.wantSameFilePaths && !areIdentical error: %v", err)
 			}
+
 			if tc.updatedFile.filePathEndPart != "" && tc.updatedFile.content != "" {
 				content, err := os.ReadFile(utils.ToFilePathFromSlashAndJoin(destinationDirectory, tc.updatedFile.filePathEndPart))
 				if err != nil {
