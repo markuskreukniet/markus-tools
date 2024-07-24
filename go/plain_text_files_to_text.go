@@ -48,25 +48,26 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 	var filePaths []string
 	for _, node := range uniqueFileSystemNodes {
 		if node.IsDirectory {
-			handler := func(metadata utils.FileMetadata) {
-				filePaths = append(filePaths, metadata.Path)
+			handler := func(file utils.FileSystemFile) error {
+				filePaths = append(filePaths, file.Path)
+				return nil
 			}
 
-			if err := utils.WalkFilterAndHandleFileMetadata(node.Path, utils.FilesWithoutZeroByteFiles, utils.PlainTextFiles, handler); err != nil {
+			if err := utils.WalkFilterAndHandleFileSystemFile(node.Path, utils.FilesWithoutZeroByteFiles, utils.PlainTextFiles, handler); err != nil {
 				return "", err
 			}
 		} else {
-			metadata, err := utils.ToFileMetadata(node.Path)
+			file, err := utils.ToFileSystemFile(node.Path)
 			if err != nil {
 				return "", err
 			}
-			if metadata.IsNonZeroByte() {
-				isTextFile, err := utils.IsNonZeroByteFileATextFile(metadata.Path)
+			if file.FileMetadata.Size > 0 {
+				isTextFile, err := utils.IsNonZeroByteFileATextFile(file.Path)
 				if err != nil {
 					return "", err
 				}
 				if isTextFile {
-					filePaths = append(filePaths, metadata.Path)
+					filePaths = append(filePaths, file.Path)
 				}
 			}
 		}

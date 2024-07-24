@@ -8,31 +8,6 @@ import (
 	"unicode"
 )
 
-type FilesByHashGroups []FilesByHash
-
-func (groups FilesByHashGroups) DidAppendByHash(file FileSystemFileExtra) bool {
-	for i, group := range groups {
-		if file.Hash == group.Hash {
-			groups[i].FileSystemFilesExtra = append(groups[i].FileSystemFilesExtra, file)
-			return true
-		}
-	}
-
-	return false
-}
-
-type FilesByHash struct {
-	Hash                 string
-	FileSystemFilesExtra []FileSystemFileExtra
-}
-
-func CreateFilesByHash(hash string, files []FileSystemFileExtra) FilesByHash {
-	return FilesByHash{
-		Hash:                 hash,
-		FileSystemFilesExtra: files,
-	}
-}
-
 type FileSystemFileExtra struct {
 	Hash           string
 	FileSystemFile FileSystemFile
@@ -59,10 +34,6 @@ func CreateFileSystemFile(data, filePath string, metadata FileMetadata) FileSyst
 	}
 }
 
-// TODO: FileData is bad naming. A hash and metadata is not file data. // FSFile is better naming // File might become a reserved keyword and it might be already used in Go standard libraries
-// FileData holds comprehensive information about a file or directory.
-// The Identifier field can store either the actual content of the file or a hash of it,
-// which makes it useful for various purposes, including as an identifier in unit tests.
 type FileData struct {
 	Identifier   string // Content or hash of the file
 	FileMetadata FileMetadata
@@ -99,23 +70,15 @@ func (groups FilesDataGroups) DidAppendByFileDataIdentifier(file FileData) bool 
 	return false
 }
 
-// TODO: For some use cases, FileMetadata has too many fields. Maybe we can use interfaces to solve that problem. Or maybe use viewModels
-// TODO: FileMetadata should not have Path
 type FileMetadata struct {
-	Path         string
 	Name         string
 	TimeModified time.Time
 	Size         int64
 	IsDirectory  bool // It should be a file type, but there is no use case.
 }
 
-func (metadata FileMetadata) IsNonZeroByte() bool {
-	return metadata.Size > 0
-}
-
 func CreateFileMetadata(path, name string, timeModified time.Time, size int64, isDirectory bool) FileMetadata {
 	return FileMetadata{
-		Path:         path,
 		Name:         name,
 		TimeModified: timeModified,
 		Size:         size,
