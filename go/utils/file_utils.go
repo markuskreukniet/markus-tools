@@ -110,14 +110,6 @@ func ToFileSystemFile(filePath string) (FileSystemFile, error) {
 	return CreateFileSystemFile("", filePath, CreateFileMetadata(filePath, info.Name(), info.ModTime(), info.Size(), info.IsDir())), nil
 }
 
-func ToFileMetadata(filePath string) (FileMetadata, error) {
-	info, err := os.Stat(filePath)
-	if err != nil {
-		return FileMetadata{}, err
-	}
-	return CreateFileMetadata(filePath, info.Name(), info.ModTime(), info.Size(), info.IsDir()), nil
-}
-
 func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileSystemFile) error) error {
 	return filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
 		if err != nil {
@@ -158,47 +150,6 @@ func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode,
 			return err
 		}
 
-		return nil
-	})
-}
-
-func WalkFilterAndHandleFileMetadata(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileMetadata)) error {
-	return filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		isDir := fileInfo.IsDir()
-
-		var size int64
-		if !isDir {
-			size = fileInfo.Size()
-		}
-
-		// is file check
-		if !isDir && mode == Directories {
-			return nil
-		}
-
-		// is directory check
-		if isDir && (mode == files || mode == FilesWithoutZeroByteFiles) {
-			return nil
-		}
-
-		// zero byte file check
-		if !isDir && size == 0 && (mode == FilesWithoutZeroByteFiles || mode == FilesAndDirectoriesWithoutZeroByteFiles) {
-			return nil
-		}
-
-		// file type check
-		if fileType == PlainTextFiles {
-			isTextFile, err := IsNonZeroByteFileATextFile(filePath)
-			if err != nil || !isTextFile {
-				return err
-			}
-		}
-
-		handler(CreateFileMetadata(filePath, fileInfo.Name(), fileInfo.ModTime(), size, isDir))
 		return nil
 	})
 }
