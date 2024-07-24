@@ -276,7 +276,7 @@ func WalkFilterAndHandleFileMetadata(rootFilePath string, mode fileFilterMode, f
 	})
 }
 
-func AppendNonZeroByteFilesNew(nodes []FileSystemNode, files *[]FileSystemFileExtra) error {
+func AppendNonZeroByteFiles(nodes []FileSystemNode, files *[]FileSystemFileExtra) error {
 	handler := func(file FileSystemFile) error {
 		*files = append(*files, CreateFileSystemFileExtra("", file))
 		return nil
@@ -289,28 +289,6 @@ func AppendNonZeroByteFilesNew(nodes []FileSystemNode, files *[]FileSystemFileEx
 			}
 		} else {
 			file, err := ToFileSystemFile(node.Path)
-			if err != nil {
-				return err
-			}
-			handler(file)
-		}
-	}
-
-	return nil
-}
-
-func AppendNonZeroByteFiles(nodes []FileSystemNode, files *[]FileData) error {
-	handler := func(metadata FileMetadata) {
-		*files = append(*files, CreateFileData("", metadata))
-	}
-
-	for _, node := range nodes {
-		if node.IsDirectory {
-			if err := WalkFilterAndHandleFileMetadata(node.Path, FilesWithoutZeroByteFiles, AllFiles, handler); err != nil {
-				return err
-			}
-		} else {
-			file, err := ToFileMetadata(node.Path)
 			if err != nil {
 				return err
 			}
