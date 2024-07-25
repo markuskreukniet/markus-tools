@@ -69,7 +69,7 @@ func createFileSystemFileByInputLine(t *testing.T, inputLine string) FileSystemF
 	timeModified := TestingParseTime(t, fields[1])
 	isDirectory := name == ""
 
-	return CreateFileSystemFile(data, filePath, CreateFileMetadata("", name, timeModified, 0, isDirectory))
+	return CreateFileSystemFile(data, filePath, CreateFileMetadata(name, timeModified, 0, isDirectory))
 }
 
 func CreateSortedRawInputLines(rawDelimitedSemicolonString string) []string {

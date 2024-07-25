@@ -243,7 +243,7 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 			*files = append(*files,
 				utils.CreateFileSystemFileExtra("",
 					utils.CreateFileSystemFile("", fullPath,
-						utils.CreateFileMetadata("", info.Name(), info.ModTime(), info.Size(), false))))
+						utils.CreateFileMetadata(info.Name(), info.ModTime(), info.Size(), false))))
 		}
 	}
 	return nil

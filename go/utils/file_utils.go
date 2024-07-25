@@ -41,7 +41,7 @@ type FileMetadata struct {
 	IsDirectory  bool // It should be a file type, but there is no use case.
 }
 
-func CreateFileMetadata(path, name string, timeModified time.Time, size int64, isDirectory bool) FileMetadata {
+func CreateFileMetadata(name string, timeModified time.Time, size int64, isDirectory bool) FileMetadata {
 	return FileMetadata{
 		Name:         name,
 		TimeModified: timeModified,
@@ -106,7 +106,7 @@ func ToFileSystemFile(filePath string) (FileSystemFile, error) {
 		return FileSystemFile{}, err
 	}
 
-	return CreateFileSystemFile("", filePath, CreateFileMetadata(filePath, info.Name(), info.ModTime(), info.Size(), info.IsDir())), nil
+	return CreateFileSystemFile("", filePath, CreateFileMetadata(info.Name(), info.ModTime(), info.Size(), info.IsDir())), nil
 }
 
 func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileSystemFile) error) error {
@@ -145,7 +145,7 @@ func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode,
 			}
 		}
 
-		if err := handler(CreateFileSystemFile("", filePath, CreateFileMetadata("", fileInfo.Name(), fileInfo.ModTime(), size, isDir))); err != nil {
+		if err := handler(CreateFileSystemFile("", filePath, CreateFileMetadata(fileInfo.Name(), fileInfo.ModTime(), size, isDir))); err != nil {
 			return err
 		}
 
