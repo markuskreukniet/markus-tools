@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -70,6 +71,37 @@ func createFileSystemFileByInputLine(t *testing.T, inputLine string) FileSystemF
 	isDirectory := name == ""
 
 	return CreateFileSystemFile(data, filePath, CreateFileMetadata(name, timeModified, 0, isDirectory))
+}
+
+func CreateSortedFileSystemFiles(t *testing.T, rawDelimitedSemicolonString string) []FileSystemFile {
+	t.Helper()
+
+	var files []FileSystemFile
+	var inputLine []rune
+	isCreatingInputLine := false
+
+	rawDelimitedSemicolonString = strings.TrimSpace(rawDelimitedSemicolonString)
+
+	for _, r := range rawDelimitedSemicolonString {
+		if isCreatingInputLine {
+			if r != ';' {
+				inputLine = append(inputLine, r)
+			} else {
+				files = append(files, createFileSystemFileByInputLine(t, string(inputLine)))
+				inputLine = nil
+				isCreatingInputLine = false
+			}
+		} else if !unicode.IsSpace(r) {
+			inputLine = append(inputLine, r)
+			isCreatingInputLine = true
+		}
+	}
+
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].Path < files[j].Path
+	})
+
+	return files
 }
 
 func CreateSortedRawInputLines(rawDelimitedSemicolonString string) []string {
