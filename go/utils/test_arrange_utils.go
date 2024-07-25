@@ -58,7 +58,7 @@ func CreateInputLine(delimitedCommaString string) InputLine {
 // RawInputLines
 type RawInputLines []string
 
-func CreateSortedRawInputLinesNew(rawDelimitedSemicolonString string) []string {
+func CreateSortedRawInputLines(rawDelimitedSemicolonString string) []string {
 	var inputLines []string
 	var inputLine []rune
 	isCreatingInputLine := false
@@ -74,7 +74,7 @@ func CreateSortedRawInputLinesNew(rawDelimitedSemicolonString string) []string {
 				inputLine = nil
 				isCreatingInputLine = false
 			}
-		} else if unicode.IsLetter(r) || r == ',' {
+		} else if !unicode.IsSpace(r) {
 			inputLine = append(inputLine, r)
 			isCreatingInputLine = true
 		}
@@ -83,12 +83,6 @@ func CreateSortedRawInputLinesNew(rawDelimitedSemicolonString string) []string {
 	slices.Sort(inputLines)
 
 	return inputLines
-}
-
-func CreateSortedRawInputLines(delimitedSemicolonString string) RawInputLines {
-	rawInputLines := strings.Split(strings.TrimSuffix(strings.TrimSpace(delimitedSemicolonString), ";"), ";")
-	slices.Sort(rawInputLines)
-	return rawInputLines
 }
 
 // TestCase
