@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"unicode"
 )
 
 // InputLine
@@ -56,6 +57,33 @@ func CreateInputLine(delimitedCommaString string) InputLine {
 
 // RawInputLines
 type RawInputLines []string
+
+func CreateSortedRawInputLinesNew(rawDelimitedSemicolonString string) []string {
+	var inputLines []string
+	var inputLine []rune
+	isCreatingInputLine := false
+
+	rawDelimitedSemicolonString = strings.TrimSpace(rawDelimitedSemicolonString)
+
+	for _, r := range rawDelimitedSemicolonString {
+		if isCreatingInputLine {
+			if r != ';' {
+				inputLine = append(inputLine, r)
+			} else {
+				inputLines = append(inputLines, string(inputLine))
+				inputLine = nil
+				isCreatingInputLine = false
+			}
+		} else if unicode.IsLetter(r) || r == ',' {
+			inputLine = append(inputLine, r)
+			isCreatingInputLine = true
+		}
+	}
+
+	slices.Sort(inputLines)
+
+	return inputLines
+}
 
 func CreateSortedRawInputLines(delimitedSemicolonString string) RawInputLines {
 	rawInputLines := strings.Split(strings.TrimSuffix(strings.TrimSpace(delimitedSemicolonString), ";"), ";")
