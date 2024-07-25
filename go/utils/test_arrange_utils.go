@@ -58,6 +58,20 @@ func CreateInputLine(delimitedCommaString string) InputLine {
 // RawInputLines
 type RawInputLines []string
 
+func createFileSystemFileByInputLine(t *testing.T, inputLine string) FileSystemFile {
+	t.Helper()
+
+	fields := strings.Split(inputLine, ",")
+
+	data := fields[3]
+	name := fields[2]
+	filePath := filepath.Join(fields[0], name)
+	timeModified := TestingParseTime(t, fields[1])
+	isDirectory := name == ""
+
+	return CreateFileSystemFile(data, filePath, CreateFileMetadata("", name, timeModified, 0, isDirectory))
+}
+
 func CreateSortedRawInputLines(rawDelimitedSemicolonString string) []string {
 	var inputLines []string
 	var inputLine []rune
