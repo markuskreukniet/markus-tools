@@ -50,7 +50,7 @@ func (line InputLine) GetDirectoryPathPartWithFileName() string {
 
 func CreateInputLine(delimitedCommaString string) InputLine {
 	return InputLine{
-		elements:                      strings.Split(strings.TrimSpace(delimitedCommaString), ","),
+		elements:                      strings.Split(delimitedCommaString, ","),
 		directoryPathPartWithFileName: "",
 	}
 }
