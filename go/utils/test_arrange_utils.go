@@ -66,11 +66,12 @@ func createFileSystemFileByInputLine(t *testing.T, inputLine string) FileSystemF
 
 	data := fields[3]
 	name := fields[2]
-	filePath := filepath.Join(fields[0], name)
+	directoryPath := fields[0]
+	filePath := filepath.Join(directoryPath, name)
 	timeModified := TestingParseTime(t, fields[1])
 	isDirectory := name == ""
 
-	return CreateFileSystemFile(data, filePath, CreateFileMetadata(name, timeModified, 0, isDirectory))
+	return CreateFileSystemFile(data, filePath, CreateFileMetadata(name, directoryPath, timeModified, 0, isDirectory))
 }
 
 func createSortedFileSystemFiles(t *testing.T, rawDelimitedSemicolonString string) []FileSystemFile {
