@@ -68,8 +68,12 @@ func createFileSystemFileByInputLine(t *testing.T, inputLine string) FileSystemF
 	name := fields[2]
 	directoryPath := fields[0]
 	filePath := filepath.Join(directoryPath, name)
-	timeModified := TestingParseTime(t, fields[1])
 	isDirectory := name == ""
+
+	var timeModified time.Time
+	if fields[1] != "" {
+		timeModified = TestingParseTime(t, fields[1])
+	}
 
 	return CreateFileSystemFile(data, filePath, CreateFileMetadata(name, directoryPath, timeModified, 0, isDirectory))
 }
@@ -176,6 +180,7 @@ func TestingWriteFileWithContentAndIndex(t *testing.T, filePath string, index in
 	return writtenContent
 }
 
+// TODO: should only receive t and file?
 func TestingWriteFile(t *testing.T, filePath string, content string) {
 	t.Helper()
 	if err := os.WriteFile(filePath, []byte(content), 0666); err != nil {
@@ -216,13 +221,23 @@ func TestingParseTime(t *testing.T, timeString string) time.Time {
 	return parsedTime
 }
 
-// func testingAsdf(t *testing.T, ) {
-// 	t.Helper()
+func testingIfFileWriteItAndAppendFileSystemNode(t *testing.T, file FileSystemFile, nodes *[]FileSystemNode) {
+	t.Helper()
 
-// 	if !line.IsDirectory() {
+	if !file.FileMetadata.IsDirectory {
+		TestingWriteFile(t, file.Path, file.Data)
+		if !file.FileMetadata.TimeModified.IsZero() {
+			if err := os.Chtimes(file.Path, time.Now(), file.FileMetadata.TimeModified); err != nil {
+				t.Errorf("Failed to change the access and modification times of the file: %v", err)
+			}
+		}
+	}
 
-// 	}
-// }
+	*nodes = append(*nodes, FileSystemNode{
+		Path:        file.Path,
+		IsDirectory: file.FileMetadata.IsDirectory,
+	})
+}
 
 func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, filePath string, line InputLine, fileSystemNodes *[]FileSystemNode) {
 	t.Helper()
@@ -310,43 +325,35 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 	return tempDirectories, fileSystemNodes
 }
 
-// // This function has to stay for synchronizing directory trees.
-// // When we add a prefix to all input lines so that TestingCreateFilesByMultipleInputs can be used, all the folders with that prefix are added to the destination directory when syncing.
-// // It should not always have to return a slice, but it is fine for testing.
-// // And disk I/O operations are significantly slower than in-memory operations.
-// func TestingCreateFilesByOneInput(t *testing.T, input string) (string, []FileSystemNode) {
-// 	t.Helper()
+// This function has to stay for synchronizing directory trees.
+// When we add a prefix to all input lines so that TestingCreateFilesByMultipleInputs can be used, all the folders with that prefix are added to the destination directory when syncing.
+// It should not always have to return a slice, but it is fine for testing.
+// And disk I/O operations are significantly slower than in-memory operations.
+func TestingCreateFilesByOneInput(t *testing.T, input string) (string, []FileSystemNode) {
+	t.Helper()
 
-// 	if isInputEmpty(input) {
-// 		return "", nil
-// 	}
+	if isInputEmpty(input) {
+		return "", nil
+	}
 
-// 	directory := CreateTemporaryDirectory(t)
+	directory := CreateTemporaryDirectory(t)
 
-// 	var nodes []FileSystemNode
-// 	var previousDirectoryPath string
+	var nodes []FileSystemNode
+	var previousDirectoryPath string
+	files := createSortedFileSystemFiles(t, input) // TODO: should receive directory to make complete file paths
 
-// 	for _, file := range createSortedFileSystemFiles(t, input) {
-// 		directoryPath := ToFilePathFromSlashAndJoin(directory, file.FileMetadata.DirectoryPath)
-// 		if previousDirectoryPath != directoryPath {
-// 			TestingCreateDirectoryAll(t, directoryPath)
-// 			previousDirectoryPath = directoryPath
-// 		}
-// 	}
+	for i := range files {
+		files[i].FileMetadata.DirectoryPath = ToFilePathFromSlashAndJoin(directory, files[i].FileMetadata.DirectoryPath)
+		if previousDirectoryPath != files[i].FileMetadata.DirectoryPath {
+			TestingCreateDirectoryAll(t, files[i].FileMetadata.DirectoryPath)
+			previousDirectoryPath = files[i].FileMetadata.DirectoryPath
+		}
+		files[i].Path = filepath.Join(files[i].FileMetadata.DirectoryPath, files[i].FileMetadata.Name)
+		testingIfFileWriteItAndAppendFileSystemNode(t, files[i], &nodes)
+	}
 
-// 	for _, rawLine := range CreateSortedRawInputLines(input) {
-// 		line := CreateInputLine(rawLine)
-// 		path := ToFilePathFromSlashAndJoin(directory, line.GetDirectoryPathPart())
-// 		if line.GetDirectoryPathPart() != previousPathPart {
-// 			TestingCreateDirectoryAll(t, path)
-
-// 			// probably not optimal but results in less code, which is fine for testing
-// 			previousPathPart = line.GetDirectoryPathPart()
-// 		}
-// 		testingIfFileCreateFileAndAppendFileSystemNode(t, path, line, &nodes)
-// 	}
-// 	return directory, nodes
-// }
+	return directory, nodes
+}
 
 // This function has to stay for synchronizing directory trees.
 // When we add a prefix to all input lines so that TestingCreateFilesAndDirectoriesByMultipleInputs can be used, all the folders with that prefix are added to the destination directory when syncing.
