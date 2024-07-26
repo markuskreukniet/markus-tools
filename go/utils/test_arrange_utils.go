@@ -216,6 +216,14 @@ func TestingParseTime(t *testing.T, timeString string) time.Time {
 	return parsedTime
 }
 
+// func testingAsdf(t *testing.T, ) {
+// 	t.Helper()
+
+// 	if !line.IsDirectory() {
+
+// 	}
+// }
+
 func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, filePath string, line InputLine, fileSystemNodes *[]FileSystemNode) {
 	t.Helper()
 	if !line.IsDirectory() {
@@ -316,10 +324,14 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 // 	directory := CreateTemporaryDirectory(t)
 
 // 	var nodes []FileSystemNode
-// 	var previousPathPart string
+// 	var previousDirectoryPath string
 
 // 	for _, file := range createSortedFileSystemFiles(t, input) {
-
+// 		directoryPath := ToFilePathFromSlashAndJoin(directory, file.FileMetadata.DirectoryPath)
+// 		if previousDirectoryPath != directoryPath {
+// 			TestingCreateDirectoryAll(t, directoryPath)
+// 			previousDirectoryPath = directoryPath
+// 		}
 // 	}
 
 // 	for _, rawLine := range CreateSortedRawInputLines(input) {
