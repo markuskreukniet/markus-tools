@@ -240,11 +240,10 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 			if err != nil {
 				return err
 			}
-			// TODO: directoryPath
 			*files = append(*files,
 				utils.CreateFileSystemFileExtra("",
 					utils.CreateFileSystemFile("", fullPath,
-						utils.CreateFileMetadata(info.Name(), "", info.ModTime(), info.Size(), false))))
+						utils.CreateFileMetadata(info.Name(), path, info.ModTime(), info.Size(), false))))
 		}
 	}
 	return nil

@@ -108,8 +108,14 @@ func ToFileSystemFile(filePath string) (FileSystemFile, error) {
 		return FileSystemFile{}, err
 	}
 
-	// TODO: directoryPath
-	return CreateFileSystemFile("", filePath, CreateFileMetadata(info.Name(), "", info.ModTime(), info.Size(), info.IsDir())), nil
+	directoryPath := filePath
+	isDirectory := info.IsDir()
+
+	if !isDirectory {
+		directoryPath = filepath.Dir(filePath)
+	}
+
+	return CreateFileSystemFile("", filePath, CreateFileMetadata(info.Name(), directoryPath, info.ModTime(), info.Size(), isDirectory)), nil
 }
 
 func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileSystemFile) error) error {
