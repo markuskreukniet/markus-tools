@@ -102,20 +102,27 @@ func IsNonZeroByteFileATextFile(filePath string) (bool, error) {
 	return true, nil
 }
 
+func toDirectoryPath(filePath string, isDirectory bool) string {
+	directoryPath := filePath
+
+	if !isDirectory {
+		directoryPath = filepath.Dir(filePath)
+	}
+
+	return directoryPath
+}
+
 func ToFileSystemFile(filePath string) (FileSystemFile, error) {
 	info, err := os.Stat(filePath)
 	if err != nil {
 		return FileSystemFile{}, err
 	}
 
-	directoryPath := filePath
 	isDirectory := info.IsDir()
 
-	if !isDirectory {
-		directoryPath = filepath.Dir(filePath)
-	}
-
-	return CreateFileSystemFile("", filePath, CreateFileMetadata(info.Name(), directoryPath, info.ModTime(), info.Size(), isDirectory)), nil
+	return CreateFileSystemFile("",
+		filePath,
+		CreateFileMetadata(info.Name(), toDirectoryPath(filePath, isDirectory), info.ModTime(), info.Size(), isDirectory)), nil
 }
 
 func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileSystemFile) error) error {
@@ -154,8 +161,9 @@ func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode,
 			}
 		}
 
-		// TODO: directoryPath
-		if err := handler(CreateFileSystemFile("", filePath, CreateFileMetadata(fileInfo.Name(), "", fileInfo.ModTime(), size, isDir))); err != nil {
+		if err := handler(CreateFileSystemFile("",
+			filePath,
+			CreateFileMetadata(fileInfo.Name(), toDirectoryPath(filePath, isDir), fileInfo.ModTime(), size, isDir))); err != nil {
 			return err
 		}
 
