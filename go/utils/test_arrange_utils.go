@@ -59,14 +59,14 @@ func CreateInputLine(delimitedCommaString string) InputLine {
 // RawInputLines
 type RawInputLines []string
 
-func createFileSystemFileByInputLine(t *testing.T, inputLine string) FileSystemFile {
+func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine string) FileSystemFile {
 	t.Helper()
 
 	fields := strings.Split(inputLine, ",")
 
+	directoryPath = ToFilePathFromSlashAndJoin(directoryPath, fields[0])
 	data := fields[3]
 	name := fields[2]
-	directoryPath := fields[0]
 	filePath := filepath.Join(directoryPath, name)
 	isDirectory := name == ""
 
@@ -78,7 +78,7 @@ func createFileSystemFileByInputLine(t *testing.T, inputLine string) FileSystemF
 	return CreateFileSystemFile(data, filePath, CreateFileMetadata(name, directoryPath, timeModified, 0, isDirectory))
 }
 
-func createSortedFileSystemFiles(t *testing.T, rawDelimitedSemicolonString string) []FileSystemFile {
+func createSortedFileSystemFiles(t *testing.T, directoryPath, rawDelimitedSemicolonString string) []FileSystemFile {
 	t.Helper()
 
 	var files []FileSystemFile
@@ -92,7 +92,7 @@ func createSortedFileSystemFiles(t *testing.T, rawDelimitedSemicolonString strin
 			if r != ';' {
 				inputLine = append(inputLine, r)
 			} else {
-				files = append(files, createFileSystemFileByInputLine(t, string(inputLine)))
+				files = append(files, createFileSystemFileByInputLine(t, directoryPath, string(inputLine)))
 				inputLine = nil
 				isCreatingInputLine = false
 			}
@@ -340,15 +340,13 @@ func TestingCreateFilesByOneInput(t *testing.T, input string) (string, []FileSys
 
 	var nodes []FileSystemNode
 	var previousDirectoryPath string
-	files := createSortedFileSystemFiles(t, input) // TODO: should receive directory to make complete file paths
+	files := createSortedFileSystemFiles(t, directory, input)
 
 	for i := range files {
-		files[i].FileMetadata.DirectoryPath = ToFilePathFromSlashAndJoin(directory, files[i].FileMetadata.DirectoryPath)
 		if previousDirectoryPath != files[i].FileMetadata.DirectoryPath {
 			TestingCreateDirectoryAll(t, files[i].FileMetadata.DirectoryPath)
 			previousDirectoryPath = files[i].FileMetadata.DirectoryPath
 		}
-		files[i].Path = filepath.Join(files[i].FileMetadata.DirectoryPath, files[i].FileMetadata.Name)
 		testingIfFileWriteItAndAppendFileSystemNode(t, files[i], &nodes)
 	}
 
