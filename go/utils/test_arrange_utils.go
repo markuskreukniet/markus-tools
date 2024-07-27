@@ -326,10 +326,10 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 }
 
 // This function has to stay for synchronizing directory trees.
-// When we add a prefix to all input lines so that TestingCreateFilesByMultipleInputs can be used, all the folders with that prefix are added to the destination directory when syncing.
+// When we add a prefix to all input lines so that TestingWriteFilesByMultipleInputs can be used, all the folders with that prefix are added to the destination directory when syncing.
 // It should not always have to return a slice, but it is fine for testing.
 // And disk I/O operations are significantly slower than in-memory operations.
-func TestingCreateFilesByOneInput(t *testing.T, input string) (string, []FileSystemNode) {
+func TestingWriteFilesByOneInput(t *testing.T, input string) (string, []FileSystemNode) {
 	t.Helper()
 
 	if isInputEmpty(input) {

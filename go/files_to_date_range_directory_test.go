@@ -192,10 +192,10 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			directories, nodes := utils.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.testCaseInput.Input)
 			defer utils.TestingRemoveDirectoryTrees(t, directories)
 
-			destination, _ := utils.TestingCreateFilesByOneInput(t, tc.destinationInput)
+			destination, _ := utils.TestingWriteFilesByOneInput(t, tc.destinationInput)
 			defer utils.TestingRemoveDirectoryTree(t, destination)
 
-			wantedOutcomeDestination, _ := utils.TestingCreateFilesByOneInput(t, tc.wantedOutcome)
+			wantedOutcomeDestination, _ := utils.TestingWriteFilesByOneInput(t, tc.wantedOutcome)
 			defer utils.TestingRemoveDirectoryTree(t, wantedOutcomeDestination)
 
 			// act
