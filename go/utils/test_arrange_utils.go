@@ -351,30 +351,3 @@ func TestingCreateFilesByOneInput(t *testing.T, input string) (string, []FileSys
 
 	return directory, nodes
 }
-
-// This function has to stay for synchronizing directory trees.
-// When we add a prefix to all input lines so that TestingCreateFilesAndDirectoriesByMultipleInputs can be used, all the folders with that prefix are added to the destination directory when syncing.
-// It should not always have to return a slice, but it is fine for testing.
-// And disk I/O operations are significantly slower than in-memory operations.
-func TestingCreateFilesAndDirectoriesByOneInput(t *testing.T, input string) (string, []FileSystemNode) {
-	t.Helper()
-	if isInputEmpty(input) {
-		return "", nil
-	}
-
-	directory := CreateTemporaryDirectory(t)
-	var nodes []FileSystemNode
-	var previousPathPart string
-	for _, rawLine := range CreateSortedRawInputLines(input) {
-		line := CreateInputLine(rawLine)
-		path := ToFilePathFromSlashAndJoin(directory, line.GetDirectoryPathPart())
-		if line.GetDirectoryPathPart() != previousPathPart {
-			TestingCreateDirectoryAll(t, path)
-
-			// probably not optimal but results in less code, which is fine for testing
-			previousPathPart = line.GetDirectoryPathPart()
-		}
-		testingIfFileCreateFileAndAppendFileSystemNode(t, path, line, &nodes)
-	}
-	return directory, nodes
-}

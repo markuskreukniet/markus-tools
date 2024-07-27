@@ -76,7 +76,7 @@ func TestFileExists(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.testCaseInput.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			directory, _ := TestingCreateFilesAndDirectoriesByOneInput(t, tc.testCaseInput.Input)
+			directory, _ := TestingCreateFilesByOneInput(t, tc.testCaseInput.Input)
 			defer TestingRemoveDirectoryTree(t, directory)
 			rawInputLines := CreateSortedRawInputLines(tc.testCaseInput.Input)
 			for _, rawInputLine := range rawInputLines {
