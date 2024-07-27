@@ -336,10 +336,9 @@ func TestingCreateFilesByOneInput(t *testing.T, input string) (string, []FileSys
 		return "", nil
 	}
 
-	directory := CreateTemporaryDirectory(t)
-
 	var nodes []FileSystemNode
 	var previousDirectoryPath string
+	directory := CreateTemporaryDirectory(t)
 	files := createSortedFileSystemFiles(t, directory, input)
 
 	for i := range files {
