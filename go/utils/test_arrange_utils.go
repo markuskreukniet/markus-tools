@@ -257,7 +257,6 @@ func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, filePath strin
 	})
 }
 
-// if empty input string, return empty temporary directory file path and empty FileSystemNode slice
 func isInputEmpty(input string) bool {
 	return input == ""
 }
@@ -269,6 +268,45 @@ func CreateTemporaryDirectory(t *testing.T) string {
 		t.Errorf("Failed to create a temporary directory: %v", err)
 	}
 	return temporaryDirectory
+}
+
+func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []FileSystemNode) {
+	t.Helper()
+
+	if isInputEmpty(input) {
+		return nil, nil
+	}
+
+	files := createSortedFileSystemFiles(t, "", input)
+	fileGroups := [][]FileSystemFile{{files[0]}}
+	index := 0
+
+	for i := 1; i < len(files); i++ {
+		if files[i].FileMetadata.DirectoryPath == "" || files[i].FileMetadata.DirectoryPath != fileGroups[index][0].FileMetadata.DirectoryPath {
+			fileGroups = append(fileGroups, []FileSystemFile{files[i]})
+			index++
+		} else {
+			fileGroups[index] = append(fileGroups[index], files[i])
+		}
+	}
+
+	var temporaryDirectories []string
+	var fileSystemNodes []FileSystemNode
+
+	for _, group := range fileGroups {
+		directory := CreateTemporaryDirectory(t)
+		temporaryDirectories = append(temporaryDirectories, directory)
+		for i, file := range group {
+			file.FileMetadata.DirectoryPath = filepath.Join(directory, file.FileMetadata.DirectoryPath)
+			file.Path = filepath.Join(directory, file.Path)
+			if i == 0 || file.FileMetadata.IsDirectory {
+				TestingCreateDirectoryAll(t, file.FileMetadata.DirectoryPath)
+			}
+			testingIfFileWriteItAndAppendFileSystemNode(t, file, &fileSystemNodes)
+		}
+	}
+
+	return temporaryDirectories, fileSystemNodes
 }
 
 // TODO: maybe using an [][][]string is not needed
@@ -325,7 +363,6 @@ func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string
 	return tempDirectories, fileSystemNodes
 }
 
-// This function has to stay for synchronizing directory trees.
 // When we add a prefix to all input lines so that TestingWriteFilesByMultipleInputs can be used, all the folders with that prefix are added to the destination directory when syncing.
 // It should not always have to return a slice, but it is fine for testing.
 // And disk I/O operations are significantly slower than in-memory operations.
