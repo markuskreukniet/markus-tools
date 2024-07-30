@@ -18,7 +18,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 		directory 1/directory 2,,txt 1-2.txt,content directory 1/directory\ncontent 2 1-2;
 		directory 1/directory 2,,txt 1-2 2.txt,content directory 1/directory\ncontent 2 1-2 2;
 	`
-	wantedOutcome := "txt 0.txt\ncontent 0\\ncontent 0\n\ntxt 1-2 2.txt\ncontent directory 1/directory\\ncontent 2 1-2 2\n\ntxt 1-2.txt\ncontent directory 1/directory\\ncontent 2 1-2"
+	wantedOutcome := "txt 1-2 2.txt\ncontent directory 1/directory\\ncontent 2 1-2 2\n\ntxt 1-2.txt\ncontent directory 1/directory\\ncontent 2 1-2\n\ntxt 0.txt\ncontent 0\\ncontent 0"
 	testCases := []utils.TestCaseInput{
 		utils.CreateTestCaseInput("Basic", input, false),
 		utils.CreateTestCaseInput("Empty Input", "", false),
@@ -28,7 +28,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			directories, fileSystemNodes := utils.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.Input)
+			directories, fileSystemNodes := utils.TestingWriteFilesByMultipleInputs(t, tc.Input)
 			defer utils.TestingRemoveDirectoryTrees(t, directories)
 			var builder strings.Builder
 			if len(directories) > 0 {
