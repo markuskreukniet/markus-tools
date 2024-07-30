@@ -188,17 +188,6 @@ func TestingWriteFile(t *testing.T, filePath string, content string) {
 	}
 }
 
-// TODO: comment
-// type plainTextFile struct {
-// 	name    string
-// 	content string
-// }
-// type directoryWithOptionalFile struct {
-// 	path          string
-// 	timeModified  time.Time
-// 	plainTextFile *plainTextFile
-// }
-
 // TODO: is it an arrange function?
 // TODO: wrong naming, testing forgotten
 func ToFilePathFromSlashAndJoin(filePath, filePathEndPart string) string {
