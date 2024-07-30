@@ -270,6 +270,20 @@ func CreateTemporaryDirectory(t *testing.T) string {
 	return temporaryDirectory
 }
 
+func toRootDirectoryPath(filePath string) string {
+	cleanPath := filepath.Clean(filePath)
+
+	for {
+		parentPath := filepath.Dir(cleanPath)
+		if parentPath == "." || parentPath == cleanPath {
+			break
+		}
+		cleanPath = parentPath
+	}
+
+	return cleanPath
+}
+
 func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []FileSystemNode) {
 	t.Helper()
 
@@ -278,12 +292,21 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 	}
 
 	files := createSortedFileSystemFiles(t, "", input)
+	length := len(files)
+
+	if length == 0 {
+		return nil, nil
+	}
+
 	fileGroups := [][]FileSystemFile{{files[0]}}
+	previousRootDirectoryPath := toRootDirectoryPath(files[0].FileMetadata.DirectoryPath)
 	index := 0
 
-	for i := 1; i < len(files); i++ {
-		if files[i].FileMetadata.DirectoryPath == "" || files[i].FileMetadata.DirectoryPath != fileGroups[index][0].FileMetadata.DirectoryPath {
+	for i := 1; i < length; i++ {
+		rootDirectoryPath := toRootDirectoryPath(files[i].FileMetadata.DirectoryPath)
+		if rootDirectoryPath == "." || rootDirectoryPath != previousRootDirectoryPath {
 			fileGroups = append(fileGroups, []FileSystemFile{files[i]})
+			previousRootDirectoryPath = rootDirectoryPath
 			index++
 		} else {
 			fileGroups[index] = append(fileGroups[index], files[i])
@@ -292,6 +315,7 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 
 	var temporaryDirectories []string
 	var fileSystemNodes []FileSystemNode
+	var previousDirectoryPath string
 
 	for _, group := range fileGroups {
 		directory := CreateTemporaryDirectory(t)
@@ -299,9 +323,10 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 		for i, file := range group {
 			file.FileMetadata.DirectoryPath = filepath.Join(directory, file.FileMetadata.DirectoryPath)
 			file.Path = filepath.Join(directory, file.Path)
-			if i == 0 || file.FileMetadata.IsDirectory {
+			if i == 0 || file.FileMetadata.DirectoryPath != previousDirectoryPath {
 				TestingCreateDirectoryAll(t, file.FileMetadata.DirectoryPath)
 			}
+			previousDirectoryPath = file.FileMetadata.DirectoryPath
 			testingIfFileWriteItAndAppendFileSystemNode(t, file, &fileSystemNodes)
 		}
 	}
