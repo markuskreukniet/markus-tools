@@ -16,7 +16,6 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 		"content 2\ncontent 2",
 		"content 3 1\ncontent 3 1",
 	}
-	// TODO: making empty lines in input does not work
 	input := `
 		empty,,,;
 		directory 2/empty,,,;
