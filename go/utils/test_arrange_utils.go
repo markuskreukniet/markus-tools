@@ -239,24 +239,6 @@ func testingIfFileWriteItAndAppendFileSystemNode(t *testing.T, file FileSystemFi
 	})
 }
 
-func testingIfFileCreateFileAndAppendFileSystemNode(t *testing.T, filePath string, line InputLine, fileSystemNodes *[]FileSystemNode) {
-	t.Helper()
-	if !line.IsDirectory() {
-		filePath = filepath.Join(filePath, line.GetFileName())
-		TestingWriteFile(t, filePath, line.GetContent())
-		if line.GetTimeModified() != "" {
-			timeModified := TestingParseTime(t, line.GetTimeModified())
-			if err := os.Chtimes(filePath, time.Now(), timeModified); err != nil {
-				t.Errorf("Failed to change the access and modification times of the file: %v", err)
-			}
-		}
-	}
-	*fileSystemNodes = append(*fileSystemNodes, FileSystemNode{
-		Path:        filePath,
-		IsDirectory: line.IsDirectory(),
-	})
-}
-
 func isInputEmpty(input string) bool {
 	return input == ""
 }
@@ -332,60 +314,6 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 	}
 
 	return temporaryDirectories, fileSystemNodes
-}
-
-// TODO: maybe using an [][][]string is not needed
-// It should not always have to return a slice, but it is fine for testing.
-// And disk I/O operations are significantly slower than in-memory operations.
-func TestingCreateFilesAndDirectoriesByMultipleInputs(t *testing.T, input string) ([]string, []FileSystemNode) {
-	t.Helper()
-	if isInputEmpty(input) {
-		return nil, nil
-	}
-
-	// create input groups
-	var inputGroups [][][]string
-	rawInputLines := CreateSortedRawInputLines(input)
-	for i := range rawInputLines {
-		index := len(inputGroups) - 1
-		inputLine := CreateInputLine(rawInputLines[i])
-
-		// probably not optimal but results in less code, which is fine for testing
-		part := inputLine.GetDirectoryPathPart()
-		if i == 0 || part == "" || part != inputGroups[index][0][0] {
-			inputGroups = append(inputGroups, [][]string{inputLine.elements})
-		} else {
-			inputGroups[index] = append(inputGroups[index], inputLine.elements)
-		}
-	}
-
-	// create and return temporary directories
-	// create and return fileSystemNodes
-	var tempDirectories []string
-	var fileSystemNodes []FileSystemNode
-	for _, group := range inputGroups {
-		temporaryDirectory := CreateTemporaryDirectory(t)
-		tempDirectories = append(tempDirectories, temporaryDirectory)
-		for i, inputLine := range group {
-			filePath := ToFilePathFromSlashAndJoin(temporaryDirectory, inputLine[0])
-			isDirectory := inputLine[2] == ""
-
-			// probably not optimal but results in less code, which is fine for testing
-			// It should be possible to add more than one empty directory.
-			if i == 0 || isDirectory {
-				TestingCreateDirectoryAll(t, filePath)
-			}
-
-			// TODO: should have been already an InputLine
-			line := InputLine{
-				elements:                      inputLine,
-				directoryPathPartWithFileName: "",
-			}
-
-			testingIfFileCreateFileAndAppendFileSystemNode(t, filePath, line, &fileSystemNodes)
-		}
-	}
-	return tempDirectories, fileSystemNodes
 }
 
 // When we add a prefix to all input lines so that TestingWriteFilesByMultipleInputs can be used, all the folders with that prefix are added to the destination directory when syncing.
