@@ -189,7 +189,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.testCaseInput.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			directories, nodes := utils.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.testCaseInput.Input)
+			directories, nodes := utils.TestingWriteFilesByMultipleInputs(t, tc.testCaseInput.Input)
 			defer utils.TestingRemoveDirectoryTrees(t, directories)
 
 			destination, _ := utils.TestingWriteFilesByOneInput(t, tc.destinationInput)
