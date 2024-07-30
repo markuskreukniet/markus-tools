@@ -48,7 +48,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Metadata.Name, func(t *testing.T) {
 			// arrange and teardown
-			directories, fileSystemNodes := utils.TestingCreateFilesAndDirectoriesByMultipleInputs(t, tc.Input)
+			directories, fileSystemNodes := utils.TestingWriteFilesByMultipleInputs(t, tc.Input)
 			defer utils.TestingRemoveDirectoryTrees(t, directories)
 
 			lines := strings.Split(wantedOutcome, "\n")
