@@ -38,7 +38,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 			// act
 			outcome, err := plainTextFilesToText(fileSystemNodes)
 
-			//log.Println("outcome:", outcome) // TODO: shows a \n bug
+			//log.Println("outcome:", outcome) // TODO: shows a \n bug, but it is nog a bug?
 
 			// assert
 			utils.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.Metadata.WantErr, builder, outcome)
