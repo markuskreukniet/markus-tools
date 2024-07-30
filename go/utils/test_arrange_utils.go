@@ -11,53 +11,6 @@ import (
 	"unicode"
 )
 
-// InputLine
-type InputLine struct {
-	elements                      []string
-	directoryPathPartWithFileName string
-}
-
-func (line InputLine) GetDirectoryPathPart() string {
-	return line.elements[0]
-}
-
-func (line InputLine) GetTimeModified() string {
-	return line.elements[1]
-}
-
-func (line InputLine) GetFileName() string {
-	return line.elements[2]
-}
-
-func (line InputLine) GetContent() string {
-	return line.elements[3]
-}
-
-func (line InputLine) HasContent() bool {
-	return line.GetContent() != ""
-}
-
-func (line InputLine) IsDirectory() bool {
-	return line.GetFileName() == ""
-}
-
-func (line InputLine) GetDirectoryPathPartWithFileName() string {
-	if line.directoryPathPartWithFileName == "" {
-		line.directoryPathPartWithFileName = filepath.Join(line.GetDirectoryPathPart(), line.GetFileName())
-	}
-	return line.directoryPathPartWithFileName
-}
-
-func CreateInputLine(delimitedCommaString string) InputLine {
-	return InputLine{
-		elements:                      strings.Split(delimitedCommaString, ","),
-		directoryPathPartWithFileName: "",
-	}
-}
-
-// RawInputLines
-type RawInputLines []string
-
 func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine string) FileSystemFile {
 	t.Helper()
 
