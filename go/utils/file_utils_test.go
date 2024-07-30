@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"path/filepath"
 	"testing"
 )
 
@@ -78,15 +77,12 @@ func TestFileExists(t *testing.T) {
 			// arrange and teardown
 			directory, _ := TestingWriteFilesByOneInput(t, tc.testCaseInput.Input)
 			defer TestingRemoveDirectoryTree(t, directory)
-			rawInputLines := CreateSortedRawInputLines(tc.testCaseInput.Input)
-			for _, rawInputLine := range rawInputLines {
-				filePath := directory
-				if directory != "" {
-					filePath = filepath.Join(directory, CreateInputLine(rawInputLine).GetDirectoryPathPartWithFileName())
-				}
 
+			files := CreateSortedFileSystemFiles(t, directory, tc.testCaseInput.Input)
+
+			for _, file := range files {
 				// act
-				exists, err := FileExists(filePath)
+				exists, err := FileExists(file.Path)
 				if err != nil {
 					t.Errorf("FileExists error")
 				}

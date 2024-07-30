@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"slices"
 	"sort"
 	"strings"
 	"testing"
@@ -78,7 +77,7 @@ func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine stri
 	return CreateFileSystemFile(data, filePath, CreateFileMetadata(name, directoryPath, timeModified, 0, isDirectory))
 }
 
-func createSortedFileSystemFiles(t *testing.T, directoryPath, rawDelimitedSemicolonString string) []FileSystemFile {
+func CreateSortedFileSystemFiles(t *testing.T, directoryPath, rawDelimitedSemicolonString string) []FileSystemFile {
 	t.Helper()
 
 	var files []FileSystemFile
@@ -107,33 +106,6 @@ func createSortedFileSystemFiles(t *testing.T, directoryPath, rawDelimitedSemico
 	})
 
 	return files
-}
-
-func CreateSortedRawInputLines(rawDelimitedSemicolonString string) []string {
-	var inputLines []string
-	var inputLine []rune
-	isCreatingInputLine := false
-
-	rawDelimitedSemicolonString = strings.TrimSpace(rawDelimitedSemicolonString)
-
-	for _, r := range rawDelimitedSemicolonString {
-		if isCreatingInputLine {
-			if r != ';' {
-				inputLine = append(inputLine, r)
-			} else {
-				inputLines = append(inputLines, string(inputLine))
-				inputLine = nil
-				isCreatingInputLine = false
-			}
-		} else if !unicode.IsSpace(r) {
-			inputLine = append(inputLine, r)
-			isCreatingInputLine = true
-		}
-	}
-
-	slices.Sort(inputLines)
-
-	return inputLines
 }
 
 // TestCase
@@ -262,7 +234,7 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 		return nil, nil
 	}
 
-	files := createSortedFileSystemFiles(t, "", input)
+	files := CreateSortedFileSystemFiles(t, "", input)
 	length := len(files)
 
 	if length == 0 {
@@ -318,7 +290,7 @@ func TestingWriteFilesByOneInput(t *testing.T, input string) (string, []FileSyst
 	var nodes []FileSystemNode
 	var previousDirectoryPath string
 	directory := CreateTemporaryDirectory(t)
-	files := createSortedFileSystemFiles(t, directory, input)
+	files := CreateSortedFileSystemFiles(t, directory, input)
 
 	for i := range files {
 		if previousDirectoryPath != files[i].FileMetadata.DirectoryPath {
