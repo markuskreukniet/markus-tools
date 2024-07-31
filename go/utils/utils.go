@@ -67,7 +67,7 @@ func CreateFileSystemFileExtraByHashGroups(files []FileSystemFileExtra, onlyDupl
 			hashMap := make(map[string][]FileSystemFileExtra)
 			for _, file := range group.files {
 				var err error
-				if file.Hash, err = HashFile(file.FileSystemFile.Path); err != nil {
+				if file.Hash, err = HashFile(file.FileSystemFile.FileMetadata.Path); err != nil {
 					return nil, err
 				}
 				hashMap[file.Hash] = append(hashMap[file.Hash], file)

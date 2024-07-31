@@ -39,7 +39,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 					return "", err
 				}
 			}
-			if _, err := result.WriteString(file.FileSystemFile.Path); err != nil {
+			if _, err := result.WriteString(file.FileSystemFile.FileMetadata.Path); err != nil {
 				return "", err
 			}
 		}

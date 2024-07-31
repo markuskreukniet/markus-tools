@@ -82,7 +82,7 @@ func TestFileExists(t *testing.T) {
 
 			for _, file := range files {
 				// act
-				exists, err := FileExists(file.Path)
+				exists, err := FileExists(file.FileMetadata.Path)
 				if err != nil {
 					t.Errorf("FileExists error")
 				}

@@ -50,7 +50,7 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 	for _, node := range uniqueFileSystemNodes {
 		if node.IsDirectory {
 			handler := func(file utils.FileSystemFile) error {
-				filePaths = append(filePaths, file.Path)
+				filePaths = append(filePaths, file.FileMetadata.Path)
 				return nil
 			}
 
@@ -63,12 +63,12 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 				return "", err
 			}
 			if file.FileMetadata.Size > 0 {
-				isTextFile, err := utils.IsNonZeroByteFileATextFile(file.Path)
+				isTextFile, err := utils.IsNonZeroByteFileATextFile(file.FileMetadata.Path)
 				if err != nil {
 					return "", err
 				}
 				if isTextFile {
-					filePaths = append(filePaths, file.Path)
+					filePaths = append(filePaths, file.FileMetadata.Path)
 				}
 			}
 		}

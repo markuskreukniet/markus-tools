@@ -12,7 +12,7 @@ func appendFileSystemFilesExtra(filePath string, files *[]FileSystemFileExtra) e
 		hash := ""
 		if !file.FileMetadata.IsDirectory {
 			var err error
-			hash, err = HashFile(file.Path)
+			hash, err = HashFile(file.FileMetadata.Path)
 			if err != nil {
 				return err
 			}
@@ -37,12 +37,12 @@ func areFileSystemFilesExtraIdentical(fileI, fileJ FileSystemFileExtra, filePath
 		return false, nil
 	}
 
-	relativeI, err := filepath.Rel(filePathI, fileI.FileSystemFile.Path)
+	relativeI, err := filepath.Rel(filePathI, fileI.FileSystemFile.FileMetadata.Path)
 	if err != nil {
 		return false, err
 	}
 
-	relativeJ, err := filepath.Rel(filePathJ, fileJ.FileSystemFile.Path)
+	relativeJ, err := filepath.Rel(filePathJ, fileJ.FileSystemFile.FileMetadata.Path)
 	if err != nil {
 		return false, err
 	}

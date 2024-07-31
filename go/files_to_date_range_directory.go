@@ -52,7 +52,7 @@ func createDirectoryDateRangeName(startTime, endTime time.Time) string {
 
 func deleteFiles(files []utils.FileSystemFileExtra) error {
 	for _, file := range files {
-		if err := os.Remove(file.FileSystemFile.Path); err != nil {
+		if err := os.Remove(file.FileSystemFile.FileMetadata.Path); err != nil {
 			return err
 		}
 	}
@@ -105,7 +105,7 @@ func createFileHandlers(filePath string) []func([]utils.FileSystemFileExtra, *[]
 	// valid name of date directory or date range directory
 	handler = func(unfilteredFiles []utils.FileSystemFileExtra, filteredFiles, remainderFiles *[]utils.FileSystemFileExtra) error {
 		for _, file := range unfilteredFiles {
-			directory := filepath.Dir(file.FileSystemFile.Path)
+			directory := filepath.Dir(file.FileSystemFile.FileMetadata.Path)
 			child, err := isDirectoryChild(filePath, directory)
 			if err != nil {
 				return err
@@ -124,7 +124,7 @@ func createFileHandlers(filePath string) []func([]utils.FileSystemFileExtra, *[]
 	// destination directory
 	handler = func(unfilteredFiles []utils.FileSystemFileExtra, filteredFiles, remainderFiles *[]utils.FileSystemFileExtra) error {
 		for _, file := range unfilteredFiles {
-			child, err := isDirectoryChild(filePath, file.FileSystemFile.Path)
+			child, err := isDirectoryChild(filePath, file.FileSystemFile.FileMetadata.Path)
 			if err != nil {
 				return err
 			}
@@ -242,8 +242,8 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 			}
 			*files = append(*files,
 				utils.CreateFileSystemFileExtra("",
-					utils.CreateFileSystemFile("", fullPath,
-						utils.CreateFileMetadata(info.Name(), path, info.ModTime(), info.Size(), false))))
+					utils.CreateFileSystemFile("",
+						utils.CreateFileMetadata(info.Name(), path, fullPath, info.ModTime(), info.Size(), false))))
 		}
 	}
 	return nil
@@ -349,7 +349,7 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 					return nil, err
 				}
 				if file.Hash == "" {
-					file.Hash, err = utils.HashFile(file.FileSystemFile.Path)
+					file.Hash, err = utils.HashFile(file.FileSystemFile.FileMetadata.Path)
 					if err != nil {
 						return nil, err
 					}
@@ -359,12 +359,12 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 					nameWithoutExtension := strings.TrimSuffix(file.FileSystemFile.FileMetadata.Name, extension)
 					fullFilePath = filepath.Join(directoryFilePath, nameWithoutExtension+" 2"+extension)
 
-					if err := os.Rename(file.FileSystemFile.Path, fullFilePath); err != nil {
+					if err := os.Rename(file.FileSystemFile.FileMetadata.Path, fullFilePath); err != nil {
 						return nil, err
 					}
 				}
 			} else {
-				if err := os.Rename(file.FileSystemFile.Path, fullFilePath); err != nil {
+				if err := os.Rename(file.FileSystemFile.FileMetadata.Path, fullFilePath); err != nil {
 					return nil, err
 				}
 			}

@@ -27,7 +27,7 @@ func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine stri
 		timeModified = TestingParseTime(t, fields[1])
 	}
 
-	return CreateFileSystemFile(data, filePath, CreateFileMetadata(name, directoryPath, timeModified, 0, isDirectory))
+	return CreateFileSystemFile(data, CreateFileMetadata(name, directoryPath, filePath, timeModified, 0, isDirectory))
 }
 
 func CreateSortedFileSystemFiles(t *testing.T, directoryPath, rawDelimitedSemicolonString string) []FileSystemFile {
@@ -55,7 +55,7 @@ func CreateSortedFileSystemFiles(t *testing.T, directoryPath, rawDelimitedSemico
 	}
 
 	sort.Slice(files, func(i, j int) bool {
-		return files[i].Path < files[j].Path
+		return files[i].FileMetadata.Path < files[j].FileMetadata.Path
 	})
 
 	return files
@@ -139,16 +139,16 @@ func testingIfFileWriteItAndAppendFileSystemNode(t *testing.T, file FileSystemFi
 	t.Helper()
 
 	if !file.FileMetadata.IsDirectory {
-		TestingWriteFile(t, file.Path, file.Data)
+		TestingWriteFile(t, file.FileMetadata.Path, file.Data)
 		if !file.FileMetadata.TimeModified.IsZero() {
-			if err := os.Chtimes(file.Path, time.Now(), file.FileMetadata.TimeModified); err != nil {
+			if err := os.Chtimes(file.FileMetadata.Path, time.Now(), file.FileMetadata.TimeModified); err != nil {
 				t.Errorf("Failed to change the access and modification times of the file: %v", err)
 			}
 		}
 	}
 
 	*nodes = append(*nodes, FileSystemNode{
-		Path:        file.Path,
+		Path:        file.FileMetadata.Path,
 		IsDirectory: file.FileMetadata.IsDirectory,
 	})
 }
@@ -218,7 +218,7 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 		temporaryDirectories = append(temporaryDirectories, directory)
 		for i, file := range group {
 			file.FileMetadata.DirectoryPath = filepath.Join(directory, file.FileMetadata.DirectoryPath)
-			file.Path = filepath.Join(directory, file.Path)
+			file.FileMetadata.Path = filepath.Join(directory, file.FileMetadata.Path)
 			if i == 0 || file.FileMetadata.DirectoryPath != previousDirectoryPath {
 				TestingCreateDirectoryAll(t, file.FileMetadata.DirectoryPath)
 			}

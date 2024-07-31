@@ -29,7 +29,7 @@ func getFilePathModificationTimeMapFromDirectoryTree(rootFilePath string) (map[s
 	filePathModificationTimeMap := make(map[string]time.Time)
 
 	handler := func(file utils.FileSystemFile) error {
-		filePathModificationTimeMap[file.Path] = file.FileMetadata.TimeModified
+		filePathModificationTimeMap[file.FileMetadata.Path] = file.FileMetadata.TimeModified
 		return nil
 	}
 
