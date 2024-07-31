@@ -70,6 +70,7 @@ package main
 | + Name:          string       |
 | + Path:          string       |
 | + DirectoryPath: string       |
+| + Hash:          string       |
 | + TimeModified:  time.Time    |
 | + FileMetadata:  FileMetadata |
 | + Size:          int64        |
