@@ -62,6 +62,26 @@ func CreateSortedFileSystemFiles(t *testing.T, directoryPath, rawDelimitedSemico
 }
 
 // TestCase
+type TestCase struct {
+	Name                  string
+	Input                 string
+	SecondInput           string
+	WantedOutcome         string
+	WantInputToFileSystem bool
+	WantErr               bool
+}
+
+func CreateTestCase(name, input, secondInput, wantedOutcome string, wantInputToFileSystem, wantErr bool) TestCase {
+	return TestCase{
+		Name:                  name,
+		Input:                 input,
+		SecondInput:           secondInput,
+		WantedOutcome:         wantedOutcome,
+		WantInputToFileSystem: wantInputToFileSystem,
+		WantErr:               wantErr,
+	}
+}
+
 type TestCaseMetadata struct {
 	Name    string
 	WantErr bool

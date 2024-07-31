@@ -57,28 +57,18 @@ func TestFileExists(t *testing.T) {
 		directory 1/empty,,,;
 		directory 1,,txt 1.txt,;
 	`
-	testCases := []struct {
-		testCaseInput    TestCaseInput
-		inputToDirectory bool
-	}{
-		{
-			testCaseInput:    CreateTestCaseInput("Basic", input, false),
-			inputToDirectory: true,
-		},
-		{
-			testCaseInput:    CreateTestCaseInput("Empty Input", "", false),
-			inputToDirectory: false,
-		},
+	testCases := []TestCase{
+		CreateTestCase("Basic", input, "", "", true, false),
+		CreateTestCase("Empty Input", "", "", "", false, false),
 	}
 
-	// run testCases
 	for _, tc := range testCases {
-		t.Run(tc.testCaseInput.Metadata.Name, func(t *testing.T) {
+		t.Run(tc.Name, func(t *testing.T) {
 			// arrange and teardown
-			directory, _ := TestingWriteFilesByOneInput(t, tc.testCaseInput.Input)
+			directory, _ := TestingWriteFilesByOneInput(t, tc.Input)
 			defer TestingRemoveDirectoryTree(t, directory)
 
-			files := CreateSortedFileSystemFiles(t, directory, tc.testCaseInput.Input)
+			files := CreateSortedFileSystemFiles(t, directory, tc.Input)
 
 			for _, file := range files {
 				// act
@@ -88,8 +78,8 @@ func TestFileExists(t *testing.T) {
 				}
 
 				// assert
-				if exists != tc.inputToDirectory {
-					t.Errorf("A directory or file should exist, but it does not.")
+				if exists != tc.WantInputToFileSystem {
+					t.Errorf("A file should exist, but it does not.")
 				}
 			}
 		})
