@@ -57,18 +57,18 @@ func TestFileExists(t *testing.T) {
 		directory 1/empty,,,;
 		directory 1,,txt 1.txt,;
 	`
-	testCases := []TestCase{
-		CreateTestCase("Basic", input, "", "", true, false),
-		CreateTestCase("Empty Input", "", "", "", false, false),
+	testCases := []TestCaseBasicWithWriteInput{
+		CreateTestCaseBasicWithWriteInput(CreateTestCaseBasic("Basic", input, "", false), true),
+		CreateTestCaseBasicWithWriteInput(CreateTestCaseBasic("Empty Input", "", "", false), false),
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.Name, func(t *testing.T) {
+		t.Run(tc.TestCaseBasic.Name, func(t *testing.T) {
 			// arrange and teardown
-			directory, _ := TestingWriteFilesByOneInput(t, tc.Input)
+			directory, _ := TestingWriteFilesByOneInput(t, tc.TestCaseBasic.Input)
 			defer TestingRemoveDirectoryTree(t, directory)
 
-			files := CreateSortedFileSystemFiles(t, directory, tc.Input)
+			files := CreateSortedFileSystemFiles(t, directory, tc.TestCaseBasic.Input)
 
 			for _, file := range files {
 				// act
@@ -78,7 +78,7 @@ func TestFileExists(t *testing.T) {
 				}
 
 				// assert
-				if exists != tc.WantInputToFileSystem {
+				if exists != tc.WriteInput {
 					t.Errorf("A file should exist, but it does not.")
 				}
 			}

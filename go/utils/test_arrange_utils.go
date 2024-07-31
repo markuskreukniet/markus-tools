@@ -61,24 +61,37 @@ func CreateSortedFileSystemFiles(t *testing.T, directoryPath, rawDelimitedSemico
 	return files
 }
 
-// TestCase
-type TestCase struct {
-	Name                  string
-	Input                 string
-	SecondInput           string
-	WantedOutcome         string
-	WantInputToFileSystem bool
-	WantErr               bool
+type TestCaseBasicWithSecondInput struct {
+	TestCaseBasic TestCaseBasic
+	SecondInput   string
 }
 
-func CreateTestCase(name, input, secondInput, wantedOutcome string, wantInputToFileSystem, wantErr bool) TestCase {
-	return TestCase{
-		Name:                  name,
-		Input:                 input,
-		SecondInput:           secondInput,
-		WantedOutcome:         wantedOutcome,
-		WantInputToFileSystem: wantInputToFileSystem,
-		WantErr:               wantErr,
+type TestCaseBasicWithWriteInput struct {
+	TestCaseBasic TestCaseBasic
+	WriteInput    bool
+}
+
+func CreateTestCaseBasicWithWriteInput(testCaseBasic TestCaseBasic, writeInput bool) TestCaseBasicWithWriteInput {
+	return TestCaseBasicWithWriteInput{
+		TestCaseBasic: testCaseBasic,
+		WriteInput:    writeInput,
+	}
+}
+
+// TestCase
+type TestCaseBasic struct {
+	Name          string
+	Input         string
+	WantedOutcome string
+	WantErr       bool
+}
+
+func CreateTestCaseBasic(name, input, wantedOutcome string, wantErr bool) TestCaseBasic {
+	return TestCaseBasic{
+		Name:          name,
+		Input:         input,
+		WantedOutcome: wantedOutcome,
+		WantErr:       wantErr,
 	}
 }
 

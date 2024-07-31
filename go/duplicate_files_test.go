@@ -39,13 +39,13 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 		directory 5\directory 6\directory 7\txt 5-6-7.txt
 		directory 8\txt 8.txt
 	`
-	testCases := []utils.TestCaseInput{
-		utils.CreateTestCaseInput("Basic", input, false),
-		utils.CreateTestCaseInput("Empty Input", "", false),
+	testCases := []utils.TestCaseBasic{
+		utils.CreateTestCaseBasic("Basic", input, wantedOutcome, false),
+		utils.CreateTestCaseBasic("Empty Input", "", wantedOutcome, false),
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.Metadata.Name, func(t *testing.T) {
+		t.Run(tc.Name, func(t *testing.T) {
 			// arrange and teardown
 			directories, fileSystemNodes := utils.TestingWriteFilesByMultipleInputs(t, tc.Input)
 			defer utils.TestingRemoveDirectoryTrees(t, directories)
