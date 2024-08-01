@@ -66,6 +66,13 @@ type TestCaseBasicWithSecondInput struct {
 	SecondInput   string
 }
 
+func CreateTestCaseBasicWithSecondInput(testCaseBasic TestCaseBasic, secondInput string) TestCaseBasicWithSecondInput {
+	return TestCaseBasicWithSecondInput{
+		TestCaseBasic: testCaseBasic,
+		SecondInput:   secondInput,
+	}
+}
+
 type TestCaseBasicWithWriteInput struct {
 	TestCaseBasic TestCaseBasic
 	WriteInput    bool

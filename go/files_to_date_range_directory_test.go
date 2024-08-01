@@ -167,35 +167,22 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 		2020-12-20 - 2020-12-21,,txt 12.txt,` + content12 + `;
 	`
 
-	// create testCases
-	testCases := []struct {
-		testCaseInput    utils.TestCaseInput
-		destinationInput string
-		wantedOutcome    string
-	}{
-		{
-			testCaseInput:    utils.CreateTestCaseInput("Basic", input, false),
-			destinationInput: destinationInput,
-			wantedOutcome:    wantedOutcome,
-		},
-		// {
-		// 	testCaseInput:    utils.CreateTestCaseInput("Empty Input", "", false),
-		// 	destinationInput: destinationInput,
-		// 	wantedOutcome:    "",
-		// },
+	// TODO: "Empty Input" is missing
+	testCases := []utils.TestCaseBasicWithSecondInput{
+		utils.CreateTestCaseBasicWithSecondInput(utils.CreateTestCaseBasic("Basic", input, wantedOutcome, false), destinationInput),
 	}
 
 	// run testCases
 	for _, tc := range testCases {
-		t.Run(tc.testCaseInput.Metadata.Name, func(t *testing.T) {
+		t.Run(tc.TestCaseBasic.Name, func(t *testing.T) {
 			// arrange and teardown
-			directories, nodes := utils.TestingWriteFilesByMultipleInputs(t, tc.testCaseInput.Input)
+			directories, nodes := utils.TestingWriteFilesByMultipleInputs(t, tc.TestCaseBasic.Input)
 			defer utils.TestingRemoveDirectoryTrees(t, directories)
 
-			destination, _ := utils.TestingWriteFilesByOneInput(t, tc.destinationInput)
+			destination, _ := utils.TestingWriteFilesByOneInput(t, tc.SecondInput)
 			defer utils.TestingRemoveDirectoryTree(t, destination)
 
-			wantedOutcomeDestination, _ := utils.TestingWriteFilesByOneInput(t, tc.wantedOutcome)
+			wantedOutcomeDestination, _ := utils.TestingWriteFilesByOneInput(t, tc.TestCaseBasic.WantedOutcome)
 			defer utils.TestingRemoveDirectoryTree(t, wantedOutcomeDestination)
 
 			// act
