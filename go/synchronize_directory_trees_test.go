@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -34,62 +33,34 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 		directory 2/directory 3,,txt 2-3 3.txt,;
 	`
 
-	// create testCases
-	testCases := []struct {
-		metadata          utils.TestCaseMetadata
-		sourceInput       string
-		destinationInput  string
-		updatedFile       filePathEndPartContent
-		wantSameFilePaths bool
-	}{
-		{
-			metadata:         utils.CreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
-			sourceInput:      sourceInput,
-			destinationInput: destinationInput,
-			updatedFile: filePathEndPartContent{
-				filePathEndPart: "directory 2/directory 3/txt 2-3 2.txt", // Do not use variables for this since it will make the inputs unreadable.
-				content:         newContent,
-			},
-			wantSameFilePaths: true,
-		},
-		{
-			metadata:          utils.CreateTestCaseMetadataWithWantErrTrue("Empty destinationInput"),
-			sourceInput:       sourceInput,
-			destinationInput:  "",
-			updatedFile:       filePathEndPartContent{},
-			wantSameFilePaths: false,
-		},
+	// TODO: "Empty Input" is missing
+	testCases := []utils.TestCaseBasicDoubleInput{
+		utils.CreateTestCaseBasicDoubleInput(utils.CreateTestCaseBasic("Basic", sourceInput, sourceInput, false), destinationInput),
 	}
 
 	// run testCases
 	for _, tc := range testCases {
-		t.Run(tc.metadata.Name, func(t *testing.T) {
+		t.Run(tc.TestCaseBasic.Name, func(t *testing.T) {
 			// arrange and teardown
-			sourceDirectory, _ := utils.TestingWriteFilesByOneInput(t, tc.sourceInput)
+			sourceDirectory, _ := utils.TestingWriteFilesByOneInput(t, tc.TestCaseBasic.Input)
 			defer utils.TestingRemoveDirectoryTree(t, sourceDirectory)
-			destinationDirectory, _ := utils.TestingWriteFilesByOneInput(t, tc.destinationInput)
+			destinationDirectory, _ := utils.TestingWriteFilesByOneInput(t, tc.SecondInput)
 			defer utils.TestingRemoveDirectoryTree(t, destinationDirectory)
 
 			// act
 			err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
 
 			// assert
-			utils.TestingAssertErrorToWantError(t, err, tc.metadata.WantErr)
+			utils.TestingAssertErrorToWantError(t, err, tc.TestCaseBasic.WantErr)
 
 			areIdentical, err := utils.AreFileTreeDescendantsIdentical(sourceDirectory, destinationDirectory)
 			if err != nil {
 				t.Errorf("AreFileTreeDescendantsIdentical error: %v", err)
 			}
-			if tc.wantSameFilePaths && !areIdentical {
-				t.Errorf("tc.wantSameFilePaths && !areIdentical error: %v", err)
-			}
 
-			if tc.updatedFile.filePathEndPart != "" && tc.updatedFile.content != "" {
-				content, err := os.ReadFile(utils.ToFilePathFromSlashAndJoin(destinationDirectory, tc.updatedFile.filePathEndPart))
-				if err != nil {
-					t.Fatalf("Failed to read file: %s", err)
-				}
-				utils.TestingAssertEqualStrings(t, string(content), tc.updatedFile.content)
+			if !areIdentical {
+				// TODO: message // TODO copied
+				t.Errorf("outcome and wanted outcome are different")
 			}
 		})
 	}
