@@ -168,8 +168,8 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	`
 
 	// TODO: "Empty Input" is missing
-	testCases := []utils.TestCaseBasicWithSecondInput{
-		utils.CreateTestCaseBasicWithSecondInput(utils.CreateTestCaseBasic("Basic", input, wantedOutcome, false), destinationInput),
+	testCases := []utils.TestCaseBasicDoubleInput{
+		utils.CreateTestCaseBasicDoubleInput(utils.CreateTestCaseBasic("Basic", input, wantedOutcome, false), destinationInput),
 	}
 
 	// run testCases

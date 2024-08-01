@@ -61,13 +61,13 @@ func CreateSortedFileSystemFiles(t *testing.T, directoryPath, rawDelimitedSemico
 	return files
 }
 
-type TestCaseBasicWithSecondInput struct {
+type TestCaseBasicDoubleInput struct {
 	TestCaseBasic TestCaseBasic
 	SecondInput   string
 }
 
-func CreateTestCaseBasicWithSecondInput(testCaseBasic TestCaseBasic, secondInput string) TestCaseBasicWithSecondInput {
-	return TestCaseBasicWithSecondInput{
+func CreateTestCaseBasicDoubleInput(testCaseBasic TestCaseBasic, secondInput string) TestCaseBasicDoubleInput {
+	return TestCaseBasicDoubleInput{
 		TestCaseBasic: testCaseBasic,
 		SecondInput:   secondInput,
 	}
