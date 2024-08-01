@@ -19,20 +19,20 @@ func TestPlainTextFilesToText(t *testing.T) {
 		directory 1/directory 2,,txt 1-2 2.txt,content directory 1/directory\ncontent 2 1-2 2;
 	`
 	wantedOutcome := "txt 1-2 2.txt\ncontent directory 1/directory\\ncontent 2 1-2 2\n\ntxt 1-2.txt\ncontent directory 1/directory\\ncontent 2 1-2\n\ntxt 0.txt\ncontent 0\\ncontent 0"
-	testCases := []utils.TestCaseInput{
-		utils.CreateTestCaseInput("Basic", input, false),
-		utils.CreateTestCaseInput("Empty Input", "", false),
+	testCases := []utils.TestCaseBasic{
+		utils.CreateTestCaseBasic("Basic", input, wantedOutcome, false),
+		utils.CreateTestCaseBasic("Empty Input", "", "", false),
 	}
 
 	// run testCases
 	for _, tc := range testCases {
-		t.Run(tc.Metadata.Name, func(t *testing.T) {
+		t.Run(tc.Name, func(t *testing.T) {
 			// arrange and teardown
 			directories, fileSystemNodes := utils.TestingWriteFilesByMultipleInputs(t, tc.Input)
 			defer utils.TestingRemoveDirectoryTrees(t, directories)
 			var builder strings.Builder
 			if len(directories) > 0 {
-				builder.WriteString(wantedOutcome)
+				builder.WriteString(tc.WantedOutcome)
 			}
 
 			// act
@@ -41,7 +41,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 			//log.Println("outcome:", outcome) // TODO: shows a \n bug, but it is nog a bug?
 
 			// assert
-			utils.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.Metadata.WantErr, builder, outcome)
+			utils.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.WantErr, builder, outcome)
 		})
 	}
 }

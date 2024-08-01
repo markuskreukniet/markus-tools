@@ -41,7 +41,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	`
 	testCases := []utils.TestCaseBasic{
 		utils.CreateTestCaseBasic("Basic", input, wantedOutcome, false),
-		utils.CreateTestCaseBasic("Empty Input", "", wantedOutcome, false),
+		utils.CreateTestCaseBasic("Empty Input", "", "", false),
 	}
 
 	for _, tc := range testCases {
