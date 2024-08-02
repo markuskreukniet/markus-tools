@@ -2,11 +2,12 @@ package main
 
 // import "testing"
 
+// TODO: escaping
 func filterComments(htmlDocument string) string {
 	var filteredHTMLDocument []rune
 	inHTMLComment := false
 	inJSCommentSingleLine := false
-	inJSCommentMultiLine := false
+	inCommentMultiLine := false
 
 	runes := []rune(htmlDocument)
 	count := len(runes)
@@ -25,9 +26,9 @@ func filterComments(htmlDocument string) string {
 			if runes[i] == '\n' {
 				inJSCommentSingleLine = false
 			}
-		} else if inJSCommentMultiLine {
+		} else if inCommentMultiLine {
 			if iPlusOne < count && runes[i] == '*' && runes[iPlusOne] == '/' {
-				inJSCommentMultiLine = false
+				inCommentMultiLine = false
 				i = iPlusOne
 			}
 		} else {
@@ -38,7 +39,7 @@ func filterComments(htmlDocument string) string {
 				inJSCommentSingleLine = true
 				i = iPlusOne
 			} else if iPlusOne < count && runes[i] == '/' && runes[iPlusOne] == '*' {
-				inJSCommentMultiLine = true
+				inCommentMultiLine = true
 				i = iPlusOne
 			} else {
 				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
