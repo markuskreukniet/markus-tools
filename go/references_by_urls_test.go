@@ -2,67 +2,52 @@ package main
 
 // import "testing"
 
-// func toUncommentedHTMLElements(htmlDocument string) {
-// 	var htmlElements []string
-// 	var htmlElement []rune
-// 	var wantedNextRune rune
-// 	isCommentBuilding := false
-// 	isCommentActive := false
-// 	countToFindElementOrComment := 0
+func filterComments(htmlDocument string) string {
+	var filteredHTMLDocument []rune
+	inHTMLComment := false
+	inJSCommentSingleLine := false
+	inJSCommentMultiLine := false
 
-// 	var filteredHTMLDocument []rune
+	runes := []rune(htmlDocument)
+	count := len(runes)
 
-// 	htmlDocument = strings.TrimSpace(htmlDocument)
+	for i := 0; i < count; i++ {
+		iPlusOne := i + 1
+		iPlusTwo := i + 2
+		iPlusThree := i + 3
 
-// 	// don't forget escaping \
+		if inHTMLComment {
+			if iPlusTwo < count && runes[i] == '-' && runes[iPlusOne] == '-' && runes[iPlusTwo] == '>' {
+				inHTMLComment = false
+				i = iPlusTwo
+			}
+		} else if inJSCommentSingleLine {
+			if runes[i] == '\n' {
+				inJSCommentSingleLine = false
+			}
+		} else if inJSCommentMultiLine {
+			if iPlusOne < count && runes[i] == '*' && runes[iPlusOne] == '/' {
+				inJSCommentMultiLine = false
+				i = iPlusOne
+			}
+		} else {
+			if iPlusThree < count && runes[i] == '<' && runes[iPlusOne] == '!' && runes[iPlusTwo] == '-' && runes[iPlusThree] == '-' {
+				inHTMLComment = true
+				i = iPlusThree
+			} else if iPlusOne < count && runes[i] == '/' && runes[iPlusOne] == '/' {
+				inJSCommentSingleLine = true
+				i = iPlusOne
+			} else if iPlusOne < count && runes[i] == '/' && runes[iPlusOne] == '*' {
+				inJSCommentMultiLine = true
+				i = iPlusOne
+			} else {
+				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
+			}
+		}
+	}
 
-// 	for _, r := range htmlDocument {
-// 		if isCommentActive {
-// 			if isCommentBuilding {
-// 				if r == wantedNextRune {
-// 					if r == '-' {
-// 						wantedNextRune = '>'
-// 					} else if r == '>' {
-// 						isCommentActive = false
-// 					}
-// 				}
-// 			} else {
-// 				if r == '-' {
-// 					wantedNextRune = '-'
-// 				} else {
-// 					filteredHTMLDocument = append(filteredHTMLDocument, r)
-// 				}
-// 			}
-// 		} else {
-// 			if isCommentBuilding {
-// 				if r == wantedNextRune {
-// 					if r == '!' {
-// 						wantedNextRune = '-'
-// 						countToFindElementOrComment++
-// 					} else if r == '-' {
-// 						if countToFindElementOrComment == 2 {
-// 							wantedNextRune = '-'
-// 							countToFindElementOrComment++
-// 						} else {
-// 							isCommentActive = true
-// 						}
-// 					}
-// 				} else {
-// 					isCommentBuilding = false
-// 					countToFindElementOrComment = 0
-// 				}
-// 			} else {
-// 				if r == '<' {
-// 					isCommentBuilding = true
-// 					wantedNextRune = '!'
-// 					countToFindElementOrComment++
-// 				} else {
-// 					filteredHTMLDocument = append(filteredHTMLDocument, r)
-// 				}
-// 			}
-// 		}
-// 	}
-// }
+	return string(filteredHTMLDocument)
+}
 
 // func TestReferencesByURLs(t *testing.T) {
 
