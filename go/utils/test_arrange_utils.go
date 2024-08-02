@@ -102,26 +102,6 @@ func CreateTestCaseBasic(name, input, wantedOutcome string, wantErr bool) TestCa
 	}
 }
 
-type TestCaseMetadata struct {
-	Name    string
-	WantErr bool
-}
-
-func CreateTestCaseMetadata(name string, wantErr bool) TestCaseMetadata {
-	return TestCaseMetadata{
-		Name:    name,
-		WantErr: wantErr,
-	}
-}
-
-func CreateTestCaseMetadataWithWantErrTrue(name string) TestCaseMetadata {
-	return CreateTestCaseMetadata(name, true)
-}
-
-func CreateTestCaseMetadataWithNameBasicAndWantErrFalse() TestCaseMetadata {
-	return CreateTestCaseMetadata("Basic", false)
-}
-
 // TODO: wrong naming
 func TestingWriteFileWithContentAndIndex(t *testing.T, filePath string, index int) string {
 	t.Helper()

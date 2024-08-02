@@ -61,7 +61,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 	}
 }
 
-// TODO: use vars from arrange utils?
+// TODO: use arrange utils?
 func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	const inputBasePath string = "/home/user/source"
 	const inputFullPath string = "/home/user/source/directory/file.txt"
@@ -69,46 +69,51 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	const joinedOutputBasePathWithRelativeInputPath string = "/home/user/destination/directory/file.txt"
 
 	testCases := []struct {
-		metadata       utils.TestCaseMetadata
+		name           string
 		inputBasePath  string
 		inputFullPath  string
 		outputBasePath string
 		want           string
+		wantErr        bool
 	}{
 		{
-			metadata:       utils.CreateTestCaseMetadataWithNameBasicAndWantErrFalse(),
+			name:           "Basic",
 			inputBasePath:  inputBasePath,
 			inputFullPath:  inputFullPath,
 			outputBasePath: outputBasePath,
 			want:           filepath.FromSlash(joinedOutputBasePathWithRelativeInputPath),
+			wantErr:        false,
 		},
 		{
-			metadata:       utils.CreateTestCaseMetadataWithWantErrTrue("Empty InputBasePath"),
+			name:           "Empty InputBasePath",
 			inputBasePath:  "",
 			inputFullPath:  inputFullPath,
 			outputBasePath: outputBasePath,
 			want:           "",
+			wantErr:        true,
 		},
 		{
-			metadata:       utils.CreateTestCaseMetadataWithWantErrTrue("Empty InputFullPath"),
+			name:           "Empty InputFullPath",
 			inputBasePath:  inputBasePath,
 			inputFullPath:  "",
 			outputBasePath: outputBasePath,
 			want:           "",
+			wantErr:        true,
 		},
 		{
-			metadata:       utils.CreateTestCaseMetadata("Equivalent Input Paths", false),
+			name:           "Equivalent Input Paths",
 			inputBasePath:  inputBasePath,
 			inputFullPath:  inputBasePath,
 			outputBasePath: outputBasePath,
 			want:           filepath.FromSlash(outputBasePath),
+			wantErr:        false,
 		},
 	}
 
 	for _, tc := range testCases {
-		t.Run(tc.metadata.Name, func(t *testing.T) {
+		t.Run(tc.name, func(t *testing.T) {
 			result, err := joinOutputBasePathWithRelativeInputPath(tc.inputBasePath, tc.inputFullPath, tc.outputBasePath)
-			utils.TestingAssertErrorToWantError(t, err, tc.metadata.WantErr)
+			utils.TestingAssertErrorToWantError(t, err, tc.wantErr)
 			if err == nil {
 				utils.TestingAssertEqualStrings(t, tc.want, result)
 			}
