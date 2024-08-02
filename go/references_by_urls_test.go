@@ -1,6 +1,5 @@
 package main
 
-// TODO: does the escaping work with \n?
 func filterComments(htmlDocument string) string {
 	var filteredHTMLDocument []rune
 	inHTMLComment := false
