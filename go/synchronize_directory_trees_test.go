@@ -7,11 +7,6 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
-type filePathEndPartContent struct {
-	filePathEndPart string
-	content         string
-}
-
 func TestSynchronizeDirectoryTrees(t *testing.T) {
 	// arrange
 	newContent := "content directory 2/directory\ncontent 3 2-3 2 new"
