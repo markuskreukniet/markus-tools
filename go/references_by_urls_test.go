@@ -1,13 +1,12 @@
 package main
 
-// import "testing"
-
-// TODO: escaping
+// TODO: does the escaping work with \n?
 func filterComments(htmlDocument string) string {
 	var filteredHTMLDocument []rune
 	inHTMLComment := false
 	inJSCommentSingleLine := false
 	inCommentMultiLine := false
+	escaped := false
 
 	runes := []rune(htmlDocument)
 	count := len(runes)
@@ -31,8 +30,14 @@ func filterComments(htmlDocument string) string {
 				inCommentMultiLine = false
 				i = iPlusOne
 			}
+		} else if escaped {
+			filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
+			escaped = false
 		} else {
-			if iPlusThree < count && runes[i] == '<' && runes[iPlusOne] == '!' && runes[iPlusTwo] == '-' && runes[iPlusThree] == '-' {
+			if runes[i] == '\\' {
+				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
+				escaped = true
+			} else if iPlusThree < count && runes[i] == '<' && runes[iPlusOne] == '!' && runes[iPlusTwo] == '-' && runes[iPlusThree] == '-' {
 				inHTMLComment = true
 				i = iPlusThree
 			} else if iPlusOne < count && runes[i] == '/' && runes[iPlusOne] == '/' {
