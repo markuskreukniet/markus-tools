@@ -6,8 +6,8 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	var h1Elements []string
 	var htmlElementPart []rune
 	creatingTitleElement := false
-	fidingTitleStartTag := false
-	fidingH1StartTag := false
+	// fidingTitleStartTag := false
+	// fidingH1StartTag := false
 
 	runes := []rune(htmlDocument)
 	count := len(runes)
