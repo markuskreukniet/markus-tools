@@ -1,5 +1,61 @@
 package main
 
+import "unicode"
+
+func isLetter(r rune) bool {
+	if unicode.IsUpper(r) || unicode.IsLower(r) {
+		return true
+	}
+
+	return false
+}
+
+func isLetterDigitHyphenOrUnderscore(r rune) bool {
+	if isLetter(r) || unicode.IsDigit(r) || r == '-' || r == '_' {
+		return true
+	}
+
+	return false
+}
+
+// TODO: WIP
+func findHTMLTagAttributes(htmlDocumentPart string) []string {
+	var htmlAttributes []string
+	var attributePart []rune
+	inAttributeName := false
+	inAttributeValue := false
+
+	runes := []rune(htmlDocumentPart)
+	count := len(runes)
+
+	for i := 0; i < count; i++ {
+		if inAttributeName {
+			iPlusOne := i + 1
+			if runes[i] == '=' {
+				attributePart = append(attributePart, runes[i])
+				inAttributeName = false
+				inAttributeValue = true
+			} else if isLetterDigitHyphenOrUnderscore(runes[i]) {
+				attributePart = append(attributePart, runes[i])
+			} else if iPlusOne < count && runes[i] == ':' && isLetterDigitHyphenOrUnderscore(runes[iPlusOne]) {
+				attributePart = append(attributePart, runes[i])
+				attributePart = append(attributePart, runes[iPlusOne])
+				i = iPlusOne
+			} else {
+				// stop ?
+			}
+		} else if inAttributeValue {
+			// htmlAttributes = append(htmlAttributes, string(attributePart))
+		} else if isLetter(runes[i]) {
+			attributePart = append(attributePart, runes[i])
+			inAttributeName = true
+		}
+		// else if valid HTML, unicode.IsSpace(runes[i])
+	}
+
+	return htmlAttributes
+}
+
 // TODO: WIP
 func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	var titleElements []string
