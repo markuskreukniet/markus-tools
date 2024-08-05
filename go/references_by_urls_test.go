@@ -20,7 +20,7 @@ func isLetterDigitHyphenOrUnderscore(r rune) bool {
 
 // TODO: WIP
 func findHTMLTagAttributes(htmlDocumentPart string) []string {
-	var htmlAttributes []string
+	var attributes []string
 	var attributePart []rune
 	inAttributeName := false
 	inAttributeValue := false
@@ -31,10 +31,14 @@ func findHTMLTagAttributes(htmlDocumentPart string) []string {
 	for i := 0; i < count; i++ {
 		if inAttributeName {
 			iPlusOne := i + 1
-			if runes[i] == '=' {
+			iPlusTwo := i + 2
+			if iPlusOne < count && runes[i] == '=' && runes[iPlusOne] == '"' && isLetterDigitHyphenOrUnderscore(runes[iPlusTwo]) {
 				attributePart = append(attributePart, runes[i])
+				attributePart = append(attributePart, runes[iPlusOne])
+				attributePart = append(attributePart, runes[iPlusTwo])
 				inAttributeName = false
 				inAttributeValue = true
+				i = iPlusTwo
 			} else if isLetterDigitHyphenOrUnderscore(runes[i]) {
 				attributePart = append(attributePart, runes[i])
 			} else if iPlusOne < count && runes[i] == ':' && isLetterDigitHyphenOrUnderscore(runes[iPlusOne]) {
@@ -42,10 +46,17 @@ func findHTMLTagAttributes(htmlDocumentPart string) []string {
 				attributePart = append(attributePart, runes[iPlusOne])
 				i = iPlusOne
 			} else {
-				// stop ?
+				attributePart = nil
+				inAttributeName = false
 			}
 		} else if inAttributeValue {
-			// htmlAttributes = append(htmlAttributes, string(attributePart))
+			if isLetterDigitHyphenOrUnderscore(runes[i]) {
+				attributePart = append(attributePart, runes[i])
+			} else if runes[i] == '"' {
+				attributePart = append(attributePart, runes[i])
+				attributes = append(attributes, string(attributePart))
+				inAttributeValue = false
+			}
 		} else if isLetter(runes[i]) {
 			attributePart = append(attributePart, runes[i])
 			inAttributeName = true
@@ -53,7 +64,7 @@ func findHTMLTagAttributes(htmlDocumentPart string) []string {
 		// else if valid HTML, unicode.IsSpace(runes[i])
 	}
 
-	return htmlAttributes
+	return attributes
 }
 
 // TODO: WIP
