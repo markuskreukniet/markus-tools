@@ -18,50 +18,52 @@ func isLetterDigitHyphenOrUnderscore(r rune) bool {
 	return false
 }
 
+// else if valid HTML, unicode.IsSpace(runes[i])
 // TODO: WIP
 func findHTMLTagAttributes(htmlDocumentPart string) []string {
 	var attributes []string
 	var attributePart []rune
 	inAttributeName := false
 	inAttributeValue := false
+	var quoteRune rune
 
 	runes := []rune(htmlDocumentPart)
 	count := len(runes)
 
 	for i := 0; i < count; i++ {
-		if inAttributeName {
-			iPlusOne := i + 1
-			iPlusTwo := i + 2
-			if iPlusOne < count && runes[i] == '=' && runes[iPlusOne] == '"' && isLetterDigitHyphenOrUnderscore(runes[iPlusTwo]) {
+		switch {
+		case inAttributeName:
+			if runes[i] == '=' {
 				attributePart = append(attributePart, runes[i])
-				attributePart = append(attributePart, runes[iPlusOne])
-				attributePart = append(attributePart, runes[iPlusTwo])
 				inAttributeName = false
 				inAttributeValue = true
-				i = iPlusTwo
 			} else if isLetterDigitHyphenOrUnderscore(runes[i]) {
 				attributePart = append(attributePart, runes[i])
-			} else if iPlusOne < count && runes[i] == ':' && isLetterDigitHyphenOrUnderscore(runes[iPlusOne]) {
-				attributePart = append(attributePart, runes[i])
-				attributePart = append(attributePart, runes[iPlusOne])
-				i = iPlusOne
 			} else {
-				attributePart = nil
 				inAttributeName = false
+				attributePart = nil
 			}
-		} else if inAttributeValue {
-			if isLetterDigitHyphenOrUnderscore(runes[i]) {
+		case inAttributeValue:
+			if runes[i] == '"' || runes[i] == '\'' {
+				quoteRune = runes[i]
 				attributePart = append(attributePart, runes[i])
-			} else if runes[i] == '"' {
-				attributePart = append(attributePart, runes[i])
+				for j := i + 1; j < count; j++ {
+					attributePart = append(attributePart, runes[j])
+					if runes[j] == quoteRune {
+						i = j
+						break
+					}
+				}
 				attributes = append(attributes, string(attributePart))
 				inAttributeValue = false
+				attributePart = nil
 			}
-		} else if isLetter(runes[i]) {
-			attributePart = append(attributePart, runes[i])
-			inAttributeName = true
+		default:
+			if isLetter(runes[i]) {
+				attributePart = append(attributePart, runes[i])
+				inAttributeName = true
+			}
 		}
-		// else if valid HTML, unicode.IsSpace(runes[i])
 	}
 
 	return attributes
