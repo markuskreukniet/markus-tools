@@ -18,19 +18,20 @@ func isLetterDigitHyphenOrUnderscore(r rune) bool {
 	return false
 }
 
-// else if valid HTML, unicode.IsSpace(runes[i])
-// TODO: WIP
-func findHTMLTagAttributes(htmlDocumentPart string) []string {
+// TODO: should also return number of runes used to end the tag
+func findHTMLTagAttributes(htmlDocumentPart string) ([]string, int) {
 	var attributes []string
 	var attributePart []rune
+	var quoteRune rune
+	numberOfRunesUsed := 0
 	inAttributeName := false
 	inAttributeValue := false
-	var quoteRune rune
 
 	runes := []rune(htmlDocumentPart)
 	count := len(runes)
 
 	for i := 0; i < count; i++ {
+		iPlusOne := i + 1
 		switch {
 		case inAttributeName:
 			if runes[i] == '=' {
@@ -47,7 +48,7 @@ func findHTMLTagAttributes(htmlDocumentPart string) []string {
 			if runes[i] == '"' || runes[i] == '\'' {
 				quoteRune = runes[i]
 				attributePart = append(attributePart, runes[i])
-				for j := i + 1; j < count; j++ {
+				for j := iPlusOne; j < count; j++ {
 					attributePart = append(attributePart, runes[j])
 					if runes[j] == quoteRune {
 						i = j
@@ -62,11 +63,19 @@ func findHTMLTagAttributes(htmlDocumentPart string) []string {
 			if isLetter(runes[i]) {
 				attributePart = append(attributePart, runes[i])
 				inAttributeName = true
+			} else if iPlusOne < count && runes[i] == '/' && runes[iPlusOne] == '>' {
+				numberOfRunesUsed = iPlusOne
+				break
+			} else if runes[i] == '>' {
+				numberOfRunesUsed = i
+				break
+			} else if unicode.IsSpace(runes[i]) {
+				continue
 			}
 		}
 	}
 
-	return attributes
+	return attributes, numberOfRunesUsed
 }
 
 // TODO: WIP
