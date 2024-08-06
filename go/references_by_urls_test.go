@@ -130,16 +130,7 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	return titleElements, h1Elements
 }
 
-// func runesHaveStringPrefixSlower(runes []rune, prefix string) (bool, int) {
-// 	prefixRunesLength := len([]rune(prefix))
-
-// 	if len(runes) < prefixRunesLength || string(runes[0:prefixRunesLength]) != "<!--" {
-// 		return false, 0
-// 	} else {
-// 		return true, prefixRunesLength
-// 	}
-// }
-
+// TODO: uses a runes sub slice, which is not optimal
 func runesHaveStringPrefix(runes []rune, prefix string) (bool, int) {
 	prefixRunes := []rune(prefix)
 	length := len(prefixRunes)
