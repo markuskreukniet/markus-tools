@@ -130,6 +130,23 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	return titleElements, h1Elements
 }
 
+func runesHaveStringPrefix(runes []rune, prefix string, runesLength int) (bool, int) {
+	prefixRunes := []rune(prefix)
+	length := len(prefixRunes)
+
+	if length >= runesLength {
+		return false, 0
+	}
+
+	for i := 0; i < length; i++ {
+		if runes[i] != prefixRunes[i] {
+			return false, 0
+		}
+	}
+
+	return true, length
+}
+
 func filterComments(htmlDocument string) string {
 	var filteredHTMLDocument []rune
 	inHTMLComment := false
