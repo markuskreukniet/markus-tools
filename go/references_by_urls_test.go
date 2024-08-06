@@ -40,7 +40,8 @@ func findHTMLTagAttributes(htmlDocumentPart string) ([]string, int) {
 				inAttributeValue = true
 			} else if isLetterDigitHyphenOrUnderscore(runes[i]) {
 				attributePart = append(attributePart, runes[i])
-			} else {
+			} else if unicode.IsSpace(runes[i]) {
+				attributes = append(attributes, string(attributePart))
 				inAttributeName = false
 				attributePart = nil
 			}
@@ -131,7 +132,7 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 }
 
 // TODO: uses a runes sub slice, which is not optimal
-func runesHaveStringPrefix(runes []rune, prefix string) (bool, int) {
+func runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes []rune, prefix string) (bool, int) {
 	prefixRunes := []rune(prefix)
 	length := len(prefixRunes)
 
@@ -139,7 +140,7 @@ func runesHaveStringPrefix(runes []rune, prefix string) (bool, int) {
 		return false, 0
 	}
 
-	for i := 0; i < length; i++ {
+	for i := range prefixRunes {
 		if runes[i] != prefixRunes[i] {
 			return false, 0
 		}
@@ -159,35 +160,36 @@ func filterComments(htmlDocument string) string {
 	count := len(runes)
 
 	for i := 0; i < count; i++ {
-		if inHTMLComment {
-			if hasPrefix, prefixLength := runesHaveStringPrefix(runes[i:], "-->"); hasPrefix {
+		switch {
+		case inHTMLComment:
+			if hasPrefix, prefixLength := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "-->"); hasPrefix {
 				inHTMLComment = false
 				i += prefixLength
 			}
-		} else if inJSCommentSingleLine {
+		case inJSCommentSingleLine:
 			if runes[i] == '\n' {
-				inJSCommentSingleLine = false
 				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
+				inJSCommentSingleLine = false
 			}
-		} else if inCommentMultiLine {
-			if hasPrefix, prefixLength := runesHaveStringPrefix(runes[i:], "*/"); hasPrefix {
+		case inCommentMultiLine:
+			if hasPrefix, prefixLength := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "*/"); hasPrefix {
 				inCommentMultiLine = false
 				i += prefixLength
 			}
-		} else if escaped {
+		case escaped:
 			filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 			escaped = false
-		} else {
+		default:
 			if runes[i] == '\\' {
 				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 				escaped = true
-			} else if hasPrefix, prefixLength := runesHaveStringPrefix(runes[i:], "<!--"); hasPrefix {
+			} else if hasPrefix, prefixLength := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "<!--"); hasPrefix {
 				inHTMLComment = true
 				i += prefixLength
-			} else if hasPrefix, prefixLength := runesHaveStringPrefix(runes[i:], "//"); hasPrefix {
+			} else if hasPrefix, prefixLength := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "//"); hasPrefix {
 				inJSCommentSingleLine = true
 				i += prefixLength
-			} else if hasPrefix, prefixLength := runesHaveStringPrefix(runes[i:], "/*"); hasPrefix {
+			} else if hasPrefix, prefixLength := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "/*"); hasPrefix {
 				inCommentMultiLine = true
 				i += prefixLength
 			} else {
