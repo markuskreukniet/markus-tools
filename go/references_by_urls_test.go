@@ -130,11 +130,21 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	return titleElements, h1Elements
 }
 
-func runesHaveStringPrefix(runes []rune, prefix string, runesLength int) (bool, int) {
+// func runesHaveStringPrefixSlower(runes []rune, prefix string) (bool, int) {
+// 	prefixRunesLength := len([]rune(prefix))
+
+// 	if len(runes) < prefixRunesLength || string(runes[0:prefixRunesLength]) != "<!--" {
+// 		return false, 0
+// 	} else {
+// 		return true, prefixRunesLength
+// 	}
+// }
+
+func runesHaveStringPrefix(runes []rune, prefix string) (bool, int) {
 	prefixRunes := []rune(prefix)
 	length := len(prefixRunes)
 
-	if length >= runesLength {
+	if len(runes) < length {
 		return false, 0
 	}
 
@@ -144,7 +154,7 @@ func runesHaveStringPrefix(runes []rune, prefix string, runesLength int) (bool, 
 		}
 	}
 
-	return true, length
+	return true, length - 1
 }
 
 func filterComments(htmlDocument string) string {
@@ -158,23 +168,20 @@ func filterComments(htmlDocument string) string {
 	count := len(runes)
 
 	for i := 0; i < count; i++ {
-		iPlusOne := i + 1
-		iPlusTwo := i + 2
-		iPlusThree := i + 3
-
 		if inHTMLComment {
-			if iPlusTwo < count && runes[i] == '-' && runes[iPlusOne] == '-' && runes[iPlusTwo] == '>' {
+			if hasPrefix, prefixLength := runesHaveStringPrefix(runes[i:], "-->"); hasPrefix {
 				inHTMLComment = false
-				i = iPlusTwo
+				i += prefixLength
 			}
 		} else if inJSCommentSingleLine {
 			if runes[i] == '\n' {
 				inJSCommentSingleLine = false
+				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 			}
 		} else if inCommentMultiLine {
-			if iPlusOne < count && runes[i] == '*' && runes[iPlusOne] == '/' {
+			if hasPrefix, prefixLength := runesHaveStringPrefix(runes[i:], "*/"); hasPrefix {
 				inCommentMultiLine = false
-				i = iPlusOne
+				i += prefixLength
 			}
 		} else if escaped {
 			filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
@@ -183,15 +190,15 @@ func filterComments(htmlDocument string) string {
 			if runes[i] == '\\' {
 				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 				escaped = true
-			} else if iPlusThree < count && runes[i] == '<' && runes[iPlusOne] == '!' && runes[iPlusTwo] == '-' && runes[iPlusThree] == '-' {
+			} else if hasPrefix, prefixLength := runesHaveStringPrefix(runes[i:], "<!--"); hasPrefix {
 				inHTMLComment = true
-				i = iPlusThree
-			} else if iPlusOne < count && runes[i] == '/' && runes[iPlusOne] == '/' {
+				i += prefixLength
+			} else if hasPrefix, prefixLength := runesHaveStringPrefix(runes[i:], "//"); hasPrefix {
 				inJSCommentSingleLine = true
-				i = iPlusOne
-			} else if iPlusOne < count && runes[i] == '/' && runes[iPlusOne] == '*' {
+				i += prefixLength
+			} else if hasPrefix, prefixLength := runesHaveStringPrefix(runes[i:], "/*"); hasPrefix {
 				inCommentMultiLine = true
-				i = iPlusOne
+				i += prefixLength
 			} else {
 				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 			}
