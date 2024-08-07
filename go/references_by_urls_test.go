@@ -79,8 +79,65 @@ func findHTMLTagAttributes(htmlDocumentPart string) ([]string, int) {
 	return attributes, numberOfRunesUsed
 }
 
-// TODO: WIP
+func getHTMLTagAttribute(htmlDocumentPart []rune) (bool, int) {
+	var attributePart []rune
+	inAttributeName := false
+	inAttributeValue := false
+
+	for i := range htmlDocumentPart {
+		switch {
+		case inAttributeName:
+			if htmlDocumentPart[i] == '=' {
+				attributePart = append(attributePart, htmlDocumentPart[i])
+				inAttributeName = false
+				inAttributeValue = true
+			} else if isLetterDigitHyphenOrUnderscore(htmlDocumentPart[i]) {
+				attributePart = append(attributePart, htmlDocumentPart[i])
+			} else if unicode.IsSpace(htmlDocumentPart[i]) || htmlDocumentPart[i] == '>' {
+				return true, len(attributePart)
+			}
+		case inAttributeValue:
+
+		default:
+
+		}
+	}
+
+	return true, 0
+}
+
 func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
+	var titleElements []string
+	var h1Elements []string
+	var htmlElementPart []rune
+	creatingTitleStartTag := false
+
+	runes := []rune(htmlDocument)
+
+	for i := range runes {
+		switch {
+		case creatingTitleStartTag:
+			if unicode.IsSpace(runes[i]) {
+				htmlElementPart = append(htmlElementPart, runes[i])
+			} else if runes[i] == '>' {
+				creatingTitleStartTag = false
+			} else if hasAttribute, length := getHTMLTagAttribute(runes[i:]); hasAttribute {
+				htmlElementPart = append(htmlElementPart, runes[i:length]...)
+			}
+		default:
+			if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "<title"); hasPrefix {
+				creatingTitleStartTag = true
+				htmlElementPart = append(htmlElementPart, runes[i:length+2]...)
+				i += length
+			}
+		}
+	}
+
+	return titleElements, h1Elements
+}
+
+// TODO: WIP
+func findTitleAndH1ElementsOld(htmlDocument string) ([]string, []string) {
 	var titleElements []string
 	var h1Elements []string
 	var htmlElementPart []rune
@@ -157,14 +214,13 @@ func filterComments(htmlDocument string) string {
 	escaped := false
 
 	runes := []rune(htmlDocument)
-	count := len(runes)
 
-	for i := 0; i < count; i++ {
+	for i := range runes {
 		switch {
 		case inHTMLComment:
-			if hasPrefix, prefixLength := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "-->"); hasPrefix {
+			if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "-->"); hasPrefix {
 				inHTMLComment = false
-				i += prefixLength
+				i += length
 			}
 		case inJSCommentSingleLine:
 			if runes[i] == '\n' {
@@ -172,9 +228,9 @@ func filterComments(htmlDocument string) string {
 				inJSCommentSingleLine = false
 			}
 		case inCommentMultiLine:
-			if hasPrefix, prefixLength := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "*/"); hasPrefix {
+			if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "*/"); hasPrefix {
 				inCommentMultiLine = false
-				i += prefixLength
+				i += length
 			}
 		case escaped:
 			filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
@@ -183,15 +239,15 @@ func filterComments(htmlDocument string) string {
 			if runes[i] == '\\' {
 				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 				escaped = true
-			} else if hasPrefix, prefixLength := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "<!--"); hasPrefix {
+			} else if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "<!--"); hasPrefix {
 				inHTMLComment = true
-				i += prefixLength
-			} else if hasPrefix, prefixLength := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "//"); hasPrefix {
+				i += length
+			} else if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "//"); hasPrefix {
 				inJSCommentSingleLine = true
-				i += prefixLength
-			} else if hasPrefix, prefixLength := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "/*"); hasPrefix {
+				i += length
+			} else if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "/*"); hasPrefix {
 				inCommentMultiLine = true
-				i += prefixLength
+				i += length
 			} else {
 				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 			}
