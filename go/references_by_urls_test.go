@@ -59,7 +59,7 @@ func finishCreatingStartTag(htmlDocumentPart []rune) int {
 			} else if htmlDocumentPart[i] == '>' {
 				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
 				return len(startTagEndPart) // TODO: should be an int instead of slice?
-			} else if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(htmlDocumentPart[i:], "/>"); hasPrefix {
+			} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart[i:], "/>"); hasPrefix {
 				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i:length+2]...)
 				return len(startTagEndPart) + length
 			} else if unicode.IsSpace(htmlDocumentPart[i]) {
@@ -80,16 +80,16 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 
 	runes := []rune(htmlDocument)
 
-	for i := range runes {
+	for i := 0; i < len(runes); i++ {
 		switch {
 		case creatingTitleStartTag:
 			// length := finishCreatingStartTag(runes[i:])
 		default:
-			if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "<title"); hasPrefix {
+			if hasPrefix, length := hasStringPrefix(runes[i:], "<title"); hasPrefix {
 				creatingTitleStartTag = true
 				htmlElementPart = append(htmlElementPart, runes[i:length+2]...)
 				i += length
-			} else if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "<h1"); hasPrefix {
+			} else if hasPrefix, length := hasStringPrefix(runes[i:], "<h1"); hasPrefix {
 				// creatingH1StartTag = true
 				htmlElementPart = append(htmlElementPart, runes[i:length+2]...)
 				i += length
@@ -101,21 +101,20 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 }
 
 // TODO: uses a runes sub slice, which is not optimal
-func runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes []rune, prefix string) (bool, int) {
-	prefixRunes := []rune(prefix)
-	length := len(prefixRunes)
+func hasStringPrefix(runes []rune, prefix string) (bool, int) {
+	length := len(prefix)
 
 	if len(runes) < length {
 		return false, 0
 	}
 
-	for i := range prefixRunes {
-		if runes[i] != prefixRunes[i] {
+	for i, r := range prefix {
+		if runes[i] != r {
 			return false, 0
 		}
 	}
 
-	return true, length - 1
+	return true, length
 }
 
 func filterComments(htmlDocument string) string {
@@ -127,12 +126,12 @@ func filterComments(htmlDocument string) string {
 
 	runes := []rune(htmlDocument)
 
-	for i := range runes {
+	for i := 0; i < len(runes); i++ {
 		switch {
 		case inHTMLComment:
-			if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "-->"); hasPrefix {
+			if hasPrefix, length := hasStringPrefix(runes[i:], "-->"); hasPrefix {
 				inHTMLComment = false
-				i += length
+				i += length - 1
 			}
 		case inJSCommentSingleLine:
 			if runes[i] == '\n' {
@@ -140,9 +139,9 @@ func filterComments(htmlDocument string) string {
 				inJSCommentSingleLine = false
 			}
 		case inCommentMultiLine:
-			if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "*/"); hasPrefix {
+			if hasPrefix, length := hasStringPrefix(runes[i:], "*/"); hasPrefix {
 				inCommentMultiLine = false
-				i += length
+				i += length - 1
 			}
 		case escaped:
 			filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
@@ -151,15 +150,16 @@ func filterComments(htmlDocument string) string {
 			if runes[i] == '\\' {
 				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 				escaped = true
-			} else if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "<!--"); hasPrefix {
+			} else if hasPrefix, length := hasStringPrefix(runes[i:], "<!--"); hasPrefix {
 				inHTMLComment = true
-				i += length
-			} else if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "//"); hasPrefix {
+				i += length - 1
+			} else if hasPrefix, length := hasStringPrefix(runes[i:], "//"); hasPrefix {
 				inJSCommentSingleLine = true
+				length--
 				i += length
-			} else if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "/*"); hasPrefix {
+			} else if hasPrefix, length := hasStringPrefix(runes[i:], "/*"); hasPrefix {
 				inCommentMultiLine = true
-				i += length
+				i += length - 1
 			} else {
 				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 			}
