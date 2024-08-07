@@ -18,92 +18,57 @@ func isLetterDigitHyphenOrUnderscore(r rune) bool {
 	return false
 }
 
-// TODO: should also return number of runes used to end the tag
-func findHTMLTagAttributes(htmlDocumentPart string) ([]string, int) {
-	var attributes []string
-	var attributePart []rune
+func finishCreatingStartTag(htmlDocumentPart []rune) int {
+	var startTagEndPart []rune
 	var quoteRune rune
-	numberOfRunesUsed := 0
 	inAttributeName := false
 	inAttributeValue := false
 
-	runes := []rune(htmlDocumentPart)
-	count := len(runes)
+	length := len(htmlDocumentPart)
 
-	for i := 0; i < count; i++ {
-		iPlusOne := i + 1
+	for i := 0; i < length; i++ {
 		switch {
 		case inAttributeName:
-			if runes[i] == '=' {
-				attributePart = append(attributePart, runes[i])
+			if htmlDocumentPart[i] == '=' {
+				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
 				inAttributeName = false
 				inAttributeValue = true
-			} else if isLetterDigitHyphenOrUnderscore(runes[i]) {
-				attributePart = append(attributePart, runes[i])
-			} else if unicode.IsSpace(runes[i]) {
-				attributes = append(attributes, string(attributePart))
+			} else if isLetterDigitHyphenOrUnderscore(htmlDocumentPart[i]) {
+				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
+			} else if unicode.IsSpace(htmlDocumentPart[i]) {
+				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
 				inAttributeName = false
-				attributePart = nil
 			}
 		case inAttributeValue:
-			if runes[i] == '"' || runes[i] == '\'' {
-				quoteRune = runes[i]
-				attributePart = append(attributePart, runes[i])
-				for j := iPlusOne; j < count; j++ {
-					attributePart = append(attributePart, runes[j])
-					if runes[j] == quoteRune {
+			if htmlDocumentPart[i] == '"' || htmlDocumentPart[i] == '\'' {
+				quoteRune = htmlDocumentPart[i]
+				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
+				for j := i + 1; j < length; j++ {
+					startTagEndPart = append(startTagEndPart, htmlDocumentPart[j])
+					if htmlDocumentPart[j] == quoteRune {
 						i = j
 						break
 					}
 				}
-				attributes = append(attributes, string(attributePart))
 				inAttributeValue = false
-				attributePart = nil
 			}
 		default:
-			if isLetter(runes[i]) {
-				attributePart = append(attributePart, runes[i])
+			if isLetter(htmlDocumentPart[i]) {
+				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
 				inAttributeName = true
-			} else if iPlusOne < count && runes[i] == '/' && runes[iPlusOne] == '>' {
-				numberOfRunesUsed = iPlusOne
-				break
-			} else if runes[i] == '>' {
-				numberOfRunesUsed = i
-				break
-			} else if unicode.IsSpace(runes[i]) {
+			} else if htmlDocumentPart[i] == '>' {
+				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
+				return len(startTagEndPart) // TODO: should be an int instead of slice?
+			} else if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(htmlDocumentPart[i:], "/>"); hasPrefix {
+				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i:length+2]...)
+				return len(startTagEndPart) + length
+			} else if unicode.IsSpace(htmlDocumentPart[i]) {
 				continue
 			}
 		}
 	}
 
-	return attributes, numberOfRunesUsed
-}
-
-func getHTMLTagAttribute(htmlDocumentPart []rune) (bool, int) {
-	var attributePart []rune
-	inAttributeName := false
-	inAttributeValue := false
-
-	for i := range htmlDocumentPart {
-		switch {
-		case inAttributeName:
-			if htmlDocumentPart[i] == '=' {
-				attributePart = append(attributePart, htmlDocumentPart[i])
-				inAttributeName = false
-				inAttributeValue = true
-			} else if isLetterDigitHyphenOrUnderscore(htmlDocumentPart[i]) {
-				attributePart = append(attributePart, htmlDocumentPart[i])
-			} else if unicode.IsSpace(htmlDocumentPart[i]) || htmlDocumentPart[i] == '>' {
-				return true, len(attributePart)
-			}
-		case inAttributeValue:
-
-		default:
-
-		}
-	}
-
-	return true, 0
+	return 0
 }
 
 func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
@@ -111,76 +76,23 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	var h1Elements []string
 	var htmlElementPart []rune
 	creatingTitleStartTag := false
+	// creatingH1StartTag := false
 
 	runes := []rune(htmlDocument)
 
 	for i := range runes {
 		switch {
 		case creatingTitleStartTag:
-			if unicode.IsSpace(runes[i]) {
-				htmlElementPart = append(htmlElementPart, runes[i])
-			} else if runes[i] == '>' {
-				creatingTitleStartTag = false
-			} else if hasAttribute, length := getHTMLTagAttribute(runes[i:]); hasAttribute {
-				htmlElementPart = append(htmlElementPart, runes[i:length]...)
-			}
+			// length := finishCreatingStartTag(runes[i:])
 		default:
 			if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "<title"); hasPrefix {
 				creatingTitleStartTag = true
 				htmlElementPart = append(htmlElementPart, runes[i:length+2]...)
 				i += length
-			}
-		}
-	}
-
-	return titleElements, h1Elements
-}
-
-// TODO: WIP
-func findTitleAndH1ElementsOld(htmlDocument string) ([]string, []string) {
-	var titleElements []string
-	var h1Elements []string
-	var htmlElementPart []rune
-	creatingTitleElement := false
-	// fidingTitleStartTag := false
-	// fidingH1StartTag := false
-
-	runes := []rune(htmlDocument)
-	count := len(runes)
-
-	for i := 0; i < count; i++ {
-		iPlusOne := i + 1
-		iPlusTwo := i + 2
-		iPlusThree := i + 3
-		iPlusFour := i + 4
-		iPlusFive := i + 5
-		iPlusSix := i + 6
-		iPlusSeven := i + 7
-
-		if creatingTitleElement {
-			if iPlusSeven < count &&
-				runes[i] == '<' && runes[iPlusOne] == '/' &&
-				runes[iPlusTwo] == 't' && runes[iPlusThree] == 'i' && runes[iPlusFour] == 't' && runes[iPlusFive] == 'l' && runes[iPlusSix] == 'e' &&
-				runes[iPlusSeven] == '>' {
-				creatingTitleElement = false
-				htmlElementPart = append(htmlElementPart, runes[i:iPlusSeven+1]...)
-				titleElements = append(titleElements, string(htmlElementPart))
-				htmlElementPart = nil
-				i = iPlusSeven
-			} else {
-				htmlElementPart = append(htmlElementPart, runes[i])
-			}
-		} else {
-			if iPlusSix < count &&
-				runes[i] == '<' &&
-				runes[iPlusOne] == 't' && runes[iPlusTwo] == 'i' && runes[iPlusThree] == 't' && runes[iPlusFour] == 'l' && runes[iPlusFive] == 'e' &&
-				runes[iPlusSix] == '>' {
-				creatingTitleElement = true
-				htmlElementPart = append(htmlElementPart, runes[i:iPlusSix+1]...)
-				i = iPlusSix
-			} else if iPlusTwo < count &&
-				runes[i] == '<' && runes[iPlusOne] == 'h' && runes[iPlusTwo] == '1' {
-				i = iPlusTwo
+			} else if hasPrefix, length := runesHaveStringPrefixAndGetPrefixLengthMinusOne(runes[i:], "<h1"); hasPrefix {
+				// creatingH1StartTag = true
+				htmlElementPart = append(htmlElementPart, runes[i:length+2]...)
+				i += length
 			}
 		}
 	}
