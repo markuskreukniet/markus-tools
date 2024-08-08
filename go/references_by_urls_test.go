@@ -1,6 +1,10 @@
 package main
 
-import "unicode"
+import (
+	"reflect"
+	"testing"
+	"unicode"
+)
 
 func isLetter(r rune) bool {
 	return unicode.IsUpper(r) || unicode.IsLower(r)
@@ -220,6 +224,52 @@ func filterComments(htmlDocument string) string {
 	return string(filteredHTMLDocument)
 }
 
-// func TestReferencesByURLs(t *testing.T) {
+func TestReferencesByURLs(t *testing.T) {
+	tests := []struct {
+		htmlDocument   string
+		expectedTitles []string
+		expectedH1s    []string
+	}{
+		{
+			htmlDocument:   "<html><head><title>Test Title</title></head><body><h1>Heading 1</h1></body></html>",
+			expectedTitles: []string{"<title>Test Title</title>"},
+			expectedH1s:    []string{"<h1>Heading 1</h1>"},
+		},
+		{
+			htmlDocument:   "<html><head><title>Another Title</title></head><body><h1>First Heading</h1><h1>Second Heading</h1></body></html>",
+			expectedTitles: []string{"<title>Another Title</title>"},
+			expectedH1s:    []string{"<h1>First Heading</h1>", "<h1>Second Heading</h1>"},
+		},
+		{
+			htmlDocument:   "<html><head></head><body><h1>Only Heading</h1></body></html>",
+			expectedTitles: []string{},
+			expectedH1s:    []string{"<h1>Only Heading</h1>"},
+		},
+		{
+			htmlDocument:   "<html><head><title>Empty Title</title></head><body><h1></h1></body></html>",
+			expectedTitles: []string{"<title>Empty Title</title>"},
+			expectedH1s:    []string{"<h1></h1>"},
+		},
+		{
+			htmlDocument:   "<html><head><title>    </title></head><body><h1>     </h1></body></html>",
+			expectedTitles: []string{"<title>    </title>"},
+			expectedH1s:    []string{"<h1>     </h1>"},
+		},
+	}
 
-// }
+	for _, test := range tests {
+		titles, h1s := findTitleAndH1Elements(test.htmlDocument)
+
+		if titles != nil && test.expectedTitles != nil {
+			if !reflect.DeepEqual(titles, test.expectedTitles) {
+				t.Errorf("findTitleAndH1Elements(%q) titles = %v; want %v", test.htmlDocument, titles, test.expectedTitles)
+			}
+		}
+
+		if h1s != nil && test.expectedH1s != nil {
+			if !reflect.DeepEqual(h1s, test.expectedH1s) {
+				t.Errorf("findTitleAndH1Elements(%q) h1s = %v; want %v", test.htmlDocument, h1s, test.expectedH1s)
+			}
+		}
+	}
+}
