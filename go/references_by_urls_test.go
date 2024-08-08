@@ -255,6 +255,11 @@ func TestReferencesByURLs(t *testing.T) {
 			expectedTitles: []string{"<title>    </title>"},
 			expectedH1s:    []string{"<h1>     </h1>"},
 		},
+		{
+			htmlDocument:   "<html><head><title te_s-t   test2-lol   test3=\"asdf-asdf2\">    </title ></head><body><h1 asdf asdf=\"asdf89-asdf99\">     </h1     ></body></html>",
+			expectedTitles: []string{"<title te_s-t   test2-lol   test3=\"asdf-asdf2\">    </title >"},
+			expectedH1s:    []string{"<h1 asdf asdf=\"asdf89-asdf99\">     </h1     >"},
+		},
 	}
 
 	for _, test := range tests {
