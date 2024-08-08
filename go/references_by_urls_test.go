@@ -18,7 +18,7 @@ func isLetterDigitHyphenOrUnderscore(r rune) bool {
 	return false
 }
 
-func finishCreatingStartTag(htmlDocumentPart []rune) int {
+func finishCreatingStartTag(htmlDocumentPart []rune) (int, bool) {
 	var startTagEndPart []rune
 	var quoteRune rune
 	inAttributeName := false
@@ -58,12 +58,35 @@ func finishCreatingStartTag(htmlDocumentPart []rune) int {
 				inAttributeName = true
 			} else if htmlDocumentPart[i] == '>' {
 				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
-				return len(startTagEndPart) // TODO: should be an int instead of slice?
+				return len(startTagEndPart), false // TODO: should be an int instead of slice?
 			} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart[i:], "/>"); hasPrefix {
 				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i:length+2]...)
-				return len(startTagEndPart) + length
+				return len(startTagEndPart) + length, true
 			} else if unicode.IsSpace(htmlDocumentPart[i]) {
 				continue
+			}
+		}
+	}
+
+	return 0, false
+}
+
+func finishCreatingHTMLElement(htmlDocumentPart []rune, endTag string) int {
+	creatingTitleStartTag := false
+
+	for i := range htmlDocumentPart {
+		switch {
+		case creatingTitleStartTag:
+			if unicode.IsSpace(htmlDocumentPart[i]) {
+				continue
+			} else if htmlDocumentPart[i] == '>' {
+				return i
+			} else {
+				return 0
+			}
+		default:
+			if hasPrefix, length := hasStringPrefix(htmlDocumentPart[i:], endTag); hasPrefix {
+				return i + length - 1
 			}
 		}
 	}
@@ -76,23 +99,38 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	var h1Elements []string
 	var htmlElementPart []rune
 	creatingTitleStartTag := false
-	// creatingH1StartTag := false
+	finishCreatingTitleElement := false
 
 	runes := []rune(htmlDocument)
 
 	for i := 0; i < len(runes); i++ {
 		switch {
 		case creatingTitleStartTag:
-			// length := finishCreatingStartTag(runes[i:])
+			length, tagIsClosed := finishCreatingStartTag(runes[i:])
+			htmlElementPart = append(htmlElementPart, runes[i:length+1]...)
+			i += length - 1
+			if tagIsClosed {
+				titleElements = append(titleElements, string(htmlElementPart))
+				htmlElementPart = nil
+			} else {
+				finishCreatingTitleElement = true
+			}
+			creatingTitleStartTag = false
+		case finishCreatingTitleElement:
+			length := finishCreatingHTMLElement(runes[i:], "</title")
+			htmlElementPart = append(htmlElementPart, runes[i:length+1]...)
+			i += length - 1
+			titleElements = append(titleElements, string(htmlElementPart))
+			htmlElementPart = nil
 		default:
-			if hasPrefix, length := hasStringPrefix(runes[i:], "<title"); hasPrefix {
+			hasPrefix, length := hasStringPrefix(runes[i:], "<title")
+			if !hasPrefix {
+				hasPrefix, length = hasStringPrefix(runes[i:], "<h1")
+			}
+			if hasPrefix {
 				creatingTitleStartTag = true
-				htmlElementPart = append(htmlElementPart, runes[i:length+2]...)
-				i += length
-			} else if hasPrefix, length := hasStringPrefix(runes[i:], "<h1"); hasPrefix {
-				// creatingH1StartTag = true
-				htmlElementPart = append(htmlElementPart, runes[i:length+2]...)
-				i += length
+				htmlElementPart = append(htmlElementPart, runes[i:length+1]...)
+				i += length - 1
 			}
 		}
 	}
