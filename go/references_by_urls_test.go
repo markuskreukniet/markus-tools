@@ -3,19 +3,11 @@ package main
 import "unicode"
 
 func isLetter(r rune) bool {
-	if unicode.IsUpper(r) || unicode.IsLower(r) {
-		return true
-	}
-
-	return false
+	return unicode.IsUpper(r) || unicode.IsLower(r)
 }
 
 func isLetterDigitHyphenOrUnderscore(r rune) bool {
-	if isLetter(r) || unicode.IsDigit(r) || r == '-' || r == '_' {
-		return true
-	}
-
-	return false
+	return isLetter(r) || unicode.IsDigit(r) || r == '-' || r == '_'
 }
 
 func finishCreatingStartTag(htmlDocumentPart []rune) (int, bool) {
