@@ -60,8 +60,8 @@ func finishCreatingStartTag(htmlDocumentPart []rune) (int, bool) {
 				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
 				return len(startTagEndPart), false // TODO: should be an int instead of slice?
 			} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart[i:], "/>"); hasPrefix {
-				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i:length+2]...)
-				return len(startTagEndPart) + length, true
+				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i:i+length]...)
+				return len(startTagEndPart), true
 			} else if unicode.IsSpace(htmlDocumentPart[i]) {
 				continue
 			}
