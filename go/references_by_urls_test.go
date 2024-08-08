@@ -144,15 +144,13 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 			htmlElementPart = nil
 			finishCreatingH1Element = false
 		default:
-			hasPrefix, length := hasStringPrefix(runes[i:], "<title")
-			if hasPrefix {
+			if hasPrefix, length := hasStringPrefix(runes[i:], "<title"); hasPrefix {
 				creatingTitleStartTag = true
 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 				i += length - 1
 				continue
 			}
-			hasPrefix, length = hasStringPrefix(runes[i:], "<h1")
-			if hasPrefix {
+			if hasPrefix, length := hasStringPrefix(runes[i:], "<h1"); hasPrefix {
 				creatingH1StartTag = true
 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 				i += length - 1
