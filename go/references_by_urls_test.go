@@ -72,22 +72,20 @@ func finishCreatingStartTag(htmlDocumentPart []rune) (int, bool) {
 }
 
 func finishCreatingHTMLElement(htmlDocumentPart []rune, endTag string) int {
-	creatingTitleStartTag := false
+	inEndTag := false
 
-	for i := range htmlDocumentPart {
-		switch {
-		case creatingTitleStartTag:
+	for i := 0; i < len(htmlDocumentPart); i++ {
+		if inEndTag {
 			if unicode.IsSpace(htmlDocumentPart[i]) {
 				continue
 			} else if htmlDocumentPart[i] == '>' {
-				return i
+				return i + 1
 			} else {
 				return 0
 			}
-		default:
-			if hasPrefix, length := hasStringPrefix(htmlDocumentPart[i:], endTag); hasPrefix {
-				return i + length - 1
-			}
+		} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart[i:], endTag); hasPrefix {
+			i += length - 1
+			inEndTag = true
 		}
 	}
 
