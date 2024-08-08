@@ -99,7 +99,9 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	var h1Elements []string
 	var htmlElementPart []rune
 	creatingTitleStartTag := false
+	creatingH1StartTag := false
 	finishCreatingTitleElement := false
+	finishCreatingH1Element := false
 
 	runes := []rune(htmlDocument)
 
@@ -107,7 +109,7 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 		switch {
 		case creatingTitleStartTag:
 			length, tagIsClosed := finishCreatingStartTag(runes[i:])
-			htmlElementPart = append(htmlElementPart, runes[i:length+1]...)
+			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 			i += length - 1
 			if tagIsClosed {
 				titleElements = append(titleElements, string(htmlElementPart))
@@ -116,20 +118,43 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 				finishCreatingTitleElement = true
 			}
 			creatingTitleStartTag = false
+		case creatingH1StartTag:
+			length, tagIsClosed := finishCreatingStartTag(runes[i:])
+			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
+			i += length - 1
+			if tagIsClosed {
+				h1Elements = append(h1Elements, string(htmlElementPart))
+				htmlElementPart = nil
+			} else {
+				finishCreatingH1Element = true
+			}
+			creatingH1StartTag = false
 		case finishCreatingTitleElement:
 			length := finishCreatingHTMLElement(runes[i:], "</title")
-			htmlElementPart = append(htmlElementPart, runes[i:length+1]...)
+			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 			i += length - 1
 			titleElements = append(titleElements, string(htmlElementPart))
 			htmlElementPart = nil
+			finishCreatingTitleElement = false
+		case finishCreatingH1Element:
+			length := finishCreatingHTMLElement(runes[i:], "</h1")
+			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
+			i += length - 1
+			h1Elements = append(h1Elements, string(htmlElementPart))
+			htmlElementPart = nil
+			finishCreatingH1Element = false
 		default:
 			hasPrefix, length := hasStringPrefix(runes[i:], "<title")
-			if !hasPrefix {
-				hasPrefix, length = hasStringPrefix(runes[i:], "<h1")
-			}
 			if hasPrefix {
 				creatingTitleStartTag = true
-				htmlElementPart = append(htmlElementPart, runes[i:length+1]...)
+				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
+				i += length - 1
+				continue
+			}
+			hasPrefix, length = hasStringPrefix(runes[i:], "<h1")
+			if hasPrefix {
+				creatingH1StartTag = true
+				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 				i += length - 1
 			}
 		}
