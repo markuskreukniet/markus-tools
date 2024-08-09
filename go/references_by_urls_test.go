@@ -47,6 +47,8 @@ func finishCreatingStartTag(htmlDocumentPart []rune) (int, bool) {
 					}
 				}
 				inAttributeValue = false
+			} else {
+				// TODO: results in endless loop? return 0, false
 			}
 		default:
 			if isLetter(htmlDocumentPart[i]) {
@@ -59,6 +61,7 @@ func finishCreatingStartTag(htmlDocumentPart []rune) (int, bool) {
 				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i:i+length]...)
 				return len(startTagEndPart), true
 			} else if unicode.IsSpace(htmlDocumentPart[i]) {
+				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
 				continue
 			}
 		}
@@ -258,9 +261,14 @@ func TestReferencesByURLs(t *testing.T) {
 			expectedH1s:    []string{"<h1>     </h1>"},
 		},
 		{
-			htmlDocument:   "<html><head><title te_s-t   test2-lol   test3=\"asdf-asdf2\">    </title ></head><body><h1 asdf asdf=\"asdf89-asdf99\">     </h1     ></body></html>",
+			htmlDocument:   "<html><head><title te_s-t   test2-lol   test3=\"asdf-asdf2\">    </title ></head><body><h1 asdf asdf=\"asdf89-asdf99\"   >     </h1     ></body></html>",
 			expectedTitles: []string{"<title te_s-t   test2-lol   test3=\"asdf-asdf2\">    </title >"},
-			expectedH1s:    []string{"<h1 asdf asdf=\"asdf89-asdf99\">     </h1     >"},
+			expectedH1s:    []string{"<h1 asdf asdf=\"asdf89-asdf99\"   >     </h1     >"},
+		},
+		{
+			htmlDocument:   "<html><head><title/></head><body><h1   /> <h1   test-a=\"a_b-c\"  /></body></html>",
+			expectedTitles: []string{"<title/>"},
+			expectedH1s:    []string{"<h1   />", "<h1   test-a=\"a_b-c\"  />"},
 		},
 	}
 
