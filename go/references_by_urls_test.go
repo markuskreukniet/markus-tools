@@ -79,8 +79,7 @@ func finishCreatingHTMLElement(htmlDocumentPart []rune, endTag string) int {
 			} else {
 				return 0
 			}
-		} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart[i:], endTag); hasPrefix {
-			i += length - 1
+		} else if updateIndexIfPrefixMatches(htmlDocumentPart[i:], endTag, &i) {
 			inEndTag = true
 		}
 	}
@@ -172,13 +171,15 @@ func hasStringPrefix(runes []rune, prefix string) (bool, int) {
 	return true, length
 }
 
-// func hasStringPrefixAndUpdateIndex(runes []rune, prefix string, index *int) bool {
-// 	hasPrefix, length := hasStringPrefix(runes, prefix)
+func updateIndexIfPrefixMatches(runes []rune, prefix string, index *int) bool {
+	hasPrefix, length := hasStringPrefix(runes, prefix)
 
-// 	*index += length - 1
+	if hasPrefix {
+		*index += length - 1
+	}
 
-// 	return hasPrefix
-// }
+	return hasPrefix
+}
 
 func filterComments(htmlDocument string) string {
 	var filteredHTMLDocument []rune
@@ -192,18 +193,16 @@ func filterComments(htmlDocument string) string {
 	for i := 0; i < len(runes); i++ {
 		switch {
 		case inHTMLComment:
-			if hasPrefix, length := hasStringPrefix(runes[i:], "-->"); hasPrefix {
+			if updateIndexIfPrefixMatches(runes[i:], "-->", &i) {
 				inHTMLComment = false
-				i += length - 1
 			}
 		case inJSCommentSingleLine:
 			if runes[i] == '\n' {
 				inJSCommentSingleLine = false
 			}
 		case inCommentMultiLine:
-			if hasPrefix, length := hasStringPrefix(runes[i:], "*/"); hasPrefix {
+			if updateIndexIfPrefixMatches(runes[i:], "*/", &i) {
 				inCommentMultiLine = false
-				i += length - 1
 			}
 		case escaped:
 			filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
@@ -212,15 +211,12 @@ func filterComments(htmlDocument string) string {
 			if runes[i] == '\\' {
 				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 				escaped = true
-			} else if hasPrefix, length := hasStringPrefix(runes[i:], "<!--"); hasPrefix {
+			} else if updateIndexIfPrefixMatches(runes[i:], "<!--", &i) {
 				inHTMLComment = true
-				i += length - 1
-			} else if hasPrefix, length := hasStringPrefix(runes[i:], "//"); hasPrefix {
+			} else if updateIndexIfPrefixMatches(runes[i:], "//", &i) {
 				inJSCommentSingleLine = true
-				i += length - 1
-			} else if hasPrefix, length := hasStringPrefix(runes[i:], "/*"); hasPrefix {
+			} else if updateIndexIfPrefixMatches(runes[i:], "/*", &i) {
 				inCommentMultiLine = true
-				i += length - 1
 			} else {
 				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 			}
