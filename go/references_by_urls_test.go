@@ -57,7 +57,7 @@ func finishCreatingStartTag(htmlDocumentPart []rune) (int, bool) {
 			} else if htmlDocumentPart[i] == '>' {
 				startTagEndPartLength++
 				return startTagEndPartLength, false
-			} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart[i:], "/>"); hasPrefix {
+			} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, "/>"); hasPrefix {
 				startTagEndPartLength += length
 				return startTagEndPartLength, true
 			} else if unicode.IsSpace(htmlDocumentPart[i]) {
@@ -82,7 +82,7 @@ func finishCreatingHTMLElement(htmlDocumentPart []rune, endTag string) int {
 			} else {
 				return 0
 			}
-		} else if updateIndexIfPrefixMatches(htmlDocumentPart[i:], endTag, &i) {
+		} else if updateIndexIfPrefixMatches(htmlDocumentPart, endTag, &i) {
 			inEndTag = true
 		}
 	}
@@ -140,13 +140,13 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 			htmlElementPart = nil
 			finishCreatingH1Element = false
 		default:
-			if hasPrefix, length := hasStringPrefix(runes[i:], "<title"); hasPrefix {
+			if hasPrefix, length := hasStringPrefix(runes, i, "<title"); hasPrefix {
 				creatingTitleStartTag = true
 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 				i += length - 1
 				continue
 			}
-			if hasPrefix, length := hasStringPrefix(runes[i:], "<h1"); hasPrefix {
+			if hasPrefix, length := hasStringPrefix(runes, i, "<h1"); hasPrefix {
 				creatingH1StartTag = true
 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 				i += length - 1
@@ -157,25 +157,25 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	return titleElements, h1Elements
 }
 
-// TODO: uses a runes sub slice, which is not optimal
-func hasStringPrefix(runes []rune, prefix string) (bool, int) {
-	length := len(prefix)
+func hasStringPrefix(runes []rune, index int, prefix string) (bool, int) {
+	prefixLength := len(prefix)
 
-	if len(runes) < length {
+	if len(runes)-index < prefixLength {
 		return false, 0
 	}
 
-	for i, r := range prefix {
-		if runes[i] != r {
+	for _, r := range prefix {
+		if runes[index] != r {
 			return false, 0
 		}
+		index++
 	}
 
-	return true, length
+	return true, prefixLength
 }
 
 func updateIndexIfPrefixMatches(runes []rune, prefix string, index *int) bool {
-	hasPrefix, length := hasStringPrefix(runes, prefix)
+	hasPrefix, length := hasStringPrefix(runes, *index, prefix)
 
 	if hasPrefix {
 		*index += length - 1
@@ -196,7 +196,7 @@ func filterComments(htmlDocument string) string {
 	for i := 0; i < len(runes); i++ {
 		switch {
 		case inHTMLComment:
-			if updateIndexIfPrefixMatches(runes[i:], "-->", &i) {
+			if updateIndexIfPrefixMatches(runes, "-->", &i) {
 				inHTMLComment = false
 			}
 		case inJSCommentSingleLine:
@@ -204,7 +204,7 @@ func filterComments(htmlDocument string) string {
 				inJSCommentSingleLine = false
 			}
 		case inCommentMultiLine:
-			if updateIndexIfPrefixMatches(runes[i:], "*/", &i) {
+			if updateIndexIfPrefixMatches(runes, "*/", &i) {
 				inCommentMultiLine = false
 			}
 		case escaped:
@@ -214,11 +214,11 @@ func filterComments(htmlDocument string) string {
 			if runes[i] == '\\' {
 				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 				escaped = true
-			} else if updateIndexIfPrefixMatches(runes[i:], "<!--", &i) {
+			} else if updateIndexIfPrefixMatches(runes, "<!--", &i) {
 				inHTMLComment = true
-			} else if updateIndexIfPrefixMatches(runes[i:], "//", &i) {
+			} else if updateIndexIfPrefixMatches(runes, "//", &i) {
 				inJSCommentSingleLine = true
-			} else if updateIndexIfPrefixMatches(runes[i:], "/*", &i) {
+			} else if updateIndexIfPrefixMatches(runes, "/*", &i) {
 				inCommentMultiLine = true
 			} else {
 				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
