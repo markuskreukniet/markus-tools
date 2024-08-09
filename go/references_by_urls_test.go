@@ -15,7 +15,7 @@ func isLetterDigitHyphenOrUnderscore(r rune) bool {
 }
 
 func finishCreatingStartTag(htmlDocumentPart []rune) (int, bool) {
-	var startTagEndPart []rune
+	startTagEndPartLength := 0
 	var quoteRune rune
 	inAttributeName := false
 	inAttributeValue := false
@@ -26,21 +26,21 @@ func finishCreatingStartTag(htmlDocumentPart []rune) (int, bool) {
 		switch {
 		case inAttributeName:
 			if htmlDocumentPart[i] == '=' {
-				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
+				startTagEndPartLength++
 				inAttributeName = false
 				inAttributeValue = true
 			} else if isLetterDigitHyphenOrUnderscore(htmlDocumentPart[i]) {
-				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
+				startTagEndPartLength++
 			} else if unicode.IsSpace(htmlDocumentPart[i]) {
-				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
+				startTagEndPartLength++
 				inAttributeName = false
 			}
 		case inAttributeValue:
 			if htmlDocumentPart[i] == '"' || htmlDocumentPart[i] == '\'' {
 				quoteRune = htmlDocumentPart[i]
-				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
+				startTagEndPartLength++
 				for j := i + 1; j < length; j++ {
-					startTagEndPart = append(startTagEndPart, htmlDocumentPart[j])
+					startTagEndPartLength++
 					if htmlDocumentPart[j] == quoteRune {
 						i = j
 						break
@@ -52,16 +52,16 @@ func finishCreatingStartTag(htmlDocumentPart []rune) (int, bool) {
 			}
 		default:
 			if isLetter(htmlDocumentPart[i]) {
-				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
+				startTagEndPartLength++
 				inAttributeName = true
 			} else if htmlDocumentPart[i] == '>' {
-				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
-				return len(startTagEndPart), false // TODO: should be an int instead of slice?
+				startTagEndPartLength++
+				return startTagEndPartLength, false
 			} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart[i:], "/>"); hasPrefix {
-				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i:i+length]...)
-				return len(startTagEndPart), true
+				startTagEndPartLength += length
+				return startTagEndPartLength, true
 			} else if unicode.IsSpace(htmlDocumentPart[i]) {
-				startTagEndPart = append(startTagEndPart, htmlDocumentPart[i])
+				startTagEndPartLength++
 				continue
 			}
 		}
