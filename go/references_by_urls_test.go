@@ -172,6 +172,14 @@ func hasStringPrefix(runes []rune, prefix string) (bool, int) {
 	return true, length
 }
 
+// func hasStringPrefixAndUpdateIndex(runes []rune, prefix string, index *int) bool {
+// 	hasPrefix, length := hasStringPrefix(runes, prefix)
+
+// 	*index += length - 1
+
+// 	return hasPrefix
+// }
+
 func filterComments(htmlDocument string) string {
 	var filteredHTMLDocument []rune
 	inHTMLComment := false
@@ -190,7 +198,6 @@ func filterComments(htmlDocument string) string {
 			}
 		case inJSCommentSingleLine:
 			if runes[i] == '\n' {
-				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 				inJSCommentSingleLine = false
 			}
 		case inCommentMultiLine:
@@ -210,8 +217,7 @@ func filterComments(htmlDocument string) string {
 				i += length - 1
 			} else if hasPrefix, length := hasStringPrefix(runes[i:], "//"); hasPrefix {
 				inJSCommentSingleLine = true
-				length--
-				i += length
+				i += length - 1
 			} else if hasPrefix, length := hasStringPrefix(runes[i:], "/*"); hasPrefix {
 				inCommentMultiLine = true
 				i += length - 1
