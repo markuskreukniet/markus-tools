@@ -14,7 +14,7 @@ func isLetterDigitHyphenOrUnderscore(r rune) bool {
 	return isLetter(r) || unicode.IsDigit(r) || r == '-' || r == '_'
 }
 
-func finishCreatingStartTag(htmlDocumentPart []rune) (int, bool) {
+func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool) {
 	startTagEndPartLength := 0
 	var quoteRune rune
 	inAttributeName := false
@@ -22,27 +22,27 @@ func finishCreatingStartTag(htmlDocumentPart []rune) (int, bool) {
 
 	length := len(htmlDocumentPart)
 
-	for i := 0; i < length; i++ {
+	for ; index < length; index++ {
 		switch {
 		case inAttributeName:
-			if htmlDocumentPart[i] == '=' {
+			if htmlDocumentPart[index] == '=' {
 				startTagEndPartLength++
 				inAttributeName = false
 				inAttributeValue = true
-			} else if isLetterDigitHyphenOrUnderscore(htmlDocumentPart[i]) {
+			} else if isLetterDigitHyphenOrUnderscore(htmlDocumentPart[index]) {
 				startTagEndPartLength++
-			} else if unicode.IsSpace(htmlDocumentPart[i]) {
+			} else if unicode.IsSpace(htmlDocumentPart[index]) {
 				startTagEndPartLength++
 				inAttributeName = false
 			}
 		case inAttributeValue:
-			if htmlDocumentPart[i] == '"' || htmlDocumentPart[i] == '\'' {
-				quoteRune = htmlDocumentPart[i]
+			if htmlDocumentPart[index] == '"' || htmlDocumentPart[index] == '\'' {
+				quoteRune = htmlDocumentPart[index]
 				startTagEndPartLength++
-				for j := i + 1; j < length; j++ {
+				for i := index + 1; i < length; i++ {
 					startTagEndPartLength++
-					if htmlDocumentPart[j] == quoteRune {
-						i = j
+					if htmlDocumentPart[i] == quoteRune {
+						index = i
 						break
 					}
 				}
@@ -51,16 +51,16 @@ func finishCreatingStartTag(htmlDocumentPart []rune) (int, bool) {
 				// TODO: results in endless loop? return 0, false
 			}
 		default:
-			if isLetter(htmlDocumentPart[i]) {
+			if isLetter(htmlDocumentPart[index]) {
 				startTagEndPartLength++
 				inAttributeName = true
-			} else if htmlDocumentPart[i] == '>' {
+			} else if htmlDocumentPart[index] == '>' {
 				startTagEndPartLength++
 				return startTagEndPartLength, false
-			} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, "/>"); hasPrefix {
+			} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart, index, "/>"); hasPrefix {
 				startTagEndPartLength += length
 				return startTagEndPartLength, true
-			} else if unicode.IsSpace(htmlDocumentPart[i]) {
+			} else if unicode.IsSpace(htmlDocumentPart[index]) {
 				startTagEndPartLength++
 				continue
 			}
@@ -69,6 +69,23 @@ func finishCreatingStartTag(htmlDocumentPart []rune) (int, bool) {
 
 	return 0, false
 }
+
+// func finishCreatingHTMLElementNew(htmlDocumentPart []rune, elementName string) int {
+
+// 	creatingStartTag := false
+
+// 	startTagPart := "<" + elementName
+// 	endTagPart := "</" + elementName
+
+// 	if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, startTagPart); hasPrefix {
+// 		creatingStartTag = true
+// 		htmlElementPart = append(htmlElementPart, htmlDocumentPart[i:i+length]...)
+// 		i += length - 1
+// 		continue
+// 	}
+
+// 	return 0
+// }
 
 func finishCreatingHTMLElement(htmlDocumentPart []rune, endTag string) int {
 	inEndTag := false
@@ -104,7 +121,7 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	for i := 0; i < len(runes); i++ {
 		switch {
 		case creatingTitleStartTag:
-			length, tagIsClosed := finishCreatingStartTag(runes[i:])
+			length, tagIsClosed := finishCreatingStartTag(runes, i)
 			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 			i += length - 1
 			if tagIsClosed {
@@ -115,7 +132,7 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 			}
 			creatingTitleStartTag = false
 		case creatingH1StartTag:
-			length, tagIsClosed := finishCreatingStartTag(runes[i:])
+			length, tagIsClosed := finishCreatingStartTag(runes, i)
 			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 			i += length - 1
 			if tagIsClosed {
