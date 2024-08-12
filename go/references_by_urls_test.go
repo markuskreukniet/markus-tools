@@ -90,7 +90,7 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool) {
 // 				if htmlDocumentPart[i] == '>' {
 // 					numberOfOpenStartTags--
 // 					if numberOfOpenStartTags == 0 {
-// 						return i
+// 						return i + 1
 // 					}
 // 				}
 // 			}
