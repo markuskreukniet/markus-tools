@@ -71,22 +71,36 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool) {
 }
 
 // func finishCreatingHTMLElementNew(htmlDocumentPart []rune, elementName string) int {
-
-// 	creatingStartTag := false
-
 // 	startTagPart := "<" + elementName
 // 	endTagPart := "</" + elementName
+// 	numberOfOpenStartTags := 1
 
-// 	if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, startTagPart); hasPrefix {
-// 		creatingStartTag = true
-// 		htmlElementPart = append(htmlElementPart, htmlDocumentPart[i:i+length]...)
-// 		i += length - 1
-// 		continue
+// 	htmlDocumentPartLength := len(htmlDocumentPart)
+
+// 	for i := 0; i < htmlDocumentPartLength; i++ {
+// 		if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, startTagPart); hasPrefix {
+// 			i += length - 1
+// 			length, tagIsClosed := finishCreatingStartTag(htmlDocumentPart, i)
+// 			i += length - 1
+// 			if !tagIsClosed {
+// 				numberOfOpenStartTags++
+// 			}
+// 		} else if updateIndexIfPrefixMatches(htmlDocumentPart, endTagPart, &i) {
+// 			for ; i < htmlDocumentPartLength; i++ {
+// 				if htmlDocumentPart[i] == '>' {
+// 					numberOfOpenStartTags--
+// 					if numberOfOpenStartTags == 0 {
+// 						return i
+// 					}
+// 				}
+// 			}
+// 		}
 // 	}
 
 // 	return 0
 // }
 
+// TODO: should work with index instead of sub slice
 func finishCreatingHTMLElement(htmlDocumentPart []rune, endTag string) int {
 	inEndTag := false
 
@@ -106,6 +120,49 @@ func finishCreatingHTMLElement(htmlDocumentPart []rune, endTag string) int {
 
 	return 0
 }
+
+// func findTitleAndH1ElementsNew(htmlDocument string) ([]string, []string) {
+// 	var titleElements []string
+// 	var h1Elements []string
+// 	var htmlElementPart []rune
+// 	finishCreatingTitleElement := false
+// 	finishCreatingH1Element := false
+
+// 	runes := []rune(htmlDocument)
+
+// 	for i := 0; i < len(runes); i++ {
+// 		switch {
+// 		case finishCreatingTitleElement:
+// 			length := finishCreatingHTMLElement(runes[i:], "title")
+// 			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
+// 			i += length - 1
+// 			titleElements = append(titleElements, string(htmlElementPart))
+// 			htmlElementPart = nil
+// 			finishCreatingTitleElement = false
+// 		case finishCreatingH1Element:
+// 			length := finishCreatingHTMLElement(runes[i:], "h1")
+// 			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
+// 			i += length - 1
+// 			h1Elements = append(h1Elements, string(htmlElementPart))
+// 			htmlElementPart = nil
+// 			finishCreatingH1Element = false
+// 		default:
+// 			if hasPrefix, length := hasStringPrefix(runes, i, "title"); hasPrefix {
+// 				finishCreatingTitleElement = true
+// 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
+// 				i += length - 1
+// 				continue
+// 			}
+// 			if hasPrefix, length := hasStringPrefix(runes, i, "h1"); hasPrefix {
+// 				finishCreatingH1Element = true
+// 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
+// 				i += length - 1
+// 			}
+// 		}
+// 	}
+
+// 	return titleElements, h1Elements
+// }
 
 func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	var titleElements []string
