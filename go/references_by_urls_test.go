@@ -147,13 +147,13 @@ func finishCreatingHTMLElement(htmlDocumentPart []rune, endTag string) int {
 // 			htmlElementPart = nil
 // 			finishCreatingH1Element = false
 // 		default:
-// 			if hasPrefix, length := hasStringPrefix(runes, i, "title"); hasPrefix {
+// 			if hasPrefix, length := hasStringPrefix(runes, i, "<title"); hasPrefix {
 // 				finishCreatingTitleElement = true
 // 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 // 				i += length - 1
 // 				continue
 // 			}
-// 			if hasPrefix, length := hasStringPrefix(runes, i, "h1"); hasPrefix {
+// 			if hasPrefix, length := hasStringPrefix(runes, i, "<h1"); hasPrefix {
 // 				finishCreatingH1Element = true
 // 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 // 				i += length - 1
