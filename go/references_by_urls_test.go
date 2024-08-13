@@ -80,7 +80,7 @@ func finishCreatingHTMLElement(htmlDocumentPart []rune, elementName string) int 
 
 	for i := 0; i < htmlDocumentPartLength; i++ {
 		if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, startTagPart); hasPrefix {
-			i += length - 1
+			i += length
 			length, tagIsClosed := finishCreatingStartTag(htmlDocumentPart, i)
 			i += length - 1
 			if !tagIsClosed {
@@ -134,15 +134,35 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 			finishCreatingH1Element = false
 		default:
 			if hasPrefix, length := hasStringPrefix(runes, i, "<title"); hasPrefix {
-				finishCreatingTitleElement = true
+				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
+				// i += length - 1
+				i += length
+
+				length, tagIsClosed := finishCreatingStartTag(runes, i)
 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 				i += length - 1
+				if tagIsClosed {
+					titleElements = append(titleElements, string(htmlElementPart))
+					htmlElementPart = nil
+				} else {
+					finishCreatingTitleElement = true
+				}
 				continue
 			}
 			if hasPrefix, length := hasStringPrefix(runes, i, "<h1"); hasPrefix {
-				finishCreatingH1Element = true
+				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
+				// i += length - 1
+				i += length
+
+				length, tagIsClosed := finishCreatingStartTag(runes, i)
 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 				i += length - 1
+				if tagIsClosed {
+					h1Elements = append(h1Elements, string(htmlElementPart))
+					htmlElementPart = nil
+				} else {
+					finishCreatingH1Element = true
+				}
 			}
 		}
 	}
@@ -264,11 +284,11 @@ func TestReferencesByURLs(t *testing.T) {
 			expectedH1s:    []string{"<h1   />", "<h1   test-a=\"a_b-c\"  />"},
 		},
 		// TODO: nested test
-		// {
-		// 	htmlDocument:   "<html><head><title te-st=\"a---test\"  lol  ><title/></title   ></head><body></body></html>",
-		// 	expectedTitles: []string{"<title te-st=\"a---test\"  lol  ><title/></title   >"},
-		// 	expectedH1s:    []string{},
-		// },
+		{
+			htmlDocument:   "<html><head><title te-st=\"a---test\"  lol  ><title/></title   ></head><body></body></html>",
+			expectedTitles: []string{"<title te-st=\"a---test\"  lol  ><title/></title   >"},
+			expectedH1s:    []string{},
+		},
 		{
 			htmlDocument:   "<html><head></head><body><h1><h1></h1></h1></body></html>",
 			expectedTitles: []string{},
