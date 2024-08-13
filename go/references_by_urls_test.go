@@ -94,6 +94,12 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool) {
 // 					}
 // 				}
 // 			}
+// 		} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, "/>"); hasPrefix {
+// 			i += length - 1
+// 			numberOfOpenStartTags--
+// 			if numberOfOpenStartTags == 0 {
+// 				return i + 1
+// 			}
 // 		}
 // 	}
 
