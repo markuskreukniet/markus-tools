@@ -48,7 +48,7 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool) {
 				}
 				inAttributeValue = false
 			} else {
-				// TODO: results in endless loop? return 0, false
+				return 0, false
 			}
 		default:
 			if isLetter(htmlDocumentPart[index]) {
