@@ -113,6 +113,14 @@ func finishCreatingHTMLElement(htmlDocumentPart []rune, elementName string) int 
 // 	for ; index < htmlDocumentPartLength; index++ {
 // 		if hasPrefix, length := hasStringPrefix(htmlDocumentPart, index, htmlOpenTagPart); hasPrefix {
 // 			index += length
+// 			// TODO: finishCreatingStartTag is useless?
+// 			length, tagIsClosed := finishCreatingStartTag(htmlDocumentPart, index)
+// 			index += length
+// 			if tagIsClosed {
+// 				return index, true, true
+// 			} else {
+// 				return index, false, true
+// 			}
 // 		}
 // 	}
 
