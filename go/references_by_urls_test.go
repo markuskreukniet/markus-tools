@@ -14,6 +14,7 @@ func isLetterDigitHyphenOrUnderscore(r rune) bool {
 	return isLetter(r) || unicode.IsDigit(r) || r == '-' || r == '_'
 }
 
+// TODO: should return length, tagIsClosed, tagIsFound?
 func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool) {
 	startTagEndPartLength := 0
 	var quoteRune rune
@@ -107,6 +108,17 @@ func finishCreatingHTMLElement(htmlDocumentPart []rune, elementName string) int 
 	return 0
 }
 
+// returns length, tagIsClosed, tagIsFound
+// func getOpenOrSelfClosingHTMLTagLength(htmlDocumentPart []rune, htmlOpenTagPart string, htmlDocumentPartLength, index int) (int, bool, bool) {
+// 	for ; index < htmlDocumentPartLength; index++ {
+// 		if hasPrefix, length := hasStringPrefix(htmlDocumentPart, index, htmlOpenTagPart); hasPrefix {
+// 			index += length
+// 		}
+// 	}
+
+// 	return 0, false, false
+// }
+
 func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	var titleElements []string
 	var h1Elements []string
@@ -135,12 +147,11 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 		default:
 			if hasPrefix, length := hasStringPrefix(runes, i, "<title"); hasPrefix {
 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
-				// i += length - 1
 				i += length
-
 				length, tagIsClosed := finishCreatingStartTag(runes, i)
 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 				i += length - 1
+
 				if tagIsClosed {
 					titleElements = append(titleElements, string(htmlElementPart))
 					htmlElementPart = nil
@@ -151,12 +162,11 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 			}
 			if hasPrefix, length := hasStringPrefix(runes, i, "<h1"); hasPrefix {
 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
-				// i += length - 1
 				i += length
-
 				length, tagIsClosed := finishCreatingStartTag(runes, i)
 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 				i += length - 1
+
 				if tagIsClosed {
 					h1Elements = append(h1Elements, string(htmlElementPart))
 					htmlElementPart = nil
