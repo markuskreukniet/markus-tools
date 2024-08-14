@@ -75,8 +75,8 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool, bool
 }
 
 // TODO: should work with index instead of sub slice
-// TODO: should receive startTagPart and endTagPart
-func finishCreatingHTMLElement(htmlDocumentPart []rune, startTagPart, endTagPart string) int {
+// returns: htmlElementPartLength, htmlElementIsFound
+func getTheOtherHTMLElementPartLength(htmlDocumentPart []rune, startTagPart, endTagPart string) (int, bool) {
 	numberOfOpenStartTags := 1
 	htmlDocumentPartLength := len(htmlDocumentPart)
 
@@ -93,7 +93,7 @@ func finishCreatingHTMLElement(htmlDocumentPart []rune, startTagPart, endTagPart
 				if htmlDocumentPart[i] == '>' {
 					numberOfOpenStartTags--
 					if numberOfOpenStartTags == 0 {
-						return i + 1
+						return i + 1, true
 					}
 				}
 			}
@@ -101,12 +101,12 @@ func finishCreatingHTMLElement(htmlDocumentPart []rune, startTagPart, endTagPart
 			i += length - 1
 			numberOfOpenStartTags--
 			if numberOfOpenStartTags == 0 {
-				return i + 1
+				return i + 1, true
 			}
 		}
 	}
 
-	return 0
+	return 0, false
 }
 
 // returns: tagLength, tagIsClosed, hasPrefix
@@ -141,9 +141,10 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 				titleElements = append(titleElements, string(htmlElementPart))
 				htmlElementPart = nil
 			} else {
-				length := finishCreatingHTMLElement(runes[i:], titleStartTagPart, titleEndTagPart)
-				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
-				i += length
+				// TODO: use htmlElementIsFound
+				htmlElementPartLength, _ := getTheOtherHTMLElementPartLength(runes[i:], titleStartTagPart, titleEndTagPart)
+				htmlElementPart = append(htmlElementPart, runes[i:i+htmlElementPartLength]...)
+				i += htmlElementPartLength
 				titleElements = append(titleElements, string(htmlElementPart))
 				htmlElementPart = nil
 			}
@@ -155,9 +156,10 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 				h1Elements = append(h1Elements, string(htmlElementPart))
 				htmlElementPart = nil
 			} else {
-				length := finishCreatingHTMLElement(runes[i:], h1StartTagPart, h1EndTagPart)
-				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
-				i += length
+				// TODO: use htmlElementIsFound
+				htmlElementPartLength, _ := getTheOtherHTMLElementPartLength(runes[i:], h1StartTagPart, h1EndTagPart)
+				htmlElementPart = append(htmlElementPart, runes[i:i+htmlElementPartLength]...)
+				i += htmlElementPartLength
 				h1Elements = append(h1Elements, string(htmlElementPart))
 				htmlElementPart = nil
 			}
