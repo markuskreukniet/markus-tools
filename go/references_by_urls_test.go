@@ -74,16 +74,17 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool, bool
 	return 0, false, false
 }
 
-// TODO: should work with index instead of sub slice
+// TODO: why is  - index needed?
+// TODO: use tagIsFound
 // returns: htmlElementPartLength, htmlElementIsFound
-func getTheOtherHTMLElementPartLength(htmlDocumentPart []rune, startTagPart, endTagPart string) (int, bool) {
+func getTheOtherHTMLElementPartLength(htmlDocumentPart []rune, index int, startTagPart, endTagPart string) (int, bool) {
 	numberOfOpenStartTags := 1
 	htmlDocumentPartLength := len(htmlDocumentPart)
 
-	for i := 0; i < htmlDocumentPartLength; i++ {
+	for i := index; i < htmlDocumentPartLength; i++ {
 		if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, startTagPart); hasPrefix {
 			i += length
-			length, tagIsClosed, _ := finishCreatingStartTag(htmlDocumentPart, i) // TODO _
+			length, tagIsClosed, _ := finishCreatingStartTag(htmlDocumentPart, i)
 			i += length - 1
 			if !tagIsClosed {
 				numberOfOpenStartTags++
@@ -93,7 +94,7 @@ func getTheOtherHTMLElementPartLength(htmlDocumentPart []rune, startTagPart, end
 				if htmlDocumentPart[i] == '>' {
 					numberOfOpenStartTags--
 					if numberOfOpenStartTags == 0 {
-						return i + 1, true
+						return i + 1 - index, true
 					}
 				}
 			}
@@ -101,7 +102,7 @@ func getTheOtherHTMLElementPartLength(htmlDocumentPart []rune, startTagPart, end
 			i += length - 1
 			numberOfOpenStartTags--
 			if numberOfOpenStartTags == 0 {
-				return i + 1, true
+				return i + 1 - index, true
 			}
 		}
 	}
@@ -109,7 +110,6 @@ func getTheOtherHTMLElementPartLength(htmlDocumentPart []rune, startTagPart, end
 	return 0, false
 }
 
-// returns: tagLength, tagIsClosed, hasPrefix
 func hasOpenOrSelfClosingHTMLTagPrefix(runes []rune, index int, prefix string) (int, bool, bool) {
 	if hasPrefix, prefixLength := hasStringPrefix(runes, index, prefix); hasPrefix {
 		if tagPartLength, tagIsClosed, tagIsFound := finishCreatingStartTag(runes, index+prefixLength); tagIsFound {
@@ -142,7 +142,7 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 				htmlElementPart = nil
 			} else {
 				// TODO: use htmlElementIsFound
-				htmlElementPartLength, _ := getTheOtherHTMLElementPartLength(runes[i:], titleStartTagPart, titleEndTagPart)
+				htmlElementPartLength, _ := getTheOtherHTMLElementPartLength(runes, i, titleStartTagPart, titleEndTagPart)
 				htmlElementPart = append(htmlElementPart, runes[i:i+htmlElementPartLength]...)
 				i += htmlElementPartLength
 				titleElements = append(titleElements, string(htmlElementPart))
@@ -157,7 +157,7 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 				htmlElementPart = nil
 			} else {
 				// TODO: use htmlElementIsFound
-				htmlElementPartLength, _ := getTheOtherHTMLElementPartLength(runes[i:], h1StartTagPart, h1EndTagPart)
+				htmlElementPartLength, _ := getTheOtherHTMLElementPartLength(runes, i, h1StartTagPart, h1EndTagPart)
 				htmlElementPart = append(htmlElementPart, runes[i:i+htmlElementPartLength]...)
 				i += htmlElementPartLength
 				h1Elements = append(h1Elements, string(htmlElementPart))
