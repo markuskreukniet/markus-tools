@@ -121,47 +121,38 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	var titleElements []string
 	var h1Elements []string
 	var htmlElementPart []rune
-	finishCreatingTitleElement := false
-	finishCreatingH1Element := false
 
 	runes := []rune(htmlDocument)
 
 	for i := 0; i < len(runes); i++ {
-		switch {
-		case finishCreatingTitleElement:
-			length := finishCreatingHTMLElement(runes[i:], "title")
-			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
-			i += length - 1
-			titleElements = append(titleElements, string(htmlElementPart))
-			htmlElementPart = nil
-			finishCreatingTitleElement = false
-		case finishCreatingH1Element:
-			length := finishCreatingHTMLElement(runes[i:], "h1")
-			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
-			i += length - 1
-			h1Elements = append(h1Elements, string(htmlElementPart))
-			htmlElementPart = nil
-			finishCreatingH1Element = false
-		default:
-			if tagLength, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, i, "<title"); hasPrefix {
-				htmlElementPart = append(htmlElementPart, runes[i:i+tagLength]...)
-				i += tagLength - 1
-				if tagIsClosed {
-					titleElements = append(titleElements, string(htmlElementPart))
-					htmlElementPart = nil
-				} else {
-					finishCreatingTitleElement = true
-				}
-			} else if tagLength, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, i, "<h1"); hasPrefix {
-				htmlElementPart = append(htmlElementPart, runes[i:i+tagLength]...)
-				i += tagLength - 1
-				if tagIsClosed {
-					h1Elements = append(h1Elements, string(htmlElementPart))
-					htmlElementPart = nil
-				} else {
-					finishCreatingH1Element = true
-				}
+		if tagLength, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, i, "<title"); hasPrefix {
+			htmlElementPart = append(htmlElementPart, runes[i:i+tagLength]...)
+			i += tagLength
+			if tagIsClosed {
+				titleElements = append(titleElements, string(htmlElementPart))
+				htmlElementPart = nil
+			} else {
+				length := finishCreatingHTMLElement(runes[i:], "title")
+				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
+				i += length
+				titleElements = append(titleElements, string(htmlElementPart))
+				htmlElementPart = nil
 			}
+			i--
+		} else if tagLength, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, i, "<h1"); hasPrefix {
+			htmlElementPart = append(htmlElementPart, runes[i:i+tagLength]...)
+			i += tagLength
+			if tagIsClosed {
+				h1Elements = append(h1Elements, string(htmlElementPart))
+				htmlElementPart = nil
+			} else {
+				length := finishCreatingHTMLElement(runes[i:], "h1")
+				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
+				i += length
+				h1Elements = append(h1Elements, string(htmlElementPart))
+				htmlElementPart = nil
+			}
+			i--
 		}
 	}
 
