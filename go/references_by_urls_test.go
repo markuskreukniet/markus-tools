@@ -73,11 +73,8 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool) {
 
 // TODO: should work with index instead of sub slice
 // TODO: should receive startTagPart and endTagPart
-func finishCreatingHTMLElement(htmlDocumentPart []rune, elementName string) int {
-	startTagPart := "<" + elementName
-	endTagPart := "</" + elementName
+func finishCreatingHTMLElement(htmlDocumentPart []rune, startTagPart, endTagPart string) int {
 	numberOfOpenStartTags := 1
-
 	htmlDocumentPartLength := len(htmlDocumentPart)
 
 	for i := 0; i < htmlDocumentPartLength; i++ {
@@ -123,31 +120,36 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	var h1Elements []string
 	var htmlElementPart []rune
 
+	titleStartTagPart := "<title"
+	titleEndTagPart := "</title"
+	h1StartTagPart := "<h1"
+	h1EndTagPart := "</h1"
+
 	runes := []rune(htmlDocument)
 
 	for i := 0; i < len(runes); i++ {
-		if tagLength, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, i, "<title"); hasPrefix {
+		if tagLength, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, i, titleStartTagPart); hasPrefix {
 			htmlElementPart = append(htmlElementPart, runes[i:i+tagLength]...)
 			i += tagLength
 			if tagIsClosed {
 				titleElements = append(titleElements, string(htmlElementPart))
 				htmlElementPart = nil
 			} else {
-				length := finishCreatingHTMLElement(runes[i:], "title")
+				length := finishCreatingHTMLElement(runes[i:], titleStartTagPart, titleEndTagPart)
 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 				i += length
 				titleElements = append(titleElements, string(htmlElementPart))
 				htmlElementPart = nil
 			}
 			i--
-		} else if tagLength, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, i, "<h1"); hasPrefix {
+		} else if tagLength, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, i, h1StartTagPart); hasPrefix {
 			htmlElementPart = append(htmlElementPart, runes[i:i+tagLength]...)
 			i += tagLength
 			if tagIsClosed {
 				h1Elements = append(h1Elements, string(htmlElementPart))
 				htmlElementPart = nil
 			} else {
-				length := finishCreatingHTMLElement(runes[i:], "h1")
+				length := finishCreatingHTMLElement(runes[i:], h1StartTagPart, h1EndTagPart)
 				htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 				i += length
 				h1Elements = append(h1Elements, string(htmlElementPart))
