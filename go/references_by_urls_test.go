@@ -35,6 +35,8 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool, bool
 			} else if unicode.IsSpace(htmlDocumentPart[index]) {
 				startTagEndPartLength++
 				inAttributeName = false
+			} else {
+				return 0, false, false
 			}
 		case inAttributeValue:
 			if htmlDocumentPart[index] == '"' || htmlDocumentPart[index] == '\'' {
@@ -63,7 +65,8 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool, bool
 				return startTagEndPartLength, true, true
 			} else if unicode.IsSpace(htmlDocumentPart[index]) {
 				startTagEndPartLength++
-				continue
+			} else {
+				return 0, false, false
 			}
 		}
 	}
