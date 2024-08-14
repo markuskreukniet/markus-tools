@@ -14,8 +14,8 @@ func isLetterDigitHyphenOrUnderscore(r rune) bool {
 	return isLetter(r) || unicode.IsDigit(r) || r == '-' || r == '_'
 }
 
-// TODO: should return length, tagIsClosed, tagIsFound?
-func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool) {
+// returns: tagPartLength, tagIsClosed, tagIsFound
+func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool, bool) {
 	startTagEndPartLength := 0
 	var quoteRune rune
 	inAttributeName := false
@@ -49,7 +49,7 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool) {
 				}
 				inAttributeValue = false
 			} else {
-				return 0, false
+				return 0, false, false
 			}
 		default:
 			if isLetter(htmlDocumentPart[index]) {
@@ -57,10 +57,10 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool) {
 				inAttributeName = true
 			} else if htmlDocumentPart[index] == '>' {
 				startTagEndPartLength++
-				return startTagEndPartLength, false
+				return startTagEndPartLength, false, true
 			} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart, index, "/>"); hasPrefix {
 				startTagEndPartLength += length
-				return startTagEndPartLength, true
+				return startTagEndPartLength, true, true
 			} else if unicode.IsSpace(htmlDocumentPart[index]) {
 				startTagEndPartLength++
 				continue
@@ -68,7 +68,7 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool) {
 		}
 	}
 
-	return 0, false
+	return 0, false, false
 }
 
 // TODO: should work with index instead of sub slice
@@ -80,7 +80,7 @@ func finishCreatingHTMLElement(htmlDocumentPart []rune, startTagPart, endTagPart
 	for i := 0; i < htmlDocumentPartLength; i++ {
 		if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, startTagPart); hasPrefix {
 			i += length
-			length, tagIsClosed := finishCreatingStartTag(htmlDocumentPart, i)
+			length, tagIsClosed, _ := finishCreatingStartTag(htmlDocumentPart, i) // TODO _
 			i += length - 1
 			if !tagIsClosed {
 				numberOfOpenStartTags++
@@ -106,10 +106,13 @@ func finishCreatingHTMLElement(htmlDocumentPart []rune, startTagPart, endTagPart
 	return 0
 }
 
+// returns: tagLength, tagIsClosed, hasPrefix
 func hasOpenOrSelfClosingHTMLTagPrefix(runes []rune, index int, prefix string) (int, bool, bool) {
 	if hasPrefix, prefixLength := hasStringPrefix(runes, index, prefix); hasPrefix {
-		tagPartLength, tagIsClosed := finishCreatingStartTag(runes, index+prefixLength)
-		return prefixLength + tagPartLength, tagIsClosed, hasPrefix
+		if tagPartLength, tagIsClosed, tagIsFound := finishCreatingStartTag(runes, index+prefixLength); tagIsFound {
+			return prefixLength + tagPartLength, tagIsClosed, hasPrefix
+		}
+		return 0, false, false
 	}
 
 	return 0, false, false
