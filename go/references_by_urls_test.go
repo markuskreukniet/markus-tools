@@ -72,6 +72,7 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool) {
 }
 
 // TODO: should work with index instead of sub slice
+// TODO: should receive startTagPart and endTagPart
 func finishCreatingHTMLElement(htmlDocumentPart []rune, elementName string) int {
 	startTagPart := "<" + elementName
 	endTagPart := "</" + elementName
