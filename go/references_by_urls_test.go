@@ -206,6 +206,18 @@ func updateIndexIfPrefixMatches(runes []rune, prefix string, index *int) bool {
 	return hasPrefix
 }
 
+func appendIfEscape(htmlDocument []rune, filteredHTMLDocument *[]rune, index, htmlDocumentLength int) bool {
+	indexPlusOne := index + 1
+
+	if htmlDocument[index] == '\\' && indexPlusOne < htmlDocumentLength {
+		*filteredHTMLDocument = append(*filteredHTMLDocument, htmlDocument[index])
+		*filteredHTMLDocument = append(*filteredHTMLDocument, htmlDocument[indexPlusOne])
+		return true
+	}
+
+	return false
+}
+
 func filterCommentsNew(htmlDocument string) string {
 	var filteredHTMLDocument []rune
 	var jsStringRune rune
@@ -214,7 +226,6 @@ func filterCommentsNew(htmlDocument string) string {
 	inJSCommentSingleLine := false
 	inJSCommentMultiLine := false
 	inJSString := false
-	escaped := false
 
 	htmlDocumentRunes := []rune(htmlDocument)
 	// htmlCommentStart := []rune("<!--")
@@ -243,20 +254,18 @@ func filterCommentsNew(htmlDocument string) string {
 			if updateIndexIfPrefixMatches(htmlDocumentRunes, "*/", &i) {
 				inJSCommentMultiLine = false
 			}
-		} else if escaped {
-			filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
-			escaped = false
 		} else if inJSString {
-			filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
-			if htmlDocumentRunes[i] == '\\' {
-				escaped = true
-			} else if htmlDocumentRunes[i] == jsStringRune {
-				inJSString = false
+			if appendIfEscape(htmlDocumentRunes, &filteredHTMLDocument, i, htmlDocumentRunesLength) {
+				i++
+			} else {
+				filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
+				if htmlDocumentRunes[i] == jsStringRune {
+					inJSString = false
+				}
 			}
 		} else {
-			if htmlDocumentRunes[i] == '\\' {
-				filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
-				escaped = true
+			if appendIfEscape(htmlDocumentRunes, &filteredHTMLDocument, i, htmlDocumentRunesLength) {
+				i++
 			} else if updateIndexIfPrefixMatches(htmlDocumentRunes, "<!--", &i) {
 				inHTMLComment = true
 			} else if updateIndexIfPrefixMatches(htmlDocumentRunes, "//", &i) {
@@ -453,7 +462,7 @@ func TestFilterComments(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			actual := filterComments(tt.input)
+			actual := filterCommentsNew(tt.input)
 			if actual != tt.expected {
 				t.Errorf("filterComments() = %v, want %v", actual, tt.expected)
 			}
