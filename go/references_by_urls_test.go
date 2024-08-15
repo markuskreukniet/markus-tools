@@ -222,7 +222,6 @@ func filterCommentsNew(htmlDocument string) string {
 	var filteredHTMLDocument []rune
 	var jsStringRune rune
 
-	inJSCommentSingleLine := false
 	inJSString := false
 
 	htmlDocumentRunes := []rune(htmlDocument)
@@ -240,11 +239,7 @@ func filterCommentsNew(htmlDocument string) string {
 	// jsCommentMultiLineEndLength := len(jsCommentMultiLineEnd)
 
 	for i := 0; i < htmlDocumentRunesLength; i++ {
-		if inJSCommentSingleLine {
-			if htmlDocumentRunes[i] == '\n' {
-				inJSCommentSingleLine = false
-			}
-		} else if inJSString {
+		if inJSString {
 			if appendIfEscape(htmlDocumentRunes, &filteredHTMLDocument, i, htmlDocumentRunesLength) {
 				i++
 			} else {
@@ -264,7 +259,11 @@ func filterCommentsNew(htmlDocument string) string {
 					}
 				}
 			} else if updateIndexIfPrefixMatches(htmlDocumentRunes, "//", &i) {
-				inJSCommentSingleLine = true
+				for ; i < htmlDocumentRunesLength; i++ {
+					if htmlDocumentRunes[i] == '\n' {
+						break
+					}
+				}
 			} else if updateIndexIfPrefixMatches(htmlDocumentRunes, "/*", &i) {
 				for j := i + 1; j < htmlDocumentRunesLength; j++ {
 					if updateIndexIfPrefixMatches(htmlDocumentRunes, "*/", &j) {
