@@ -206,6 +206,76 @@ func updateIndexIfPrefixMatches(runes []rune, prefix string, index *int) bool {
 	return hasPrefix
 }
 
+func filterCommentsNew(htmlDocument string) string {
+	var filteredHTMLDocument []rune
+	var jsStringRune rune
+
+	inHTMLComment := false
+	inJSCommentSingleLine := false
+	inJSCommentMultiLine := false
+	inJSString := false
+	escaped := false
+
+	htmlDocumentRunes := []rune(htmlDocument)
+	// htmlCommentStart := []rune("<!--")
+	// htmlCommentEnd := []rune("-->")
+	// jsCommentSingleLine := []rune("//")
+	// jsCommentMultiLineStart := []rune("/*")
+	// jsCommentMultiLineEnd := []rune("*/")
+
+	htmlDocumentRunesLength := len(htmlDocumentRunes)
+	// htmlCommentStartLength := len(htmlCommentStart)
+	// htmlCommentEndLength := len(htmlCommentEnd)
+	// jsCommentSingleLineLength := len(jsCommentSingleLine)
+	// jsCommentMultiLineStartLength := len(jsCommentMultiLineStart)
+	// jsCommentMultiLineEndLength := len(jsCommentMultiLineEnd)
+
+	for i := 0; i < htmlDocumentRunesLength; i++ {
+		if inHTMLComment {
+			if updateIndexIfPrefixMatches(htmlDocumentRunes, "-->", &i) {
+				inHTMLComment = false
+			}
+		} else if inJSCommentSingleLine {
+			if htmlDocumentRunes[i] == '\n' {
+				inJSCommentSingleLine = false
+			}
+		} else if inJSCommentMultiLine {
+			if updateIndexIfPrefixMatches(htmlDocumentRunes, "*/", &i) {
+				inJSCommentMultiLine = false
+			}
+		} else if escaped {
+			filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
+			escaped = false
+		} else if inJSString {
+			filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
+			if htmlDocumentRunes[i] == '\\' {
+				escaped = true
+			} else if htmlDocumentRunes[i] == jsStringRune {
+				inJSString = false
+			}
+		} else {
+			if htmlDocumentRunes[i] == '\\' {
+				filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
+				escaped = true
+			} else if updateIndexIfPrefixMatches(htmlDocumentRunes, "<!--", &i) {
+				inHTMLComment = true
+			} else if updateIndexIfPrefixMatches(htmlDocumentRunes, "//", &i) {
+				inJSCommentSingleLine = true
+			} else if updateIndexIfPrefixMatches(htmlDocumentRunes, "/*", &i) {
+				inJSCommentMultiLine = true
+			} else if htmlDocumentRunes[i] == '"' || htmlDocumentRunes[i] == '\'' { // TODO: also add backtick strings
+				filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
+				jsStringRune = htmlDocumentRunes[i]
+				inJSString = true
+			} else {
+				filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
+			}
+		}
+	}
+
+	return string(filteredHTMLDocument)
+}
+
 func filterComments(htmlDocument string) string {
 	var filteredHTMLDocument []rune
 	var jsStringRune rune
