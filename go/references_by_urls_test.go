@@ -74,38 +74,44 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool, bool
 	return 0, false, false
 }
 
-// TODO: use tagPartLength
-// TODO: why is  - index needed?
 // TODO: use tagIsFound
 // returns: htmlElementPartLength, htmlElementIsFound
 func getTheOtherHTMLElementPartLength(htmlDocumentPart []rune, index int, startTagPart, endTagPart string) (int, bool) {
+	tagPartLength := 0
 	numberOfOpenStartTags := 1
 	htmlDocumentPartLength := len(htmlDocumentPart)
 
 	for i := index; i < htmlDocumentPartLength; i++ {
 		if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, startTagPart); hasPrefix {
+			tagPartLength += length
 			i += length
 			length, tagIsClosed, _ := finishCreatingStartTag(htmlDocumentPart, i)
+			tagPartLength += length
 			i += length - 1
 			if !tagIsClosed {
 				numberOfOpenStartTags++
 			}
 		} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, endTagPart); hasPrefix {
+			tagPartLength += length
 			i += length
 			for ; i < htmlDocumentPartLength; i++ {
+				tagPartLength++
 				if htmlDocumentPart[i] == '>' {
 					numberOfOpenStartTags--
 					if numberOfOpenStartTags == 0 {
-						return i + 1 - index, true
+						return tagPartLength, true
 					}
 				}
 			}
 		} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, "/>"); hasPrefix {
+			tagPartLength += length
 			i += length - 1
 			numberOfOpenStartTags--
 			if numberOfOpenStartTags == 0 {
-				return i + 1 - index, true
+				return tagPartLength, true
 			}
+		} else {
+			tagPartLength++
 		}
 	}
 
@@ -172,6 +178,7 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	return titleElements, h1Elements
 }
 
+// TODO: not efficient since it is used in a loop
 func hasStringPrefix(runes []rune, index int, prefix string) (bool, int) {
 	prefixLength := len(prefix)
 
