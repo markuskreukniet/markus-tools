@@ -208,31 +208,39 @@ func updateIndexIfPrefixMatches(runes []rune, prefix string, index *int) bool {
 
 func filterComments(htmlDocument string) string {
 	var filteredHTMLDocument []rune
+	var jsStringRune rune
 	inHTMLComment := false
 	inJSCommentSingleLine := false
 	inCommentMultiLine := false
+	inJSString := false
 	escaped := false
 
 	runes := []rune(htmlDocument)
 
 	for i := 0; i < len(runes); i++ {
-		switch {
-		case inHTMLComment:
+		if inHTMLComment {
 			if updateIndexIfPrefixMatches(runes, "-->", &i) {
 				inHTMLComment = false
 			}
-		case inJSCommentSingleLine:
+		} else if inJSCommentSingleLine {
 			if runes[i] == '\n' {
 				inJSCommentSingleLine = false
 			}
-		case inCommentMultiLine:
+		} else if inCommentMultiLine {
 			if updateIndexIfPrefixMatches(runes, "*/", &i) {
 				inCommentMultiLine = false
 			}
-		case escaped:
+		} else if escaped {
 			filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 			escaped = false
-		default:
+		} else if inJSString {
+			filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
+			if runes[i] == '\\' {
+				escaped = true
+			} else if runes[i] == jsStringRune {
+				inJSString = false
+			}
+		} else {
 			if runes[i] == '\\' {
 				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 				escaped = true
@@ -242,6 +250,10 @@ func filterComments(htmlDocument string) string {
 				inJSCommentSingleLine = true
 			} else if updateIndexIfPrefixMatches(runes, "/*", &i) {
 				inCommentMultiLine = true
+			} else if runes[i] == '"' || runes[i] == '\'' { // TODO: also add backtick strings
+				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
+				jsStringRune = runes[i]
+				inJSString = true
 			} else {
 				filteredHTMLDocument = append(filteredHTMLDocument, runes[i])
 			}
@@ -357,11 +369,11 @@ func TestFilterComments(t *testing.T) {
 			input:    "<html><!-- HTML comment --><script>// JS single-line comment\n/* JS multi-line comment */var x = 1;</script></html>",
 			expected: "<html><script>var x = 1;</script></html>",
 		},
-		// {
-		// 	name:     "Escaped characters",
-		// 	input:    "<script>var str = \"This is not a comment: \\\" /* not a comment */\";</script>",
-		// 	expected: "<script>var str = \"This is not a comment: \\\" /* not a comment */\";</script>",
-		// },
+		{
+			name:     "Escaped characters",
+			input:    "<script>var str = \"This is not a comment: \\\" /* not a comment */\";</script>",
+			expected: "<script>var str = \"This is not a comment: \\\" /* not a comment */\";</script>",
+		},
 		{
 			name:     "Comment with escaped newline",
 			input:    "<script>// JS comment \\n still comment\nvar x = 1;</script>",
