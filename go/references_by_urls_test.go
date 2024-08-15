@@ -222,9 +222,7 @@ func filterCommentsNew(htmlDocument string) string {
 	var filteredHTMLDocument []rune
 	var jsStringRune rune
 
-	inHTMLComment := false
 	inJSCommentSingleLine := false
-	inJSCommentMultiLine := false
 	inJSString := false
 
 	htmlDocumentRunes := []rune(htmlDocument)
@@ -242,17 +240,9 @@ func filterCommentsNew(htmlDocument string) string {
 	// jsCommentMultiLineEndLength := len(jsCommentMultiLineEnd)
 
 	for i := 0; i < htmlDocumentRunesLength; i++ {
-		if inHTMLComment {
-			if updateIndexIfPrefixMatches(htmlDocumentRunes, "-->", &i) {
-				inHTMLComment = false
-			}
-		} else if inJSCommentSingleLine {
+		if inJSCommentSingleLine {
 			if htmlDocumentRunes[i] == '\n' {
 				inJSCommentSingleLine = false
-			}
-		} else if inJSCommentMultiLine {
-			if updateIndexIfPrefixMatches(htmlDocumentRunes, "*/", &i) {
-				inJSCommentMultiLine = false
 			}
 		} else if inJSString {
 			if appendIfEscape(htmlDocumentRunes, &filteredHTMLDocument, i, htmlDocumentRunesLength) {
@@ -267,11 +257,21 @@ func filterCommentsNew(htmlDocument string) string {
 			if appendIfEscape(htmlDocumentRunes, &filteredHTMLDocument, i, htmlDocumentRunesLength) {
 				i++
 			} else if updateIndexIfPrefixMatches(htmlDocumentRunes, "<!--", &i) {
-				inHTMLComment = true
+				for j := i + 1; j < htmlDocumentRunesLength; j++ {
+					if updateIndexIfPrefixMatches(htmlDocumentRunes, "-->", &j) {
+						i = j
+						break
+					}
+				}
 			} else if updateIndexIfPrefixMatches(htmlDocumentRunes, "//", &i) {
 				inJSCommentSingleLine = true
 			} else if updateIndexIfPrefixMatches(htmlDocumentRunes, "/*", &i) {
-				inJSCommentMultiLine = true
+				for j := i + 1; j < htmlDocumentRunesLength; j++ {
+					if updateIndexIfPrefixMatches(htmlDocumentRunes, "*/", &j) {
+						i = j
+						break
+					}
+				}
 			} else if htmlDocumentRunes[i] == '"' || htmlDocumentRunes[i] == '\'' { // TODO: also add backtick strings
 				filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
 				jsStringRune = htmlDocumentRunes[i]
