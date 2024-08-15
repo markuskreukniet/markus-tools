@@ -252,9 +252,8 @@ func filterCommentsNew(htmlDocument string) string {
 			if appendIfEscape(htmlDocumentRunes, &filteredHTMLDocument, i, htmlDocumentRunesLength) {
 				i++
 			} else if updateIndexIfPrefixMatches(htmlDocumentRunes, "<!--", &i) {
-				for j := i + 1; j < htmlDocumentRunesLength; j++ {
-					if updateIndexIfPrefixMatches(htmlDocumentRunes, "-->", &j) {
-						i = j
+				for ; i < htmlDocumentRunesLength; i++ {
+					if updateIndexIfPrefixMatches(htmlDocumentRunes, "-->", &i) {
 						break
 					}
 				}
@@ -265,9 +264,8 @@ func filterCommentsNew(htmlDocument string) string {
 					}
 				}
 			} else if updateIndexIfPrefixMatches(htmlDocumentRunes, "/*", &i) {
-				for j := i + 1; j < htmlDocumentRunesLength; j++ {
-					if updateIndexIfPrefixMatches(htmlDocumentRunes, "*/", &j) {
-						i = j
+				for ; i < htmlDocumentRunesLength; i++ {
+					if updateIndexIfPrefixMatches(htmlDocumentRunes, "*/", &i) {
 						break
 					}
 				}
