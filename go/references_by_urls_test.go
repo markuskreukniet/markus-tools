@@ -74,6 +74,7 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool, bool
 	return 0, false, false
 }
 
+// TODO: use tagPartLength
 // TODO: why is  - index needed?
 // TODO: use tagIsFound
 // returns: htmlElementPartLength, htmlElementIsFound
@@ -89,7 +90,8 @@ func getTheOtherHTMLElementPartLength(htmlDocumentPart []rune, index int, startT
 			if !tagIsClosed {
 				numberOfOpenStartTags++
 			}
-		} else if updateIndexIfPrefixMatches(htmlDocumentPart, endTagPart, &i) {
+		} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, endTagPart); hasPrefix {
+			i += length
 			for ; i < htmlDocumentPartLength; i++ {
 				if htmlDocumentPart[i] == '>' {
 					numberOfOpenStartTags--
