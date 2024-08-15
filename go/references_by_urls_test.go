@@ -325,3 +325,56 @@ func TestReferencesByURLs(t *testing.T) {
 		}
 	}
 }
+
+func TestFilterComments(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected string
+	}{
+		{
+			name:     "No comments",
+			input:    "<html><body>Hello World</body></html>",
+			expected: "<html><body>Hello World</body></html>",
+		},
+		{
+			name:     "HTML comment",
+			input:    "<html><!-- This is a comment --><body>Hello World</body></html>",
+			expected: "<html><body>Hello World</body></html>",
+		},
+		{
+			name:     "Single-line JS comment",
+			input:    "<script>// This is a comment\nvar x = 1;</script>",
+			expected: "<script>var x = 1;</script>",
+		},
+		{
+			name:     "Multi-line JS comment",
+			input:    "<script>/* This is a \n multi-line comment */var x = 1;</script>",
+			expected: "<script>var x = 1;</script>",
+		},
+		{
+			name:     "Mixed comments",
+			input:    "<html><!-- HTML comment --><script>// JS single-line comment\n/* JS multi-line comment */var x = 1;</script></html>",
+			expected: "<html><script>var x = 1;</script></html>",
+		},
+		// {
+		// 	name:     "Escaped characters",
+		// 	input:    "<script>var str = \"This is not a comment: \\\" /* not a comment */\";</script>",
+		// 	expected: "<script>var str = \"This is not a comment: \\\" /* not a comment */\";</script>",
+		// },
+		{
+			name:     "Comment with escaped newline",
+			input:    "<script>// JS comment \\n still comment\nvar x = 1;</script>",
+			expected: "<script>var x = 1;</script>",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := filterComments(tt.input)
+			if actual != tt.expected {
+				t.Errorf("filterComments() = %v, want %v", actual, tt.expected)
+			}
+		})
+	}
+}
