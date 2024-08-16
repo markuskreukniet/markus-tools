@@ -178,6 +178,25 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	return titleElements, h1Elements
 }
 
+func updateIndexIfHasPrefix(runes, prefix []rune, runesLength, prefixLength int, index *int) bool {
+	i := *index
+
+	if runesLength-i < prefixLength {
+		return false
+	}
+
+	for _, r := range prefix {
+		if runes[i] != r {
+			return false
+		}
+		i++
+	}
+
+	*index = prefixLength
+
+	return true
+}
+
 // TODO: not efficient since it is used in a loop
 func hasStringPrefix(runes []rune, index int, prefix string) (bool, int) {
 	prefixLength := len(prefix)
