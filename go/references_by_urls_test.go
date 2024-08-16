@@ -192,7 +192,7 @@ func updateIndexIfHasPrefix(runes, prefix []rune, runesLength, prefixLength int,
 		i++
 	}
 
-	*index = prefixLength
+	*index += prefixLength
 
 	return true
 }
@@ -242,14 +242,14 @@ func filterComments(htmlDocument string) string {
 	var jsStringRune rune
 
 	htmlDocumentRunes := []rune(htmlDocument)
-	// htmlCommentStart := []rune("<!--")
+	htmlCommentStart := []rune("<!--")
 	// htmlCommentEnd := []rune("-->")
 	// jsCommentSingleLine := []rune("//")
 	// jsCommentMultiLineStart := []rune("/*")
 	// jsCommentMultiLineEnd := []rune("*/")
 
 	htmlDocumentRunesLength := len(htmlDocumentRunes)
-	// htmlCommentStartLength := len(htmlCommentStart)
+	htmlCommentStartLength := len(htmlCommentStart)
 	// htmlCommentEndLength := len(htmlCommentEnd)
 	// jsCommentSingleLineLength := len(jsCommentSingleLine)
 	// jsCommentMultiLineStartLength := len(jsCommentMultiLineStart)
@@ -260,8 +260,7 @@ func filterComments(htmlDocument string) string {
 		if appendIfEscape(htmlDocumentRunes, &filteredHTMLDocument, i, htmlDocumentRunesLength) {
 			i++
 			// HTML comment
-		} else if updateIndexIfPrefixMatches(htmlDocumentRunes, "<!--", &i) {
-			i++
+		} else if updateIndexIfHasPrefix(htmlDocumentRunes, htmlCommentStart, htmlDocumentRunesLength, htmlCommentStartLength, &i) {
 			for ; i < htmlDocumentRunesLength; i++ {
 				if updateIndexIfPrefixMatches(htmlDocumentRunes, "-->", &i) {
 					break
