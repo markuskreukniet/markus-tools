@@ -178,23 +178,37 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	return titleElements, h1Elements
 }
 
-func updateIndexIfHasPrefix(runes, prefix []rune, runesLength, prefixLength int, index *int) bool {
-	i := *index
-
-	if runesLength-i < prefixLength {
+func hasPrefix(runes, prefix []rune, runesLength, prefixLength int, index int) bool {
+	if runesLength-index < prefixLength {
 		return false
 	}
 
 	for _, r := range prefix {
-		if runes[i] != r {
+		if runes[index] != r {
 			return false
 		}
-		i++
+		index++
 	}
 
-	*index += prefixLength
-
 	return true
+}
+
+func updateIndexMinusOneIfHasPrefix(runes, prefix []rune, runesLength, prefixLength int, index *int) bool {
+	if hasPrefix(runes, prefix, runesLength, prefixLength, *index) {
+		*index += prefixLength - 1
+		return true
+	}
+
+	return false
+}
+
+func updateIndexIfHasPrefix(runes, prefix []rune, runesLength, prefixLength int, index *int) bool {
+	if hasPrefix(runes, prefix, runesLength, prefixLength, *index) {
+		*index += prefixLength
+		return true
+	}
+
+	return false
 }
 
 // TODO: not efficient since it is used in a loop
@@ -215,16 +229,6 @@ func hasStringPrefix(runes []rune, index int, prefix string) (bool, int) {
 	return true, prefixLength
 }
 
-func updateIndexIfPrefixMatches(runes []rune, prefix string, index *int) bool {
-	hasPrefix, length := hasStringPrefix(runes, *index, prefix)
-
-	if hasPrefix {
-		*index += length - 1
-	}
-
-	return hasPrefix
-}
-
 func appendIfEscape(htmlDocument []rune, filteredHTMLDocument *[]rune, index, htmlDocumentLength int) bool {
 	indexPlusOne := index + 1
 
@@ -243,17 +247,17 @@ func filterComments(htmlDocument string) string {
 
 	htmlDocumentRunes := []rune(htmlDocument)
 	htmlCommentStart := []rune("<!--")
-	// htmlCommentEnd := []rune("-->")
+	htmlCommentEnd := []rune("-->")
 	jsCommentSingleLine := []rune("//")
 	commentMultiLineStart := []rune("/*")
-	// commentMultiLineEnd := []rune("*/")
+	commentMultiLineEnd := []rune("*/")
 
 	htmlDocumentRunesLength := len(htmlDocumentRunes)
 	htmlCommentStartLength := len(htmlCommentStart)
-	// htmlCommentEndLength := len(htmlCommentEnd)
+	htmlCommentEndLength := len(htmlCommentEnd)
 	jsCommentSingleLineLength := len(jsCommentSingleLine)
 	commentMultiLineStartLength := len(commentMultiLineStart)
-	// commentMultiLineEndLength := len(commentMultiLineEnd)
+	commentMultiLineEndLength := len(commentMultiLineEnd)
 
 	for i := 0; i < htmlDocumentRunesLength; i++ {
 		// string escape
@@ -262,7 +266,7 @@ func filterComments(htmlDocument string) string {
 			// HTML comment
 		} else if updateIndexIfHasPrefix(htmlDocumentRunes, htmlCommentStart, htmlDocumentRunesLength, htmlCommentStartLength, &i) {
 			for ; i < htmlDocumentRunesLength; i++ {
-				if updateIndexIfPrefixMatches(htmlDocumentRunes, "-->", &i) {
+				if updateIndexMinusOneIfHasPrefix(htmlDocumentRunes, htmlCommentEnd, htmlDocumentRunesLength, htmlCommentEndLength, &i) {
 					break
 				}
 			}
@@ -276,7 +280,7 @@ func filterComments(htmlDocument string) string {
 			// comment multi line
 		} else if updateIndexIfHasPrefix(htmlDocumentRunes, commentMultiLineStart, htmlDocumentRunesLength, commentMultiLineStartLength, &i) {
 			for ; i < htmlDocumentRunesLength; i++ {
-				if updateIndexIfPrefixMatches(htmlDocumentRunes, "*/", &i) {
+				if updateIndexMinusOneIfHasPrefix(htmlDocumentRunes, commentMultiLineEnd, htmlDocumentRunesLength, commentMultiLineEndLength, &i) {
 					break
 				}
 			}
