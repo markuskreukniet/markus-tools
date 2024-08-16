@@ -244,16 +244,16 @@ func filterComments(htmlDocument string) string {
 	htmlDocumentRunes := []rune(htmlDocument)
 	htmlCommentStart := []rune("<!--")
 	// htmlCommentEnd := []rune("-->")
-	// jsCommentSingleLine := []rune("//")
-	// jsCommentMultiLineStart := []rune("/*")
-	// jsCommentMultiLineEnd := []rune("*/")
+	jsCommentSingleLine := []rune("//")
+	commentMultiLineStart := []rune("/*")
+	// commentMultiLineEnd := []rune("*/")
 
 	htmlDocumentRunesLength := len(htmlDocumentRunes)
 	htmlCommentStartLength := len(htmlCommentStart)
 	// htmlCommentEndLength := len(htmlCommentEnd)
-	// jsCommentSingleLineLength := len(jsCommentSingleLine)
-	// jsCommentMultiLineStartLength := len(jsCommentMultiLineStart)
-	// jsCommentMultiLineEndLength := len(jsCommentMultiLineEnd)
+	jsCommentSingleLineLength := len(jsCommentSingleLine)
+	commentMultiLineStartLength := len(commentMultiLineStart)
+	// commentMultiLineEndLength := len(commentMultiLineEnd)
 
 	for i := 0; i < htmlDocumentRunesLength; i++ {
 		// string escape
@@ -267,16 +267,14 @@ func filterComments(htmlDocument string) string {
 				}
 			}
 			// JavaScript comment single line
-		} else if updateIndexIfPrefixMatches(htmlDocumentRunes, "//", &i) {
-			i++
+		} else if updateIndexIfHasPrefix(htmlDocumentRunes, jsCommentSingleLine, htmlDocumentRunesLength, jsCommentSingleLineLength, &i) {
 			for ; i < htmlDocumentRunesLength; i++ {
 				if htmlDocumentRunes[i] == '\n' {
 					break
 				}
 			}
 			// comment multi line
-		} else if updateIndexIfPrefixMatches(htmlDocumentRunes, "/*", &i) {
-			i++
+		} else if updateIndexIfHasPrefix(htmlDocumentRunes, commentMultiLineStart, htmlDocumentRunesLength, commentMultiLineStartLength, &i) {
 			for ; i < htmlDocumentRunesLength; i++ {
 				if updateIndexIfPrefixMatches(htmlDocumentRunes, "*/", &i) {
 					break
@@ -409,6 +407,11 @@ func TestFilterComments(t *testing.T) {
 		{
 			name:     "Multi-line JS comment",
 			input:    "<script>/* This is a \n multi-line comment */var x = 1;</script>",
+			expected: "<script>var x = 1;</script>",
+		},
+		{
+			name:     "Multi-line empty comment",
+			input:    "<script>/**/var x = 1;</script>",
 			expected: "<script>var x = 1;</script>",
 		},
 		{
