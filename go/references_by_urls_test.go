@@ -241,6 +241,38 @@ func appendIfEscape(htmlDocument []rune, filteredHTMLDocument *[]rune, index, ht
 	return false
 }
 
+type commentDelimiter struct {
+	startDelimiter       []rune
+	endDelimiter         []rune
+	startDelimiterLength int
+	endDelimiterLength   int
+}
+
+func createCommentDelimiter(startDelimiter, endDelimiter []rune, startDelimiterLength, endDelimiterLength int) commentDelimiter {
+	return commentDelimiter{
+		startDelimiter:       startDelimiter,
+		endDelimiter:         endDelimiter,
+		startDelimiterLength: startDelimiterLength,
+		endDelimiterLength:   endDelimiterLength,
+	}
+}
+
+func updateIndexIfComment(htmlDocumentRunes []rune, htmlDocumentRunesLength int, index *int, commentDelimiters []commentDelimiter) bool {
+	for _, delimiter := range commentDelimiters {
+		if updateIndexIfHasPrefix(htmlDocumentRunes, delimiter.startDelimiter, htmlDocumentRunesLength, delimiter.startDelimiterLength, index) {
+			for i := *index; i < htmlDocumentRunesLength; i++ {
+				if updateIndexMinusOneIfHasPrefix(htmlDocumentRunes, delimiter.endDelimiter, htmlDocumentRunesLength, delimiter.endDelimiterLength, &i) {
+					*index = i + delimiter.endDelimiterLength
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}
+
+// TODO: abstract the updateIndexIfHasPrefix ifs
 func filterComments(htmlDocument string) string {
 	var filteredHTMLDocument []rune
 	var jsStringRune rune
