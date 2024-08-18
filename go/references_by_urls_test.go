@@ -248,12 +248,12 @@ type commentDelimiter struct {
 	endDelimiterLength   int
 }
 
-func createCommentDelimiter(startDelimiter, endDelimiter []rune, startDelimiterLength, endDelimiterLength int) commentDelimiter {
+func createCommentDelimiter(startDelimiter, endDelimiter []rune) commentDelimiter {
 	return commentDelimiter{
 		startDelimiter:       startDelimiter,
 		endDelimiter:         endDelimiter,
-		startDelimiterLength: startDelimiterLength,
-		endDelimiterLength:   endDelimiterLength,
+		startDelimiterLength: len(startDelimiter),
+		endDelimiterLength:   len(endDelimiter),
 	}
 }
 
@@ -286,9 +286,9 @@ func filterComments(htmlDocument string) string {
 	htmlDocumentRunesLength := len(htmlDocumentRunes)
 
 	commentDelimiters := []commentDelimiter{
-		createCommentDelimiter(htmlCommentStart, htmlCommentEnd, len(htmlCommentStart), len(htmlCommentEnd)),
-		createCommentDelimiter(jsCommentSingleLineStart, jsCommentSingleLineEnd, len(jsCommentSingleLineStart), len(jsCommentSingleLineEnd)),
-		createCommentDelimiter(commentMultiLineStart, commentMultiLineEnd, len(commentMultiLineStart), len(commentMultiLineEnd)),
+		createCommentDelimiter(htmlCommentStart, htmlCommentEnd),
+		createCommentDelimiter(jsCommentSingleLineStart, jsCommentSingleLineEnd),
+		createCommentDelimiter(commentMultiLineStart, commentMultiLineEnd),
 	}
 
 	for i := 0; i < htmlDocumentRunesLength; i++ {
