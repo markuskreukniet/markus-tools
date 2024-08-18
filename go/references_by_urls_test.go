@@ -260,9 +260,8 @@ func createCommentDelimiter(startDelimiter, endDelimiter []rune, startDelimiterL
 func updateIndexIfComment(htmlDocumentRunes []rune, htmlDocumentRunesLength int, index *int, commentDelimiters []commentDelimiter) bool {
 	for _, delimiter := range commentDelimiters {
 		if updateIndexIfHasPrefix(htmlDocumentRunes, delimiter.startDelimiter, htmlDocumentRunesLength, delimiter.startDelimiterLength, index) {
-			for i := *index; i < htmlDocumentRunesLength; i++ {
-				if updateIndexMinusOneIfHasPrefix(htmlDocumentRunes, delimiter.endDelimiter, htmlDocumentRunesLength, delimiter.endDelimiterLength, &i) {
-					*index = i + delimiter.endDelimiterLength
+			for ; *index < htmlDocumentRunesLength; *index++ {
+				if updateIndexMinusOneIfHasPrefix(htmlDocumentRunes, delimiter.endDelimiter, htmlDocumentRunesLength, delimiter.endDelimiterLength, index) {
 					return true
 				}
 			}
@@ -285,34 +284,23 @@ func filterComments(htmlDocument string) string {
 	commentMultiLineEnd := []rune("*/")
 
 	htmlDocumentRunesLength := len(htmlDocumentRunes)
-	htmlCommentStartLength := len(htmlCommentStart)
-	htmlCommentEndLength := len(htmlCommentEnd)
 	jsCommentSingleLineLength := len(jsCommentSingleLine)
-	commentMultiLineStartLength := len(commentMultiLineStart)
-	commentMultiLineEndLength := len(commentMultiLineEnd)
+
+	commentDelimiters := []commentDelimiter{
+		createCommentDelimiter(htmlCommentStart, htmlCommentEnd, len(htmlCommentStart), len(htmlCommentEnd)),
+		createCommentDelimiter(commentMultiLineStart, commentMultiLineEnd, len(commentMultiLineStart), len(commentMultiLineEnd)),
+	}
 
 	for i := 0; i < htmlDocumentRunesLength; i++ {
 		// string escape
 		if appendIfEscape(htmlDocumentRunes, &filteredHTMLDocument, i, htmlDocumentRunesLength) {
 			i++
-			// HTML comment
-		} else if updateIndexIfHasPrefix(htmlDocumentRunes, htmlCommentStart, htmlDocumentRunesLength, htmlCommentStartLength, &i) {
-			for ; i < htmlDocumentRunesLength; i++ {
-				if updateIndexMinusOneIfHasPrefix(htmlDocumentRunes, htmlCommentEnd, htmlDocumentRunesLength, htmlCommentEndLength, &i) {
-					break
-				}
-			}
+		} else if updateIndexIfComment(htmlDocumentRunes, htmlDocumentRunesLength, &i, commentDelimiters) {
+			continue
 			// JavaScript comment single line
 		} else if updateIndexIfHasPrefix(htmlDocumentRunes, jsCommentSingleLine, htmlDocumentRunesLength, jsCommentSingleLineLength, &i) {
 			for ; i < htmlDocumentRunesLength; i++ {
 				if htmlDocumentRunes[i] == '\n' {
-					break
-				}
-			}
-			// comment multi line
-		} else if updateIndexIfHasPrefix(htmlDocumentRunes, commentMultiLineStart, htmlDocumentRunesLength, commentMultiLineStartLength, &i) {
-			for ; i < htmlDocumentRunesLength; i++ {
-				if updateIndexMinusOneIfHasPrefix(htmlDocumentRunes, commentMultiLineEnd, htmlDocumentRunesLength, commentMultiLineEndLength, &i) {
 					break
 				}
 			}
