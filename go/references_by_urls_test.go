@@ -271,7 +271,6 @@ func updateIndexIfComment(htmlDocumentRunes []rune, htmlDocumentRunesLength int,
 	return false
 }
 
-// TODO: abstract the updateIndexIfHasPrefix ifs
 func filterComments(htmlDocument string) string {
 	var filteredHTMLDocument []rune
 	var jsStringRune rune
@@ -279,15 +278,16 @@ func filterComments(htmlDocument string) string {
 	htmlDocumentRunes := []rune(htmlDocument)
 	htmlCommentStart := []rune("<!--")
 	htmlCommentEnd := []rune("-->")
-	jsCommentSingleLine := []rune("//")
+	jsCommentSingleLineStart := []rune("//")
+	jsCommentSingleLineEnd := []rune("\n")
 	commentMultiLineStart := []rune("/*")
 	commentMultiLineEnd := []rune("*/")
 
 	htmlDocumentRunesLength := len(htmlDocumentRunes)
-	jsCommentSingleLineLength := len(jsCommentSingleLine)
 
 	commentDelimiters := []commentDelimiter{
 		createCommentDelimiter(htmlCommentStart, htmlCommentEnd, len(htmlCommentStart), len(htmlCommentEnd)),
+		createCommentDelimiter(jsCommentSingleLineStart, jsCommentSingleLineEnd, len(jsCommentSingleLineStart), len(jsCommentSingleLineEnd)),
 		createCommentDelimiter(commentMultiLineStart, commentMultiLineEnd, len(commentMultiLineStart), len(commentMultiLineEnd)),
 	}
 
@@ -297,13 +297,6 @@ func filterComments(htmlDocument string) string {
 			i++
 		} else if updateIndexIfComment(htmlDocumentRunes, htmlDocumentRunesLength, &i, commentDelimiters) {
 			continue
-			// JavaScript comment single line
-		} else if updateIndexIfHasPrefix(htmlDocumentRunes, jsCommentSingleLine, htmlDocumentRunesLength, jsCommentSingleLineLength, &i) {
-			for ; i < htmlDocumentRunesLength; i++ {
-				if htmlDocumentRunes[i] == '\n' {
-					break
-				}
-			}
 			// JavaScript string
 		} else if htmlDocumentRunes[i] == '"' || htmlDocumentRunes[i] == '\'' { // TODO: also add backtick strings
 			filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
@@ -426,6 +419,11 @@ func TestFilterComments(t *testing.T) {
 		{
 			name:     "Single-line JS comment",
 			input:    "<script>// This is a comment\nvar x = 1;</script>",
+			expected: "<script>var x = 1;</script>",
+		},
+		{
+			name:     "Single-line JS empty comment",
+			input:    "<script>//\nvar x = 1;</script>",
 			expected: "<script>var x = 1;</script>",
 		},
 		{
