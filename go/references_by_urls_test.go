@@ -151,7 +151,7 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	h1StartTagPartLength := len(h1StartTagPartRunes)
 
 	for i := 0; i < runesLength; i++ {
-		if length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, titleStartTagPartRunes, runesLength, i, titleStartTagPartLength); hasPrefix {
+		if length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, titleStartTagPartRunes, runesLength, titleStartTagPartLength, i); hasPrefix {
 			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 			i += length
 			if tagIsClosed {
@@ -166,7 +166,7 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 				htmlElementPart = nil
 			}
 			i--
-		} else if length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, h1StartTagPartRunes, runesLength, i, h1StartTagPartLength); hasPrefix {
+		} else if length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, h1StartTagPartRunes, runesLength, h1StartTagPartLength, i); hasPrefix {
 			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
 			i += length
 			if tagIsClosed {
