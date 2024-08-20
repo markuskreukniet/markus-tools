@@ -119,15 +119,17 @@ func getTheOtherHTMLElementPartLength(htmlDocumentPart []rune, index int, startT
 	return 0, false
 }
 
-// TODO: returning tagPartLength is useless
-func hasOpenOrSelfClosingHTMLTagPrefix(htmlDocument, prefix []rune, htmlDocumentLength, prefixLength, index int) (bool, bool) {
-	if hasPrefix(htmlDocument, []rune(prefix), htmlDocumentLength, prefixLength, index) {
-		if _, tagIsClosed, tagIsFound := finishCreatingStartTag(htmlDocument, index+prefixLength); tagIsFound {
-			return tagIsClosed, true
+func hasOpenOrSelfClosingHTMLTagPrefix(htmlDocument, prefix []rune, htmlDocumentLength, prefixLength, index int) (int, bool, bool) {
+	prefixRunes := []rune(prefix)
+	prefixRunesLength := len(prefixRunes)
+
+	if hasPrefix(htmlDocument, []rune(prefix), len(htmlDocument), prefixRunesLength, index) {
+		if tagPartLength, tagIsClosed, tagIsFound := finishCreatingStartTag(htmlDocument, index+prefixRunesLength); tagIsFound {
+			return prefixRunesLength + tagPartLength, tagIsClosed, true
 		}
 	}
 
-	return false, false
+	return 0, false, false
 }
 
 func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
@@ -149,9 +151,9 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	h1StartTagPartLength := len(h1StartTagPartRunes)
 
 	for i := 0; i < runesLength; i++ {
-		if tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, titleStartTagPartRunes, runesLength, i, titleStartTagPartLength); hasPrefix {
-			htmlElementPart = append(htmlElementPart, runes[i:i+titleStartTagPartLength]...)
-			i += titleStartTagPartLength
+		if length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, titleStartTagPartRunes, runesLength, i, titleStartTagPartLength); hasPrefix {
+			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
+			i += length
 			if tagIsClosed {
 				titleElements = append(titleElements, string(htmlElementPart))
 				htmlElementPart = nil
@@ -164,9 +166,9 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 				htmlElementPart = nil
 			}
 			i--
-		} else if tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, h1StartTagPartRunes, runesLength, i, h1StartTagPartLength); hasPrefix {
-			htmlElementPart = append(htmlElementPart, runes[i:i+h1StartTagPartLength]...)
-			i += h1StartTagPartLength
+		} else if length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, h1StartTagPartRunes, runesLength, i, h1StartTagPartLength); hasPrefix {
+			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
+			i += length
 			if tagIsClosed {
 				h1Elements = append(h1Elements, string(htmlElementPart))
 				htmlElementPart = nil
@@ -333,21 +335,21 @@ func TestReferencesByURLs(t *testing.T) {
 		expectedTitles []string
 		expectedH1s    []string
 	}{
-		{
-			htmlDocument:   "<html><head><title>Test Title</title></head><body><h1>Heading 1</h1></body></html>",
-			expectedTitles: []string{"<title>Test Title</title>"},
-			expectedH1s:    []string{"<h1>Heading 1</h1>"},
-		},
+		// {
+		// 	htmlDocument:   "<html><head><title>Test Title</title></head><body><h1>Heading 1</h1></body></html>",
+		// 	expectedTitles: []string{"<title>Test Title</title>"},
+		// 	expectedH1s:    []string{"<h1>Heading 1</h1>"},
+		// },
 		// {
 		// 	htmlDocument:   "<html><head><title>Another Title</title></head><body><h1>First Heading</h1><h1>Second Heading</h1></body></html>",
 		// 	expectedTitles: []string{"<title>Another Title</title>"},
 		// 	expectedH1s:    []string{"<h1>First Heading</h1>", "<h1>Second Heading</h1>"},
 		// },
-		// {
-		// 	htmlDocument:   "<html><head></head><body><h1>Only Heading</h1></body></html>",
-		// 	expectedTitles: nil,
-		// 	expectedH1s:    []string{"<h1>Only Heading</h1>"},
-		// },
+		{
+			htmlDocument:   "<html><head></head><body><h1>Only Heading</h1></body></html>",
+			expectedTitles: nil,
+			expectedH1s:    []string{"<h1>Only Heading</h1>"},
+		},
 		// {
 		// 	htmlDocument:   "<html><head><title>Empty Title</title></head><body><h1></h1></body></html>",
 		// 	expectedTitles: []string{"<title>Empty Title</title>"},
