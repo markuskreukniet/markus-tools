@@ -187,6 +187,26 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	return titleElements, h1Elements
 }
 
+// TODO: not efficient since it is used in a loop
+func hasStringPrefix(runes []rune, index int, prefix string) (bool, int) {
+	prefixLength := len(prefix)
+
+	if len(runes)-index < prefixLength {
+		return false, 0
+	}
+
+	for _, r := range prefix {
+		if runes[index] != r {
+			return false, 0
+		}
+		index++
+	}
+
+	return true, prefixLength
+}
+
+// // //
+
 func hasPrefix(runes, prefix []rune, runesLength, prefixLength, index int) bool {
 	if runesLength-index < prefixLength {
 		return false
@@ -218,24 +238,6 @@ func updateIndexIfHasPrefix(runes, prefix []rune, runesLength, prefixLength int,
 	}
 
 	return false
-}
-
-// TODO: not efficient since it is used in a loop
-func hasStringPrefix(runes []rune, index int, prefix string) (bool, int) {
-	prefixLength := len(prefix)
-
-	if len(runes)-index < prefixLength {
-		return false, 0
-	}
-
-	for _, r := range prefix {
-		if runes[index] != r {
-			return false, 0
-		}
-		index++
-	}
-
-	return true, prefixLength
 }
 
 func appendIfEscape(htmlDocument []rune, filteredHTMLDocument *[]rune, index, htmlDocumentLength int) bool {
