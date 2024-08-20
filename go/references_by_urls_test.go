@@ -345,7 +345,7 @@ func TestReferencesByURLs(t *testing.T) {
 		// },
 		// {
 		// 	htmlDocument:   "<html><head></head><body><h1>Only Heading</h1></body></html>",
-		// 	expectedTitles: []string{},
+		// 	expectedTitles: nil,
 		// 	expectedH1s:    []string{"<h1>Only Heading</h1>"},
 		// },
 		// {
@@ -371,16 +371,16 @@ func TestReferencesByURLs(t *testing.T) {
 		// {
 		// 	htmlDocument:   "<html><head><title te-st=\"a---test\"  lol  ><title/></title   ></head><body></body></html>",
 		// 	expectedTitles: []string{"<title te-st=\"a---test\"  lol  ><title/></title   >"},
-		// 	expectedH1s:    []string{},
+		// 	expectedH1s:    nil,
 		// },
 		// {
 		// 	htmlDocument:   "<html><head></head><body><h1 te-st=\"a---test\"  lol  ><h1 asdf-l=\"test\"  /></h1   ></body></html>",
-		// 	expectedTitles: []string{},
+		// 	expectedTitles: nil,
 		// 	expectedH1s:    []string{"<h1 te-st=\"a---test\"  lol  ><h1 asdf-l=\"test\"  /></h1   >"},
 		// },
 		// {
 		// 	htmlDocument:   "<html><head></head><body><h1><h1></h1></h1></body></html>",
-		// 	expectedTitles: []string{},
+		// 	expectedTitles: nil,
 		// 	expectedH1s:    []string{"<h1><h1></h1></h1>"},
 		// },
 	}
