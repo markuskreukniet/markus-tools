@@ -132,6 +132,20 @@ func hasOpenOrSelfClosingHTMLTagPrefix(htmlDocument, prefix []rune, htmlDocument
 	return 0, false, false
 }
 
+// TODO: WIP and rename
+func ding(htmlDocument, prefix []rune, htmlDocumentLength, prefixLength int, index *int, htmlElementPart *[]rune) (int, bool, bool) {
+	length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(htmlDocument, prefix, htmlDocumentLength, prefixLength, *index)
+
+	if hasPrefix {
+		*htmlElementPart = append(*htmlElementPart, htmlDocument[*index:*index+length]...)
+		*index += length
+
+		return length, tagIsClosed, hasPrefix
+	}
+
+	return 0, false, false
+}
+
 func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	var titleElements []string
 	var h1Elements []string
@@ -151,9 +165,7 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	h1StartTagPartLength := len(h1StartTagPartRunes)
 
 	for i := 0; i < runesLength; i++ {
-		if length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, titleStartTagPartRunes, runesLength, titleStartTagPartLength, i); hasPrefix {
-			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
-			i += length
+		if _, tagIsClosed, hasPrefix := ding(runes, titleStartTagPartRunes, runesLength, titleStartTagPartLength, &i, &htmlElementPart); hasPrefix {
 			if tagIsClosed {
 				titleElements = append(titleElements, string(htmlElementPart))
 				htmlElementPart = nil
@@ -166,9 +178,7 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 				htmlElementPart = nil
 			}
 			i--
-		} else if length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(runes, h1StartTagPartRunes, runesLength, h1StartTagPartLength, i); hasPrefix {
-			htmlElementPart = append(htmlElementPart, runes[i:i+length]...)
-			i += length
+		} else if _, tagIsClosed, hasPrefix := ding(runes, h1StartTagPartRunes, runesLength, h1StartTagPartLength, &i, &htmlElementPart); hasPrefix {
 			if tagIsClosed {
 				h1Elements = append(h1Elements, string(htmlElementPart))
 				htmlElementPart = nil
