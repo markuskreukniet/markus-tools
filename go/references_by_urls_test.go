@@ -378,9 +378,9 @@ func TestReferencesByURLs(t *testing.T) {
 			expectedH1s:    nil,
 		},
 		{
-			htmlDocument:   "<html><head></head><body><h1 te-st=\"a---test\"  lol  ><h1 asdf-l=\"test\"  /></h1   ></body></html>",
+			htmlDocument:   "<html><head></head><body><h1 te-st=\"a---test\"  lol  ><h1 asdf-l=\"test\"  /></h1   ><h1/></body></html>",
 			expectedTitles: nil,
-			expectedH1s:    []string{"<h1 te-st=\"a---test\"  lol  ><h1 asdf-l=\"test\"  /></h1   >"},
+			expectedH1s:    []string{"<h1 te-st=\"a---test\"  lol  ><h1 asdf-l=\"test\"  /></h1   >", "<h1/>"},
 		},
 		{
 			htmlDocument:   "<html><head></head><body><h1><h1></h1></h1></body></html>",
