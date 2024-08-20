@@ -141,6 +141,7 @@ func ding(htmlDocument, prefix []rune, htmlDocumentLength, prefixLength int, ind
 		*index += length
 		if tagIsClosed {
 			*htmlElements = append(*htmlElements, string(*htmlElementPart))
+			*htmlElementPart = nil // should move out of the if else?
 		}
 
 		return length, tagIsClosed, hasPrefix
@@ -169,9 +170,7 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 
 	for i := 0; i < runesLength; i++ {
 		if _, tagIsClosed, hasPrefix := ding(runes, titleStartTagPartRunes, runesLength, titleStartTagPartLength, &i, &titleElements, &htmlElementPart); hasPrefix {
-			if tagIsClosed {
-				htmlElementPart = nil
-			} else {
+			if !tagIsClosed {
 				// TODO: use htmlElementIsFound
 				htmlElementPartLength, _ := getTheOtherHTMLElementPartLength(runes, i, titleStartTagPart, titleEndTagPart)
 				htmlElementPart = append(htmlElementPart, runes[i:i+htmlElementPartLength]...)
@@ -181,9 +180,7 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 			}
 			i--
 		} else if _, tagIsClosed, hasPrefix := ding(runes, h1StartTagPartRunes, runesLength, h1StartTagPartLength, &i, &h1Elements, &htmlElementPart); hasPrefix {
-			if tagIsClosed {
-				htmlElementPart = nil
-			} else {
+			if !tagIsClosed {
 				// TODO: use htmlElementIsFound
 				htmlElementPartLength, _ := getTheOtherHTMLElementPartLength(runes, i, h1StartTagPart, h1EndTagPart)
 				htmlElementPart = append(htmlElementPart, runes[i:i+htmlElementPartLength]...)
