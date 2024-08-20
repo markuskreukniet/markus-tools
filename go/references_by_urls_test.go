@@ -133,12 +133,15 @@ func hasOpenOrSelfClosingHTMLTagPrefix(htmlDocument, prefix []rune, htmlDocument
 }
 
 // TODO: WIP and rename
-func ding(htmlDocument, prefix []rune, htmlDocumentLength, prefixLength int, index *int, htmlElementPart *[]rune) (int, bool, bool) {
+func ding(htmlDocument, prefix []rune, htmlDocumentLength, prefixLength int, index *int, htmlElements *[]string, htmlElementPart *[]rune) (int, bool, bool) {
 	length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(htmlDocument, prefix, htmlDocumentLength, prefixLength, *index)
 
 	if hasPrefix {
 		*htmlElementPart = append(*htmlElementPart, htmlDocument[*index:*index+length]...)
 		*index += length
+		if tagIsClosed {
+			*htmlElements = append(*htmlElements, string(*htmlElementPart))
+		}
 
 		return length, tagIsClosed, hasPrefix
 	}
@@ -165,9 +168,8 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	h1StartTagPartLength := len(h1StartTagPartRunes)
 
 	for i := 0; i < runesLength; i++ {
-		if _, tagIsClosed, hasPrefix := ding(runes, titleStartTagPartRunes, runesLength, titleStartTagPartLength, &i, &htmlElementPart); hasPrefix {
+		if _, tagIsClosed, hasPrefix := ding(runes, titleStartTagPartRunes, runesLength, titleStartTagPartLength, &i, &titleElements, &htmlElementPart); hasPrefix {
 			if tagIsClosed {
-				titleElements = append(titleElements, string(htmlElementPart))
 				htmlElementPart = nil
 			} else {
 				// TODO: use htmlElementIsFound
@@ -178,9 +180,8 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 				htmlElementPart = nil
 			}
 			i--
-		} else if _, tagIsClosed, hasPrefix := ding(runes, h1StartTagPartRunes, runesLength, h1StartTagPartLength, &i, &htmlElementPart); hasPrefix {
+		} else if _, tagIsClosed, hasPrefix := ding(runes, h1StartTagPartRunes, runesLength, h1StartTagPartLength, &i, &h1Elements, &htmlElementPart); hasPrefix {
 			if tagIsClosed {
-				h1Elements = append(h1Elements, string(htmlElementPart))
 				htmlElementPart = nil
 			} else {
 				// TODO: use htmlElementIsFound
