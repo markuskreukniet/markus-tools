@@ -385,6 +385,7 @@ func TestReferencesByURLs(t *testing.T) {
 		// },
 	}
 
+	// TODO: should only use !reflect.DeepEqual instead of the ifs around it?
 	for _, test := range tests {
 		titles, h1s := findTitleAndH1Elements(test.htmlDocument)
 
