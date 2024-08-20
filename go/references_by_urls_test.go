@@ -337,76 +337,67 @@ func TestReferencesByURLs(t *testing.T) {
 		expectedTitles []string
 		expectedH1s    []string
 	}{
-		// {
-		// 	htmlDocument:   "<html><head><title>Test Title</title></head><body><h1>Heading 1</h1></body></html>",
-		// 	expectedTitles: []string{"<title>Test Title</title>"},
-		// 	expectedH1s:    []string{"<h1>Heading 1</h1>"},
-		// },
-		// {
-		// 	htmlDocument:   "<html><head><title>Another Title</title></head><body><h1>First Heading</h1><h1>Second Heading</h1></body></html>",
-		// 	expectedTitles: []string{"<title>Another Title</title>"},
-		// 	expectedH1s:    []string{"<h1>First Heading</h1>", "<h1>Second Heading</h1>"},
-		// },
+		{
+			htmlDocument:   "<html><head><title>Test Title</title></head><body><h1>Heading 1</h1></body></html>",
+			expectedTitles: []string{"<title>Test Title</title>"},
+			expectedH1s:    []string{"<h1>Heading 1</h1>"},
+		},
+		{
+			htmlDocument:   "<html><head><title>Another Title</title></head><body><h1>First Heading</h1><h1>Second Heading</h1></body></html>",
+			expectedTitles: []string{"<title>Another Title</title>"},
+			expectedH1s:    []string{"<h1>First Heading</h1>", "<h1>Second Heading</h1>"},
+		},
 		{
 			htmlDocument:   "<html><head></head><body><h1>Only Heading</h1></body></html>",
 			expectedTitles: nil,
 			expectedH1s:    []string{"<h1>Only Heading</h1>"},
 		},
-		// {
-		// 	htmlDocument:   "<html><head><title>Empty Title</title></head><body><h1></h1></body></html>",
-		// 	expectedTitles: []string{"<title>Empty Title</title>"},
-		// 	expectedH1s:    []string{"<h1></h1>"},
-		// },
-		// {
-		// 	htmlDocument:   "<html><head><title>    </title></head><body><h1>     </h1></body></html>",
-		// 	expectedTitles: []string{"<title>    </title>"},
-		// 	expectedH1s:    []string{"<h1>     </h1>"},
-		// },
-		// {
-		// 	htmlDocument:   "<html><head><title te_s-t   test2-lol   test3=\"asdf-asdf2\">    </title ></head><body><h1 asdf asdf=\"asdf89-asdf99\"   >     </h1     ></body></html>",
-		// 	expectedTitles: []string{"<title te_s-t   test2-lol   test3=\"asdf-asdf2\">    </title >"},
-		// 	expectedH1s:    []string{"<h1 asdf asdf=\"asdf89-asdf99\"   >     </h1     >"},
-		// },
-		// {
-		// 	htmlDocument:   "<html><head><title/></head><body><h1   /> <h1   test-a=\"a_b-c\"  /></body></html>",
-		// 	expectedTitles: []string{"<title/>"},
-		// 	expectedH1s:    []string{"<h1   />", "<h1   test-a=\"a_b-c\"  />"},
-		// },
-		// {
-		// 	htmlDocument:   "<html><head><title te-st=\"a---test\"  lol  ><title/></title   ></head><body></body></html>",
-		// 	expectedTitles: []string{"<title te-st=\"a---test\"  lol  ><title/></title   >"},
-		// 	expectedH1s:    nil,
-		// },
-		// {
-		// 	htmlDocument:   "<html><head></head><body><h1 te-st=\"a---test\"  lol  ><h1 asdf-l=\"test\"  /></h1   ></body></html>",
-		// 	expectedTitles: nil,
-		// 	expectedH1s:    []string{"<h1 te-st=\"a---test\"  lol  ><h1 asdf-l=\"test\"  /></h1   >"},
-		// },
-		// {
-		// 	htmlDocument:   "<html><head></head><body><h1><h1></h1></h1></body></html>",
-		// 	expectedTitles: nil,
-		// 	expectedH1s:    []string{"<h1><h1></h1></h1>"},
-		// },
+		{
+			htmlDocument:   "<html><head><title>Empty Title</title></head><body><h1></h1></body></html>",
+			expectedTitles: []string{"<title>Empty Title</title>"},
+			expectedH1s:    []string{"<h1></h1>"},
+		},
+		{
+			htmlDocument:   "<html><head><title>    </title></head><body><h1>     </h1></body></html>",
+			expectedTitles: []string{"<title>    </title>"},
+			expectedH1s:    []string{"<h1>     </h1>"},
+		},
+		{
+			htmlDocument:   "<html><head><title te_s-t   test2-lol   test3=\"asdf-asdf2\">    </title ></head><body><h1 asdf asdf=\"asdf89-asdf99\"   >     </h1     ></body></html>",
+			expectedTitles: []string{"<title te_s-t   test2-lol   test3=\"asdf-asdf2\">    </title >"},
+			expectedH1s:    []string{"<h1 asdf asdf=\"asdf89-asdf99\"   >     </h1     >"},
+		},
+		{
+			htmlDocument:   "<html><head><title/></head><body><h1   /> <h1   test-a=\"a_b-c\"  /></body></html>",
+			expectedTitles: []string{"<title/>"},
+			expectedH1s:    []string{"<h1   />", "<h1   test-a=\"a_b-c\"  />"},
+		},
+		{
+			htmlDocument:   "<html><head><title te-st=\"a---test\"  lol  ><title/></title   ></head><body></body></html>",
+			expectedTitles: []string{"<title te-st=\"a---test\"  lol  ><title/></title   >"},
+			expectedH1s:    nil,
+		},
+		{
+			htmlDocument:   "<html><head></head><body><h1 te-st=\"a---test\"  lol  ><h1 asdf-l=\"test\"  /></h1   ></body></html>",
+			expectedTitles: nil,
+			expectedH1s:    []string{"<h1 te-st=\"a---test\"  lol  ><h1 asdf-l=\"test\"  /></h1   >"},
+		},
+		{
+			htmlDocument:   "<html><head></head><body><h1><h1></h1></h1></body></html>",
+			expectedTitles: nil,
+			expectedH1s:    []string{"<h1><h1></h1></h1>"},
+		},
 	}
 
-	// TODO: should only use !reflect.DeepEqual instead of the ifs around it?
 	for _, test := range tests {
 		titles, h1s := findTitleAndH1Elements(test.htmlDocument)
 
-		if titles == nil && test.expectedTitles != nil {
+		if !reflect.DeepEqual(titles, test.expectedTitles) {
 			t.Errorf("findTitleAndH1Elements(%q) titles = %v; want %v", test.htmlDocument, titles, test.expectedTitles)
-		} else if titles != nil && test.expectedTitles != nil {
-			if !reflect.DeepEqual(titles, test.expectedTitles) {
-				t.Errorf("findTitleAndH1Elements(%q) titles = %v; want %v", test.htmlDocument, titles, test.expectedTitles)
-			}
 		}
 
-		if h1s == nil && test.expectedH1s != nil {
+		if !reflect.DeepEqual(h1s, test.expectedH1s) {
 			t.Errorf("findTitleAndH1Elements(%q) h1s = %v; want %v", test.htmlDocument, h1s, test.expectedH1s)
-		} else if h1s != nil && test.expectedH1s != nil {
-			if !reflect.DeepEqual(h1s, test.expectedH1s) {
-				t.Errorf("findTitleAndH1Elements(%q) h1s = %v; want %v", test.htmlDocument, h1s, test.expectedH1s)
-			}
 		}
 	}
 }
