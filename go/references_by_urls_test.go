@@ -16,36 +16,34 @@ func isLetterDigitHyphenOrUnderscore(r rune) bool {
 
 // TODO: returning tagPartLength is useless?
 // returns: tagPartLength, tagIsClosed, tagIsFound
-func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool, bool) {
+func finishCreatingStartTag(documentPart []rune, documentPartLength, index int) (int, bool, bool) {
 	startTagEndPartLength := 0
 	var quoteRune rune
 	inAttributeName := false
 	inAttributeValue := false
 
-	length := len(htmlDocumentPart)
-
-	for ; index < length; index++ {
+	for ; index < documentPartLength; index++ {
 		switch {
 		case inAttributeName:
-			if htmlDocumentPart[index] == '=' {
+			if documentPart[index] == '=' {
 				startTagEndPartLength++
 				inAttributeName = false
 				inAttributeValue = true
-			} else if isLetterDigitHyphenOrUnderscore(htmlDocumentPart[index]) {
+			} else if isLetterDigitHyphenOrUnderscore(documentPart[index]) {
 				startTagEndPartLength++
-			} else if unicode.IsSpace(htmlDocumentPart[index]) {
+			} else if unicode.IsSpace(documentPart[index]) {
 				startTagEndPartLength++
 				inAttributeName = false
 			} else {
 				return 0, false, false
 			}
 		case inAttributeValue:
-			if htmlDocumentPart[index] == '"' || htmlDocumentPart[index] == '\'' {
-				quoteRune = htmlDocumentPart[index]
+			if documentPart[index] == '"' || documentPart[index] == '\'' {
+				quoteRune = documentPart[index]
 				startTagEndPartLength++
-				for i := index + 1; i < length; i++ {
+				for i := index + 1; i < documentPartLength; i++ {
 					startTagEndPartLength++
-					if htmlDocumentPart[i] == quoteRune {
+					if documentPart[i] == quoteRune {
 						index = i
 						break
 					}
@@ -55,16 +53,16 @@ func finishCreatingStartTag(htmlDocumentPart []rune, index int) (int, bool, bool
 				return 0, false, false
 			}
 		default:
-			if isLetter(htmlDocumentPart[index]) {
+			if isLetter(documentPart[index]) {
 				startTagEndPartLength++
 				inAttributeName = true
-			} else if htmlDocumentPart[index] == '>' {
+			} else if documentPart[index] == '>' {
 				startTagEndPartLength++
 				return startTagEndPartLength, false, true
-			} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart, index, "/>"); hasPrefix {
+			} else if hasPrefix, length := hasStringPrefix(documentPart, index, "/>"); hasPrefix {
 				startTagEndPartLength += length
 				return startTagEndPartLength, true, true
-			} else if unicode.IsSpace(htmlDocumentPart[index]) {
+			} else if unicode.IsSpace(documentPart[index]) {
 				startTagEndPartLength++
 			} else {
 				return 0, false, false
@@ -86,7 +84,7 @@ func getTheOtherHTMLElementPartLength(htmlDocumentPart []rune, index int, startT
 		if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, startTagPart); hasPrefix {
 			tagPartLength += length
 			i += length
-			length, tagIsClosed, _ := finishCreatingStartTag(htmlDocumentPart, i)
+			length, tagIsClosed, _ := finishCreatingStartTag(htmlDocumentPart, htmlDocumentPartLength, i)
 			tagPartLength += length
 			i += length - 1
 			if !tagIsClosed {
@@ -119,9 +117,9 @@ func getTheOtherHTMLElementPartLength(htmlDocumentPart []rune, index int, startT
 	return 0, false
 }
 
-func hasOpenOrSelfClosingHTMLTagPrefix(htmlDocument, prefix []rune, htmlDocumentLength, prefixLength, index int) (int, bool, bool) {
-	if hasPrefix(htmlDocument, prefix, htmlDocumentLength, prefixLength, index) {
-		if tagPartLength, tagIsClosed, tagIsFound := finishCreatingStartTag(htmlDocument, index+prefixLength); tagIsFound {
+func hasOpenOrSelfClosingHTMLTagPrefix(document, prefix []rune, documentLength, prefixLength, index int) (int, bool, bool) {
+	if hasPrefix(document, prefix, documentLength, prefixLength, index) {
+		if tagPartLength, tagIsClosed, tagIsFound := finishCreatingStartTag(document, documentLength, index+prefixLength); tagIsFound {
 			return prefixLength + tagPartLength, tagIsClosed, true
 		}
 	}
