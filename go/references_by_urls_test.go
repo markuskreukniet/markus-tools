@@ -127,10 +127,10 @@ func hasOpenOrSelfClosingHTMLTagPrefix(document, prefix []rune, documentLength, 
 }
 
 // Finding HTML elements should happen for every element name in a complete HTML document since an element could be a child element of another element.
-func findHTMLElements(htmlDocument, elementName string) []string {
+func findHTMLElements(document, elementName string) []string {
 	var elements []string
 
-	documentRunes := []rune(htmlDocument)
+	documentRunes := []rune(document)
 	startTagPartRunes := append([]rune("<"), []rune(elementName)...)
 	endTagPartRunes := append([]rune("</"), []rune(elementName)...)
 
