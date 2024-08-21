@@ -74,16 +74,15 @@ func finishCreatingStartTag(document []rune, documentLength, index int) (int, bo
 
 // TODO: use tagIsFound
 // returns: htmlElementPartLength, htmlElementIsFound
-func getTheOtherHTMLElementPartLength(document []rune, index int, startTagPart, endTagPart string) (int, bool) {
+func getTheOtherHTMLElementPartLength(document []rune, startTagPart, endTagPart string, index, documentLength int) (int, bool) {
 	tagPartLength := 0
 	numberOfOpenStartTags := 1
-	htmlDocumentPartLength := len(document)
 
-	for i := index; i < htmlDocumentPartLength; i++ {
+	for i := index; i < documentLength; i++ {
 		if hasPrefix, length := hasStringPrefix(document, i, startTagPart); hasPrefix {
 			tagPartLength += length
 			i += length
-			length, tagIsClosed, _ := finishCreatingStartTag(document, htmlDocumentPartLength, i)
+			length, tagIsClosed, _ := finishCreatingStartTag(document, documentLength, i)
 			tagPartLength += length
 			i += length - 1
 			if !tagIsClosed {
@@ -92,7 +91,7 @@ func getTheOtherHTMLElementPartLength(document []rune, index int, startTagPart, 
 		} else if hasPrefix, length := hasStringPrefix(document, i, endTagPart); hasPrefix {
 			tagPartLength += length
 			i += length
-			for ; i < htmlDocumentPartLength; i++ {
+			for ; i < documentLength; i++ {
 				tagPartLength++
 				if document[i] == '>' {
 					numberOfOpenStartTags--
@@ -144,7 +143,7 @@ func findHTMLElements(document, elementName string) []string {
 			i += length
 			if !tagIsClosed {
 				// TODO: use htmlElementIsFound?
-				elementPartLength, _ := getTheOtherHTMLElementPartLength(documentRunes, i, string(startTagPartRunes), string(endTagPartRunes))
+				elementPartLength, _ := getTheOtherHTMLElementPartLength(documentRunes, string(startTagPartRunes), string(endTagPartRunes), i, documentLength)
 				elementPart = append(elementPart, documentRunes[i:i+elementPartLength]...)
 				i += elementPartLength
 			}
