@@ -14,36 +14,35 @@ func isLetterDigitHyphenOrUnderscore(r rune) bool {
 	return isLetter(r) || unicode.IsDigit(r) || r == '-' || r == '_'
 }
 
-// TODO: returning tagPartLength is useless?
 // returns: tagPartLength, tagIsClosed, tagIsFound
-func finishCreatingStartTag(documentPart []rune, documentPartLength, index int) (int, bool, bool) {
+func finishCreatingStartTag(document []rune, documentLength, index int) (int, bool, bool) {
 	startTagEndPartLength := 0
 	var quoteRune rune
 	inAttributeName := false
 	inAttributeValue := false
 
-	for ; index < documentPartLength; index++ {
+	for ; index < documentLength; index++ {
 		switch {
 		case inAttributeName:
-			if documentPart[index] == '=' {
+			if document[index] == '=' {
 				startTagEndPartLength++
 				inAttributeName = false
 				inAttributeValue = true
-			} else if isLetterDigitHyphenOrUnderscore(documentPart[index]) {
+			} else if isLetterDigitHyphenOrUnderscore(document[index]) {
 				startTagEndPartLength++
-			} else if unicode.IsSpace(documentPart[index]) {
+			} else if unicode.IsSpace(document[index]) {
 				startTagEndPartLength++
 				inAttributeName = false
 			} else {
 				return 0, false, false
 			}
 		case inAttributeValue:
-			if documentPart[index] == '"' || documentPart[index] == '\'' {
-				quoteRune = documentPart[index]
+			if document[index] == '"' || document[index] == '\'' {
+				quoteRune = document[index]
 				startTagEndPartLength++
-				for i := index + 1; i < documentPartLength; i++ {
+				for i := index + 1; i < documentLength; i++ {
 					startTagEndPartLength++
-					if documentPart[i] == quoteRune {
+					if document[i] == quoteRune {
 						index = i
 						break
 					}
@@ -53,16 +52,16 @@ func finishCreatingStartTag(documentPart []rune, documentPartLength, index int) 
 				return 0, false, false
 			}
 		default:
-			if isLetter(documentPart[index]) {
+			if isLetter(document[index]) {
 				startTagEndPartLength++
 				inAttributeName = true
-			} else if documentPart[index] == '>' {
+			} else if document[index] == '>' {
 				startTagEndPartLength++
 				return startTagEndPartLength, false, true
-			} else if hasPrefix, length := hasStringPrefix(documentPart, index, "/>"); hasPrefix {
+			} else if hasPrefix, length := hasStringPrefix(document, index, "/>"); hasPrefix {
 				startTagEndPartLength += length
 				return startTagEndPartLength, true, true
-			} else if unicode.IsSpace(documentPart[index]) {
+			} else if unicode.IsSpace(document[index]) {
 				startTagEndPartLength++
 			} else {
 				return 0, false, false
@@ -75,34 +74,34 @@ func finishCreatingStartTag(documentPart []rune, documentPartLength, index int) 
 
 // TODO: use tagIsFound
 // returns: htmlElementPartLength, htmlElementIsFound
-func getTheOtherHTMLElementPartLength(htmlDocumentPart []rune, index int, startTagPart, endTagPart string) (int, bool) {
+func getTheOtherHTMLElementPartLength(document []rune, index int, startTagPart, endTagPart string) (int, bool) {
 	tagPartLength := 0
 	numberOfOpenStartTags := 1
-	htmlDocumentPartLength := len(htmlDocumentPart)
+	htmlDocumentPartLength := len(document)
 
 	for i := index; i < htmlDocumentPartLength; i++ {
-		if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, startTagPart); hasPrefix {
+		if hasPrefix, length := hasStringPrefix(document, i, startTagPart); hasPrefix {
 			tagPartLength += length
 			i += length
-			length, tagIsClosed, _ := finishCreatingStartTag(htmlDocumentPart, htmlDocumentPartLength, i)
+			length, tagIsClosed, _ := finishCreatingStartTag(document, htmlDocumentPartLength, i)
 			tagPartLength += length
 			i += length - 1
 			if !tagIsClosed {
 				numberOfOpenStartTags++
 			}
-		} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, endTagPart); hasPrefix {
+		} else if hasPrefix, length := hasStringPrefix(document, i, endTagPart); hasPrefix {
 			tagPartLength += length
 			i += length
 			for ; i < htmlDocumentPartLength; i++ {
 				tagPartLength++
-				if htmlDocumentPart[i] == '>' {
+				if document[i] == '>' {
 					numberOfOpenStartTags--
 					if numberOfOpenStartTags == 0 {
 						return tagPartLength, true
 					}
 				}
 			}
-		} else if hasPrefix, length := hasStringPrefix(htmlDocumentPart, i, "/>"); hasPrefix {
+		} else if hasPrefix, length := hasStringPrefix(document, i, "/>"); hasPrefix {
 			tagPartLength += length
 			i += length - 1
 			numberOfOpenStartTags--
