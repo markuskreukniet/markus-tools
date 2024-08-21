@@ -120,12 +120,9 @@ func getTheOtherHTMLElementPartLength(htmlDocumentPart []rune, index int, startT
 }
 
 func hasOpenOrSelfClosingHTMLTagPrefix(htmlDocument, prefix []rune, htmlDocumentLength, prefixLength, index int) (int, bool, bool) {
-	prefixRunes := []rune(prefix)
-	prefixRunesLength := len(prefixRunes)
-
-	if hasPrefix(htmlDocument, []rune(prefix), len(htmlDocument), prefixRunesLength, index) {
-		if tagPartLength, tagIsClosed, tagIsFound := finishCreatingStartTag(htmlDocument, index+prefixRunesLength); tagIsFound {
-			return prefixRunesLength + tagPartLength, tagIsClosed, true
+	if hasPrefix(htmlDocument, prefix, htmlDocumentLength, prefixLength, index) {
+		if tagPartLength, tagIsClosed, tagIsFound := finishCreatingStartTag(htmlDocument, index+prefixLength); tagIsFound {
+			return prefixLength + tagPartLength, tagIsClosed, true
 		}
 	}
 
@@ -143,7 +140,7 @@ func findHTMLElements(htmlDocument, elementName string) []string {
 	documentLength := len(documentRunes)
 	startTagPartLength := len(startTagPartRunes)
 
-	for i := 0; i < len(documentRunes); i++ {
+	for i := 0; i < documentLength; i++ {
 		length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(documentRunes, startTagPartRunes, documentLength, startTagPartLength, i)
 		if hasPrefix {
 			elementPart := documentRunes[i : i+length]
