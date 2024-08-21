@@ -160,9 +160,41 @@ func ding(htmlDocument, prefix []rune, htmlDocumentLength, prefixLength int, ind
 	return 0, false, false
 }
 
+// Finding HTML elements should happen for every element name in a complete HTML document since an element could be a child element of another element.
 // func findTitleAndH1ElementsNew(htmlDocument string) ([]string, []string) {
-// 	return findHTMLElements("title"), findHTMLElements("h1")
+// 	return findHTMLElements(htmlDocument, "title"), findHTMLElements(htmlDocument, "h1")
 // }
+
+func findHTMLElements(htmlDocument, elementName string) []string {
+	var elements []string
+
+	documentRunes := []rune(htmlDocument)
+	startTagPartRunes := append([]rune("<"), []rune(elementName)...)
+	endTagPartRunes := append([]rune("</"), []rune(elementName)...)
+
+	documentLength := len(documentRunes)
+	startTagPartLength := len(startTagPartRunes)
+
+	for i := 0; i < len(documentRunes); i++ {
+		length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(documentRunes, startTagPartRunes, documentLength, startTagPartLength, i)
+		if hasPrefix {
+			elementPart := documentRunes[i : i+length]
+			i += length
+			if tagIsClosed {
+				elements = append(elements, string(elementPart))
+			} else {
+				// TODO: use htmlElementIsFound?
+				elementPartLength, _ := getTheOtherHTMLElementPartLength(documentRunes, i, string(startTagPartRunes), string(endTagPartRunes))
+				elementPart = append(elementPart, documentRunes[i:i+elementPartLength]...)
+				i += elementPartLength
+				elements = append(elements, string(elementPart))
+			}
+			i--
+		}
+	}
+
+	return elements
+}
 
 func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	var titleElements []string
