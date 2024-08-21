@@ -74,25 +74,24 @@ func finishCreatingStartTag(document []rune, documentLength, index int) (int, bo
 
 // TODO: use tagIsFound
 // returns: htmlElementPartLength, htmlElementIsFound
-func getTheOtherHTMLElementPartLength(document []rune, index int, startTagPart, endTagPart string) (int, bool) {
+func getTheOtherHTMLElementPartLength(document, startTagPart, endTagPart []rune, index, documentLength, startTagPartLength, endTagPartLength int) (int, bool) {
 	tagPartLength := 0
 	numberOfOpenStartTags := 1
-	htmlDocumentPartLength := len(document)
 
-	for i := index; i < htmlDocumentPartLength; i++ {
-		if hasPrefix, length := hasStringPrefix(document, i, startTagPart); hasPrefix {
-			tagPartLength += length
-			i += length
-			length, tagIsClosed, _ := finishCreatingStartTag(document, htmlDocumentPartLength, i)
+	for i := index; i < documentLength; i++ {
+		if hasPrefix(document, startTagPart, documentLength, startTagPartLength, i) {
+			tagPartLength += startTagPartLength
+			i += startTagPartLength
+			length, tagIsClosed, _ := finishCreatingStartTag(document, documentLength, i)
 			tagPartLength += length
 			i += length - 1
 			if !tagIsClosed {
 				numberOfOpenStartTags++
 			}
-		} else if hasPrefix, length := hasStringPrefix(document, i, endTagPart); hasPrefix {
-			tagPartLength += length
-			i += length
-			for ; i < htmlDocumentPartLength; i++ {
+		} else if hasPrefix(document, endTagPart, documentLength, endTagPartLength, i) {
+			tagPartLength += endTagPartLength
+			i += endTagPartLength
+			for ; i < documentLength; i++ {
 				tagPartLength++
 				if document[i] == '>' {
 					numberOfOpenStartTags--
@@ -101,7 +100,7 @@ func getTheOtherHTMLElementPartLength(document []rune, index int, startTagPart, 
 					}
 				}
 			}
-		} else if hasPrefix, length := hasStringPrefix(document, i, "/>"); hasPrefix {
+		} else if hasPrefix, length := hasStringPrefix(document, i, "/>"); hasPrefix { // WIP
 			tagPartLength += length
 			i += length - 1
 			numberOfOpenStartTags--
@@ -144,7 +143,7 @@ func findHTMLElements(document, elementName string) []string {
 			i += length
 			if !tagIsClosed {
 				// TODO: use htmlElementIsFound?
-				elementPartLength, _ := getTheOtherHTMLElementPartLength(documentRunes, i, string(startTagPartRunes), string(endTagPartRunes))
+				elementPartLength, _ := getTheOtherHTMLElementPartLength(documentRunes, startTagPartRunes, endTagPartRunes, i, documentLength, startTagPartLength, len(endTagPartRunes))
 				elementPart = append(elementPart, documentRunes[i:i+elementPartLength]...)
 				i += elementPartLength
 			}
