@@ -133,7 +133,7 @@ func hasOpenOrSelfClosingHTMLTagPrefix(htmlDocument, prefix []rune, htmlDocument
 }
 
 // TODO: WIP and rename
-func ding(htmlDocument, prefix []rune, htmlDocumentLength, prefixLength int, index *int, htmlElements *[]string, htmlElementPart *[]rune) (int, bool, bool) {
+func ding(htmlDocument, prefix []rune, htmlDocumentLength, prefixLength int, index *int, endTagPart string, htmlElements *[]string, htmlElementPart *[]rune) (int, bool, bool) {
 	length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(htmlDocument, prefix, htmlDocumentLength, prefixLength, *index)
 
 	if hasPrefix {
@@ -142,13 +142,27 @@ func ding(htmlDocument, prefix []rune, htmlDocumentLength, prefixLength int, ind
 		if tagIsClosed {
 			*htmlElements = append(*htmlElements, string(*htmlElementPart))
 			*htmlElementPart = nil // should move out of the if else?
+		} else {
+			// TODO: use htmlElementIsFound?
+			htmlElementPartLength, _ := getTheOtherHTMLElementPartLength(htmlDocument, *index, string(prefix), endTagPart)
+			*htmlElementPart = append(*htmlElementPart, htmlDocument[*index:*index+htmlElementPartLength]...)
+			*index += htmlElementPartLength
+
+			*htmlElements = append(*htmlElements, string(*htmlElementPart))
+			*htmlElementPart = nil // should move out of the if else?
 		}
+
+		*index--
 
 		return length, tagIsClosed, hasPrefix
 	}
 
 	return 0, false, false
 }
+
+// func findTitleAndH1ElementsNew(htmlDocument string) ([]string, []string) {
+// 	return findHTMLElements("title"), findHTMLElements("h1")
+// }
 
 func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	var titleElements []string
@@ -169,26 +183,10 @@ func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	h1StartTagPartLength := len(h1StartTagPartRunes)
 
 	for i := 0; i < runesLength; i++ {
-		if _, tagIsClosed, hasPrefix := ding(runes, titleStartTagPartRunes, runesLength, titleStartTagPartLength, &i, &titleElements, &htmlElementPart); hasPrefix {
-			if !tagIsClosed {
-				// TODO: use htmlElementIsFound
-				htmlElementPartLength, _ := getTheOtherHTMLElementPartLength(runes, i, titleStartTagPart, titleEndTagPart)
-				htmlElementPart = append(htmlElementPart, runes[i:i+htmlElementPartLength]...)
-				i += htmlElementPartLength
-				titleElements = append(titleElements, string(htmlElementPart))
-				htmlElementPart = nil
-			}
-			i--
-		} else if _, tagIsClosed, hasPrefix := ding(runes, h1StartTagPartRunes, runesLength, h1StartTagPartLength, &i, &h1Elements, &htmlElementPart); hasPrefix {
-			if !tagIsClosed {
-				// TODO: use htmlElementIsFound
-				htmlElementPartLength, _ := getTheOtherHTMLElementPartLength(runes, i, h1StartTagPart, h1EndTagPart)
-				htmlElementPart = append(htmlElementPart, runes[i:i+htmlElementPartLength]...)
-				i += htmlElementPartLength
-				h1Elements = append(h1Elements, string(htmlElementPart))
-				htmlElementPart = nil
-			}
-			i--
+		if _, _, hasPrefix := ding(runes, titleStartTagPartRunes, runesLength, titleStartTagPartLength, &i, titleEndTagPart, &titleElements, &htmlElementPart); hasPrefix {
+			continue
+		} else if _, _, hasPrefix := ding(runes, h1StartTagPartRunes, runesLength, h1StartTagPartLength, &i, h1EndTagPart, &h1Elements, &htmlElementPart); hasPrefix {
+			continue
 		}
 	}
 
