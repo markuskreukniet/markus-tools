@@ -21,6 +21,9 @@ func finishCreatingStartTag(document []rune, documentLength, index int) (int, bo
 	inAttributeName := false
 	inAttributeValue := false
 
+	closingTagPart := []rune("/>") // TODO: /> is duplicate
+	closingTagPartLength := len(closingTagPart)
+
 	for ; index < documentLength; index++ {
 		switch {
 		case inAttributeName:
@@ -58,8 +61,8 @@ func finishCreatingStartTag(document []rune, documentLength, index int) (int, bo
 			} else if document[index] == '>' {
 				startTagEndPartLength++
 				return startTagEndPartLength, false, true
-			} else if hasPrefix, length := hasStringPrefix(document, index, "/>"); hasPrefix {
-				startTagEndPartLength += length
+			} else if hasPrefix(document, closingTagPart, documentLength, closingTagPartLength, index) {
+				startTagEndPartLength += closingTagPartLength
 				return startTagEndPartLength, true, true
 			} else if unicode.IsSpace(document[index]) {
 				startTagEndPartLength++
@@ -161,26 +164,6 @@ func findHTMLElements(document, elementName string) []string {
 func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	return findHTMLElements(htmlDocument, "title"), findHTMLElements(htmlDocument, "h1")
 }
-
-// TODO: not efficient since it is used in a loop
-func hasStringPrefix(runes []rune, index int, prefix string) (bool, int) {
-	prefixLength := len(prefix)
-
-	if len(runes)-index < prefixLength {
-		return false, 0
-	}
-
-	for _, r := range prefix {
-		if runes[index] != r {
-			return false, 0
-		}
-		index++
-	}
-
-	return true, prefixLength
-}
-
-// // //
 
 func hasPrefix(runes, prefix []rune, runesLength, prefixLength, index int) bool {
 	if runesLength-index < prefixLength {
