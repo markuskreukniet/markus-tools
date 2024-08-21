@@ -78,6 +78,9 @@ func getTheOtherHTMLElementPartLength(document, startTagPart, endTagPart []rune,
 	tagPartLength := 0
 	numberOfOpenStartTags := 1
 
+	closingTagPart := []rune("/>") // TODO: /> is duplicate
+	closingTagPartLength := len(closingTagPart)
+
 	for i := index; i < documentLength; i++ {
 		if hasPrefix(document, startTagPart, documentLength, startTagPartLength, i) {
 			tagPartLength += startTagPartLength
@@ -100,9 +103,9 @@ func getTheOtherHTMLElementPartLength(document, startTagPart, endTagPart []rune,
 					}
 				}
 			}
-		} else if hasPrefix, length := hasStringPrefix(document, i, "/>"); hasPrefix { // WIP
-			tagPartLength += length
-			i += length - 1
+		} else if hasPrefix(document, closingTagPart, documentLength, closingTagPartLength, i) {
+			tagPartLength += closingTagPartLength
+			i += closingTagPartLength - 1
 			numberOfOpenStartTags--
 			if numberOfOpenStartTags == 0 {
 				return tagPartLength, true
