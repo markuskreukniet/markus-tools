@@ -79,10 +79,7 @@ func getTheOtherHTMLElementPartLength(document, startTagPart, endTagPart []rune,
 	numberOfOpenStartTags := 1
 
 	for i := index; i < documentLength; i++ {
-
-		// WIP
-
-		if hasPrefix, _ := hasStringPrefix(document, i, string(startTagPart)); hasPrefix {
+		if hasPrefix(document, startTagPart, documentLength, startTagPartLength, i) {
 			tagPartLength += startTagPartLength
 			i += startTagPartLength
 			length, tagIsClosed, _ := finishCreatingStartTag(document, documentLength, i)
@@ -91,7 +88,7 @@ func getTheOtherHTMLElementPartLength(document, startTagPart, endTagPart []rune,
 			if !tagIsClosed {
 				numberOfOpenStartTags++
 			}
-		} else if hasPrefix, _ := hasStringPrefix(document, i, string(endTagPart)); hasPrefix {
+		} else if hasPrefix(document, endTagPart, documentLength, endTagPartLength, i) {
 			tagPartLength += endTagPartLength
 			i += endTagPartLength
 			for ; i < documentLength; i++ {
@@ -103,7 +100,7 @@ func getTheOtherHTMLElementPartLength(document, startTagPart, endTagPart []rune,
 					}
 				}
 			}
-		} else if hasPrefix, length := hasStringPrefix(document, i, "/>"); hasPrefix {
+		} else if hasPrefix, length := hasStringPrefix(document, i, "/>"); hasPrefix { // WIP
 			tagPartLength += length
 			i += length - 1
 			numberOfOpenStartTags--
