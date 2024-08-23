@@ -22,8 +22,7 @@ func finishCreatingStartTag(document, closingTagPart []rune, documentLength, clo
 	inAttributeValue := false
 
 	for ; index < documentLength; index++ {
-		switch {
-		case inAttributeName:
+		if inAttributeName {
 			if document[index] == '=' {
 				startTagEndPartLength++
 				inAttributeName = false
@@ -36,7 +35,7 @@ func finishCreatingStartTag(document, closingTagPart []rune, documentLength, clo
 			} else {
 				return 0, false, false
 			}
-		case inAttributeValue:
+		} else if inAttributeValue {
 			if document[index] == '"' || document[index] == '\'' {
 				quoteRune = document[index]
 				startTagEndPartLength++
@@ -51,7 +50,7 @@ func finishCreatingStartTag(document, closingTagPart []rune, documentLength, clo
 			} else {
 				return 0, false, false
 			}
-		default:
+		} else {
 			if isLetter(document[index]) {
 				startTagEndPartLength++
 				inAttributeName = true
