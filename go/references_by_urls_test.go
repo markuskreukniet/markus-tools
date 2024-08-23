@@ -81,9 +81,7 @@ func getTheOtherHTMLElementPartLength(document, startTagPart, endTagPart []rune,
 	numberOfOpenStartTags := 1
 
 	for i := index; i < documentLength; i++ {
-		if hasPrefix(document, startTagPart, documentLength, startTagPartLength, i) {
-			tagPartLength += startTagPartLength
-			i += startTagPartLength
+		if updateTagPartLengthAndIndexIfHasPrefix(document, startTagPart, documentLength, startTagPartLength, &tagPartLength, &i) {
 			length, tagIsClosed, tagIsFound := finishCreatingStartTag(document, documentLength, i)
 			if tagIsFound {
 				tagPartLength += length
@@ -94,9 +92,7 @@ func getTheOtherHTMLElementPartLength(document, startTagPart, endTagPart []rune,
 			} else {
 				return 0, false
 			}
-		} else if hasPrefix(document, endTagPart, documentLength, endTagPartLength, i) {
-			tagPartLength += endTagPartLength
-			i += endTagPartLength
+		} else if updateTagPartLengthAndIndexIfHasPrefix(document, endTagPart, documentLength, endTagPartLength, &tagPartLength, &i) {
 			for ; i < documentLength; i++ {
 				tagPartLength++
 				if document[i] == '>' {
@@ -177,6 +173,15 @@ func hasPrefix(runes, prefix []rune, runesLength, prefixLength, index int) bool 
 	}
 
 	return true
+}
+
+func updateTagPartLengthAndIndexIfHasPrefix(runes, prefix []rune, runesLength, prefixLength int, tagPartLength, index *int) bool {
+	if updateIndexIfHasPrefix(runes, prefix, runesLength, prefixLength, index) {
+		*tagPartLength += prefixLength
+		return true
+	}
+
+	return false
 }
 
 func updateIndexMinusOneIfHasPrefix(runes, prefix []rune, runesLength, prefixLength int, index *int) bool {
