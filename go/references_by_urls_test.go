@@ -15,14 +15,11 @@ func isLetterDigitHyphenOrUnderscore(r rune) bool {
 }
 
 // returns: tagPartLength, tagIsClosed, tagIsFound
-func finishCreatingStartTag(document []rune, documentLength, index int) (int, bool, bool) {
+func finishCreatingStartTag(document, closingTagPart []rune, documentLength, closingTagPartLength, index int) (int, bool, bool) {
 	startTagEndPartLength := 0
 	var quoteRune rune
 	inAttributeName := false
 	inAttributeValue := false
-
-	closingTagPart := []rune("/>") // TODO: /> is duplicate
-	closingTagPartLength := len(closingTagPart)
 
 	for ; index < documentLength; index++ {
 		switch {
@@ -77,18 +74,15 @@ func finishCreatingStartTag(document []rune, documentLength, index int) (int, bo
 
 // TODO: use tagIsFound
 // returns: htmlElementPartLength, htmlElementIsFound
-func getTheOtherHTMLElementPartLength(document, startTagPart, endTagPart []rune, index, documentLength, startTagPartLength, endTagPartLength int) (int, bool) {
+func getTheOtherHTMLElementPartLength(document, startTagPart, endTagPart, closingTagPart []rune, documentLength, startTagPartLength, endTagPartLength, closingTagPartLength, index int) (int, bool) {
 	tagPartLength := 0
 	numberOfOpenStartTags := 1
-
-	closingTagPart := []rune("/>") // TODO: /> is duplicate
-	closingTagPartLength := len(closingTagPart)
 
 	for i := index; i < documentLength; i++ {
 		if hasPrefix(document, startTagPart, documentLength, startTagPartLength, i) {
 			tagPartLength += startTagPartLength
 			i += startTagPartLength
-			length, tagIsClosed, _ := finishCreatingStartTag(document, documentLength, i)
+			length, tagIsClosed, _ := finishCreatingStartTag(document, closingTagPart, documentLength, closingTagPartLength, i)
 			tagPartLength += length
 			i += length - 1
 			if !tagIsClosed {
@@ -121,9 +115,9 @@ func getTheOtherHTMLElementPartLength(document, startTagPart, endTagPart []rune,
 	return 0, false
 }
 
-func hasOpenOrSelfClosingHTMLTagPrefix(document, prefix []rune, documentLength, prefixLength, index int) (int, bool, bool) {
+func hasOpenOrSelfClosingHTMLTagPrefix(document, prefix, closingTagPart []rune, documentLength, prefixLength, closingTagPartLength, index int) (int, bool, bool) {
 	if hasPrefix(document, prefix, documentLength, prefixLength, index) {
-		if tagPartLength, tagIsClosed, tagIsFound := finishCreatingStartTag(document, documentLength, index+prefixLength); tagIsFound {
+		if tagPartLength, tagIsClosed, tagIsFound := finishCreatingStartTag(document, closingTagPart, documentLength, closingTagPartLength, index+prefixLength); tagIsFound {
 			return prefixLength + tagPartLength, tagIsClosed, true
 		}
 	}
@@ -138,18 +132,20 @@ func findHTMLElements(document, elementName string) []string {
 	documentRunes := []rune(document)
 	startTagPartRunes := append([]rune("<"), []rune(elementName)...)
 	endTagPartRunes := append([]rune("</"), []rune(elementName)...)
+	closingTagPart := []rune("/>")
 
 	documentLength := len(documentRunes)
 	startTagPartLength := len(startTagPartRunes)
+	closingTagPartLength := len(closingTagPart)
 
 	for i := 0; i < documentLength; i++ {
-		length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(documentRunes, startTagPartRunes, documentLength, startTagPartLength, i)
+		length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(documentRunes, startTagPartRunes, closingTagPart, documentLength, startTagPartLength, closingTagPartLength, i)
 		if hasPrefix {
 			elementPart := documentRunes[i : i+length]
 			i += length
 			if !tagIsClosed {
 				// TODO: use htmlElementIsFound?
-				elementPartLength, _ := getTheOtherHTMLElementPartLength(documentRunes, startTagPartRunes, endTagPartRunes, i, documentLength, startTagPartLength, len(endTagPartRunes))
+				elementPartLength, _ := getTheOtherHTMLElementPartLength(documentRunes, startTagPartRunes, endTagPartRunes, closingTagPart, documentLength, startTagPartLength, len(endTagPartRunes), closingTagPartLength, i)
 				elementPart = append(elementPart, documentRunes[i:i+elementPartLength]...)
 				i += elementPartLength
 			}
