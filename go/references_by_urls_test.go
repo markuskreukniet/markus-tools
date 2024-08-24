@@ -14,7 +14,6 @@ func isLetterDigitHyphenOrUnderscore(r rune) bool {
 	return isLetter(r) || unicode.IsDigit(r) || r == '-' || r == '_'
 }
 
-// V
 // returns: tagPartLength, tagIsClosed, tagIsFound
 func finishCreatingStartTag(document []rune, documentLength, index int) (int, bool, bool) {
 	startTagEndPartLength := 0
@@ -82,8 +81,7 @@ func getTheOtherHTMLElementPartLength(document, startTagPart, endTagPart []rune,
 
 	for i := index; i < documentLength; i++ {
 		if updateTagPartLengthAndIndexIfHasPrefix(document, startTagPart, documentLength, startTagPartLength, &tagPartLength, &i) {
-			length, tagIsClosed, tagIsFound := finishCreatingStartTag(document, documentLength, i)
-			if tagIsFound {
+			if length, tagIsClosed, tagIsFound := finishCreatingStartTag(document, documentLength, i); tagIsFound {
 				tagPartLength += length
 				i += length - 1
 				if !tagIsClosed {
@@ -110,7 +108,6 @@ func getTheOtherHTMLElementPartLength(document, startTagPart, endTagPart []rune,
 	return 0, false
 }
 
-// V
 func hasOpenOrSelfClosingHTMLTagPrefix(document, prefix []rune, documentLength, prefixLength, index int) (int, bool, bool) {
 	if hasPrefix(document, prefix, documentLength, prefixLength, index) {
 		if tagPartLength, tagIsClosed, tagIsFound := finishCreatingStartTag(document, documentLength, index+prefixLength); tagIsFound {
@@ -121,7 +118,6 @@ func hasOpenOrSelfClosingHTMLTagPrefix(document, prefix []rune, documentLength, 
 	return 0, false, false
 }
 
-// V
 // TODO: Finding HTML elements should happen for every element name in a complete HTML document since an element could be a child element of another element,
 // which is possible to fix.
 func findHTMLElements(document, elementName string) []string {
