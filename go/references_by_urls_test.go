@@ -244,6 +244,8 @@ func filterComments(htmlDocument string) string {
 	var filteredHTMLDocument []rune
 	var jsStringRune rune
 
+	backtickRune := rune('`')
+
 	htmlDocumentRunes := []rune(htmlDocument)
 	htmlCommentStart := []rune("<!--")
 	htmlCommentEnd := []rune("-->")
@@ -265,8 +267,10 @@ func filterComments(htmlDocument string) string {
 		if appendAndIncrementIfEscape(htmlDocumentRunes, &filteredHTMLDocument, htmlDocumentRunesLength, &i) ||
 			updateIndexIfComment(htmlDocumentRunes, htmlDocumentRunesLength, &i, commentDelimiters) {
 			continue
-			// JavaScript string
-		} else if htmlDocumentRunes[i] == '"' || htmlDocumentRunes[i] == '\'' {
+		}
+
+		// JavaScript string
+		if htmlDocumentRunes[i] == '"' || htmlDocumentRunes[i] == '\'' {
 			filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
 			jsStringRune = htmlDocumentRunes[i]
 			i++
@@ -280,14 +284,19 @@ func filterComments(htmlDocument string) string {
 					}
 				}
 			}
-			// } else if htmlDocumentRunes[i] == '`' {
-			// 	filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
-			// 	i++
-			// 	for ; i < htmlDocumentRunesLength; i++ {
-			// 		if appendAndIncrementIfEscape(htmlDocumentRunes, &filteredHTMLDocument, htmlDocumentRunesLength, &i) {
-			// 			continue
-			// 		}
-			// 	}
+		} else if htmlDocumentRunes[i] == backtickRune { // TODO: WIP
+			filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
+			i++
+			for ; i < htmlDocumentRunesLength; i++ {
+				if appendAndIncrementIfEscape(htmlDocumentRunes, &filteredHTMLDocument, htmlDocumentRunesLength, &i) {
+					continue
+				} else {
+					filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
+					if htmlDocumentRunes[i] == backtickRune {
+						break
+					}
+				}
+			}
 		} else {
 			filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
 		}
