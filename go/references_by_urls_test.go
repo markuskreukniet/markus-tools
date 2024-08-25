@@ -240,9 +240,16 @@ func updateIndexIfComment(htmlDocumentRunes []rune, htmlDocumentRunesLength int,
 	return false
 }
 
+func appendAndIncrement(filteredHTMLDocument *[]rune, r rune, index *int) {
+	*filteredHTMLDocument = append(*filteredHTMLDocument, r)
+	*index++
+}
+
 func filterComments(htmlDocument string) string {
 	var filteredHTMLDocument []rune
 	var jsStringRune rune
+
+	backtickRune := rune('`')
 
 	htmlDocumentRunes := []rune(htmlDocument)
 	htmlCommentStart := []rune("<!--")
@@ -265,11 +272,12 @@ func filterComments(htmlDocument string) string {
 		if appendAndIncrementIfEscape(htmlDocumentRunes, &filteredHTMLDocument, htmlDocumentRunesLength, &i) ||
 			updateIndexIfComment(htmlDocumentRunes, htmlDocumentRunesLength, &i, commentDelimiters) {
 			continue
-			// JavaScript string
-		} else if htmlDocumentRunes[i] == '"' || htmlDocumentRunes[i] == '\'' {
-			filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
+		}
+
+		// JavaScript string
+		if htmlDocumentRunes[i] == '"' || htmlDocumentRunes[i] == '\'' {
 			jsStringRune = htmlDocumentRunes[i]
-			i++
+			appendAndIncrement(&filteredHTMLDocument, htmlDocumentRunes[i], &i)
 			for ; i < htmlDocumentRunesLength; i++ {
 				if appendAndIncrementIfEscape(htmlDocumentRunes, &filteredHTMLDocument, htmlDocumentRunesLength, &i) {
 					continue
@@ -280,14 +288,25 @@ func filterComments(htmlDocument string) string {
 					}
 				}
 			}
-			// } else if htmlDocumentRunes[i] == '`' {
-			// 	filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
-			// 	i++
-			// 	for ; i < htmlDocumentRunesLength; i++ {
-			// 		if appendAndIncrementIfEscape(htmlDocumentRunes, &filteredHTMLDocument, htmlDocumentRunesLength, &i) {
-			// 			continue
-			// 		}
-			// 	}
+		} else if htmlDocumentRunes[i] == backtickRune { // TODO: WIP
+			appendAndIncrement(&filteredHTMLDocument, htmlDocumentRunes[i], &i)
+			for ; i < htmlDocumentRunesLength; i++ {
+				if appendAndIncrementIfEscape(htmlDocumentRunes, &filteredHTMLDocument, htmlDocumentRunesLength, &i) {
+					continue
+				} else if htmlDocumentRunes[i] == '{' {
+					appendAndIncrement(&filteredHTMLDocument, htmlDocumentRunes[i], &i)
+					for ; i < htmlDocumentRunesLength; i++ {
+						if htmlDocumentRunes[i] == '}' {
+							break
+						}
+					}
+				} else {
+					filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
+					if htmlDocumentRunes[i] == backtickRune {
+						break
+					}
+				}
+			}
 		} else {
 			filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
 		}
