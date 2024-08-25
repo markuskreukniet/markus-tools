@@ -180,6 +180,7 @@ func updateTagPartLengthAndIndexIfHasPrefix(runes, prefix []rune, runesLength, p
 	return false
 }
 
+// TODO: useless?
 func updateIndexMinusOneIfHasPrefix(runes, prefix []rune, runesLength, prefixLength int, index *int) bool {
 	if hasPrefix(runes, prefix, runesLength, prefixLength, *index) {
 		*index += prefixLength - 1
@@ -198,12 +199,13 @@ func updateIndexIfHasPrefix(runes, prefix []rune, runesLength, prefixLength int,
 	return false
 }
 
+// TODO: add function appendAndIncrementIndexIfEscape
 func appendIfEscape(htmlDocument []rune, filteredHTMLDocument *[]rune, index, htmlDocumentLength int) bool {
-	indexPlusOne := index + 1
+	incrementedIndex := index + 1
 
-	if htmlDocument[index] == '\\' && indexPlusOne < htmlDocumentLength {
+	if htmlDocument[index] == '\\' && incrementedIndex < htmlDocumentLength {
 		*filteredHTMLDocument = append(*filteredHTMLDocument, htmlDocument[index])
-		*filteredHTMLDocument = append(*filteredHTMLDocument, htmlDocument[indexPlusOne])
+		*filteredHTMLDocument = append(*filteredHTMLDocument, htmlDocument[incrementedIndex])
 		return true
 	}
 
@@ -267,7 +269,7 @@ func filterComments(htmlDocument string) string {
 		} else if updateIndexIfComment(htmlDocumentRunes, htmlDocumentRunesLength, &i, commentDelimiters) {
 			continue
 			// JavaScript string
-		} else if htmlDocumentRunes[i] == '"' || htmlDocumentRunes[i] == '\'' { // TODO: also add backtick strings
+		} else if htmlDocumentRunes[i] == '"' || htmlDocumentRunes[i] == '\'' {
 			filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
 			jsStringRune = htmlDocumentRunes[i]
 			i++
@@ -281,6 +283,14 @@ func filterComments(htmlDocument string) string {
 					}
 				}
 			}
+			// } else if htmlDocumentRunes[i] == '`' {
+			// 	filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
+			// 	i++
+			// 	for ; i < htmlDocumentRunesLength; i++ {
+			// 		if appendIfEscape(htmlDocumentRunes, &filteredHTMLDocument, i, htmlDocumentRunesLength) {
+			// 			i++
+			// 		}
+			// 	}
 		} else {
 			filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
 		}
