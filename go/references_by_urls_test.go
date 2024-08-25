@@ -199,13 +199,11 @@ func updateIndexIfHasPrefix(runes, prefix []rune, runesLength, prefixLength int,
 	return false
 }
 
-// TODO: add function appendAndIncrementIndexIfEscape
-func appendIfEscape(htmlDocument []rune, filteredHTMLDocument *[]rune, index, htmlDocumentLength int) bool {
-	incrementedIndex := index + 1
-
-	if htmlDocument[index] == '\\' && incrementedIndex < htmlDocumentLength {
-		*filteredHTMLDocument = append(*filteredHTMLDocument, htmlDocument[index])
-		*filteredHTMLDocument = append(*filteredHTMLDocument, htmlDocument[incrementedIndex])
+func appendAndIncrementIfEscape(htmlDocument []rune, filteredHTMLDocument *[]rune, htmlDocumentLength int, index *int) bool {
+	if htmlDocument[*index] == '\\' && *index+1 < htmlDocumentLength {
+		*filteredHTMLDocument = append(*filteredHTMLDocument, htmlDocument[*index])
+		*index++
+		*filteredHTMLDocument = append(*filteredHTMLDocument, htmlDocument[*index])
 		return true
 	}
 
@@ -263,10 +261,9 @@ func filterComments(htmlDocument string) string {
 	}
 
 	for i := 0; i < htmlDocumentRunesLength; i++ {
-		// string escape
-		if appendIfEscape(htmlDocumentRunes, &filteredHTMLDocument, i, htmlDocumentRunesLength) {
-			i++
-		} else if updateIndexIfComment(htmlDocumentRunes, htmlDocumentRunesLength, &i, commentDelimiters) {
+		// string escape or comment
+		if appendAndIncrementIfEscape(htmlDocumentRunes, &filteredHTMLDocument, htmlDocumentRunesLength, &i) ||
+			updateIndexIfComment(htmlDocumentRunes, htmlDocumentRunesLength, &i, commentDelimiters) {
 			continue
 			// JavaScript string
 		} else if htmlDocumentRunes[i] == '"' || htmlDocumentRunes[i] == '\'' {
@@ -274,8 +271,8 @@ func filterComments(htmlDocument string) string {
 			jsStringRune = htmlDocumentRunes[i]
 			i++
 			for ; i < htmlDocumentRunesLength; i++ {
-				if appendIfEscape(htmlDocumentRunes, &filteredHTMLDocument, i, htmlDocumentRunesLength) {
-					i++
+				if appendAndIncrementIfEscape(htmlDocumentRunes, &filteredHTMLDocument, htmlDocumentRunesLength, &i) {
+					continue
 				} else {
 					filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
 					if htmlDocumentRunes[i] == jsStringRune {
@@ -287,8 +284,8 @@ func filterComments(htmlDocument string) string {
 			// 	filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
 			// 	i++
 			// 	for ; i < htmlDocumentRunesLength; i++ {
-			// 		if appendIfEscape(htmlDocumentRunes, &filteredHTMLDocument, i, htmlDocumentRunesLength) {
-			// 			i++
+			// 		if appendAndIncrementIfEscape(htmlDocumentRunes, &filteredHTMLDocument, htmlDocumentRunesLength, &i) {
+			// 			continue
 			// 		}
 			// 	}
 		} else {
