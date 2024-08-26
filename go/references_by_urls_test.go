@@ -258,6 +258,7 @@ func filterComments(htmlDocument string) string {
 	jsCommentSingleLineEnd := []rune("\n")
 	commentMultiLineStart := []rune("/*")
 	commentMultiLineEnd := []rune("*/")
+	jsBacktickInterpolationStart := []rune("${")
 
 	htmlDocumentRunesLength := len(htmlDocumentRunes)
 
@@ -293,8 +294,7 @@ func filterComments(htmlDocument string) string {
 			for ; i < htmlDocumentRunesLength; i++ {
 				if appendAndIncrementIfEscape(htmlDocumentRunes, &filteredHTMLDocument, htmlDocumentRunesLength, &i) {
 					continue
-				} else if htmlDocumentRunes[i] == '{' {
-					appendAndIncrement(&filteredHTMLDocument, htmlDocumentRunes[i], &i)
+				} else if updateIndexIfHasPrefix(htmlDocumentRunes, jsBacktickInterpolationStart, htmlDocumentRunesLength, len(jsBacktickInterpolationStart), &i) {
 					for ; i < htmlDocumentRunesLength; i++ {
 						if htmlDocumentRunes[i] == '}' {
 							break
