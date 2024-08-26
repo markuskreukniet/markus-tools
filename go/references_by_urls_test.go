@@ -262,11 +262,15 @@ func filterComments(htmlDocument string) string {
 
 	htmlDocumentRunesLength := len(htmlDocumentRunes)
 
+	jsCommentSingleLineDelimiter := createCommentDelimiter(jsCommentSingleLineStart, jsCommentSingleLineEnd)
+	commentMultiLineDelimiter := createCommentDelimiter(commentMultiLineStart, commentMultiLineEnd)
+
 	commentDelimiters := []commentDelimiter{
 		createCommentDelimiter(htmlCommentStart, htmlCommentEnd),
-		createCommentDelimiter(jsCommentSingleLineStart, jsCommentSingleLineEnd),
-		createCommentDelimiter(commentMultiLineStart, commentMultiLineEnd),
+		jsCommentSingleLineDelimiter,
+		commentMultiLineDelimiter,
 	}
+	commentMultiLineDelimiters := []commentDelimiter{commentMultiLineDelimiter}
 
 	for i := 0; i < htmlDocumentRunesLength; i++ {
 		// string escape or comment
@@ -297,10 +301,22 @@ func filterComments(htmlDocument string) string {
 				}
 
 				if updateIndexIfHasPrefix(htmlDocumentRunes, jsBacktickInterpolationStart, htmlDocumentRunesLength, len(jsBacktickInterpolationStart), &i) {
+					jsBacktickInterpolationIsClosed := false
 					for ; i < htmlDocumentRunesLength; i++ {
-						// updateIndexIfComment stops // on \n if reuse
+						if updateIndexIfComment(htmlDocumentRunes, htmlDocumentRunesLength, &i, commentMultiLineDelimiters) {
+							continue
+						}
 
-						if htmlDocumentRunes[i] == '}' {
+						if updateIndexIfHasPrefix(htmlDocumentRunes, jsCommentSingleLineStart, htmlDocumentRunesLength, jsCommentSingleLineDelimiter.startDelimiterLength, &i) {
+							for ; i < htmlDocumentRunesLength; i++ {
+								if htmlDocumentRunes[i] == '}' {
+									filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
+									jsBacktickInterpolationIsClosed = true
+									break
+								}
+							}
+						}
+						if htmlDocumentRunes[i] == '}' || jsBacktickInterpolationIsClosed {
 							break
 						}
 					}
