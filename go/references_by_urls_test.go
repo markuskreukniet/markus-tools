@@ -282,11 +282,11 @@ func filterComments(htmlDocument string) string {
 			for ; i < htmlDocumentRunesLength; i++ {
 				if appendAndIncrementIfEscape(htmlDocumentRunes, &filteredHTMLDocument, htmlDocumentRunesLength, &i) {
 					continue
-				} else {
-					filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
-					if htmlDocumentRunes[i] == jsStringRune {
-						break
-					}
+				}
+
+				filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
+				if htmlDocumentRunes[i] == jsStringRune {
+					break
 				}
 			}
 		} else if htmlDocumentRunes[i] == backtickRune { // TODO: WIP
@@ -294,8 +294,12 @@ func filterComments(htmlDocument string) string {
 			for ; i < htmlDocumentRunesLength; i++ {
 				if appendAndIncrementIfEscape(htmlDocumentRunes, &filteredHTMLDocument, htmlDocumentRunesLength, &i) {
 					continue
-				} else if updateIndexIfHasPrefix(htmlDocumentRunes, jsBacktickInterpolationStart, htmlDocumentRunesLength, len(jsBacktickInterpolationStart), &i) {
+				}
+
+				if updateIndexIfHasPrefix(htmlDocumentRunes, jsBacktickInterpolationStart, htmlDocumentRunesLength, len(jsBacktickInterpolationStart), &i) {
 					for ; i < htmlDocumentRunesLength; i++ {
+						// updateIndexIfComment stops // on \n if reuse
+
 						if htmlDocumentRunes[i] == '}' {
 							break
 						}
