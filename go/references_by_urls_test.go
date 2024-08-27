@@ -241,6 +241,7 @@ func filterComments(htmlDocument string) string {
 	var jsStringRune rune
 
 	backtickRune := rune('`')
+	jsBacktickInterpolationEnd := rune('}')
 
 	htmlDocumentRunes := []rune(htmlDocument)
 	htmlCommentStart := []rune("<!--")
@@ -308,7 +309,7 @@ func filterComments(htmlDocument string) string {
 
 						if updateIndexIfHasPrefix(htmlDocumentRunes, jsCommentSingleLineStart, htmlDocumentRunesLength, jsCommentSingleLineDelimiter.startDelimiterLength, &i) {
 							for ; i < htmlDocumentRunesLength; i++ {
-								if htmlDocumentRunes[i] == '}' {
+								if htmlDocumentRunes[i] == jsBacktickInterpolationEnd {
 									filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
 									jsBacktickInterpolationIsClosed = true
 									break
@@ -317,7 +318,7 @@ func filterComments(htmlDocument string) string {
 						} else {
 							filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
 						}
-						if htmlDocumentRunes[i] == '}' || jsBacktickInterpolationIsClosed {
+						if htmlDocumentRunes[i] == jsBacktickInterpolationEnd || jsBacktickInterpolationIsClosed {
 							break
 						}
 					}
