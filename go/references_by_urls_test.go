@@ -462,6 +462,11 @@ func TestFilterComments(t *testing.T) {
 			input:    "<script>// JS comment \\n still comment\nvar x = 1;</script>",
 			expected: "<script>var x = 1;</script>",
 		},
+		// {
+		// 	name:     "Single-line JS comment in backtick string interpolation",
+		// 	input:    "<script>let test = `Test, ${A}, asdf ${C // A comment} another test.`;</script>",
+		// 	expected: "<script>let test = `Test, ${A}, asdf ${C } another test.`;</script>",
+		// },
 	}
 
 	for _, tt := range tests {
