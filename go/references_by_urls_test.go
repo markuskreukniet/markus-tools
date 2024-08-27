@@ -300,22 +300,18 @@ func filterComments(htmlDocument string) string {
 				if appendAndIncrementIfEscape(htmlDocumentRunes, &filteredHTMLDocument, htmlDocumentRunesLength, &i) {
 					continue
 				}
-
-				//
 				if hasPrefix(htmlDocumentRunes, jsBacktickInterpolationStart, htmlDocumentRunesLength, jsBacktickInterpolationStartLength, i) {
 					jsBacktickInterpolationIsClosed := false
-
 					if i+jsBacktickInterpolationStartLength < htmlDocumentRunesLength {
 						for j := 0; j < jsBacktickInterpolationStartLength; j++ {
 							filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i+j])
 						}
+						i += jsBacktickInterpolationStartLength
 					}
-
 					for ; i < htmlDocumentRunesLength; i++ {
 						if updateIndexIfComment(htmlDocumentRunes, htmlDocumentRunesLength, &i, commentMultiLineDelimiters) {
 							continue
 						}
-
 						if updateIndexIfHasPrefix(htmlDocumentRunes, jsCommentSingleLineStart, htmlDocumentRunesLength, jsCommentSingleLineDelimiter.startDelimiterLength, &i) {
 							for ; i < htmlDocumentRunesLength; i++ {
 								if htmlDocumentRunes[i] == '}' {
@@ -324,6 +320,8 @@ func filterComments(htmlDocument string) string {
 									break
 								}
 							}
+						} else {
+							filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i])
 						}
 						if htmlDocumentRunes[i] == '}' || jsBacktickInterpolationIsClosed {
 							break
@@ -471,11 +469,11 @@ func TestFilterComments(t *testing.T) {
 			input:    "<script>// JS comment \\n still comment\nvar x = 1;</script>",
 			expected: "<script>var x = 1;</script>",
 		},
-		// {
-		// 	name:     "Single-line JS comment in backtick string interpolation",
-		// 	input:    "<script>let test = `t ${A}, asdf ${C // A comment} another test.`;</script>",
-		// 	expected: "<script>let test = `t ${A}, asdf ${C } another test.`;</script>",
-		// },
+		{
+			name:     "Single-line JS comment in backtick string interpolation",
+			input:    "<script>let test = `t ${A}, asdf ${C // A comment} another test.`;</script>",
+			expected: "<script>let test = `t ${A}, asdf ${C } another test.`;</script>",
+		},
 	}
 
 	for _, tt := range tests {
