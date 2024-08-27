@@ -294,12 +294,14 @@ func filterComments(htmlDocument string) string {
 					break
 				}
 			}
-		} else if htmlDocumentRunes[i] == backtickRune { // TODO: WIP
+			// JavaScript backtick string
+		} else if htmlDocumentRunes[i] == backtickRune {
 			appendAndIncrement(&filteredHTMLDocument, htmlDocumentRunes[i], &i)
 			for ; i < htmlDocumentRunesLength; i++ {
 				if appendAndIncrementIfEscape(htmlDocumentRunes, &filteredHTMLDocument, htmlDocumentRunesLength, &i) {
 					continue
 				}
+
 				if hasPrefix(htmlDocumentRunes, jsBacktickInterpolationStart, htmlDocumentRunesLength, jsBacktickInterpolationStartLength, i) {
 					jsBacktickInterpolationIsClosed := false
 					if i+jsBacktickInterpolationStartLength < htmlDocumentRunesLength {
@@ -312,6 +314,7 @@ func filterComments(htmlDocument string) string {
 						if updateIndexIfComment(htmlDocumentRunes, htmlDocumentRunesLength, &i, commentMultiLineDelimiters) {
 							continue
 						}
+
 						if updateIndexIfHasPrefix(htmlDocumentRunes, jsCommentSingleLineStart, htmlDocumentRunesLength, jsCommentSingleLineDelimiter.startDelimiterLength, &i) {
 							for ; i < htmlDocumentRunesLength; i++ {
 								if htmlDocumentRunes[i] == '}' {
