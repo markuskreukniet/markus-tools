@@ -261,6 +261,7 @@ func filterComments(htmlDocument string) string {
 	jsBacktickInterpolationStart := []rune("${")
 
 	htmlDocumentRunesLength := len(htmlDocumentRunes)
+	jsBacktickInterpolationStartLength := len(jsBacktickInterpolationStart)
 
 	jsCommentSingleLineDelimiter := createCommentDelimiter(jsCommentSingleLineStart, jsCommentSingleLineEnd)
 	commentMultiLineDelimiter := createCommentDelimiter(commentMultiLineStart, commentMultiLineEnd)
@@ -300,8 +301,16 @@ func filterComments(htmlDocument string) string {
 					continue
 				}
 
-				if updateIndexIfHasPrefix(htmlDocumentRunes, jsBacktickInterpolationStart, htmlDocumentRunesLength, len(jsBacktickInterpolationStart), &i) {
+				//
+				if hasPrefix(htmlDocumentRunes, jsBacktickInterpolationStart, htmlDocumentRunesLength, jsBacktickInterpolationStartLength, i) {
 					jsBacktickInterpolationIsClosed := false
+
+					if i+jsBacktickInterpolationStartLength < htmlDocumentRunesLength {
+						for j := 0; j < jsBacktickInterpolationStartLength; j++ {
+							filteredHTMLDocument = append(filteredHTMLDocument, htmlDocumentRunes[i+j])
+						}
+					}
+
 					for ; i < htmlDocumentRunesLength; i++ {
 						if updateIndexIfComment(htmlDocumentRunes, htmlDocumentRunesLength, &i, commentMultiLineDelimiters) {
 							continue
@@ -464,8 +473,8 @@ func TestFilterComments(t *testing.T) {
 		},
 		// {
 		// 	name:     "Single-line JS comment in backtick string interpolation",
-		// 	input:    "<script>let test = `Test, ${A}, asdf ${C // A comment} another test.`;</script>",
-		// 	expected: "<script>let test = `Test, ${A}, asdf ${C } another test.`;</script>",
+		// 	input:    "<script>let test = `t ${A}, asdf ${C // A comment} another test.`;</script>",
+		// 	expected: "<script>let test = `t ${A}, asdf ${C } another test.`;</script>",
 		// },
 	}
 
