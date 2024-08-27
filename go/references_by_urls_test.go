@@ -180,16 +180,6 @@ func updateTagPartLengthAndIndexIfHasPrefix(runes, prefix []rune, runesLength, p
 	return false
 }
 
-// TODO: useless?
-func updateIndexMinusOneIfHasPrefix(runes, prefix []rune, runesLength, prefixLength int, index *int) bool {
-	if hasPrefix(runes, prefix, runesLength, prefixLength, *index) {
-		*index += prefixLength - 1
-		return true
-	}
-
-	return false
-}
-
 func updateIndexIfHasPrefix(runes, prefix []rune, runesLength, prefixLength int, index *int) bool {
 	if hasPrefix(runes, prefix, runesLength, prefixLength, *index) {
 		*index += prefixLength
@@ -230,7 +220,8 @@ func updateIndexIfComment(htmlDocumentRunes []rune, htmlDocumentRunesLength int,
 	for _, delimiter := range commentDelimiters {
 		if updateIndexIfHasPrefix(htmlDocumentRunes, delimiter.startDelimiter, htmlDocumentRunesLength, delimiter.startDelimiterLength, index) {
 			for ; *index < htmlDocumentRunesLength; *index++ {
-				if updateIndexMinusOneIfHasPrefix(htmlDocumentRunes, delimiter.endDelimiter, htmlDocumentRunesLength, delimiter.endDelimiterLength, index) {
+				if hasPrefix(htmlDocumentRunes, delimiter.endDelimiter, htmlDocumentRunesLength, delimiter.endDelimiterLength, *index) {
+					*index += delimiter.endDelimiterLength - 1
 					return true
 				}
 			}
