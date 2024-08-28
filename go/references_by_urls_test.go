@@ -151,6 +151,26 @@ func findHTMLElements(document, elementName string) []string {
 
 	return elements
 }
+func removeTagsFromElements(elements []string) []string {
+	var elementsWithoutTags []string
+
+	for _, element := range elements {
+		elementWithoutTags := removeTagsFromElement(element)
+		elementsWithoutTags = append(elementsWithoutTags, elementWithoutTags)
+	}
+
+	return elementsWithoutTags
+}
+
+// TODO: WIP
+func removeTagsFromElement(element string) string {
+	return ""
+}
+
+func findTitleAndH1ElementsAndRemoveTags(htmlDocument string) ([]string, []string) {
+	titles, h1s := findTitleAndH1Elements(htmlDocument)
+	return removeTagsFromElements(titles), removeTagsFromElements(h1s)
+}
 
 func findTitleAndH1Elements(htmlDocument string) ([]string, []string) {
 	return findHTMLElements(htmlDocument, "title"), findHTMLElements(htmlDocument, "h1")
