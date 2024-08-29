@@ -6,12 +6,20 @@ import (
 	"unicode"
 )
 
+func isPeriod(r rune) bool {
+	return r == '.'
+}
+
 func isLetter(r rune) bool {
 	return unicode.IsUpper(r) || unicode.IsLower(r)
 }
 
+func isLetterOrUnderscore(r rune) bool {
+	return isLetter(r) || r == '_'
+}
+
 func isLetterDigitHyphenOrUnderscore(r rune) bool {
-	return isLetter(r) || unicode.IsDigit(r) || r == '-' || r == '_'
+	return isLetterOrUnderscore(r) || unicode.IsDigit(r) || r == '-'
 }
 
 // returns: tagPartLength, tagIsClosed, tagIsFound
@@ -162,9 +170,114 @@ func removeTagsFromElements(elements []string) []string {
 	return elementsWithoutTags
 }
 
+// TODO: function is useless?
 // TODO: WIP
+func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int, bool) {
+	if elementPart[indexArgument] != '<' || !isLetterOrUnderscore(elementPart[indexArgument+1]) {
+		return 0, false
+	}
+
+	var quoteRune rune
+	tagFound := false
+	index := indexArgument + 2
+
+	for ; index < elementPartLength; index++ {
+		if isLetterDigitHyphenOrUnderscore(elementPart[index]) {
+			continue
+		}
+
+		if elementPart[index] == '>' {
+			tagFound = true
+			break
+		}
+
+		indexPlusOne := index + 1
+		if indexPlusOne < elementPartLength {
+			if elementPart[index] == '/' && elementPart[indexPlusOne] == '>' {
+				index++
+				tagFound = true
+				break
+			}
+
+			if isPeriod(elementPart[index]) && isLetter(elementPart[indexPlusOne]) {
+				index++
+				continue
+			}
+		}
+
+		if unicode.IsSpace(elementPart[index]) {
+			if index+1 >= elementPartLength {
+				return 0, false
+			}
+
+			index++
+			for ; index < elementPartLength; index++ {
+				if !unicode.IsSpace(elementPart[index]) {
+					break
+				}
+			}
+
+			index++
+			if isLetter(elementPart[index]) {
+				index++
+				for ; index < elementPartLength; index++ {
+					if unicode.IsSpace(elementPart[index]) || isLetterDigitHyphenOrUnderscore(elementPart[index]) {
+						continue
+					}
+
+					indexPlusOne = index + 1
+					if isPeriod(elementPart[index]) && isLetter(elementPart[indexPlusOne]) {
+						index++
+						continue
+					}
+
+					if elementPart[index] == '=' && (elementPart[indexPlusOne] == '"' || elementPart[indexPlusOne] == '\'') { // part copied
+						quoteRune = elementPart[index]
+						index++
+						for ; index < elementPartLength; index++ {
+							if elementPart[index] == quoteRune {
+								break
+							} else if elementPart[index] == '\\' { // copied
+								index++
+							}
+						}
+					}
+
+					if elementPart[index] == '>' || (elementPart[index] == '/' && elementPart[indexPlusOne] == '>') {
+						tagFound = true
+						break
+					}
+
+					return 0, false
+				}
+			}
+			continue
+		}
+
+		if tagFound {
+			break
+		}
+
+		return 0, false
+	}
+
+	return index - indexArgument, true
+}
+
 func removeTagsFromElement(element string) string {
-	return ""
+	var elementWithoutTags []rune
+	elementRunes := []rune(element)
+	elementRunesLength := len(elementRunes)
+
+	for i := 0; i < elementRunesLength; i++ {
+		if tagLength, tagFound := getTagLength(elementRunes, elementRunesLength, i); tagFound {
+			i += tagLength
+		} else {
+			elementWithoutTags = append(elementWithoutTags, elementRunes[i])
+		}
+	}
+
+	return string(elementWithoutTags)
 }
 
 func findTitleAndH1ElementsAndRemoveTags(htmlDocument string) ([]string, []string) {
@@ -505,3 +618,53 @@ func TestFilterComments(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveTagsFromElement(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"<div>Hello</div>", "Hello"},
+		// {"<p>This is a <strong>test</strong>.</p>", "This is a test."},
+		// {"<a href=\"#\">Link</a>", "Link"},
+		// {"<span class='class-name'>Text</span>", "Text"},
+		// {"<img src=\"image.jpg\" alt=\"image\"/>", ""},
+		// {"<div>Nested <span>tags</span> example</div>", "Nested tags example"},
+		// {"No tags here", "No tags here"},
+		// {"<div>Incomplete tag", "Incomplete tag"},
+	}
+
+	for _, tt := range tests {
+		result := removeTagsFromElement(tt.input)
+		if result != tt.expected {
+			t.Errorf("removeTagsFromElement(%q) = %q; want %q", tt.input, result, tt.expected)
+		}
+	}
+}
+
+// func TestRemoveTagsFromElements(t *testing.T) {
+// 	tests := []struct {
+// 		input    []string
+// 		expected []string
+// 	}{
+// 		{
+// 			[]string{"<div>Hello</div>", "<p>World</p>"},
+// 			[]string{"Hello", "World"},
+// 		},
+// 		{
+// 			[]string{"<a href=\"#\">Link 1</a>", "<a href=\"#\">Link 2</a>"},
+// 			[]string{"Link 1", "Link 2"},
+// 		},
+// 		{
+// 			[]string{"<span>Text</span>", "Plain text"},
+// 			[]string{"Text", "Plain text"},
+// 		},
+// 	}
+
+// 	for _, tt := range tests {
+// 		result := removeTagsFromElements(tt.input)
+// 		if !reflect.DeepEqual(result, tt.expected) {
+// 			t.Errorf("removeTagsFromElements(%v) = %v; want %v", tt.input, result, tt.expected)
+// 		}
+// 	}
+// }
