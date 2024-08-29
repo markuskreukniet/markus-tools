@@ -10,8 +10,12 @@ func isLetter(r rune) bool {
 	return unicode.IsUpper(r) || unicode.IsLower(r)
 }
 
+func isLetterOrUnderscore(r rune) bool {
+	return isLetter(r) || r == '_'
+}
+
 func isLetterDigitHyphenOrUnderscore(r rune) bool {
-	return isLetter(r) || unicode.IsDigit(r) || r == '-' || r == '_'
+	return isLetterOrUnderscore(r) || unicode.IsDigit(r) || r == '-'
 }
 
 // returns: tagPartLength, tagIsClosed, tagIsFound
@@ -162,9 +166,45 @@ func removeTagsFromElements(elements []string) []string {
 	return elementsWithoutTags
 }
 
+// TODO: function is useless?
 // TODO: WIP
+func getTagLength(elementPart []rune, elementPartLength, index int) (int, bool) {
+	for ; index < elementPartLength; index++ {
+		// if elementRunes[i] == '<' && isLetterOrUnderscore(elementRunes[i+1]) {
+		// 	i += 2
+		// 	for ; i < elementRunesLength; i++ {
+		// 		if elementRunes[i] == '<' && elementRunes[i+1] == '/' && isLetterOrUnderscore(elementRunes[i+2]) {
+		// 			i += 3
+		// 			for ; i < elementRunesLength; i++ {
+
+		// 			}
+		// 		} else if unicode.IsSpace(elementRunes[i]) {
+		// 			i++
+		// 			for ; i < elementRunesLength; i++ {
+
+		// 			}
+		// 		}
+		// 	}
+		// }
+	}
+
+	return 0, false
+}
+
 func removeTagsFromElement(element string) string {
-	return ""
+	var elementWithoutTags []rune
+	elementRunes := []rune(element)
+	elementRunesLength := len(elementRunes)
+
+	for i := 0; i < elementRunesLength; i++ {
+		if length, foundTag := getTagLength(elementRunes, elementRunesLength, i); foundTag {
+			i += length
+		} else {
+			elementWithoutTags = append(elementWithoutTags, elementRunes[i])
+		}
+	}
+
+	return string(elementWithoutTags)
 }
 
 func findTitleAndH1ElementsAndRemoveTags(htmlDocument string) ([]string, []string) {
