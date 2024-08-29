@@ -169,9 +169,16 @@ func removeTagsFromElements(elements []string) []string {
 // TODO: function is useless?
 // TODO: WIP
 func getTagLength(elementPart []rune, elementPartLength, index int) (int, bool) {
+	tagLength := 2
+
+	if elementPart[index] != '<' || !isLetterOrUnderscore(elementPart[index+1]) {
+		return 0, false
+	}
+
+	index += 2
+
 	for ; index < elementPartLength; index++ {
-		// if elementRunes[i] == '<' && isLetterOrUnderscore(elementRunes[i+1]) {
-		// 	i += 2
+
 		// 	for ; i < elementRunesLength; i++ {
 		// 		if elementRunes[i] == '<' && elementRunes[i+1] == '/' && isLetterOrUnderscore(elementRunes[i+2]) {
 		// 			i += 3
@@ -185,10 +192,9 @@ func getTagLength(elementPart []rune, elementPartLength, index int) (int, bool) 
 		// 			}
 		// 		}
 		// 	}
-		// }
 	}
 
-	return 0, false
+	return tagLength, false
 }
 
 func removeTagsFromElement(element string) string {
@@ -197,8 +203,8 @@ func removeTagsFromElement(element string) string {
 	elementRunesLength := len(elementRunes)
 
 	for i := 0; i < elementRunesLength; i++ {
-		if length, foundTag := getTagLength(elementRunes, elementRunesLength, i); foundTag {
-			i += length
+		if tagLength, foundTag := getTagLength(elementRunes, elementRunesLength, i); foundTag {
+			i += tagLength
 		} else {
 			elementWithoutTags = append(elementWithoutTags, elementRunes[i])
 		}
