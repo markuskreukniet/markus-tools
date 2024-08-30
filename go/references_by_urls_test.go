@@ -168,33 +168,53 @@ func removeTagsFromElements(elements []string) []string {
 
 // TODO: function is useless?
 // TODO: WIP
-func getTagLength(elementPart []rune, elementPartLength, index int) (int, bool) {
-	tagLength := 2
-
-	if elementPart[index] != '<' || !isLetterOrUnderscore(elementPart[index+1]) {
+func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int, bool) {
+	if elementPart[indexArgument] != '<' || !isLetterOrUnderscore(elementPart[indexArgument+1]) {
 		return 0, false
 	}
 
-	index += 2
+	var quoteRune rune
+	index := indexArgument + 2
 
 	for ; index < elementPartLength; index++ {
+		if unicode.IsSpace(elementPart[index]) {
+			index++
+			if isLetter(elementPart[index]) {
+				index++
+				for ; index < elementPartLength; index++ {
+					indexPlusOne := index + 1
+					if unicode.IsSpace(elementPart[index]) || isLetterDigitHyphenOrUnderscore(elementPart[index]) {
+						continue
+					}
 
-		// 	for ; i < elementRunesLength; i++ {
-		// 		if elementRunes[i] == '<' && elementRunes[i+1] == '/' && isLetterOrUnderscore(elementRunes[i+2]) {
-		// 			i += 3
-		// 			for ; i < elementRunesLength; i++ {
+					if elementPart[index] == '.' && isLetter(elementPart[indexPlusOne]) {
+						index++
+						continue
+					}
 
-		// 			}
-		// 		} else if unicode.IsSpace(elementRunes[i]) {
-		// 			i++
-		// 			for ; i < elementRunesLength; i++ {
+					if elementPart[index] == '=' && (elementPart[indexPlusOne] == '"' || elementPart[indexPlusOne] == '\'') { // part copied
+						quoteRune = elementPart[index]
+						index++
+						for ; index < elementPartLength; index++ {
+							if elementPart[index] == quoteRune {
+								break
+							} else if elementPart[index] == '\\' { // copied
+								index++
+							}
+						}
+					}
 
-		// 			}
-		// 		}
-		// 	}
+					if elementPart[index] == '>' || (elementPart[index] == '/' && elementPart[indexPlusOne] == '>') {
+						break // TODO: another break?
+					}
+
+					return 0, false
+				}
+			}
+		}
 	}
 
-	return tagLength, false
+	return index - indexArgument, true
 }
 
 func removeTagsFromElement(element string) string {
