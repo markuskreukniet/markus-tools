@@ -6,6 +6,10 @@ import (
 	"unicode"
 )
 
+func isPeriod(r rune) bool {
+	return r == '.'
+}
+
 func isLetter(r rune) bool {
 	return unicode.IsUpper(r) || unicode.IsLower(r)
 }
@@ -177,17 +181,32 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 	index := indexArgument + 2
 
 	for ; index < elementPartLength; index++ {
+		if isLetterDigitHyphenOrUnderscore(elementPart[index]) {
+			continue
+		}
+
+		indexPlusOne := index + 1
+		if indexPlusOne < elementPartLength && (isPeriod(elementPart[index]) && isLetter(elementPart[indexPlusOne])) {
+			index++
+			continue
+		}
+
 		if unicode.IsSpace(elementPart[index]) {
+			indexPlusOne = index + 1
+			if indexPlusOne >= elementPartLength {
+				break
+			}
+
 			index++
 			if isLetter(elementPart[index]) {
 				index++
 				for ; index < elementPartLength; index++ {
-					indexPlusOne := index + 1
 					if unicode.IsSpace(elementPart[index]) || isLetterDigitHyphenOrUnderscore(elementPart[index]) {
 						continue
 					}
 
-					if elementPart[index] == '.' && isLetter(elementPart[indexPlusOne]) {
+					indexPlusOne = index + 1
+					if isPeriod(elementPart[index]) && isLetter(elementPart[indexPlusOne]) {
 						index++
 						continue
 					}
@@ -211,7 +230,10 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 					return 0, false
 				}
 			}
+			continue
 		}
+
+		return 0, false
 	}
 
 	return index - indexArgument, true
