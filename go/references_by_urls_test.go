@@ -178,6 +178,7 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 	}
 
 	var quoteRune rune
+	tagFound := false
 	index := indexArgument + 2
 
 	for ; index < elementPartLength; index++ {
@@ -224,13 +225,18 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 					}
 
 					if elementPart[index] == '>' || (elementPart[index] == '/' && elementPart[indexPlusOne] == '>') {
-						break // TODO: another break?
+						tagFound = true
+						break
 					}
 
 					return 0, false
 				}
 			}
 			continue
+		}
+
+		if tagFound {
+			break
 		}
 
 		return 0, false
@@ -245,7 +251,7 @@ func removeTagsFromElement(element string) string {
 	elementRunesLength := len(elementRunes)
 
 	for i := 0; i < elementRunesLength; i++ {
-		if tagLength, foundTag := getTagLength(elementRunes, elementRunesLength, i); foundTag {
+		if tagLength, tagFound := getTagLength(elementRunes, elementRunesLength, i); tagFound {
 			i += tagLength
 		} else {
 			elementWithoutTags = append(elementWithoutTags, elementRunes[i])
