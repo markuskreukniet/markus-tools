@@ -205,11 +205,16 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 			}
 		}
 
-		// TODO: there could be two or more spaces
 		if unicode.IsSpace(elementPart[index]) {
-			indexPlusOne = index + 1
-			if indexPlusOne >= elementPartLength {
-				break
+			if index+1 >= elementPartLength {
+				return 0, false
+			}
+
+			index++
+			for ; index < elementPartLength; index++ {
+				if !unicode.IsSpace(elementPart[index]) {
+					break
+				}
 			}
 
 			index++
