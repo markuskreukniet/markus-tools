@@ -186,12 +186,26 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 			continue
 		}
 
-		indexPlusOne := index + 1
-		if indexPlusOne < elementPartLength && (isPeriod(elementPart[index]) && isLetter(elementPart[indexPlusOne])) {
-			index++
-			continue
+		if elementPart[index] == '>' {
+			tagFound = true
+			break
 		}
 
+		indexPlusOne := index + 1
+		if indexPlusOne < elementPartLength {
+			if elementPart[index] == '/' && elementPart[indexPlusOne] == '>' {
+				index++
+				tagFound = true
+				break
+			}
+
+			if isPeriod(elementPart[index]) && isLetter(elementPart[indexPlusOne]) {
+				index++
+				continue
+			}
+		}
+
+		// TODO: there could be two or more spaces
 		if unicode.IsSpace(elementPart[index]) {
 			indexPlusOne = index + 1
 			if indexPlusOne >= elementPartLength {
@@ -599,3 +613,53 @@ func TestFilterComments(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveTagsFromElement(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"<div>Hello</div>", "Hello"},
+		// {"<p>This is a <strong>test</strong>.</p>", "This is a test."},
+		// {"<a href=\"#\">Link</a>", "Link"},
+		// {"<span class='class-name'>Text</span>", "Text"},
+		// {"<img src=\"image.jpg\" alt=\"image\"/>", ""},
+		// {"<div>Nested <span>tags</span> example</div>", "Nested tags example"},
+		// {"No tags here", "No tags here"},
+		// {"<div>Incomplete tag", "Incomplete tag"},
+	}
+
+	for _, tt := range tests {
+		result := removeTagsFromElement(tt.input)
+		if result != tt.expected {
+			t.Errorf("removeTagsFromElement(%q) = %q; want %q", tt.input, result, tt.expected)
+		}
+	}
+}
+
+// func TestRemoveTagsFromElements(t *testing.T) {
+// 	tests := []struct {
+// 		input    []string
+// 		expected []string
+// 	}{
+// 		{
+// 			[]string{"<div>Hello</div>", "<p>World</p>"},
+// 			[]string{"Hello", "World"},
+// 		},
+// 		{
+// 			[]string{"<a href=\"#\">Link 1</a>", "<a href=\"#\">Link 2</a>"},
+// 			[]string{"Link 1", "Link 2"},
+// 		},
+// 		{
+// 			[]string{"<span>Text</span>", "Plain text"},
+// 			[]string{"Text", "Plain text"},
+// 		},
+// 	}
+
+// 	for _, tt := range tests {
+// 		result := removeTagsFromElements(tt.input)
+// 		if !reflect.DeepEqual(result, tt.expected) {
+// 			t.Errorf("removeTagsFromElements(%v) = %v; want %v", tt.input, result, tt.expected)
+// 		}
+// 	}
+// }
