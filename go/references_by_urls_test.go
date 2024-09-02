@@ -256,10 +256,12 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 					}
 
 					if elementPart[index] == '=' && (elementPart[indexPlusOne] == '"' || elementPart[indexPlusOne] == '\'') { // part copied
+						index++
 						quoteRune = elementPart[index]
 						index++
 						for ; index < elementPartLength; index++ {
 							if elementPart[index] == quoteRune {
+								index++
 								break
 							} else if elementPart[index] == '\\' { // copied
 								index++
@@ -267,7 +269,7 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 						}
 					}
 
-					if elementPart[index] == '>' || (elementPart[index] == '/' && elementPart[indexPlusOne] == '>') {
+					if elementPart[index] == '>' || (elementPart[index] == '/' && elementPart[indexPlusOne] == '>') { // bug, plus one moet ook index plus one
 						tagFound = true
 						break
 					}
@@ -275,6 +277,11 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 					return 0, false
 				}
 			}
+
+			if tagFound {
+				break
+			}
+
 			continue
 		}
 
