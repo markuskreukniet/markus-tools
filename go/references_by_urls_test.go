@@ -269,7 +269,13 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 						}
 					}
 
-					if elementPart[index] == '>' || (elementPart[index] == '/' && elementPart[indexPlusOne] == '>') { // bug, plus one moet ook index plus one
+					if elementPart[index] == '>' {
+						tagFound = true
+						break
+					}
+
+					if elementPart[index] == '/' && elementPart[indexPlusOne] == '>' { // bug, plus one moet ook index plus one
+						index++
 						tagFound = true
 						break
 					}
