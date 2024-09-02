@@ -261,12 +261,12 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 						index++
 						for ; index < elementPartLength; index++ {
 							if elementPart[index] == quoteRune {
-								index++
 								break
 							} else if elementPart[index] == '\\' { // copied
 								index++
 							}
 						}
+						continue
 					}
 
 					if elementPart[index] == '>' {
@@ -274,13 +274,13 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 						break
 					}
 
-					if elementPart[index] == '/' && elementPart[indexPlusOne] == '>' { // bug, plus one moet ook index plus one
+					if elementPart[index] == '/' && elementPart[index+1] == '>' {
 						index++
 						tagFound = true
 						break
 					}
 
-					return 0, false
+					// return 0, false TODO: needed?
 				}
 			}
 
@@ -665,7 +665,7 @@ func TestRemoveTagsFromElement(t *testing.T) {
 		{"<p>This is a <strong>test</strong>.</p>", "This is a test."},
 		{"<a href=\"#\">Link</a>", "Link"},
 		{"<span class='class-name'>Text</span>", "Text"},
-		// {"<img src=\"image.jpg\" alt=\"image\"/>", ""},
+		{"<img src=\"image.jpg\" alt=\"image\"/>", ""},
 		{"<div>Nested <span>tags</span> example</div>", "Nested tags example"},
 		// {"No tags here", "No tags here"},
 		{"<div>Incomplete tag", "Incomplete tag"},
