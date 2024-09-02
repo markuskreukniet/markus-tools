@@ -170,16 +170,34 @@ func removeTagsFromElements(elements []string) []string {
 	return elementsWithoutTags
 }
 
+func incrementIfPlusOneIsSmaller(i *int, j int) bool {
+	if *i+1 < j {
+		*i++
+		return true
+	}
+
+	return false
+}
+
 // TODO: function is useless?
 // TODO: WIP
 func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int, bool) {
-	if elementPart[indexArgument] != '<' || !isLetterOrUnderscore(elementPart[indexArgument+1]) {
+	index := indexArgument
+
+	if elementPart[indexArgument] != '<' {
+		return 0, false
+	}
+
+	if isLetterOrUnderscore(elementPart[indexArgument+1]) {
+		index += 2
+	} else if elementPart[indexArgument+1] == '/' && isLetterOrUnderscore(elementPart[indexArgument+2]) {
+		index += 3
+	} else {
 		return 0, false
 	}
 
 	var quoteRune rune
 	tagFound := false
-	index := indexArgument + 2
 
 	for ; index < elementPartLength; index++ {
 		if isLetterDigitHyphenOrUnderscore(elementPart[index]) {
@@ -206,18 +224,20 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 		}
 
 		if unicode.IsSpace(elementPart[index]) {
-			if index+1 >= elementPartLength {
+			if !incrementIfPlusOneIsSmaller(&index, elementPartLength) {
 				return 0, false
 			}
 
-			index++
 			for ; index < elementPartLength; index++ {
 				if !unicode.IsSpace(elementPart[index]) {
 					break
 				}
 			}
 
-			index++
+			if !incrementIfPlusOneIsSmaller(&index, elementPartLength) {
+				return 0, false
+			}
+
 			if isLetter(elementPart[index]) {
 				index++
 				for ; index < elementPartLength; index++ {
@@ -226,6 +246,10 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 					}
 
 					indexPlusOne = index + 1
+					if indexPlusOne >= elementPartLength {
+						return 0, false
+					}
+
 					if isPeriod(elementPart[index]) && isLetter(elementPart[indexPlusOne]) {
 						index++
 						continue
