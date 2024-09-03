@@ -679,29 +679,29 @@ func TestRemoveTagsFromElement(t *testing.T) {
 	}
 }
 
-// func TestRemoveTagsFromElements(t *testing.T) {
-// 	tests := []struct {
-// 		input    []string
-// 		expected []string
-// 	}{
-// 		{
-// 			[]string{"<div>Hello</div>", "<p>World</p>"},
-// 			[]string{"Hello", "World"},
-// 		},
-// 		{
-// 			[]string{"<a href=\"#\">Link 1</a>", "<a href=\"#\">Link 2</a>"},
-// 			[]string{"Link 1", "Link 2"},
-// 		},
-// 		{
-// 			[]string{"<span>Text</span>", "Plain text"},
-// 			[]string{"Text", "Plain text"},
-// 		},
-// 	}
+func TestRemoveTagsFromElements(t *testing.T) {
+	tests := []struct {
+		input    []string
+		expected []string
+	}{
+		{
+			[]string{"<div>Hello</div>", "<p>World</p>"},
+			[]string{"Hello", "World"},
+		},
+		{
+			[]string{"<a href=\"#\">Link 1</a>", "<a href=\"#\">Link 2</a>"},
+			[]string{"Link 1", "Link 2"},
+		},
+		{
+			[]string{"<span>Text</span>", "Plain text"},
+			[]string{"Text", "Plain text"},
+		},
+	}
 
-// 	for _, tt := range tests {
-// 		result := removeTagsFromElements(tt.input)
-// 		if !reflect.DeepEqual(result, tt.expected) {
-// 			t.Errorf("removeTagsFromElements(%v) = %v; want %v", tt.input, result, tt.expected)
-// 		}
-// 	}
-// }
+	for _, tt := range tests {
+		result := removeTagsFromElements(tt.input)
+		if !reflect.DeepEqual(result, tt.expected) {
+			t.Errorf("removeTagsFromElements(%v) = %v; want %v", tt.input, result, tt.expected)
+		}
+	}
+}
