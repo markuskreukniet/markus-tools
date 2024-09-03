@@ -667,7 +667,7 @@ func TestRemoveTagsFromElement(t *testing.T) {
 		{"<span class='class-name'>Text</span>", "Text"},
 		{"<img src=\"image.jpg\" alt=\"image\"/>", ""},
 		{"<div>Nested <span>tags</span> example</div>", "Nested tags example"},
-		// {"No tags here", "No tags here"},
+		{"No tags here", "No tags here"},
 		{"<div>Incomplete tag", "Incomplete tag"},
 	}
 
