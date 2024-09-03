@@ -10,6 +10,10 @@ func isPeriod(r rune) bool {
 	return r == '.'
 }
 
+func isGreaterThanSign(r rune) bool {
+	return r == '>'
+}
+
 func isLetter(r rune) bool {
 	return unicode.IsUpper(r) || unicode.IsLower(r)
 }
@@ -65,7 +69,7 @@ func finishCreatingStartTag(document []rune, documentLength, index int) (int, bo
 			if isLetter(document[index]) {
 				startTagEndPartLength++
 				inAttributeName = true
-			} else if document[index] == '>' {
+			} else if isGreaterThanSign(document[index]) {
 				startTagEndPartLength++
 				return startTagEndPartLength, false, true
 			} else if hasPrefix(document, closingTagPart, documentLength, closingTagPartLength, index) {
@@ -101,7 +105,7 @@ func getTheOtherHTMLElementPartLength(document, startTagPart, endTagPart []rune,
 		} else if updateTagPartLengthAndIndexIfHasPrefix(document, endTagPart, documentLength, endTagPartLength, &tagPartLength, &i) {
 			for ; i < documentLength; i++ {
 				tagPartLength++
-				if document[i] == '>' {
+				if isGreaterThanSign(document[i]) {
 					numberOfOpenStartTags--
 					if numberOfOpenStartTags == 0 {
 						return tagPartLength, true
@@ -204,14 +208,14 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 			continue
 		}
 
-		if elementPart[index] == '>' {
+		if isGreaterThanSign(elementPart[index]) {
 			tagFound = true
 			break
 		}
 
 		indexPlusOne := index + 1
 		if indexPlusOne < elementPartLength {
-			if elementPart[index] == '/' && elementPart[indexPlusOne] == '>' {
+			if elementPart[index] == '/' && isGreaterThanSign(elementPart[indexPlusOne]) {
 				index++
 				tagFound = true
 				break
@@ -269,12 +273,12 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 						continue
 					}
 
-					if elementPart[index] == '>' {
+					if isGreaterThanSign(elementPart[index]) {
 						tagFound = true
 						break
 					}
 
-					if elementPart[index] == '/' && elementPart[index+1] == '>' {
+					if elementPart[index] == '/' && isGreaterThanSign(elementPart[index+1]) {
 						index++
 						tagFound = true
 						break
