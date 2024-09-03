@@ -280,7 +280,7 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 						break
 					}
 
-					// return 0, false TODO: needed?
+					return 0, false
 				}
 			}
 
