@@ -12,6 +12,10 @@ func isForwardSlash(r rune) bool {
 	return r == '/'
 }
 
+func isBackSlash(r rune) bool {
+	return r == '\\'
+}
+
 func isGreaterThan(r rune) bool {
 	return r == '>'
 }
@@ -280,7 +284,7 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 						for ; index < elementPartLength; index++ {
 							if elementPart[index] == quoteRune {
 								break
-							} else if elementPart[index] == '\\' { // copied
+							} else if isBackSlash(elementPart[index]) {
 								index++
 							}
 						}
@@ -378,7 +382,7 @@ func updateIndexIfHasPrefix(runes, prefix []rune, runesLength, prefixLength int,
 }
 
 func appendAndIncrementIfEscape(htmlDocument []rune, filteredHTMLDocument *[]rune, htmlDocumentLength int, index *int) bool {
-	if htmlDocument[*index] == '\\' && *index+1 < htmlDocumentLength {
+	if isBackSlash(htmlDocument[*index]) && *index+1 < htmlDocumentLength {
 		*filteredHTMLDocument = append(*filteredHTMLDocument, htmlDocument[*index])
 		*index++
 		*filteredHTMLDocument = append(*filteredHTMLDocument, htmlDocument[*index])
