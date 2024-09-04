@@ -20,6 +20,10 @@ func isEqual(r rune) bool {
 	return r == '='
 }
 
+func isDoubleQuote(r rune) bool {
+	return r == '"'
+}
+
 func isLetter(r rune) bool {
 	return unicode.IsUpper(r) || unicode.IsLower(r)
 }
@@ -57,7 +61,7 @@ func finishCreatingStartTag(document []rune, documentLength, index int) (int, bo
 				return 0, false, false
 			}
 		} else if inAttributeValue {
-			if document[index] == '"' || document[index] == '\'' {
+			if isDoubleQuote(document[index]) || document[index] == '\'' {
 				quoteRune = document[index]
 				startTagEndPartLength++
 				for i := index + 1; i < documentLength; i++ {
@@ -265,7 +269,7 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 						continue
 					}
 
-					if isEqual(elementPart[index]) && (elementPart[indexPlusOne] == '"' || elementPart[indexPlusOne] == '\'') { // part copied
+					if isEqual(elementPart[index]) && (isDoubleQuote(elementPart[indexPlusOne]) || elementPart[indexPlusOne] == '\'') { // part copied
 						index++
 						quoteRune = elementPart[index]
 						index++
@@ -453,7 +457,7 @@ func filterComments(htmlDocument string) string {
 		}
 
 		// JavaScript string
-		if htmlDocumentRunes[i] == '"' || htmlDocumentRunes[i] == '\'' {
+		if isDoubleQuote(htmlDocumentRunes[i]) || htmlDocumentRunes[i] == '\'' {
 			jsStringRune = htmlDocumentRunes[i]
 			appendAndIncrement(&filteredHTMLDocument, htmlDocumentRunes[i], &i)
 			for ; i < htmlDocumentRunesLength; i++ {
