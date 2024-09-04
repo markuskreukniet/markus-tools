@@ -14,8 +14,12 @@ func isForwardSlash(r rune) bool {
 	return r == '/'
 }
 
-func isGreaterThanSign(r rune) bool {
+func isGreaterThan(r rune) bool {
 	return r == '>'
+}
+
+func isEqual(r rune) bool {
+	return r == '='
 }
 
 func isLetter(r rune) bool {
@@ -42,7 +46,7 @@ func finishCreatingStartTag(document []rune, documentLength, index int) (int, bo
 
 	for ; index < documentLength; index++ {
 		if inAttributeName {
-			if document[index] == '=' {
+			if isEqual(document[index]) {
 				startTagEndPartLength++
 				inAttributeName = false
 				inAttributeValue = true
@@ -73,7 +77,7 @@ func finishCreatingStartTag(document []rune, documentLength, index int) (int, bo
 			if isLetter(document[index]) {
 				startTagEndPartLength++
 				inAttributeName = true
-			} else if isGreaterThanSign(document[index]) {
+			} else if isGreaterThan(document[index]) {
 				startTagEndPartLength++
 				return startTagEndPartLength, false, true
 			} else if hasPrefix(document, closingTagPart, documentLength, closingTagPartLength, index) {
@@ -109,7 +113,7 @@ func getTheOtherHTMLElementPartLength(document, startTagPart, endTagPart []rune,
 		} else if updateTagPartLengthAndIndexIfHasPrefix(document, endTagPart, documentLength, endTagPartLength, &tagPartLength, &i) {
 			for ; i < documentLength; i++ {
 				tagPartLength++
-				if isGreaterThanSign(document[i]) {
+				if isGreaterThan(document[i]) {
 					numberOfOpenStartTags--
 					if numberOfOpenStartTags == 0 {
 						return tagPartLength, true
@@ -212,14 +216,14 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 			continue
 		}
 
-		if isGreaterThanSign(elementPart[index]) {
+		if isGreaterThan(elementPart[index]) {
 			tagFound = true
 			break
 		}
 
 		indexPlusOne := index + 1
 		if indexPlusOne < elementPartLength {
-			if isForwardSlash(elementPart[index]) && isGreaterThanSign(elementPart[indexPlusOne]) {
+			if isForwardSlash(elementPart[index]) && isGreaterThan(elementPart[indexPlusOne]) {
 				index++
 				tagFound = true
 				break
@@ -263,7 +267,7 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 						continue
 					}
 
-					if elementPart[index] == '=' && (elementPart[indexPlusOne] == '"' || elementPart[indexPlusOne] == '\'') { // part copied
+					if isEqual(elementPart[index]) && (elementPart[indexPlusOne] == '"' || elementPart[indexPlusOne] == '\'') { // part copied
 						index++
 						quoteRune = elementPart[index]
 						index++
@@ -277,12 +281,12 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 						continue
 					}
 
-					if isGreaterThanSign(elementPart[index]) {
+					if isGreaterThan(elementPart[index]) {
 						tagFound = true
 						break
 					}
 
-					if isForwardSlash(elementPart[index]) && isGreaterThanSign(elementPart[index+1]) {
+					if isForwardSlash(elementPart[index]) && isGreaterThan(elementPart[index+1]) {
 						index++
 						tagFound = true
 						break
