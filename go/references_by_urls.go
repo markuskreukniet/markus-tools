@@ -24,12 +24,8 @@ func isEqual(r rune) bool {
 	return r == '='
 }
 
-func isSingleQuote(r rune) bool {
-	return r == '\''
-}
-
-func isDoubleQuote(r rune) bool {
-	return r == '"'
+func isSingleOrDoubleQuote(r rune) bool {
+	return r == '\'' || r == '"'
 }
 
 func isLetter(r rune) bool {
@@ -69,7 +65,7 @@ func finishCreatingStartTag(document []rune, documentLength, index int) (int, bo
 				return 0, false, false
 			}
 		} else if inAttributeValue {
-			if isDoubleQuote(document[index]) || isSingleQuote(document[index]) {
+			if isSingleOrDoubleQuote(document[index]) {
 				quoteRune = document[index]
 				startTagEndPartLength++
 				for i := index + 1; i < documentLength; i++ {
@@ -201,8 +197,6 @@ func incrementIfPlusOneIsSmaller(i *int, j int) bool {
 	return false
 }
 
-// TODO: function is useless?
-// TODO: WIP
 func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int, bool) {
 	index := indexArgument
 
@@ -277,7 +271,7 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 						continue
 					}
 
-					if isEqual(elementPart[index]) && (isDoubleQuote(elementPart[indexPlusOne]) || isSingleQuote(elementPart[indexPlusOne])) { // part copied
+					if isEqual(elementPart[index]) && isSingleOrDoubleQuote(elementPart[indexPlusOne]) {
 						index++
 						quoteRune = elementPart[index]
 						index++
@@ -465,7 +459,7 @@ func filterComments(htmlDocument string) string {
 		}
 
 		// JavaScript string
-		if isDoubleQuote(htmlDocumentRunes[i]) || isSingleQuote(htmlDocumentRunes[i]) {
+		if isSingleOrDoubleQuote(htmlDocumentRunes[i]) {
 			jsStringRune = htmlDocumentRunes[i]
 			appendAndIncrement(&filteredHTMLDocument, htmlDocumentRunes[i], &i)
 			for ; i < htmlDocumentRunesLength; i++ {
