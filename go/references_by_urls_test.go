@@ -10,6 +10,10 @@ func isPeriod(r rune) bool {
 	return r == '.'
 }
 
+func isForwardSlash(r rune) bool {
+	return r == '/'
+}
+
 func isGreaterThanSign(r rune) bool {
 	return r == '>'
 }
@@ -194,7 +198,7 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 
 	if isLetterOrUnderscore(elementPart[indexArgument+1]) {
 		index += 2
-	} else if elementPart[indexArgument+1] == '/' && isLetterOrUnderscore(elementPart[indexArgument+2]) {
+	} else if isForwardSlash(elementPart[indexArgument+1]) && isLetterOrUnderscore(elementPart[indexArgument+2]) {
 		index += 3
 	} else {
 		return 0, false
@@ -215,7 +219,7 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 
 		indexPlusOne := index + 1
 		if indexPlusOne < elementPartLength {
-			if elementPart[index] == '/' && isGreaterThanSign(elementPart[indexPlusOne]) {
+			if isForwardSlash(elementPart[index]) && isGreaterThanSign(elementPart[indexPlusOne]) {
 				index++
 				tagFound = true
 				break
@@ -278,7 +282,7 @@ func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int
 						break
 					}
 
-					if elementPart[index] == '/' && isGreaterThanSign(elementPart[index+1]) {
+					if isForwardSlash(elementPart[index]) && isGreaterThanSign(elementPart[index+1]) {
 						index++
 						tagFound = true
 						break
