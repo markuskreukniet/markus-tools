@@ -15,7 +15,7 @@
     --lightness: 60%;
 
     --primary-color: hsl(0, 0%, 8%);
-    --secondary-color: hsl(240, var(--saturation), var(--lightness));
+    --secondary-color: hsl(var(--secondary-color-hue), var(--saturation), var(--lightness));
     --tertiary-color: hsl(calc((var(--secondary-color-hue) + 180) % 360), var(--saturation), var(--lightness));
   */
 
