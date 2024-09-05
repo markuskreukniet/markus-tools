@@ -7,8 +7,6 @@
   --size-2: calc(var(--size-1) * 2);
   --size-1-s: calc(var(--size-1) * var(--g-ratio-n));
 
-  --size-1-s-2: calc(var(--size-1-s) * 2);
-
   --size-2-50: calc(50% - var(--size-2));
 
   --light-gray: #D3D3D3; /* color: LightGray */
@@ -57,7 +55,6 @@ h1, h2, ul, .padding-bottom-1 {
 }
 
 textarea, .custom-textarea-placeholder {
-  width: calc(100% - var(--size-1-s-2));
   height: calc(var(--size-1) * 13);
   padding: var(--size-1-s);
 }
