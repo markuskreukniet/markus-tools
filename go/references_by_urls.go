@@ -197,7 +197,6 @@ func incrementIfPlusOneIsSmaller(i *int, j int) bool {
 	return false
 }
 
-// TODO: check if clean
 func getTagLength(elementPart []rune, elementPartLength, indexArgument int) (int, bool) {
 	index := indexArgument
 
