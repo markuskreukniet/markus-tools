@@ -10,8 +10,11 @@
   --size-2-50: calc(50% - var(--size-2));
 
 /* WIP: */
-/* --secondary-color-hue + 180 % 360 */
-/* TODO: this does not work? --tertiary-color-hue: calc((var(--secondary-color-hue) + 180) % 360); */
+/* --tertiary-color-hue = --secondary-color-hue + 180 % 360 */
+/*
+This calc does not work since we can't use the % operator in CSS calc:
+--tertiary-color-hue: calc((var(--secondary-color-hue) + 180) % 360);
+*/
 /*
   --secondary-color-hue: 240;
   --saturation: 60%;
