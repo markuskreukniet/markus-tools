@@ -15,6 +15,11 @@
   --light-steel-blue: #B0C4DE; /* color: LightSteelBlue */
   --midnight-blue: #191970; /* color: MidnightBlue */
 
+    /* WIP:
+    --primary-color: hsl(0, 0%, 8%);
+    --secondary-color: hsl(240, 60%, 60%);
+    */
+
   --border: solid 1px var(--gray);
 }
 
