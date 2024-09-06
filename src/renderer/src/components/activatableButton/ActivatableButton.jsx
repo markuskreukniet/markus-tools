@@ -13,7 +13,11 @@ export default function ActivatableButton(props) {
   })
 
   return (
-    <button onClick={() => props.onAction()} disabled={!active()}>
+    <button
+      onClick={() => props.onAction()}
+      disabled={!active()}
+      id={props.primary ? 'primary-button' : null}
+    >
       {props.text}
     </button>
   )
