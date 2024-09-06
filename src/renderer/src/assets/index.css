@@ -25,6 +25,9 @@ This calc does not work since we can't use the % operator in CSS calc:
 
   --tertiary-color-hue: 60; 
   --tertiary-color: hsl(var(--tertiary-color-hue), var(--saturation), var(--lightness));
+
+  --secondary-color-border: solid 1px var(--secondary-color);
+  --tertiary-color-border: solid 1px var(--tertiary-color);
 */
 
   --light-gray: #D3D3D3; /* color: LightGray */
@@ -80,6 +83,23 @@ textarea, .custom-textarea-placeholder {
 .textarea-height-5 {
   height: calc(var(--size-1) * 5);
 }
+
+/*
+#primary-button {
+  background-color: var(--tertiary-color);
+  border: var(--secondary-color-border);
+}
+
+.secondary-button {
+  background-color: var(--primary-color);
+  border: var(--tertiary-color-border);
+}
+
+.tertiary-button {
+  background-color: var(--primary-color);
+  border: var(--secondary-color-border);
+}
+*/
 
 .custom-textarea-placeholder {
   color: rgb(0, 0, 0, 0.6);
