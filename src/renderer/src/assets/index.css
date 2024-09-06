@@ -25,6 +25,24 @@ This calc does not work since we can't use the % operator in CSS calc:
 
   --tertiary-color-hue: 60; 
   --tertiary-color: hsl(var(--tertiary-color-hue), var(--saturation), var(--lightness));
+
+  --solid-1px-secondary-color-border: solid 1px var(--secondary-color);
+
+  #primary-button {
+    background-color: var(--tertiary-color);
+    border: var(--solid-1px-secondary-color-border);
+  }
+
+  .secondary-button {
+    background-color: var(--primary-color);
+    border: var(--solid-1px-secondary-color-border);
+    border-color: var(--tertiary-color)
+  }
+
+  .tertiary-button {
+    background-color: var(--primary-color);
+    border: var(--solid-1px-secondary-color-border);
+  }
 */
 
   --light-gray: #D3D3D3; /* color: LightGray */
