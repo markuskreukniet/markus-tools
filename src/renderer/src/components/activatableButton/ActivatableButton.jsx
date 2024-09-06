@@ -1,6 +1,6 @@
 import { createEffect, createSignal } from 'solid-js'
 
-// TODO: useless component?
+// This component is not useless. We can use it as a self-closing tag, which reduces some code, and onClick does the same.
 export default function ActivatableButton(props) {
   const [active, setActive] = createSignal(false)
 
