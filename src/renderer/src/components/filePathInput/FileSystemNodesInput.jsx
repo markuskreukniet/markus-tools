@@ -94,7 +94,12 @@ export default function FileSystemNodesInput(props) {
         </Show>
       </div>
       <div class="display-flex justify-content-flex-end gap-1 padding-bottom-1">
-        <ActivatableButton text="reset" active={hasFileSystemNode()} onAction={resetState} />
+        <ActivatableButton
+          text="reset"
+          active={hasFileSystemNode()}
+          onAction={resetState}
+          variant={'tertiary'}
+        />
         {props.submitButton}
       </div>
       <ul>

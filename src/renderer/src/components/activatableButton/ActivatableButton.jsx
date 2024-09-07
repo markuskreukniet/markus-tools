@@ -12,11 +12,23 @@ export default function ActivatableButton(props) {
     }
   })
 
+  function getVariantAttribute(variant) {
+    if (variant === 'primary') {
+      return { id: 'primary-button' }
+    } else if (variant === 'secondary') {
+      return { class: 'secondary-button' }
+    } else if (variant === 'tertiary') {
+      return { class: 'tertiary-button' }
+    } else {
+      return null
+    }
+  }
+
   return (
     <button
       onClick={() => props.onAction()}
       disabled={!active()}
-      id={props.primary ? 'primary-button' : null}
+      {...getVariantAttribute(props.variant)}
     >
       {props.text}
     </button>
