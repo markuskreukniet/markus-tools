@@ -14,5 +14,10 @@ export default function FilePathSelector(props) {
     }
   }
 
-  return <button onClick={clickInput}>{`add a ${props.directory ? 'directory' : 'file'}`}</button>
+  // TODO: this button be become a component that we at least also use in ActivatableButton. Or it is a button that is always active
+  return (
+    <button onClick={clickInput} class="secondary-button">{`add a ${
+      props.directory ? 'directory' : 'file'
+    }`}</button>
+  )
 }
