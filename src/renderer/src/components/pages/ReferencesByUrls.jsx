@@ -1,4 +1,5 @@
 import { createSignal } from 'solid-js'
+import ActivatableSubmitButton from '../activatableButton/ActivatableSubmitButton'
 import ResultPage from '../page/ResultPage'
 import { getEitherResultValueOrEitherResultToErrorString } from '../../../../preload/monads/either'
 import TextArea from '../TextArea'
@@ -45,9 +46,7 @@ export default function ReferencesByUrls(props) {
         onChange={handleChange}
         placeholderContent={placeholderContent}
       />
-      <button onClick={submit} disabled={!isValid()}>
-        submit
-      </button>
+      <ActivatableSubmitButton onAction={submit} active={isValid()} />
     </div>
   )
 
