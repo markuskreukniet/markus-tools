@@ -1,3 +1,4 @@
+import ActivatableButton from '../activatableButton/ActivatableButton'
 import { Either, isEitherRightResult } from '../../../../preload/monads/either'
 
 export default function FilePathSelector(props) {
@@ -14,10 +15,12 @@ export default function FilePathSelector(props) {
     }
   }
 
-  // TODO: this button be become a component that we at least also use in ActivatableButton. Or it is a button that is always active
   return (
-    <button onClick={clickInput} class="secondary-button">{`add a ${
-      props.directory ? 'directory' : 'file'
-    }`}</button>
+    <ActivatableButton
+      text={`add a ${props.directory ? 'directory' : 'file'}`}
+      active
+      onAction={clickInput}
+      variant={'secondary'}
+    />
   )
 }
