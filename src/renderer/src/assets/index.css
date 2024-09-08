@@ -15,7 +15,6 @@
 This calc does not work since we can't use the % operator in CSS calc:
 --tertiary-color-hue: calc((var(--secondary-color-hue) + 180) % 360);
 */
-/*
   --secondary-color-hue: 240;
   --saturation: 60%;
   --lightness: 80%;
@@ -28,7 +27,6 @@ This calc does not work since we can't use the % operator in CSS calc:
 
   --secondary-color-border: solid 1px var(--secondary-color);
   --tertiary-color-border: solid 1px var(--tertiary-color);
-*/
 
   --light-gray: #D3D3D3; /* color: LightGray */
   --gray: #808080; /* color: Gray */
@@ -54,17 +52,13 @@ body {
   flex-direction: column;
   font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Open Sans', sans-serif;
-  color: var(--light-steel-blue);
-  background-color: var(--midnight-blue);
+  color: var(--secondary-color);
+  background-color: var(--primary-color);
 }
 
 button, #navigation-bar > li {
   padding: var(--size-1-s) var(--size-1);
   cursor: pointer;
-}
-
-button {
-  background-color: var(--light-gray);
 }
 
 ul {
@@ -84,7 +78,6 @@ textarea, .custom-textarea-placeholder {
   height: calc(var(--size-1) * 5);
 }
 
-/*
 #primary-button {
   color: var(--primary-color);
   background-color: var(--tertiary-color);
@@ -103,7 +96,6 @@ textarea, .custom-textarea-placeholder {
 .tertiary-button {
   border: var(--secondary-color-border);
 }
-*/
 
 .custom-textarea-placeholder {
   color: rgb(0, 0, 0, 0.6);
@@ -113,7 +105,7 @@ textarea, .custom-textarea-placeholder {
   align-items: flex-start;
 }
 
-button, textarea, #navigation-bar > li, .custom-textarea-placeholder {
+textarea, #navigation-bar > li, .custom-textarea-placeholder {
   border: var(--border);
 }
 
