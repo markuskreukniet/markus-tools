@@ -89,7 +89,7 @@ textarea, .custom-textarea-placeholder {
   background-color: var(--primary-color);
 }
 
-.secondary-button {
+.secondary-button, .custom-textarea-placeholder {
   border: var(--tertiary-color-border);
 }
 
@@ -98,14 +98,14 @@ textarea, .custom-textarea-placeholder {
 }
 
 .custom-textarea-placeholder {
-  color: rgb(0, 0, 0, 0.6);
-  background-color: white;
+  color: var(--secondary-color);
+  background-color: var(--primary-color);
   text-align: left;
   display: flex;
   align-items: flex-start;
 }
 
-textarea, #navigation-bar > li, .custom-textarea-placeholder {
+textarea, #navigation-bar > li {
   border: var(--border);
 }
 
