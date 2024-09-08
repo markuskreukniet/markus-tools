@@ -18,7 +18,7 @@ This calc does not work since we can't use the % operator in CSS calc:
 /*
   --secondary-color-hue: 240;
   --saturation: 60%;
-  --lightness: 60%;
+  --lightness: 80%;
 
   --primary-color: hsl(0, 0%, 8%);
   --secondary-color: hsl(var(--secondary-color-hue), var(--saturation), var(--lightness));
@@ -86,17 +86,21 @@ textarea, .custom-textarea-placeholder {
 
 /*
 #primary-button {
+  color: var(--primary-color);
   background-color: var(--tertiary-color);
-  border: var(--secondary-color-border);
+  border: none;
+}
+
+.secondary-button, .tertiary-button {
+  color: var(--secondary-color);
+  background-color: var(--primary-color);
 }
 
 .secondary-button {
-  background-color: var(--primary-color);
   border: var(--tertiary-color-border);
 }
 
 .tertiary-button {
-  background-color: var(--primary-color);
   border: var(--secondary-color-border);
 }
 */
