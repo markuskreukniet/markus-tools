@@ -28,9 +28,6 @@ This calc does not work since we can't use the % operator in CSS calc:
   --secondary-color-border: solid 1px var(--secondary-color);
   --tertiary-color-border: solid 1px var(--tertiary-color);
 
-  --light-steel-blue: #B0C4DE; /* color: LightSteelBlue */
-  --midnight-blue: #191970; /* color: MidnightBlue */
-
   --border: solid 1px #808080; /* color: Gray */
 }
 
@@ -90,7 +87,7 @@ textarea, .custom-textarea-placeholder {
   border: var(--tertiary-color-border);
 }
 
-.tertiary-button {
+#navigation-bar > li, .tertiary-button {
   border: var(--secondary-color-border);
 }
 
@@ -102,7 +99,7 @@ textarea, .custom-textarea-placeholder {
   align-items: flex-start;
 }
 
-textarea, #navigation-bar > li {
+textarea {
   border: var(--border);
 }
 
@@ -115,8 +112,8 @@ textarea, #navigation-bar > li {
 }
 
 .navigationBarItemActive {
-  color: var(--midnight-blue);
-  background-color: var(--light-steel-blue);
+  color: var(--primary-color);
+  background-color: var(--secondary-color);
 }
 
 .container {
