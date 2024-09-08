@@ -15,28 +15,20 @@
 This calc does not work since we can't use the % operator in CSS calc:
 --tertiary-color-hue: calc((var(--secondary-color-hue) + 180) % 360);
 */
-/*
   --secondary-color-hue: 240;
-  --saturation: 60%;
+  --saturation: 40%;
   --lightness: 80%;
 
   --primary-color: hsl(0, 0%, 8%);
   --secondary-color: hsl(var(--secondary-color-hue), var(--saturation), var(--lightness));
 
-  --tertiary-color-hue: 60; 
+  --tertiary-color-hue: 60;
   --tertiary-color: hsl(var(--tertiary-color-hue), var(--saturation), var(--lightness));
 
   --secondary-color-border: solid 1px var(--secondary-color);
   --tertiary-color-border: solid 1px var(--tertiary-color);
-*/
 
-  --light-gray: #D3D3D3; /* color: LightGray */
-  --gray: #808080; /* color: Gray */
-
-  --light-steel-blue: #B0C4DE; /* color: LightSteelBlue */
-  --midnight-blue: #191970; /* color: MidnightBlue */
-
-  --border: solid 1px var(--gray);
+  --border: solid 1px #808080; /* color: Gray */
 }
 
 * {
@@ -54,17 +46,13 @@ body {
   flex-direction: column;
   font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Open Sans', sans-serif;
-  color: var(--light-steel-blue);
-  background-color: var(--midnight-blue);
+  color: var(--secondary-color);
+  background-color: var(--primary-color);
 }
 
 button, #navigation-bar > li {
   padding: var(--size-1-s) var(--size-1);
   cursor: pointer;
-}
-
-button {
-  background-color: var(--light-gray);
 }
 
 ul {
@@ -84,7 +72,6 @@ textarea, .custom-textarea-placeholder {
   height: calc(var(--size-1) * 5);
 }
 
-/*
 #primary-button {
   color: var(--primary-color);
   background-color: var(--tertiary-color);
@@ -96,24 +83,23 @@ textarea, .custom-textarea-placeholder {
   background-color: var(--primary-color);
 }
 
-.secondary-button {
+.secondary-button, .custom-textarea-placeholder {
   border: var(--tertiary-color-border);
 }
 
-.tertiary-button {
+#navigation-bar > li, .tertiary-button {
   border: var(--secondary-color-border);
 }
-*/
 
 .custom-textarea-placeholder {
-  color: rgb(0, 0, 0, 0.6);
-  background-color: white;
+  color: var(--secondary-color);
+  background-color: var(--primary-color);
   text-align: left;
   display: flex;
   align-items: flex-start;
 }
 
-button, textarea, #navigation-bar > li, .custom-textarea-placeholder {
+textarea {
   border: var(--border);
 }
 
@@ -126,8 +112,8 @@ button, textarea, #navigation-bar > li, .custom-textarea-placeholder {
 }
 
 .navigationBarItemActive {
-  color: var(--midnight-blue);
-  background-color: var(--light-steel-blue);
+  color: var(--secondary-color);
+  border: solid 5px var(--secondary-color) !important;
 }
 
 .container {
@@ -156,8 +142,8 @@ button, textarea, #navigation-bar > li, .custom-textarea-placeholder {
 }
 
 #loader {
-  border: var(--size-1-s) solid var(--light-gray);
-  border-top: var(--size-1-s) solid var(--light-steel-blue);
+  border: var(--size-1-s) solid var(--secondary-color);
+  border-top: var(--size-1-s) solid var(--tertiary-color);
   border-radius: 50%;
   width: var(--size-2);
   height: var(--size-2);
