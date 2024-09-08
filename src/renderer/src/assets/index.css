@@ -16,13 +16,13 @@ This calc does not work since we can't use the % operator in CSS calc:
 --tertiary-color-hue: calc((var(--secondary-color-hue) + 180) % 360);
 */
   --secondary-color-hue: 240;
-  --saturation: 60%;
+  --saturation: 40%;
   --lightness: 80%;
 
   --primary-color: hsl(0, 0%, 8%);
   --secondary-color: hsl(var(--secondary-color-hue), var(--saturation), var(--lightness));
 
-  --tertiary-color-hue: 60; 
+  --tertiary-color-hue: 60;
   --tertiary-color: hsl(var(--tertiary-color-hue), var(--saturation), var(--lightness));
 
   --secondary-color-border: solid 1px var(--secondary-color);
@@ -112,8 +112,8 @@ textarea {
 }
 
 .navigationBarItemActive {
-  color: var(--primary-color);
-  background-color: var(--secondary-color);
+  color: var(--secondary-color);
+  border: solid 5px var(--secondary-color) !important;
 }
 
 .container {
