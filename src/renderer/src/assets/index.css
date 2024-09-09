@@ -66,6 +66,11 @@ h1, h2, ul, .padding-bottom-1 {
   cursor: pointer;
 }
 
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 textarea, .custom-textarea-placeholder {
   height: calc(var(--size-1) * 13);
   padding: var(--size-1-s);
