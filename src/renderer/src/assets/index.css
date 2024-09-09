@@ -27,8 +27,6 @@ This calc does not work since we can't use the % operator in CSS calc:
 
   --secondary-color-border: solid 1px var(--secondary-color);
   --tertiary-color-border: solid 1px var(--tertiary-color);
-
-  --border: solid 1px #808080; /* color: Gray */
 }
 
 * {
@@ -71,7 +69,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-textarea, .custom-textarea-placeholder {
+.custom-textarea-placeholder {
   height: calc(var(--size-1) * 13);
   padding: var(--size-1-s);
 }
@@ -91,7 +89,7 @@ textarea, .custom-textarea-placeholder {
   background-color: var(--primary-color);
 }
 
-.secondary-button, .custom-textarea-placeholder {
+textarea, .secondary-button, .custom-textarea-placeholder {
   border: var(--tertiary-color-border);
 }
 
@@ -108,7 +106,7 @@ textarea, .custom-textarea-placeholder {
 }
 
 textarea {
-  border: var(--border);
+  background-color: var(--primary-color);
 }
 
 .display-flex, #navigation-bar, #page-wrapper {
