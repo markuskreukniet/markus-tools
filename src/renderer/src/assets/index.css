@@ -52,7 +52,6 @@ body {
 
 button, #navigation-bar > li {
   padding: var(--size-1-s) var(--size-1);
-  cursor: pointer;
 }
 
 ul {
@@ -61,6 +60,10 @@ ul {
 
 h1, h2, ul, .padding-bottom-1 {
   padding: 0 0 var(--size-1) 0;
+}
+
+#navigation-bar > li, button:not(:disabled) {
+  cursor: pointer;
 }
 
 textarea, .custom-textarea-placeholder {
