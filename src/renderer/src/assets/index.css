@@ -41,8 +41,11 @@ html, .custom-textarea-placeholder {
   font-size: 16px;
 }
 
-body {
+body, .display-flex, #navigation-bar, #page-wrapper, .custom-textarea-placeholder, .container {
   display: flex;
+}
+
+body {
   flex-direction: column;
   font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Open Sans', sans-serif;
@@ -110,12 +113,7 @@ textarea, .secondary-button, .custom-textarea-placeholder {
 
 .custom-textarea-placeholder {
   text-align: left;
-  display: flex;
   align-items: flex-start;
-}
-
-.display-flex, #navigation-bar, #page-wrapper {
-  display: flex;
 }
 
 .display-none, .displayNone {
@@ -127,7 +125,6 @@ textarea, .secondary-button, .custom-textarea-placeholder {
 }
 
 .container {
-  display: flex;
   flex-direction: column;
   max-width: calc(var(--size-1) * 55);
   margin: 0 auto;
