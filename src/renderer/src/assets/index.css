@@ -46,6 +46,9 @@ body {
   flex-direction: column;
   font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Open Sans', sans-serif;
+}
+
+body, .secondary-button, .tertiary-button, .custom-textarea-placeholder {
   color: var(--secondary-color);
 }
 
@@ -97,10 +100,6 @@ button:disabled {
   border: none;
 }
 
-.secondary-button, .tertiary-button {
-  color: var(--secondary-color);
-}
-
 textarea, .secondary-button, .custom-textarea-placeholder {
   border: var(--tertiary-color-border);
 }
@@ -110,7 +109,6 @@ textarea, .secondary-button, .custom-textarea-placeholder {
 }
 
 .custom-textarea-placeholder {
-  color: var(--secondary-color);
   text-align: left;
   display: flex;
   align-items: flex-start;
@@ -125,7 +123,6 @@ textarea, .secondary-button, .custom-textarea-placeholder {
 }
 
 .navigationBarItemActive {
-  color: var(--secondary-color);
   border: solid var(--border-width-5) var(--secondary-color) !important;
 }
 
