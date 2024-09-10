@@ -51,7 +51,7 @@ body {
     'Ubuntu', 'Cantarell', 'Open Sans', sans-serif;
 }
 
-body, .secondary-button, .tertiary-button, .custom-textarea-placeholder {
+body, textarea, .secondary-button, .tertiary-button, .custom-textarea-placeholder {
   color: var(--secondary-color);
 }
 
@@ -86,6 +86,10 @@ h1, h2, ul, .padding-bottom-1 {
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+textarea {
+  width: 100%;
 }
 
 .custom-textarea-placeholder {
