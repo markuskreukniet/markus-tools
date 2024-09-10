@@ -47,6 +47,9 @@ body {
   font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Open Sans', sans-serif;
   color: var(--secondary-color);
+}
+
+body, textarea, .secondary-button, .tertiary-button, .custom-textarea-placeholder {
   background-color: var(--primary-color);
 }
 
@@ -96,7 +99,6 @@ button:disabled {
 
 .secondary-button, .tertiary-button {
   color: var(--secondary-color);
-  background-color: var(--primary-color);
 }
 
 textarea, .secondary-button, .custom-textarea-placeholder {
@@ -109,14 +111,9 @@ textarea, .secondary-button, .custom-textarea-placeholder {
 
 .custom-textarea-placeholder {
   color: var(--secondary-color);
-  background-color: var(--primary-color);
   text-align: left;
   display: flex;
   align-items: flex-start;
-}
-
-textarea {
-  background-color: var(--primary-color);
 }
 
 .display-flex, #navigation-bar, #page-wrapper {
