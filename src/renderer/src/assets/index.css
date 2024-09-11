@@ -92,7 +92,7 @@ textarea {
   width: 100%;
 }
 
-.custom-textarea-placeholder {
+.custom-textarea-placeholder, .textarea-input {
   height: calc(var(--size-1) * 13);
   padding: var(--size-1-s);
 }
