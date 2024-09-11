@@ -92,6 +92,10 @@ textarea {
   width: 100%;
 }
 
+textarea:focus-visible {
+  outline: var(--tertiary-color-border);
+}
+
 .custom-textarea-placeholder, .textarea-input {
   height: calc(var(--size-1) * 13);
   padding: var(--size-1-s);
