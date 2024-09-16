@@ -56,7 +56,7 @@ body, textarea, .secondary-button, .tertiary-button, .custom-textarea-placeholde
   color: var(--secondary-color);
 }
 
-body, textarea, .secondary-button, .tertiary-button, .custom-textarea-placeholder {
+body, textarea, .secondary-button, .tertiary-button, .custom-textarea-placeholder { /* TODO: duplicate selector */
   background-color: var(--primary-color);
 }
 
