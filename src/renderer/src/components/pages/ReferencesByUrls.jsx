@@ -40,7 +40,7 @@ export default function ReferencesByUrls(props) {
   )
 
   const inputComponent = (
-    <div>
+    <div class="references-by-urls__input-component">
       <TextArea
         textAreaValue={textAreaValue}
         onChange={handleChange}
