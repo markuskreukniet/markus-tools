@@ -39,7 +39,7 @@ html, .text-area__custom-placeholder {
   font-size: 16px;
 }
 
-body, #app__container, #navigation-bar, #page-wrapper,
+body, #app__container, #navigation-bar, #page-navigator__page-wrapper,
 .file-system-nodes-input__file-path-selector-container, .file-system-nodes-input__submission-buttons,
 .text-area__custom-placeholder {
   display: flex;
@@ -136,7 +136,7 @@ textarea, .button--secondary, .text-area__custom-placeholder {
   padding: var(--size-1) var(--size-2);
 }
 
-#page-wrapper {
+#page-navigator__page-wrapper {
   justify-content: center;
 }
 

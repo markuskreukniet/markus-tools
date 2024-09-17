@@ -40,7 +40,7 @@ export default function PageNavigator(props) {
   return (
     <div>
       <NavigationBar items={navigationBarItems} onChange={handleChange} />
-      <div id="page-wrapper">{activePage()}</div>
+      <div id="page-navigator__page-wrapper">{activePage()}</div>
     </div>
   )
 }
