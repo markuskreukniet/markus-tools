@@ -17,7 +17,7 @@ export default function ActivatableButton(props) {
     if (variant === 'primary') {
       return { id: 'primary-button' }
     } else if (variant === 'secondary') {
-      return { class: 'secondary-button' }
+      return { class: 'button--secondary' }
     } else if (variant === 'tertiary') {
       return { class: 'tertiary-button' }
     } else {

@@ -85,7 +85,7 @@ export default function FileSystemNodesInput(props) {
 
   return (
     <div>
-      <div class="file-path-selector-container gap-1">
+      <div class="file-system-nodes-input__file-path-selector-container gap-1">
         <Show when={showFilePathSelector(filePathSelectionType.file)}>
           <FilePathSelector onChange={handleChange} />
         </Show>
