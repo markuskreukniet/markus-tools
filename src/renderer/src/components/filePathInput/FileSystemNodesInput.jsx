@@ -93,7 +93,7 @@ export default function FileSystemNodesInput(props) {
           <FilePathSelector onChange={handleChange} directory />
         </Show>
       </div>
-      <div class="reset-and-submit-button-container justify-content-flex-end gap-1 padding-bottom-1">
+      <div class="file-system-nodes-input__submission-buttons justify-content-flex-end gap-1 padding-bottom-1">
         <ActivatableButton
           text="reset"
           active={hasFileSystemNode()}

@@ -39,8 +39,8 @@ html, .custom-textarea-placeholder {
   font-size: 16px;
 }
 
-body, #main-container, #navigation-bar, #page-wrapper,
-.file-path-selector-container, .reset-and-submit-button-container, .custom-textarea-placeholder {
+body, #app__container, #navigation-bar, #page-wrapper,
+.file-path-selector-container, .file-system-nodes-input__submission-buttons, .custom-textarea-placeholder {
   display: flex;
 }
 
@@ -131,7 +131,7 @@ textarea, .secondary-button, .custom-textarea-placeholder {
   border: solid var(--border-width-5) var(--secondary-color) !important;
 }
 
-#main-container {
+#app__container {
   flex-direction: column;
   max-width: calc(var(--size-1) * 55);
   margin: 0 auto;
