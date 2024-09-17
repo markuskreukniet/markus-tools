@@ -39,8 +39,9 @@ html, .custom-textarea-placeholder {
   font-size: 16px;
 }
 
-body, #main-container, #navigation-bar, #page-wrapper,
-.file-path-selector-container, .reset-and-submit-button-container, .custom-textarea-placeholder {
+body, #app__container, #navigation-bar, #page-wrapper,
+.file-system-nodes-input__file-path-selector-container, .file-system-nodes-input__submission-buttons,
+.custom-textarea-placeholder {
   display: flex;
 }
 
@@ -50,11 +51,8 @@ body {
     'Ubuntu', 'Cantarell', 'Open Sans', sans-serif;
 }
 
-body, textarea, .secondary-button, .tertiary-button, .custom-textarea-placeholder {
+body, textarea, .button--secondary, .button--tertiary, .custom-textarea-placeholder {
   color: var(--secondary-color);
-}
-
-body, textarea, .secondary-button, .tertiary-button, .custom-textarea-placeholder { /* TODO: duplicate selector */
   background-color: var(--primary-color);
 }
 
@@ -104,17 +102,17 @@ textarea:focus-visible {
   height: calc(var(--size-1) * 5);
 }
 
-#primary-button {
+#button--primary {
   color: var(--primary-color);
   background-color: var(--tertiary-color);
   border: none;
 }
 
-textarea, .secondary-button, .custom-textarea-placeholder {
+textarea, .button--secondary, .custom-textarea-placeholder {
   border: var(--tertiary-color-border);
 }
 
-#navigation-bar > li, .tertiary-button {
+#navigation-bar > li, .button--tertiary {
   border: var(--secondary-color-border);
 }
 
@@ -131,7 +129,7 @@ textarea, .secondary-button, .custom-textarea-placeholder {
   border: solid var(--border-width-5) var(--secondary-color) !important;
 }
 
-#main-container {
+#app__container {
   flex-direction: column;
   max-width: calc(var(--size-1) * 55);
   margin: 0 auto;
