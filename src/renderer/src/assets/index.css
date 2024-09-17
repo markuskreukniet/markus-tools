@@ -150,7 +150,7 @@ textarea, .button--secondary, .text-area__custom-placeholder {
   justify-content: flex-end;
 }
 
-.gap-1 {
+.references-by-urls__input-component, .gap-1 {
   gap: var(--size-1);
 }
 
