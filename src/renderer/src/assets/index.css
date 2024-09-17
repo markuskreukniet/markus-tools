@@ -68,7 +68,7 @@ ul {
   list-style: none;
 }
 
-h1, h2, ul, .padding-bottom-1 {
+h1, h2, ul, .file-system-nodes-input__submission-buttons {
   padding: 0 0 var(--size-1) 0;
 }
 
@@ -150,7 +150,7 @@ textarea, .button--secondary, .text-area__custom-placeholder {
   justify-content: flex-end;
 }
 
-.references-by-urls__input-component, .gap-1 {
+.references-by-urls__input-component, .file-system-nodes-input__file-path-selector-container, .file-system-nodes-input__submission-buttons {
   gap: var(--size-1);
 }
 
