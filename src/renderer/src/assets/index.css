@@ -35,13 +35,13 @@ We can't use the % operator in CSS calc.
   box-sizing: border-box;
 }
 
-html, .custom-textarea-placeholder {
+html, .text-area__custom-placeholder {
   font-size: 16px;
 }
 
 body, #app__container, #navigation-bar, #page-wrapper,
 .file-system-nodes-input__file-path-selector-container, .file-system-nodes-input__submission-buttons,
-.custom-textarea-placeholder {
+.text-area__custom-placeholder {
   display: flex;
 }
 
@@ -51,7 +51,7 @@ body {
     'Ubuntu', 'Cantarell', 'Open Sans', sans-serif;
 }
 
-body, textarea, .button--secondary, .button--tertiary, .custom-textarea-placeholder {
+body, textarea, .button--secondary, .button--tertiary, .text-area__custom-placeholder {
   color: var(--secondary-color);
   background-color: var(--primary-color);
 }
@@ -93,7 +93,7 @@ textarea:focus-visible {
   outline: var(--tertiary-color-border);
 }
 
-.custom-textarea-placeholder, .textarea-input {
+.text-area__custom-placeholder, .textarea-input {
   height: calc(var(--size-1) * 13);
   padding: var(--size-1-s);
 }
@@ -108,7 +108,7 @@ textarea:focus-visible {
   border: none;
 }
 
-textarea, .button--secondary, .custom-textarea-placeholder {
+textarea, .button--secondary, .text-area__custom-placeholder {
   border: var(--tertiary-color-border);
 }
 
@@ -116,7 +116,7 @@ textarea, .button--secondary, .custom-textarea-placeholder {
   border: var(--secondary-color-border);
 }
 
-.custom-textarea-placeholder {
+.text-area__custom-placeholder {
   text-align: left;
   align-items: flex-start;
 }
