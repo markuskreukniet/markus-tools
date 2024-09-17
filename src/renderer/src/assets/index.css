@@ -51,7 +51,7 @@ body {
     'Ubuntu', 'Cantarell', 'Open Sans', sans-serif;
 }
 
-body, textarea, .button--secondary, .tertiary-button, .custom-textarea-placeholder {
+body, textarea, .button--secondary, .button--tertiary, .custom-textarea-placeholder {
   color: var(--secondary-color);
   background-color: var(--primary-color);
 }
@@ -102,7 +102,7 @@ textarea:focus-visible {
   height: calc(var(--size-1) * 5);
 }
 
-#primary-button {
+#button--primary {
   color: var(--primary-color);
   background-color: var(--tertiary-color);
   border: none;
@@ -112,7 +112,7 @@ textarea, .button--secondary, .custom-textarea-placeholder {
   border: var(--tertiary-color-border);
 }
 
-#navigation-bar > li, .tertiary-button {
+#navigation-bar > li, .button--tertiary {
   border: var(--secondary-color-border);
 }
 
