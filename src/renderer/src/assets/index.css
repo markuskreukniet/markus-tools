@@ -41,12 +41,16 @@ html, .text-area__custom-placeholder {
 
 body, #app__container, #navigation-bar, #page-navigator__page-wrapper,
 .file-system-nodes-input__file-path-selector-container, .file-system-nodes-input__submission-buttons,
-.text-area__custom-placeholder {
+.text-area__custom-placeholder,
+.references-by-urls__input-component {
   display: flex;
 }
 
-body {
+body, #app__container, .references-by-urls__input-component {
   flex-direction: column;
+}
+
+body {
   font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Open Sans', sans-serif;
 }
@@ -116,9 +120,12 @@ textarea, .button--secondary, .text-area__custom-placeholder {
   border: var(--secondary-color-border);
 }
 
+.references-by-urls__input-component, .text-area__custom-placeholder {
+  align-items: flex-start;
+}
+
 .text-area__custom-placeholder {
   text-align: left;
-  align-items: flex-start;
 }
 
 .display-none, .displayNone {
@@ -130,7 +137,6 @@ textarea, .button--secondary, .text-area__custom-placeholder {
 }
 
 #app__container {
-  flex-direction: column;
   max-width: calc(var(--size-1) * 55);
   margin: 0 auto;
   padding: var(--size-1) var(--size-2);
