@@ -60,7 +60,7 @@ export default function TextArea(props) {
     }
   }
 
-  const placeholderClass = 'custom-textarea-placeholder'
+  const placeholderClass = 'text-area__custom-placeholder'
 
   return (
     <Show
