@@ -69,7 +69,7 @@ ul {
 }
 
 h1, h2, ul, .file-system-nodes-input__submission-buttons {
-  padding: 0 0 var(--size-1) 0;
+  padding-bottom: var(--size-1);
 }
 
 #navigation-bar > li, button:not(:disabled) {
