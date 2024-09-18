@@ -7,7 +7,7 @@ export default function NavigationBar(props) {
         {(item) => (
           <li
             onClick={() => props.onChange(item.name)}
-            classList={{ navigationBarItemActive: item.active }}
+            classList={{ 'navigation-bar__item--active': item.active }}
           >
             {item.name}
           </li>

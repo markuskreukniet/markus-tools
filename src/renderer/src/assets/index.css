@@ -132,7 +132,7 @@ textarea, .button--secondary, .text-area__custom-placeholder {
   display: none;
 }
 
-.navigationBarItemActive {
+.navigation-bar__item--active {
   border: solid var(--border-width-5) var(--secondary-color) !important;
 }
 
