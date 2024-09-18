@@ -83,7 +83,7 @@ export default function TextArea(props) {
         value={props.readOnly ? props.textAreaValue() : null}
         onInput={handleFunctionOrNull(props.readOnly, handleChange)}
         onBlur={handleFunctionOrNull(props.readOnly, handleBlur)}
-        class="textarea-input"
+        class="text-area__input"
       />
     </Show>
   )
