@@ -97,7 +97,7 @@ textarea:focus-visible {
   outline: var(--tertiary-color-border);
 }
 
-.text-area__custom-placeholder, .textarea-input {
+.text-area__custom-placeholder, .text-area__input {
   height: calc(var(--size-1) * 13);
   padding: var(--size-1-s);
 }
@@ -146,7 +146,7 @@ textarea, .button--secondary, .text-area__custom-placeholder {
   justify-content: center;
 }
 
-.justify-content-flex-end {
+.file-system-nodes-input__submission-buttons {
   justify-content: flex-end;
 }
 
