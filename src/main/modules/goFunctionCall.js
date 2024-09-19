@@ -23,7 +23,7 @@ async function toGoFunctionCall(functionCall, jsonArguments) {
 
     // When we run the 'npm start' command, 'preview' is active, which is scripts.start from package.json.
     // When we run a 'run build:' command, 'production' is active, which is build:win, build:mac, or build:linux from package.json scripts.
-    // Adding '--mode preview' and '--mode production' to these scripts was needed.
+    // Adding the parts '--mode preview' and '--mode production' to these scripts was needed.
     switch (import.meta.env.MODE) {
       case 'preview':
         goProcess = exec(`go run . "${functionCall}" "${jsonArguments}"`, {
