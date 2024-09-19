@@ -19,9 +19,23 @@ export default async function goFunctionCall(functionName, argumentObject) {
 async function toGoFunctionCall(functionCall, jsonArguments) {
   return new Promise((resolve, reject) => {
     let result = ''
-    const goProcess = exec(`go run . "${functionCall}" "${jsonArguments}"`, {
-      cwd: path.join(__dirname, '..', '..', 'go')
-    })
+    let goProcess = null
+
+    // When we run the 'npm start' command, 'preview' is active, which is scripts.start from package.json.
+    // When we run a 'run build:' command, 'production' is active, which is build:win, build:mac, or build:linux from package.json scripts.
+    // Adding '--mode preview' and '--mode production' to these scripts was needed.
+    switch (import.meta.env.MODE) {
+      case 'preview':
+        goProcess = exec(`go run . "${functionCall}" "${jsonArguments}"`, {
+          cwd: path.join(__dirname, '..', '..', 'go')
+        })
+        break
+      case 'production':
+        // TODO:
+        break
+      default:
+      // TODO: error
+    }
 
     // build with: go build -o ../out/go/markus-tools-go.exe
     // use this exec:
