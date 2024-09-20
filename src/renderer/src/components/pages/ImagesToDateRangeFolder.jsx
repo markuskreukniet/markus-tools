@@ -54,6 +54,7 @@ export default function imagesToDateRangeFolder(props) {
     setGetOutput(setStateWithBE(inputFilePathObjects, outputFilePath))
   }
 
+  // TODO: It should become a new component since this inputComponent is almost the same as the inputComponent from SynchronizeDirectoryTrees.
   const inputComponent = (
     <div>
       <FileSystemNodesInput onChange={handleInputFileSystemNodes} />
