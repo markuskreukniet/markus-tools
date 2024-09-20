@@ -38,16 +38,6 @@ async function toGoFunctionCall(functionCall, jsonArguments) {
     }
 
     // build with: go build -o ../out/go/markus-tools-go.exe
-    // use this exec:
-    // const goProcess = exec(
-    //   `"${path.join(
-    //     __dirname,
-    //     '..',
-    //     'go',
-    //     'markus-tools-go.exe'
-    //   )}" "${functionCall}" "${jsonArguments}"`
-    // )
-
     // add to electron-builder.yml:
     // asarUnpack:
     //   - 'out/go/markus-tools-go.exe'
