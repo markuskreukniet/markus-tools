@@ -11,6 +11,9 @@ files:
 asarUnpack:
   - resources/**
 afterSign: build/notarize.js
+extraResources:
+  - from: 'out/bin'
+    to: 'bin'
 win:
   executableName: markus-tools
 nsis:
