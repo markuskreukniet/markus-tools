@@ -21,6 +21,14 @@ async function toGoFunctionCall(functionCall, jsonArguments) {
     let result = ''
     let goProcess = null
 
+    // TODO: clean code
+    // TODO: fix comments
+    // extraResources is cleaner than asarUnpack and cleaner than extraFiles in electron-builder.yml
+
+    // extraResources:
+    //  - from: 'out/bin'
+    //    to: 'bin'
+
     // When we run the 'npm start' command, 'preview' is active, which is scripts.start from package.json.
     // When we run a 'run build:' command, 'production' is active, which is build:win, build:mac, or build:linux from package.json scripts.
     // Adding the parts '--mode preview' and '--mode production' to these scripts was needed.
@@ -31,7 +39,13 @@ async function toGoFunctionCall(functionCall, jsonArguments) {
         })
         break
       case 'production':
-        // TODO:
+        goProcess = exec(
+          `"${path.join(
+            process.resourcesPath,
+            'bin',
+            'markus-tools-go.exe'
+          )}" "${functionCall}" "${jsonArguments}"`
+        )
         break
       default:
       // TODO: error
