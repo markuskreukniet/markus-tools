@@ -21,9 +21,16 @@ async function toGoFunctionCall(functionCall, jsonArguments) {
     let result = ''
     let goProcess = null
 
+    // Use 'extraResources' in electron-builder (electron-builder.yml) to include the 'bin' directory (containing binaries such as .exe files) in the 'resources' folder.
+    // In this case, we should prefer 'extraResources' instead of 'asarUnpack' or 'extraFiles,' at least for these reasons:
+    // - Binaries need to be accessible outside the '.asar' archive. While 'asarUnpack' can unpack specific files from the '.asar' archive, it is unnecessary for executables.
+    // - 'extraResources' automatically places files in the 'resources' folder,
+    //    which is where Electron expects additional runtime dependencies, and are easily accessed using `process.resourcesPath`, which always points to the 'resources' folder.
+    // - Using 'extraFiles' would place the files in the root directory (e.g., `win-unpacked/bin`), cluttering the app's root and making it harder to manage.
+    // - Storing binaries in `resources/bin` keeps the app organized and follows Electron's convention for runtime dependencies.
+
     // TODO: clean code
     // TODO: fix comments
-    // extraResources is cleaner than asarUnpack and cleaner than extraFiles in electron-builder.yml
 
     // extraResources:
     //  - from: 'out/bin'
