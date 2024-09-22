@@ -20,6 +20,7 @@ async function toGoFunctionCall(functionCall, jsonArguments) {
   return new Promise((resolve, reject) => {
     let result = ''
     let goProcess = null
+    const commandPart = `"${functionCall}" "${jsonArguments}"`
 
     // Use 'extraResources' in electron-builder (electron-builder.yml) to include the 'bin' directory (containing binaries such as .exe files) in the 'resources' folder.
     // In this case, we should prefer 'extraResources' instead of 'asarUnpack' or 'extraFiles,' at least for these reasons:
@@ -29,7 +30,6 @@ async function toGoFunctionCall(functionCall, jsonArguments) {
     // - Using 'extraFiles' would place the files in the root directory (e.g., `win-unpacked/bin`), cluttering the app's root and making it harder to manage.
     // - Storing binaries in `resources/bin` keeps the app organized and follows Electron's convention for runtime dependencies.
 
-    // TODO: clean code
     // TODO: fix comments
 
     // extraResources:
@@ -41,38 +41,18 @@ async function toGoFunctionCall(functionCall, jsonArguments) {
     // Adding the parts '--mode preview' and '--mode production' to these scripts was needed.
     switch (import.meta.env.MODE) {
       case 'preview':
-        goProcess = exec(`go run . "${functionCall}" "${jsonArguments}"`, {
+        goProcess = exec(`go run . ${commandPart}`, {
           cwd: path.join(__dirname, '..', '..', 'go')
         })
         break
       case 'production':
         goProcess = exec(
-          `"${path.join(
-            process.resourcesPath,
-            'bin',
-            'markus-tools-go.exe'
-          )}" "${functionCall}" "${jsonArguments}"`
+          `"${path.join(process.resourcesPath, 'bin', 'markus-tools-go.exe')}" ${commandPart}`
         )
         break
       default:
       // TODO: error
     }
-
-    // build with: go build -o ../out/go/markus-tools-go.exe
-    // add to electron-builder.yml:
-    // asarUnpack:
-    //   - 'out/go/markus-tools-go.exe'
-    // build with: npm run build:win
-    // use this exec:
-    // const goProcess = exec(
-    //   `"${path.join(
-    //     process.resourcesPath,
-    //     'app.asar.unpacked',
-    //     'out',
-    //     'go',
-    //     'markus-tools-go.exe'
-    //   )}" "${functionCall}" "${jsonArguments}"`
-    // )
 
     goProcess.stdout.on('data', (data) => {
       result += data
