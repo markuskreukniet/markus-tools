@@ -30,8 +30,7 @@ async function toGoFunctionCall(functionCall, jsonArguments) {
     // - Using 'extraFiles' would place the files in the root directory (e.g., `win-unpacked/bin`), cluttering the app's root and making it harder to manage.
     // - Storing binaries in `resources/bin` keeps the app organized and follows Electron's convention for runtime dependencies.
 
-    // TODO: fix comments
-
+    // These lines should be part of the 'extraResources' part in electron-builder.yml:
     // extraResources:
     //  - from: 'out/bin'
     //    to: 'bin'
