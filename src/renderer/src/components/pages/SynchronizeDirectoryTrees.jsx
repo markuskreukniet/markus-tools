@@ -1,7 +1,6 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
-import ActivatableSubmitButton from '../activatableButton/ActivatableSubmitButton'
-import MaxOneDirectoryInput from '../filePathInput/MaxOneDirectoryInput'
+import SubmittableFileSystemNodeInputs from '../filePathInput/SubmittableFileSystemNodeInputs'
 
 export default function SynchronizeDirectoryTrees(props) {
   let sourceDirectoryFilePath = ''
@@ -49,12 +48,17 @@ export default function SynchronizeDirectoryTrees(props) {
     setGetOutput(setStateWithBE)
   }
 
+  const fileSystemNodesInputs = [
+    { fileSystemNodesInputType: 'maxOneDirectory', onChange: handleInputSourceDirectory },
+    { fileSystemNodesInputType: 'maxOneDirectory', onChange: handleInputDestinationDirectory }
+  ]
+
   const inputComponent = (
-    <div>
-      <MaxOneDirectoryInput onChange={handleInputSourceDirectory} />
-      <MaxOneDirectoryInput onChange={handleInputDestinationDirectory} />
-      <ActivatableSubmitButton active={hasValidInput()} onAction={submit} />
-    </div>
+    <SubmittableFileSystemNodeInputs
+      fileSystemNodesInputs={fileSystemNodesInputs}
+      hasValidInput={hasValidInput()}
+      onAction={submit}
+    />
   )
 
   return (
