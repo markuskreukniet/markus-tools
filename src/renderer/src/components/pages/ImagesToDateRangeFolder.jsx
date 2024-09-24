@@ -59,7 +59,6 @@ export default function imagesToDateRangeFolder(props) {
   ]
 
   // TODO: rename filePathInput directory in src\components to FileSystemNodesInput
-  // TODO: It should become a new component since this inputComponent is almost the same as the inputComponent from SynchronizeDirectoryTrees.
   const inputComponent = (
     <SubmittableFileSystemNodeInputs
       fileSystemNodesInputs={fileSystemNodesInputs}
