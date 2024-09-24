@@ -1,8 +1,7 @@
 import { createSignal } from 'solid-js'
 import TextResultPage from '../page/TextResultPage'
-import ActivatableSubmitButton from '../activatableButton/ActivatableSubmitButton'
-import FileSystemNodesInput from '../filePathInput/FileSystemNodesInput'
-import MaxOneDirectoryInput from '../filePathInput/MaxOneDirectoryInput'
+import SubmittableFileSystemNodeInputs from '../filePathInput/SubmittableFileSystemNodeInputs'
+
 import { toEitherRightResult } from '../../../../preload/monads/either'
 
 export default function imagesToDateRangeFolder(props) {
@@ -54,14 +53,19 @@ export default function imagesToDateRangeFolder(props) {
     setGetOutput(setStateWithBE(inputFilePathObjects, outputFilePath))
   }
 
+  const fileSystemNodesInputs = [
+    { fileSystemNodesInputType: 'all', onChange: handleInputFileSystemNodes },
+    { fileSystemNodesInputType: 'maxOneDirectory', onChange: handleOutputDirectory }
+  ]
+
   // TODO: rename filePathInput directory in src\components to FileSystemNodesInput
   // TODO: It should become a new component since this inputComponent is almost the same as the inputComponent from SynchronizeDirectoryTrees.
   const inputComponent = (
-    <div>
-      <FileSystemNodesInput onChange={handleInputFileSystemNodes} />
-      <MaxOneDirectoryInput onChange={handleOutputDirectory} />
-      <ActivatableSubmitButton active={hasValidInput()} onAction={submit} />
-    </div>
+    <SubmittableFileSystemNodeInputs
+      fileSystemNodesInputs={fileSystemNodesInputs}
+      hasValidInput={hasValidInput()}
+      onAction={submit}
+    />
   )
 
   return (
