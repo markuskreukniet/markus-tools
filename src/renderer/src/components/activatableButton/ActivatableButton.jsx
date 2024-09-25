@@ -14,14 +14,15 @@ export default function ActivatableButton(props) {
   })
 
   function getVariantAttribute(variant) {
-    if (variant === 'primary') {
-      return { id: 'button--primary' }
-    } else if (variant === 'secondary') {
-      return { class: 'button--secondary' }
-    } else if (variant === 'tertiary') {
-      return { class: 'button--tertiary' }
-    } else {
-      return null
+    switch (variant) {
+      case 'primary':
+        return { id: 'button--primary' }
+      case 'secondary':
+        return { class: 'button--secondary' }
+      case 'tertiary':
+        return { class: 'button--tertiary' }
+      default:
+        return null
     }
   }
 
