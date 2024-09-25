@@ -3,6 +3,8 @@ import ActivatableSubmitButton from '../activatableButton/ActivatableSubmitButto
 import { Either } from '../../../../preload/monads/either'
 import FileSystemNodesInput from './FileSystemNodesInput'
 
+// TODO: remove this component and use SubmittableFileSystemNodeInputs instead
+
 export default function SubmittableFileSystemNodesInput(props) {
   let selectedFileSystemNodes = []
   const [buttonActive, setButtonActive] = createSignal(false)
