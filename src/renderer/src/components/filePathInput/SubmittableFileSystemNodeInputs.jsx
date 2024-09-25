@@ -1,11 +1,22 @@
 import { For } from 'solid-js'
 import ActivatableSubmitButton from '../activatableButton/ActivatableSubmitButton'
+import { filePathSelectionType } from '../../../../preload/modules/files'
 import FileSystemNodesInput from './FileSystemNodesInput'
-import MaxOneDirectoryInput from './MaxOneDirectoryInput'
 
 // TODO: enum: all and maxOneDirectory
 
 export default function SubmittableFileSystemNodeInputs(props) {
+  function handleChange(result, handler) {
+    if (result.isRight()) {
+      if (result.value.hasFileSystemNode) {
+        result.value = result.value.selectedFileSystemNodes[0].path
+      } else {
+        result.value = ''
+      }
+    }
+    handler(result)
+  }
+
   return (
     <div>
       <For each={props.fileSystemNodesInputs}>
@@ -14,7 +25,13 @@ export default function SubmittableFileSystemNodeInputs(props) {
             case 'all':
               return <FileSystemNodesInput onChange={input.onChange} />
             case 'maxOneDirectory':
-              return <MaxOneDirectoryInput onChange={input.onChange} />
+              return (
+                <FileSystemNodesInput
+                  onChange={(result) => handleChange(result, input.onChange)}
+                  filePathSelectionType={filePathSelectionType.directory}
+                  maxOneInput
+                />
+              )
             default:
               // TODO: error
               return null
