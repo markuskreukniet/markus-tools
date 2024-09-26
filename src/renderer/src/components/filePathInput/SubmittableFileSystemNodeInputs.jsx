@@ -5,6 +5,8 @@ import FileSystemNodesInput from './FileSystemNodesInput'
 
 // TODO: enum: all and maxOneDirectory
 
+// TODO: is valid check should happen here
+
 export default function SubmittableFileSystemNodeInputs(props) {
   function handleChange(result, handler) {
     if (result.isRight()) {
@@ -41,4 +43,6 @@ export default function SubmittableFileSystemNodeInputs(props) {
       <ActivatableSubmitButton active={props.hasValidInput} onAction={props.onAction} />
     </div>
   )
+
+  // TODO: rename onAction to onChange???
 }
