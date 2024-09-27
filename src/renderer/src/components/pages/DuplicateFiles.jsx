@@ -8,9 +8,13 @@ export default function DuplicateFiles(props) {
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [result, setResult] = createSignal('')
 
-  async function setStateWithBE(filePathObjects) {
-    const duplicateFiles = await window.duplicateFiles.duplicateFilesBE(filePathObjects)
-    const textareaValue = duplicateFiles !== '' ? duplicateFiles : 'No duplicate files found'
+  async function setStateWithBE(uniqueFileSystemNodes) {
+    const duplicateFiles = await window.goBackend.goFunctionCallBE(
+      'getDuplicateFilesAsNewlineSeparatedStringToJSON',
+      { uniqueFileSystemNodes }
+    )
+    const textareaValue =
+      duplicateFiles.value !== '' ? duplicateFiles.value : 'No duplicate files found'
     setResult(textareaValue)
   }
 
