@@ -43,4 +43,6 @@ export default function SubmittableFileSystemNodeInputs(props) {
       <ActivatableSubmitButton active={props.hasValidInput} onAction={props.onAction} />
     </div>
   )
+
+  // TODO: rename onAction to onChange???
 }
