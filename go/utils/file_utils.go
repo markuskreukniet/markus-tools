@@ -8,6 +8,8 @@ import (
 	"unicode"
 )
 
+// TODO: remove FileSystemFileExtra with CreateFileSystemFileExtra
+
 type FileSystemFileExtra struct {
 	Hash           string
 	FileSystemFile FileSystemFile
@@ -33,15 +35,13 @@ func CreateFileSystemFile(data string, metadata FileMetadata) FileSystemFile {
 }
 
 type FileMetadata struct {
-	Name          string
-	DirectoryPath string
-	Path          string
-	TimeModified  time.Time
-	Size          int64
-	IsDirectory   bool // It should be a file type, but there is no use case.
+	Name, DirectoryPath, Path, Hash string
+	TimeModified                    time.Time
+	Size                            int64
+	IsDirectory                     bool // It should be a file type, but there is no use case.
 }
 
-func CreateFileMetadata(name, directoryPath, path string, timeModified time.Time, size int64, isDirectory bool) FileMetadata {
+func CreateFileMetadata(name, directoryPath, path, hash string, timeModified time.Time, size int64, isDirectory bool) FileMetadata {
 	return FileMetadata{
 		Name:          name,
 		DirectoryPath: directoryPath,
@@ -49,6 +49,7 @@ func CreateFileMetadata(name, directoryPath, path string, timeModified time.Time
 		TimeModified:  timeModified,
 		Size:          size,
 		IsDirectory:   isDirectory,
+		Hash:          hash,
 	}
 }
 
@@ -121,7 +122,7 @@ func ToFileSystemFile(filePath string) (FileSystemFile, error) {
 	isDirectory := info.IsDir()
 
 	return CreateFileSystemFile("",
-		CreateFileMetadata(info.Name(), toDirectoryPath(filePath, isDirectory), filePath, info.ModTime(), info.Size(), isDirectory)), nil
+		CreateFileMetadata(info.Name(), toDirectoryPath(filePath, isDirectory), filePath, "", info.ModTime(), info.Size(), isDirectory)), nil
 }
 
 func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileSystemFile) error) error {
@@ -161,7 +162,7 @@ func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode,
 		}
 
 		if err := handler(CreateFileSystemFile("",
-			CreateFileMetadata(fileInfo.Name(), toDirectoryPath(filePath, isDir), filePath, fileInfo.ModTime(), size, isDir))); err != nil {
+			CreateFileMetadata(fileInfo.Name(), toDirectoryPath(filePath, isDir), filePath, "", fileInfo.ModTime(), size, isDir))); err != nil {
 			return err
 		}
 
