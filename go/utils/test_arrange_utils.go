@@ -27,7 +27,7 @@ func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine stri
 		timeModified = TestingParseTime(t, fields[1])
 	}
 
-	return CreateFileSystemFile(data, CreateFileMetadata(name, directoryPath, filePath, timeModified, 0, isDirectory))
+	return CreateFileSystemFile(data, CreateFileMetadata(name, directoryPath, filePath, "", timeModified, 0, isDirectory))
 }
 
 func CreateSortedFileSystemFiles(t *testing.T, directoryPath, rawDelimitedSemicolonString string) []FileSystemFile {
