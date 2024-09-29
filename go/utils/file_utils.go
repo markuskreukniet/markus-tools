@@ -170,6 +170,29 @@ func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode,
 	})
 }
 
+func AppendNonZeroByteFilesNew(nodes []FileSystemNode, files *[]FileSystemFile) error {
+	handler := func(file FileSystemFile) error {
+		*files = append(*files, file)
+		return nil
+	}
+
+	for _, node := range nodes {
+		if node.IsDirectory {
+			if err := WalkFilterAndHandleFileSystemFile(node.Path, NonZeroByteFiles, AllFiles, handler); err != nil {
+				return err
+			}
+		} else {
+			file, err := ToFileSystemFile(node.Path)
+			if err != nil {
+				return err
+			}
+			handler(file)
+		}
+	}
+
+	return nil
+}
+
 func AppendNonZeroByteFiles(nodes []FileSystemNode, files *[]FileSystemFileExtra) error {
 	handler := func(file FileSystemFile) error {
 		*files = append(*files, CreateFileSystemFileExtra("", file))
