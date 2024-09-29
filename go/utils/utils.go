@@ -27,6 +27,65 @@ func WriteTwoNewlineStrings(builder *strings.Builder) (int, error) {
 }
 
 // TODO: does work, but can be improved?
+func CreateFileSystemFileExtraByHashGroupsNew(files []FileSystemFile, onlyDuplicates bool) ([][]FileSystemFile, error) {
+	if len(files) == 0 {
+		return nil, nil
+	}
+
+	type filesByFileSize struct {
+		fileSize int64
+		files    []FileSystemFile
+	}
+
+	var result [][]FileSystemFile
+	var groups []filesByFileSize
+	sizeIndex := 0
+
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].FileMetadata.Size < files[j].FileMetadata.Size
+	})
+
+	groups = append(groups, filesByFileSize{
+		fileSize: files[0].FileMetadata.Size,
+		files:    []FileSystemFile{files[0]},
+	})
+
+	for i := 1; i < len(files); i++ {
+		if files[i].FileMetadata.Size == groups[sizeIndex].files[0].FileMetadata.Size {
+			groups[sizeIndex].files = append(groups[sizeIndex].files, files[i])
+		} else {
+			groups = append(groups, filesByFileSize{
+				fileSize: files[i].FileMetadata.Size,
+				files:    []FileSystemFile{files[i]},
+			})
+			sizeIndex++
+		}
+	}
+
+	for _, group := range groups {
+		if len(group.files) > 1 {
+			hashMap := make(map[string][]FileSystemFile)
+			for _, file := range group.files {
+				var err error
+				if file.FileMetadata.Hash, err = HashFile(file.FileMetadata.Path); err != nil {
+					return nil, err
+				}
+				hashMap[file.FileMetadata.Hash] = append(hashMap[file.FileMetadata.Hash], file)
+			}
+			for _, hashedFiles := range hashMap {
+				if len(hashedFiles) > 1 || !onlyDuplicates {
+					result = append(result, hashedFiles)
+				}
+			}
+		} else if !onlyDuplicates {
+			result = append(result, group.files)
+		}
+	}
+
+	return result, nil
+}
+
+// TODO: does work, but can be improved?
 func CreateFileSystemFileExtraByHashGroups(files []FileSystemFileExtra, onlyDuplicates bool) ([][]FileSystemFileExtra, error) {
 	if len(files) == 0 {
 		return nil, nil
