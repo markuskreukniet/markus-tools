@@ -170,6 +170,7 @@ func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode,
 	})
 }
 
+// TODO: remove rename without New and remove the other duplicate function
 func AppendNonZeroByteFilesNew(nodes []FileSystemNode, files *[]FileSystemFile) error {
 	handler := func(file FileSystemFile) error {
 		*files = append(*files, file)

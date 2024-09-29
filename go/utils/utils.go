@@ -27,6 +27,7 @@ func WriteTwoNewlineStrings(builder *strings.Builder) (int, error) {
 }
 
 // TODO: does work, but can be improved?
+// TODO: remove rename without New and remove the other duplicate function
 func CreateFileSystemFileExtraByHashGroupsNew(files []FileSystemFile, onlyDuplicates bool) ([][]FileSystemFile, error) {
 	if len(files) == 0 {
 		return nil, nil
