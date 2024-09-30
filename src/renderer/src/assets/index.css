@@ -42,11 +42,12 @@ html, .text-area__custom-placeholder {
 body, #app__container, #navigation-bar, #page-navigator__page-wrapper,
 .file-system-nodes-input__file-path-selector-container, .file-system-nodes-input__submission-buttons,
 .text-area__custom-placeholder,
-.references-by-urls__input-component {
+.references-by-urls__input-component,
+.submittable-file-system-node-inputs {
   display: flex;
 }
 
-body, #app__container, .references-by-urls__input-component {
+body, #app__container, .references-by-urls__input-component, .submittable-file-system-node-inputs {
   flex-direction: column;
 }
 
@@ -72,7 +73,7 @@ h1, h2 {
   line-height: 1;
 }
 
-h1, h2, ul, .file-system-nodes-input__submission-buttons, .references-by-urls__input-component {
+h1, h2, ul, .file-system-nodes-input__submission-buttons, .references-by-urls__input-component, .submittable-file-system-node-inputs {
   padding-bottom: var(--size-1);
 }
 
@@ -150,7 +151,7 @@ textarea, .button--secondary, .text-area__custom-placeholder {
   justify-content: center;
 }
 
-.file-system-nodes-input__submission-buttons {
+.file-system-nodes-input__submission-buttons, .submittable-file-system-node-inputs {
   justify-content: flex-end;
 }
 
