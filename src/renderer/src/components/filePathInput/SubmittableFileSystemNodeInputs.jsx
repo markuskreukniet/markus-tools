@@ -20,7 +20,7 @@ export default function SubmittableFileSystemNodeInputs(props) {
   }
 
   return (
-    <div>
+    <div class="submittable-file-system-node-inputs">
       <For each={props.fileSystemNodesInputs}>
         {(input) => {
           switch (input.fileSystemNodesInputType) {
