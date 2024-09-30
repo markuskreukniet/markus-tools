@@ -22,7 +22,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 		return "", err
 	}
 
-	groups, err := utils.CreateFileSystemFileExtraByHashGroupsNew(files, true)
+	groups, err := utils.CreateFileSystemFileByHashGroups(files, true)
 	if err != nil {
 		return "", err
 	}
