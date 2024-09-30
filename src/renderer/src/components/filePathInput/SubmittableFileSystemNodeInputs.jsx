@@ -40,7 +40,9 @@ export default function SubmittableFileSystemNodeInputs(props) {
           }
         }}
       </For>
-      <ActivatableSubmitButton active={props.hasValidInput} onAction={props.onAction} />
+      <div class="submittable-file-system-node-inputs__activatable-submit-button-wrapper">
+        <ActivatableSubmitButton active={props.hasValidInput} onAction={props.onAction} />
+      </div>
     </div>
   )
 
