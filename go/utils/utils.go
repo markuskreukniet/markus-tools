@@ -85,65 +85,6 @@ func CreateFileSystemFileByHashGroups(files []FileSystemFile, onlyDuplicates boo
 	return result, nil
 }
 
-// TODO: remove
-func CreateFileSystemFileExtraByHashGroups(files []FileSystemFileExtra, onlyDuplicates bool) ([][]FileSystemFileExtra, error) {
-	if len(files) == 0 {
-		return nil, nil
-	}
-
-	type filesByFileSize struct {
-		fileSize int64
-		files    []FileSystemFileExtra
-	}
-
-	var result [][]FileSystemFileExtra
-	var groups []filesByFileSize
-	sizeIndex := 0
-
-	sort.Slice(files, func(i, j int) bool {
-		return files[i].FileSystemFile.FileMetadata.Size < files[j].FileSystemFile.FileMetadata.Size
-	})
-
-	groups = append(groups, filesByFileSize{
-		fileSize: files[0].FileSystemFile.FileMetadata.Size,
-		files:    []FileSystemFileExtra{files[0]},
-	})
-
-	for i := 1; i < len(files); i++ {
-		if files[i].FileSystemFile.FileMetadata.Size == groups[sizeIndex].files[0].FileSystemFile.FileMetadata.Size {
-			groups[sizeIndex].files = append(groups[sizeIndex].files, files[i])
-		} else {
-			groups = append(groups, filesByFileSize{
-				fileSize: files[i].FileSystemFile.FileMetadata.Size,
-				files:    []FileSystemFileExtra{files[i]},
-			})
-			sizeIndex++
-		}
-	}
-
-	for _, group := range groups {
-		if len(group.files) > 1 {
-			hashMap := make(map[string][]FileSystemFileExtra)
-			for _, file := range group.files {
-				var err error
-				if file.Hash, err = HashFile(file.FileSystemFile.FileMetadata.Path); err != nil {
-					return nil, err
-				}
-				hashMap[file.Hash] = append(hashMap[file.Hash], file)
-			}
-			for _, hashedFiles := range hashMap {
-				if len(hashedFiles) > 1 || !onlyDuplicates {
-					result = append(result, hashedFiles)
-				}
-			}
-		} else if !onlyDuplicates {
-			result = append(result, group.files)
-		}
-	}
-
-	return result, nil
-}
-
 // func CreateDuplicateFileGroups(files []FileData) (FilesDataGroups, error) {
 // 	sort.Slice(files, func(i, j int) bool {
 // 		return files[i].FileMetadata.Size < files[j].FileMetadata.Size
