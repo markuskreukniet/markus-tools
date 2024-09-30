@@ -7,17 +7,16 @@ import (
 	"testing"
 )
 
-func appendFileSystemFilesExtra(filePath string, files *[]FileSystemFileExtra) error {
+func appendFileSystemFiles(filePath string, files *[]FileSystemFile) error {
 	handler := func(file FileSystemFile) error {
-		hash := ""
 		if !file.FileMetadata.IsDirectory {
 			var err error
-			hash, err = HashFile(file.FileMetadata.Path)
+			file.FileMetadata.Hash, err = HashFile(file.FileMetadata.Path)
 			if err != nil {
 				return err
 			}
 		}
-		*files = append(*files, CreateFileSystemFileExtra(hash, file))
+		*files = append(*files, file)
 		return nil
 	}
 
@@ -28,38 +27,38 @@ func appendFileSystemFilesExtra(filePath string, files *[]FileSystemFileExtra) e
 	return nil
 }
 
-func areFileSystemFilesExtraIdentical(fileI, fileJ FileSystemFileExtra, filePathI, filePathJ string) (bool, error) {
+func areFileSystemFilesExtraIdentical(fileI, fileJ FileSystemFile, filePathI, filePathJ string) (bool, error) {
 	// FileMetadata
 	// TODO: compare TimeModified
-	if fileI.FileSystemFile.FileMetadata.IsDirectory != fileJ.FileSystemFile.FileMetadata.IsDirectory ||
-		fileI.FileSystemFile.FileMetadata.Name != fileJ.FileSystemFile.FileMetadata.Name ||
-		fileI.FileSystemFile.FileMetadata.Size != fileJ.FileSystemFile.FileMetadata.Size {
+	if fileI.FileMetadata.IsDirectory != fileJ.FileMetadata.IsDirectory ||
+		fileI.FileMetadata.Name != fileJ.FileMetadata.Name ||
+		fileI.FileMetadata.Size != fileJ.FileMetadata.Size ||
+		fileI.FileMetadata.Hash != fileJ.FileMetadata.Hash {
 		return false, nil
 	}
 
-	relativeI, err := filepath.Rel(filePathI, fileI.FileSystemFile.FileMetadata.Path)
+	relativeI, err := filepath.Rel(filePathI, fileI.FileMetadata.Path)
 	if err != nil {
 		return false, err
 	}
 
-	relativeJ, err := filepath.Rel(filePathJ, fileJ.FileSystemFile.FileMetadata.Path)
+	relativeJ, err := filepath.Rel(filePathJ, fileJ.FileMetadata.Path)
 	if err != nil {
 		return false, err
 	}
 
-	// FileSystemFile and FileSystemFileExtra
+	// FileSystemFile
 	if relativeI != relativeJ ||
-		fileI.FileSystemFile.Data != fileJ.FileSystemFile.Data ||
-		fileI.Hash != fileJ.Hash {
+		fileI.Data != fileJ.Data {
 		return false, nil
 	}
 
 	return true, nil
 }
 
-func sortFileSystemFilesExtraOnName(files *[]FileSystemFileExtra) {
+func sortFileSystemFilesExtraOnName(files *[]FileSystemFile) {
 	sort.Slice(*files, func(i, j int) bool {
-		return (*files)[i].FileSystemFile.FileMetadata.Name < (*files)[j].FileSystemFile.FileMetadata.Name
+		return (*files)[i].FileMetadata.Name < (*files)[j].FileMetadata.Name
 	})
 }
 
@@ -68,12 +67,12 @@ func AreFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) 
 		return false, nil
 	}
 
-	var filesI, filesJ []FileSystemFileExtra
+	var filesI, filesJ []FileSystemFile
 
-	if err := appendFileSystemFilesExtra(filePathI, &filesI); err != nil {
+	if err := appendFileSystemFiles(filePathI, &filesI); err != nil {
 		return false, err
 	}
-	if err := appendFileSystemFilesExtra(filePathJ, &filesJ); err != nil {
+	if err := appendFileSystemFiles(filePathJ, &filesJ); err != nil {
 		return false, err
 	}
 
@@ -83,8 +82,8 @@ func AreFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) 
 		return false, nil
 	}
 
-	filesI[0].FileSystemFile.FileMetadata.Name = ""
-	filesJ[0].FileSystemFile.FileMetadata.Name = ""
+	filesI[0].FileMetadata.Name = ""
+	filesJ[0].FileMetadata.Name = ""
 
 	sortFileSystemFilesExtraOnName(&filesI)
 	sortFileSystemFilesExtraOnName(&filesJ)
