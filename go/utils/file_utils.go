@@ -8,20 +8,6 @@ import (
 	"unicode"
 )
 
-// TODO: remove FileSystemFileExtra with CreateFileSystemFileExtra
-
-type FileSystemFileExtra struct {
-	Hash           string
-	FileSystemFile FileSystemFile
-}
-
-func CreateFileSystemFileExtra(hash string, file FileSystemFile) FileSystemFileExtra {
-	return FileSystemFileExtra{
-		Hash:           hash,
-		FileSystemFile: file,
-	}
-}
-
 type FileSystemFile struct {
 	Data         string
 	FileMetadata FileMetadata
