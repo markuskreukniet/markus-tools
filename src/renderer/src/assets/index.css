@@ -39,7 +39,7 @@ html, .text-area__custom-placeholder {
   font-size: 16px;
 }
 
-body, #app__container, #navigation-bar, #page-navigator__page-wrapper,
+body, #app, #navigation-bar, #page-navigator__page-wrapper,
 .file-system-nodes-input__file-path-selector-container, .file-system-nodes-input__submission-buttons,
 .text-area__custom-placeholder,
 .references-by-urls__input-component,
@@ -47,7 +47,7 @@ body, #app__container, #navigation-bar, #page-navigator__page-wrapper,
   display: flex;
 }
 
-body, #app__container, .references-by-urls__input-component, .submittable-file-system-node-inputs {
+body, #app, .references-by-urls__input-component, .submittable-file-system-node-inputs {
   flex-direction: column;
 }
 
@@ -141,7 +141,7 @@ textarea, .button--secondary, .text-area__custom-placeholder {
   border: solid var(--border-width-5) var(--secondary-color) !important;
 }
 
-#app__container {
+#app {
   max-width: calc(var(--size-1) * 55);
   margin: 0 auto;
   padding: var(--size-1) var(--size-2);

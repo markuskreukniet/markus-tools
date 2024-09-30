@@ -51,7 +51,7 @@ function App() {
   }
 
   return (
-    <div id="app__container">
+    <div id="app">
       <PageNavigator
         navigationBarItemPageCombinations={navigationBarItemPageCombinations}
         activeNavigationBarItem={activeNavigationBarItem}
