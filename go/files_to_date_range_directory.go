@@ -50,17 +50,17 @@ func createDirectoryDateRangeName(startTime, endTime time.Time) string {
 	return fmt.Sprintf("%s - %s", start, end)
 }
 
-func deleteFiles(files []utils.FileSystemFileExtra) error {
+func deleteFiles(files []utils.FileSystemFile) error {
 	for _, file := range files {
-		if err := os.Remove(file.FileSystemFile.FileMetadata.Path); err != nil {
+		if err := os.Remove(file.FileMetadata.Path); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func filterAndDeleteRemainderFiles(files *[]utils.FileSystemFileExtra, handler func([]utils.FileSystemFileExtra, *[]utils.FileSystemFileExtra, *[]utils.FileSystemFileExtra) error) error {
-	var filteredFiles, remainderFiles []utils.FileSystemFileExtra
+func filterAndDeleteRemainderFiles(files *[]utils.FileSystemFile, handler func([]utils.FileSystemFile, *[]utils.FileSystemFile, *[]utils.FileSystemFile) error) error {
+	var filteredFiles, remainderFiles []utils.FileSystemFile
 
 	err := handler(*files, &filteredFiles, &remainderFiles)
 	if err != nil {
@@ -78,19 +78,19 @@ func filterAndDeleteRemainderFiles(files *[]utils.FileSystemFileExtra, handler f
 }
 
 // garbage collection: handler
-func createFileHandlers(filePath string) []func([]utils.FileSystemFileExtra, *[]utils.FileSystemFileExtra, *[]utils.FileSystemFileExtra) error {
-	var handlers []func([]utils.FileSystemFileExtra, *[]utils.FileSystemFileExtra, *[]utils.FileSystemFileExtra) error
+func createFileHandlers(filePath string) []func([]utils.FileSystemFile, *[]utils.FileSystemFile, *[]utils.FileSystemFile) error {
+	var handlers []func([]utils.FileSystemFile, *[]utils.FileSystemFile, *[]utils.FileSystemFile) error
 
 	// shortest file name
-	handler := func(unfilteredFiles []utils.FileSystemFileExtra, filteredFiles, remainderFiles *[]utils.FileSystemFileExtra) error {
+	handler := func(unfilteredFiles []utils.FileSystemFile, filteredFiles, remainderFiles *[]utils.FileSystemFile) error {
 		minimumLength := 0
 
 		for _, file := range unfilteredFiles {
-			length := len(file.FileSystemFile.FileMetadata.Name)
+			length := len(file.FileMetadata.Name)
 			if length < minimumLength || minimumLength == 0 {
 				minimumLength = length
 				*remainderFiles = append(*remainderFiles, *filteredFiles...)
-				*filteredFiles = []utils.FileSystemFileExtra{file}
+				*filteredFiles = []utils.FileSystemFile{file}
 			} else if length == minimumLength {
 				*filteredFiles = append(*filteredFiles, file)
 			} else {
@@ -103,9 +103,9 @@ func createFileHandlers(filePath string) []func([]utils.FileSystemFileExtra, *[]
 	handlers = append(handlers, handler)
 
 	// valid name of date directory or date range directory
-	handler = func(unfilteredFiles []utils.FileSystemFileExtra, filteredFiles, remainderFiles *[]utils.FileSystemFileExtra) error {
+	handler = func(unfilteredFiles []utils.FileSystemFile, filteredFiles, remainderFiles *[]utils.FileSystemFile) error {
 		for _, file := range unfilteredFiles {
-			directory := filepath.Dir(file.FileSystemFile.FileMetadata.Path)
+			directory := filepath.Dir(file.FileMetadata.Path)
 			child, err := isDirectoryChild(filePath, directory)
 			if err != nil {
 				return err
@@ -122,9 +122,9 @@ func createFileHandlers(filePath string) []func([]utils.FileSystemFileExtra, *[]
 	handlers = append(handlers, handler)
 
 	// destination directory
-	handler = func(unfilteredFiles []utils.FileSystemFileExtra, filteredFiles, remainderFiles *[]utils.FileSystemFileExtra) error {
+	handler = func(unfilteredFiles []utils.FileSystemFile, filteredFiles, remainderFiles *[]utils.FileSystemFile) error {
 		for _, file := range unfilteredFiles {
-			child, err := isDirectoryChild(filePath, file.FileSystemFile.FileMetadata.Path)
+			child, err := isDirectoryChild(filePath, file.FileMetadata.Path)
 			if err != nil {
 				return err
 			}
@@ -140,15 +140,15 @@ func createFileHandlers(filePath string) []func([]utils.FileSystemFileExtra, *[]
 	handlers = append(handlers, handler)
 
 	// newest modification time
-	handler = func(unfilteredFiles []utils.FileSystemFileExtra, filteredFiles, remainderFiles *[]utils.FileSystemFileExtra) error {
+	handler = func(unfilteredFiles []utils.FileSystemFile, filteredFiles, remainderFiles *[]utils.FileSystemFile) error {
 		var newestTime time.Time
 
 		for _, file := range unfilteredFiles {
-			if file.FileSystemFile.FileMetadata.TimeModified.After(newestTime) {
-				newestTime = file.FileSystemFile.FileMetadata.TimeModified
+			if file.FileMetadata.TimeModified.After(newestTime) {
+				newestTime = file.FileMetadata.TimeModified
 				*remainderFiles = append(*remainderFiles, *filteredFiles...)
-				*filteredFiles = []utils.FileSystemFileExtra{file}
-			} else if file.FileSystemFile.FileMetadata.TimeModified.Equal(newestTime) {
+				*filteredFiles = []utils.FileSystemFile{file}
+			} else if file.FileMetadata.TimeModified.Equal(newestTime) {
 				*filteredFiles = append(*filteredFiles, file)
 			} else {
 				*remainderFiles = append(*remainderFiles, file)
@@ -164,8 +164,8 @@ func createFileHandlers(filePath string) []func([]utils.FileSystemFileExtra, *[]
 
 // Each handler loops unfilteredFiles, but the code is clean enough.
 // garbage collection: groups
-func filterAndDeleteDuplicateFiles(files []utils.FileSystemFileExtra, destinationDirectory string) ([]utils.FileSystemFileExtra, error) {
-	groups, err := utils.CreateFileSystemFileExtraByHashGroups(files, false)
+func filterAndDeleteDuplicateFiles(files []utils.FileSystemFile, destinationDirectory string) ([]utils.FileSystemFile, error) {
+	groups, err := utils.CreateFileSystemFileByHashGroups(files, false)
 	if err != nil {
 		return nil, err
 	}
@@ -208,7 +208,7 @@ func isDirectoryChild(filePath, childFilePath string) (bool, error) {
 	return !strings.HasPrefix(path, "..") && !strings.Contains(path, utils.FilePathSeparator), nil
 }
 
-func appendPathsAndFilesByReadingDirectoryTree(path string, paths *[]string, files *[]utils.FileSystemFileExtra) error {
+func appendPathsAndFilesByReadingDirectoryTree(path string, paths *[]string, files *[]utils.FileSystemFile) error {
 	handler := func(_, path string, stack *[]string) {
 		*paths = append(*paths, path)
 		*stack = append(*stack, path)
@@ -225,7 +225,7 @@ func appendPathsAndFilesByReadingDirectoryTree(path string, paths *[]string, fil
 	return nil
 }
 
-func appendPathsAndFilesByReadingDirectory(path string, handler func(string, string, *[]string), files *[]utils.FileSystemFileExtra, stack *[]string) error {
+func appendPathsAndFilesByReadingDirectory(path string, handler func(string, string, *[]string), files *[]utils.FileSystemFile, stack *[]string) error {
 	entries, err := os.ReadDir(path)
 	if err != nil {
 		return err
@@ -241,17 +241,16 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 				return err
 			}
 			*files = append(*files,
-				utils.CreateFileSystemFileExtra("",
-					utils.CreateFileSystemFile("",
-						utils.CreateFileMetadata(info.Name(), path, fullPath, "", info.ModTime(), info.Size(), false))))
+				utils.CreateFileSystemFile("",
+					utils.CreateFileMetadata(info.Name(), path, fullPath, "", info.ModTime(), info.Size(), false)))
 		}
 	}
 	return nil
 }
 
 // garbage collection: handler
-func createFilesAndDirectoryFilePaths(filePath string) ([]utils.FileSystemFileExtra, []string, []string, error) {
-	var files []utils.FileSystemFileExtra
+func createFilesAndDirectoryFilePaths(filePath string) ([]utils.FileSystemFile, []string, []string, error) {
+	var files []utils.FileSystemFile
 	var goodDirectoryFilePaths []string
 	var badDirectoryFilePaths []string
 
@@ -286,23 +285,23 @@ func createFilesAndDirectoryFilePaths(filePath string) ([]utils.FileSystemFileEx
 
 // TODO: Does not work efficient, could be done without making groups?
 // garbage collection: length, groups, groupIndex
-func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.FileSystemFileExtra, filePaths []string, filePath string) ([]string, error) {
+func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.FileSystemFile, filePaths []string, filePath string) ([]string, error) {
 	length := len(files)
 
 	if length == 0 {
 		return filePaths, nil
 	}
 
-	groups := [][]utils.FileSystemFileExtra{{files[0]}}
+	groups := [][]utils.FileSystemFile{{files[0]}}
 	groupIndex := 0
 
 	for i := 1; i < length; i++ {
 		iMinusOne := i - 1
-		if isWithin72Hours(files[iMinusOne].FileSystemFile.FileMetadata.TimeModified, files[i].FileSystemFile.FileMetadata.TimeModified) {
+		if isWithin72Hours(files[iMinusOne].FileMetadata.TimeModified, files[i].FileMetadata.TimeModified) {
 			groups[groupIndex] = append(groups[groupIndex], files[i])
 		} else {
 			groupIndex++
-			groups = append(groups, []utils.FileSystemFileExtra{files[i]})
+			groups = append(groups, []utils.FileSystemFile{files[i]})
 		}
 	}
 
@@ -310,10 +309,10 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 		length = len(group)
 		lengthMinusOne := length - 1
 		var name string
-		if group[0].FileSystemFile.FileMetadata.TimeModified == group[lengthMinusOne].FileSystemFile.FileMetadata.TimeModified {
-			name = toDateFormat(group[0].FileSystemFile.FileMetadata.TimeModified)
+		if group[0].FileMetadata.TimeModified == group[lengthMinusOne].FileMetadata.TimeModified {
+			name = toDateFormat(group[0].FileMetadata.TimeModified)
 		} else {
-			name = createDirectoryDateRangeName(group[0].FileSystemFile.FileMetadata.TimeModified, group[lengthMinusOne].FileSystemFile.FileMetadata.TimeModified)
+			name = createDirectoryDateRangeName(group[0].FileMetadata.TimeModified, group[lengthMinusOne].FileMetadata.TimeModified)
 		}
 		directoryFilePath := filepath.Join(filePath, name)
 		isDirectoryFound := false
@@ -336,7 +335,7 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 		// TODO clean and make it more efficient
 		// add files
 		for _, file := range group {
-			fullFilePath := filepath.Join(directoryFilePath, file.FileSystemFile.FileMetadata.Name)
+			fullFilePath := filepath.Join(directoryFilePath, file.FileMetadata.Name)
 			exists, err := utils.FileExists(fullFilePath)
 			if err != nil {
 				return nil, err
@@ -348,23 +347,23 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 				if err != nil {
 					return nil, err
 				}
-				if file.Hash == "" {
-					file.Hash, err = utils.HashFile(file.FileSystemFile.FileMetadata.Path)
+				if file.FileMetadata.Hash == "" {
+					file.FileMetadata.Hash, err = utils.HashFile(file.FileMetadata.Path)
 					if err != nil {
 						return nil, err
 					}
 				}
-				if hash != file.Hash {
-					extension := filepath.Ext(file.FileSystemFile.FileMetadata.Name)
-					nameWithoutExtension := strings.TrimSuffix(file.FileSystemFile.FileMetadata.Name, extension)
+				if hash != file.FileMetadata.Hash {
+					extension := filepath.Ext(file.FileMetadata.Name)
+					nameWithoutExtension := strings.TrimSuffix(file.FileMetadata.Name, extension)
 					fullFilePath = filepath.Join(directoryFilePath, nameWithoutExtension+" 2"+extension)
 
-					if err := os.Rename(file.FileSystemFile.FileMetadata.Path, fullFilePath); err != nil {
+					if err := os.Rename(file.FileMetadata.Path, fullFilePath); err != nil {
 						return nil, err
 					}
 				}
 			} else {
-				if err := os.Rename(file.FileSystemFile.FileMetadata.Path, fullFilePath); err != nil {
+				if err := os.Rename(file.FileMetadata.Path, fullFilePath); err != nil {
 					return nil, err
 				}
 			}
@@ -380,7 +379,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		return err
 	}
 
-	if err := utils.AppendNonZeroByteFiles(uniqueFileSystemNodes, &files); err != nil {
+	if err := utils.AppendNonZeroByteFilesNew(uniqueFileSystemNodes, &files); err != nil {
 		return err
 	}
 
@@ -390,7 +389,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	}
 
 	sort.Slice(files, func(i, j int) bool {
-		return files[i].FileSystemFile.FileMetadata.TimeModified.Before(files[j].FileSystemFile.FileMetadata.TimeModified)
+		return files[i].FileMetadata.TimeModified.Before(files[j].FileMetadata.TimeModified)
 	})
 
 	// TODO: goodDirectoryFilePaths should work with reference?
