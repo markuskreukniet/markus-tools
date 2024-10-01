@@ -51,9 +51,7 @@ func copyFileWithFileMode(sourceFilePath string, destinationFilePath string, fil
 		return err
 	}
 	defer destinationFile.Close()
-	// TODO: if?
-	_, err = io.Copy(destinationFile, sourceFile)
-	if err != nil {
+	if _, err = io.Copy(destinationFile, sourceFile); err != nil {
 		return err
 	}
 	return os.Chmod(destinationFilePath, fileMode)
