@@ -126,8 +126,12 @@ textarea, .button--secondary, .text-area__custom-placeholder {
   border: var(--secondary-color-border);
 }
 
-.references-by-urls__input-component, .text-area__custom-placeholder {
+.text-area__custom-placeholder {
   align-items: flex-start;
+}
+
+.references-by-urls__input-component {
+  align-items: flex-end;
 }
 
 .text-area__custom-placeholder {
@@ -152,8 +156,7 @@ textarea, .button--secondary, .text-area__custom-placeholder {
   justify-content: center;
 }
 
-.file-system-nodes-input__submission-buttons,
-.submittable-file-system-node-inputs, .submittable-file-system-node-inputs__activatable-submit-button-wrapper {
+.file-system-nodes-input__submission-buttons, .submittable-file-system-node-inputs__activatable-submit-button-wrapper {
   justify-content: flex-end;
 }
 
