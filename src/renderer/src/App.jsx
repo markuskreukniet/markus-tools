@@ -5,7 +5,7 @@ import LinesOfCode from './components/pages/LinesOfCode'
 import PlainTextFilesToText from './components/pages/PlainTextFilesToText'
 import ReferencesByUrls from './components/pages/ReferencesByUrls'
 import SynchronizeDirectoryTrees from './components/pages/SynchronizeDirectoryTrees'
-import Loader from './components/Loader'
+import LoadingSpinner from './components/LoadingSpinner'
 import PageNavigator from './components/PageNavigator'
 // import logo from './assets/logo.svg'
 
@@ -56,7 +56,7 @@ function App() {
         navigationBarItemPageCombinations={navigationBarItemPageCombinations}
         activeNavigationBarItem={activeNavigationBarItem}
       />
-      <Loader loading={loading()} />
+      <LoadingSpinner loading={loading()} />
 
       {/* <img class="hero-logo" src={logo} alt="logo" />
       <h2 class="hero-text">You{"'"}ve successfully created an Electron project with Solid</h2>
