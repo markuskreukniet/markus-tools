@@ -169,7 +169,7 @@ textarea, .button--secondary, .text-area__custom-placeholder {
   width: calc(var(--size-1) * 34);
 }
 
-#loader {
+#loading-spinner {
   border: var(--size-1-s) solid var(--secondary-color);
   border-top: var(--size-1-s) solid var(--tertiary-color);
   border-radius: 50%;
