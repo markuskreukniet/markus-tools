@@ -14,14 +14,27 @@ An Electron application with Solid
 $ npm install
 ```
 
+#### Go
+
+We should have installed Go on our local machine to run the Go code. We can install go from [go.dev](https://go.dev/doc/install).
+
+We can install the [Delve](https://github.com/go-delve/delve) debugger, which this project supports.
+
 ### Development
 
 ```bash
 $ npm run dev
 ```
 
-Rules:
-- Don't use CSS Margins: https://www.youtube.com/watch?v=KVQMoEFUee8
+### Unit Testing
+
+#### Go
+
+With `go test`, we can run unit test from 'markus-tools/go' to test the 'go' directory and from 'markus-tools/go/utils' to test the 'go/utils' directory.
+
+### Rules
+
+- We should not use CSS margins. This [video](https://www.youtube.com/watch?v=KVQMoEFUee8) can explain why we should not use it.
 
 ### Build
 
