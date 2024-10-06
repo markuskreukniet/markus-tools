@@ -26,6 +26,11 @@ We can install the [Delve](https://github.com/go-delve/delve) debugger, which th
 $ npm run dev
 ```
 
+<!--
+TODO: how to install: IntelliJ IDEA, OpenJDK (if it is used)
+TODO: JUnit, how to to name unit tests,iven-When-Then
+-->
+
 ### Unit Testing
 
 #### Go
