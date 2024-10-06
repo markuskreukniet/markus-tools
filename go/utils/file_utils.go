@@ -30,8 +30,8 @@ type FileMetadata struct {
 func CreateFileMetadata(name, directoryPath, path, hash string, timeModified time.Time, size int64, isDirectory bool) FileMetadata {
 	return FileMetadata{
 		Name:          name,
-		DirectoryPath: directoryPath,
-		Path:          path,
+		DirectoryPath: directoryPath, // TODO: absoluteDirectoryPath better naming?
+		Path:          path,          // TODO: absolutePath better naming?
 		TimeModified:  timeModified,
 		Size:          size,
 		IsDirectory:   isDirectory,
