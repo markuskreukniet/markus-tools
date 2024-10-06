@@ -17,6 +17,7 @@ func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []uti
 
 func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.FileSystemNode) (string, error) {
 	var result strings.Builder
+	// TODO: should be FileMetadata
 	var files []utils.FileSystemFile
 	if err := utils.AppendNonZeroByteFiles(uniqueFileSystemNodes, &files); err != nil {
 		return "", err
