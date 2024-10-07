@@ -70,7 +70,7 @@ fun ToFileMetadata(absoluteFilePath: String): FileMetadata? {
 
   return FileMetadata(
     name = file.name,
-    absoluteDirectoryPath = "",
+    absoluteDirectoryPath = "", // TODO:
     absolutePath = absoluteFilePath,
     timeModified = file.lastModified(),
     size = file.length(),
