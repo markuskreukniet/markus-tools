@@ -134,7 +134,7 @@ func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode,
 			return nil
 		}
 
-		// zero byte file check
+		// is zero byte file check
 		if !isDir && size == 0 && (mode == NonZeroByteFiles || mode == NonZeroByteFilesAndDirectories) {
 			return nil
 		}

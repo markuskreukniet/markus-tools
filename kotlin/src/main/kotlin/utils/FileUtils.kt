@@ -11,7 +11,7 @@ data class FileMetadata(
   val timeModified: Long,
   val size: Long,
   val isDirectory: Boolean,
-  var hash: String,
+  var hash: String
 )
 
 enum class FileFilterMode {
@@ -19,11 +19,17 @@ enum class FileFilterMode {
   NON_ZERO_BYTE_FILES,
   FILES_AND_DIRECTORIES,
   NON_ZERO_BYTE_FILES_AND_DIRECTORIES,
-  DIRECTORIES,
+  DIRECTORIES
 }
 
-fun WalkFilterAndHandleFileMetadata(absoluteFilePath: String, mode: FileFilterMode, handler: (FileMetadata?)) {
-  val rootDirectory = File("path/to/your/directory")
+enum class FileType {
+  ALL_FILES,
+  PLAIN_TEXT_FILES
+}
+
+fun WalkFilterAndHandleFileMetadata(
+  absoluteFilePath: String, mode: FileFilterMode, type: FileType, handler: (FileMetadata?) -> Unit) {
+  val rootDirectory = File(absoluteFilePath)
 
   for (file in rootDirectory.walk()) {
     var size: Long = 0L
@@ -37,12 +43,18 @@ fun WalkFilterAndHandleFileMetadata(absoluteFilePath: String, mode: FileFilterMo
     }
 
     // is directory check
-    if (file.isDirectory && (mode == FileFilterMode.FILES) || mode == FileFilterMode.NON_ZERO_BYTE_FILES) {
+    if (file.isDirectory && (mode == FileFilterMode.FILES || mode == FileFilterMode.NON_ZERO_BYTE_FILES)) {
       continue
     }
 
+    // file type check
+    if (type == FileType.PLAIN_TEXT_FILES) {
+      continue // TODO:
+    }
+
     // is zero byte file check
-    if (file.isFile && size == 0L && (mode == FileFilterMode.NON_ZERO_BYTE_FILES || mode == FileFilterMode.NON_ZERO_BYTE_FILES_AND_DIRECTORIES)) {
+    if (file.isFile && size == 0L &&
+      (mode == FileFilterMode.NON_ZERO_BYTE_FILES || mode == FileFilterMode.NON_ZERO_BYTE_FILES_AND_DIRECTORIES)) {
       continue
     }
   }
