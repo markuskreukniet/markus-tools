@@ -58,8 +58,8 @@ const (
 )
 
 const (
-	AllFiles fileType = iota
-	PlainTextFiles
+	AllFiles       fileType = iota
+	PlainTextFiles          // TODO: rename to TextFiles
 )
 
 const FilePathSeparator = string(filepath.Separator)
@@ -68,6 +68,7 @@ func CreateDirectory(filePath string) error {
 	return os.Mkdir(filePath, 0755)
 }
 
+// TODO: isTextFile better naming
 func IsNonZeroByteFileATextFile(filePath string) (bool, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -139,7 +140,7 @@ func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode,
 			return nil
 		}
 
-		// file type check
+		// is text file check
 		if fileType == PlainTextFiles {
 			isTextFile, err := IsNonZeroByteFileATextFile(filePath)
 			if err != nil || !isTextFile {
