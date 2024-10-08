@@ -35,10 +35,7 @@ fun isTextFile(file: File): Boolean {
     mimeType = URLConnection.guessContentTypeFromStream(inputStream)
   }
 
-  if (mimeType?.startsWith("text") == true) {
-    return true
-  }
-  return false
+  return mimeType?.startsWith("text") == true
 }
 
 fun walkFilterAndHandleFileMetadata(
@@ -46,10 +43,7 @@ fun walkFilterAndHandleFileMetadata(
   val rootDirectory = File(absoluteFilePath)
 
   for (file in rootDirectory.walk()) {
-    var size: Long = 0L
-    if (file.isFile) {
-      size = file.length()
-    }
+    val size: Long = if (file.isFile) file.length() else 0L
 
     // is file check
     if (file.isFile && mode == FileFilterMode.DIRECTORIES) {
