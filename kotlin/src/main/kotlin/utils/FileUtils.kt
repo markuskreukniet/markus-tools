@@ -1,6 +1,7 @@
 package org.example.utils
 
 import java.io.File
+import java.net.URLConnection
 
 data class FileSystemFile(val data: String, val fileMetadata: FileMetadata)
 
@@ -24,10 +25,23 @@ enum class FileFilterMode {
 
 enum class FileType {
   ALL_FILES,
-  PLAIN_TEXT_FILES
+  TEXT_FILES
 }
 
-fun WalkFilterAndHandleFileMetadata(
+fun isTextFile(file: File): Boolean {
+  var mimeType: String? = null
+
+  file.inputStream().use { inputStream ->
+    mimeType = URLConnection.guessContentTypeFromStream(inputStream)
+  }
+
+  if (mimeType?.startsWith("text") == true) {
+    return true
+  }
+  return false
+}
+
+fun walkFilterAndHandleFileMetadata(
   absoluteFilePath: String, mode: FileFilterMode, type: FileType, handler: (FileMetadata?) -> Unit) {
   val rootDirectory = File(absoluteFilePath)
 
@@ -47,21 +61,21 @@ fun WalkFilterAndHandleFileMetadata(
       continue
     }
 
-    // file type check
-    if (type == FileType.PLAIN_TEXT_FILES) {
-      continue // TODO:
-    }
-
     // is zero byte file check
     if (file.isFile && size == 0L &&
       (mode == FileFilterMode.NON_ZERO_BYTE_FILES || mode == FileFilterMode.NON_ZERO_BYTE_FILES_AND_DIRECTORIES)) {
+      continue
+    }
+
+    // is text file check
+    if (type == FileType.TEXT_FILES && isTextFile(file)) {
       continue
     }
   }
 }
 
 // TODO: should the Golang version return a FileMetadata{} instead of an error?
-fun ToFileMetadata(absoluteFilePath: String): FileMetadata? {
+fun toFileMetadata(absoluteFilePath: String): FileMetadata? {
   val file = File(absoluteFilePath)
 
   if (!file.exists()) {
