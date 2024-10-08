@@ -29,14 +29,17 @@ enum class FileType {
 }
 
 fun isTextFile(file: File): Boolean {
-  var mimeType: String? = null
-
-  file.inputStream().use { inputStream ->
-    mimeType = URLConnection.guessContentTypeFromStream(inputStream)
+  val mimeType = file.inputStream().use { inputStream ->
+    URLConnection.guessContentTypeFromStream(inputStream)
   }
 
   return mimeType?.startsWith("text") == true
 }
+
+// TODO: function naming
+//fun appendNonZeroByteFiles() {
+//
+//}
 
 fun walkFilterAndHandleFileMetadata(
   absoluteFilePath: String, mode: FileFilterMode, type: FileType, handler: (FileMetadata?) -> Unit) {
@@ -65,6 +68,16 @@ fun walkFilterAndHandleFileMetadata(
     if (type == FileType.TEXT_FILES && isTextFile(file)) {
       continue
     }
+
+    handler(FileMetadata(
+      name = file.name,
+      absoluteDirectoryPath = "", // TODO:
+      absolutePath = absoluteFilePath,
+      timeModified = file.lastModified(),
+      size = file.length(),
+      isDirectory = file.isDirectory,
+      hash = ""
+    ))
   }
 }
 
