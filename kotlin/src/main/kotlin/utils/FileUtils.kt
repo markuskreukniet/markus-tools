@@ -3,17 +3,19 @@ package org.example.utils
 import java.io.File
 import java.net.URLConnection
 
-data class FileSystemFile(val data: String, val fileMetadata: FileMetadata)
+interface FileMetadata {
+  val size: Long
+}
 
-data class FileMetadata(
+data class CompleteFileMetadata(
   val name: String,
   val absoluteDirectoryPath: String,
   val absolutePath: String,
   val timeModified: Long,
-  val size: Long,
+  override val size: Long,
   val isDirectory: Boolean,
   var hash: String
-)
+) : FileMetadata
 
 data class FileSystemNode(
   val absolutePath: String,
@@ -42,7 +44,7 @@ fun isTextFile(file: File): Boolean {
 }
 
 fun filterAndHandleFileMetadata(
-  file: File, mode: FileFilterMode, type: FileType, absoluteFilePath: String, handler: (FileMetadata) -> Unit) {
+  file: File, mode: FileFilterMode, type: FileType, absoluteFilePath: String, handler: (CompleteFileMetadata) -> Unit) {
   val size: Long = if (file.isFile) file.length() else 0L
 
   // is file check
@@ -66,7 +68,7 @@ fun filterAndHandleFileMetadata(
     return
   }
 
-  handler(FileMetadata(
+  handler(CompleteFileMetadata(
     name = file.name,
     absoluteDirectoryPath = "", // TODO:
     absolutePath = absoluteFilePath,
@@ -78,7 +80,7 @@ fun filterAndHandleFileMetadata(
 }
 
 fun walkFilterAndHandleFileMetadata(
-  absoluteFilePath: String, mode: FileFilterMode, type: FileType, handler: (FileMetadata) -> Unit) {
+  absoluteFilePath: String, mode: FileFilterMode, type: FileType, handler: (CompleteFileMetadata) -> Unit) {
   val rootFile = File(absoluteFilePath)
 
   if (!rootFile.exists()) {

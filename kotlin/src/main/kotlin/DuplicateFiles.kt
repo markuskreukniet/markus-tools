@@ -2,17 +2,17 @@ package org.example
 
 import org.example.utils.*
 
-data class DuplicateFileMetadata(
-  val absolutePath: String,
-  val size: Long,
-  var hash: String
-)
-
 fun getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes: Array<FileSystemNode>): String {
+  data class DuplicateFileMetadata(
+    val absolutePath: String,
+    override val size: Long,
+    var hash: String
+  ) : FileMetadata
+
   val result = StringBuilder()
   val files = mutableListOf<DuplicateFileMetadata>()
 
-  val handler = fun(file: FileMetadata) {
+  val handler = fun(file: CompleteFileMetadata) {
     files.add(DuplicateFileMetadata(
       absolutePath = file.absolutePath,
       size = file.size,
