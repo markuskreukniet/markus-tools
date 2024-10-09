@@ -10,26 +10,25 @@ fun createFileMetadataByHashGroups(files: Array<FileMetadata>, onlyDuplicates: B
     val files: MutableList<FileMetadata>
   )
 
-  files.sortBy { it.size }
+  fun addGroup(groups: MutableList<FilesByFileSize>, file: FileMetadata) {
+    groups.add(FilesByFileSize(
+      fileSize = file.size,
+      files = mutableListOf(file)
+    ))
+  }
 
   val result: MutableList<MutableList<FileMetadata>> = mutableListOf()
   val groups = mutableListOf<FilesByFileSize>()
   var sizeIndex = 0
 
-  // TODO: abstract, now duplicate with line 29
-  groups.add(FilesByFileSize(
-    fileSize = files.first().size,
-    files = mutableListOf(files.first())
-  ))
+  files.sortBy { it.size }
+  addGroup(groups, files.first())
 
   files.withIndex().drop(1).forEach { (index, file) ->
     if (file.size == groups[sizeIndex].files.first().size) {
       groups[sizeIndex].files.add(files[index])
     } else {
-      groups.add(FilesByFileSize(
-        fileSize = files[index].size,
-        files = mutableListOf(files[index])
-      ))
+      addGroup(groups, files[index])
       sizeIndex++
     }
   }
