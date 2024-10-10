@@ -1,7 +1,5 @@
 package org.example.utils
 
-import java.io.File
-import java.io.FileInputStream
 import java.security.MessageDigest
 
 fun createFileMetadataByHashGroups(files: Array<FileMetadata>, onlyDuplicates: Boolean) {

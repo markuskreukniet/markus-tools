@@ -81,12 +81,13 @@ fun filterAndHandleFileMetadata(
 }
 
 fun walkFilterAndHandleFileMetadata(
-  absoluteFilePath: String, mode: FileFilterMode, type: FileType, handler: (CompleteFileMetadata) -> Unit) {
-  val rootFile = File(absoluteFilePath)
-
-  if (!rootFile.exists()) {
-    return
-  }
+  absoluteFilePath: String,
+  mode: FileFilterMode,
+  type: FileType,
+  handler: (CompleteFileMetadata) -> Unit
+): Result<Unit> {
+  val rootFile = createExistingFile(absoluteFilePath)
+    .getOrElse { return Result.failure(it) } ?: return Result.success(Unit)
 
   if (rootFile.isFile) {
     filterAndHandleFileMetadata(rootFile, mode, type, absoluteFilePath, handler)
@@ -95,6 +96,8 @@ fun walkFilterAndHandleFileMetadata(
       filterAndHandleFileMetadata(file, mode, type, absoluteFilePath, handler)
     }
   }
+
+  return Result.success(Unit)
 }
 
 fun createExistingFile(filePath: String): Result<File?> {
