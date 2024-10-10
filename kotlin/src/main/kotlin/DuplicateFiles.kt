@@ -4,7 +4,7 @@ import org.example.utils.*
 
 fun getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes: Array<FileSystemNode>): String {
   data class DuplicateFileMetadata(
-    val absolutePath: String,
+    override val absolutePath: String,
     override val size: Long,
     var hash: String
   ) : FileMetadata

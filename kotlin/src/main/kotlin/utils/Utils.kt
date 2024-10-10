@@ -1,5 +1,9 @@
 package org.example.utils
 
+import java.io.File
+import java.io.FileInputStream
+import java.security.MessageDigest
+
 fun createFileMetadataByHashGroups(files: Array<FileMetadata>, onlyDuplicates: Boolean) {
   if (files.isEmpty()) {
     return
@@ -35,9 +39,23 @@ fun createFileMetadataByHashGroups(files: Array<FileMetadata>, onlyDuplicates: B
 
   groups.forEach { group ->
     if (group.files.size > 1) {
+      val map = mutableMapOf<String, FileMetadata>()
+      group.files.forEach { file ->
+        file.absolutePath
+        //
+      }
       //
     } else if (!onlyDuplicates) {
       result.add(group.files)
     }
   }
+}
+
+fun createFileHash(filePath: String): Result<String> {
+  val file = createExistingFile(filePath).getOrElse { return Result.failure(it) } ?: return Result.success("")
+
+  val bytes = file.readBytes()
+  val md = runCatching { MessageDigest.getInstance("SHA-256") }.getOrElse { return Result.failure(it) }
+  val hashBytes = md.digest(bytes)
+  return Result.success(hashBytes.joinToString("") { "%02x".format(it) })
 }

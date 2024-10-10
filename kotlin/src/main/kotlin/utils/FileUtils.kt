@@ -4,13 +4,14 @@ import java.io.File
 import java.net.URLConnection
 
 interface FileMetadata {
+  val absolutePath: String
   val size: Long
 }
 
 data class CompleteFileMetadata(
   val name: String,
   val absoluteDirectoryPath: String,
-  val absolutePath: String,
+  override val absolutePath: String,
   val timeModified: Long,
   override val size: Long,
   val isDirectory: Boolean,
@@ -93,5 +94,12 @@ fun walkFilterAndHandleFileMetadata(
     rootFile.walk().forEach { file ->
       filterAndHandleFileMetadata(file, mode, type, absoluteFilePath, handler)
     }
+  }
+}
+
+fun createExistingFile(filePath: String): Result<File?> {
+  return runCatching {
+    val file = File(filePath)
+    if (file.exists()) file else null
   }
 }
