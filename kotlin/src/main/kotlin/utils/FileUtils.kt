@@ -3,6 +3,11 @@ package org.example.utils
 import java.io.File
 import java.net.URLConnection
 
+data class FileSystemFile(
+  val data: String,
+  val completeFileMetadata: CompleteFileMetadata
+)
+
 interface FileMetadata {
   val absolutePath: String
   val size: Long
@@ -10,8 +15,8 @@ interface FileMetadata {
 
 data class CompleteFileMetadata(
   val name: String,
-  val absoluteDirectoryPath: String,
-  override val absolutePath: String,
+  var absoluteDirectoryPath: String,
+  override var absolutePath: String,
   val timeModified: Long,
   override val size: Long,
   val isDirectory: Boolean,

@@ -2,9 +2,20 @@ package org.example.utils
 
 import java.security.MessageDigest
 
-fun createFileMetadataByHashGroups(files: Array<FileMetadata>, onlyDuplicates: Boolean) {
+// writeNewline
+fun writeNewlineString(builder: StringBuilder) {
+  builder.append("\n")
+}
+
+fun writeTwoNewlineStrings(builder: StringBuilder) {
+  builder.append("\n\n")
+}
+
+fun createFileMetadataByHashGroups(
+  files: MutableList<FileMetadata>, onlyDuplicates: Boolean
+): Result<MutableList<MutableList<FileMetadata>>?> = runCatching {
   if (files.isEmpty()) {
-    return
+    return@runCatching null
   }
 
   data class FilesByFileSize(
@@ -19,7 +30,7 @@ fun createFileMetadataByHashGroups(files: Array<FileMetadata>, onlyDuplicates: B
     ))
   }
 
-  val result: MutableList<MutableList<FileMetadata>> = mutableListOf()
+  val result = mutableListOf<MutableList<FileMetadata>>()
   val groups = mutableListOf<FilesByFileSize>()
   var sizeIndex = 0
 
@@ -37,20 +48,26 @@ fun createFileMetadataByHashGroups(files: Array<FileMetadata>, onlyDuplicates: B
 
   groups.forEach { group ->
     if (group.files.size > 1) {
-      val map = mutableMapOf<String, FileMetadata>()
+      val map = mutableMapOf<String, MutableList<FileMetadata>>()
       group.files.forEach { file ->
-        file.absolutePath
-        //
+        val hash = createFileHash(file.absolutePath).getOrThrow() ?: return@runCatching null
+        map.getOrPut(hash) { mutableListOf() }.add(file)
       }
-      //
+      map.values.forEach { hashedFiles ->
+        if (hashedFiles.size > 1 || !onlyDuplicates){
+          result.add(hashedFiles)
+        }
+      }
     } else if (!onlyDuplicates) {
       result.add(group.files)
     }
   }
+
+  result
 }
 
-fun createFileHash(filePath: String): Result<String> = runCatching {
-  val file = createExistingFile(filePath).getOrThrow() ?: return@runCatching ""
+fun createFileHash(filePath: String): Result<String?> = runCatching {
+  val file = createExistingFile(filePath).getOrThrow() ?: return@runCatching null
   val bytes = file.readBytes()
   val md = MessageDigest.getInstance("SHA-256")
   val hashBytes = md.digest(bytes)
