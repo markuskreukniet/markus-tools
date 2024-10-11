@@ -51,7 +51,6 @@ fun createFileMetadataByHashGroups(files: Array<FileMetadata>, onlyDuplicates: B
 
 fun createFileHash(filePath: String): Result<String> = runCatching {
   val file = createExistingFile(filePath).getOrThrow() ?: return@runCatching ""
-
   val bytes = file.readBytes()
   val md = MessageDigest.getInstance("SHA-256")
   val hashBytes = md.digest(bytes)
