@@ -66,7 +66,7 @@ fun filterAndHandleFileMetadata(
   }
 
   // is text file check
-  val isTextFile = isTextFile(file).getOrElse { return Result.failure(it) }
+  val isTextFile = isTextFile(file).getOrThrow()
   if (type == FileType.TEXT_FILES && isTextFile) {
     return Result.success(Unit)
   }
@@ -90,23 +90,21 @@ fun walkFilterAndHandleFileMetadata(
   type: FileType,
   handler: (CompleteFileMetadata) -> Unit
 ): Result<Unit> {
-  val rootFile = createExistingFile(absoluteFilePath)
-    .getOrElse { return Result.failure(it) } ?: return Result.success(Unit)
+  val rootFile = createExistingFile(absoluteFilePath).getOrThrow() ?: return Result.success(Unit)
 
-  if (rootFile.isFile) {
-    filterAndHandleFileMetadata(rootFile, mode, type, absoluteFilePath, handler)
-  } else if (rootFile.isDirectory) {
-    rootFile.walk().forEach { file ->
-      filterAndHandleFileMetadata(file, mode, type, absoluteFilePath, handler)
-    }
+  if (!rootFile.isFile && !rootFile.isDirectory) {
+    return Result.success(Unit)
+  }
+
+  val files = if (rootFile.isDirectory) rootFile.walk() else sequenceOf(rootFile)
+  files.forEach { file ->
+    filterAndHandleFileMetadata(file, mode, type, absoluteFilePath, handler).getOrThrow()
   }
 
   return Result.success(Unit)
 }
 
-fun createExistingFile(filePath: String): Result<File?> {
-  return runCatching {
+fun createExistingFile(filePath: String): Result<File?> = runCatching {
     val file = File(filePath)
     if (file.exists()) file else null
-  }
 }
