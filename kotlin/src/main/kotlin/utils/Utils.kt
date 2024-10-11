@@ -37,20 +37,24 @@ fun createFileMetadataByHashGroups(files: Array<FileMetadata>, onlyDuplicates: B
 
   groups.forEach { group ->
     if (group.files.size > 1) {
-      val map = mutableMapOf<String, FileMetadata>()
+      val map = mutableMapOf<String, MutableList<FileMetadata>>()
       group.files.forEach { file ->
-        file.absolutePath
-        //
+        val hash = createFileHash(file.absolutePath).getOrThrow() ?: return
+        map.getOrPut(hash) { mutableListOf() }.add(file)
       }
-      //
+      map.values.forEach { hashedFiles ->
+        if (hashedFiles.size > 1 || !onlyDuplicates){
+          result.add(hashedFiles)
+        }
+      }
     } else if (!onlyDuplicates) {
       result.add(group.files)
     }
   }
 }
 
-fun createFileHash(filePath: String): Result<String> = runCatching {
-  val file = createExistingFile(filePath).getOrThrow() ?: return@runCatching ""
+fun createFileHash(filePath: String): Result<String?> = runCatching {
+  val file = createExistingFile(filePath).getOrThrow() ?: return@runCatching null
   val bytes = file.readBytes()
   val md = MessageDigest.getInstance("SHA-256")
   val hashBytes = md.digest(bytes)
