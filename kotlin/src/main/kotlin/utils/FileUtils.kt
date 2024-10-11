@@ -46,29 +46,29 @@ fun isTextFile(file: File): Result<Boolean> = runCatching {
 
 fun filterAndHandleFileMetadata(
   file: File, mode: FileFilterMode, type: FileType, absoluteFilePath: String, handler: (CompleteFileMetadata) -> Unit
-): Result<Unit> {
+): Result<Unit> = runCatching {
   val size: Long = if (file.isFile) file.length() else 0L
 
   // is file check
   if (file.isFile && mode == FileFilterMode.DIRECTORIES) {
-    return Result.success(Unit)
+    return@runCatching
   }
 
   // is directory check
   if (file.isDirectory && (mode == FileFilterMode.FILES || mode == FileFilterMode.NON_ZERO_BYTE_FILES)) {
-    return Result.success(Unit)
+    return@runCatching
   }
 
   // is zero byte file check
   if (file.isFile && size == 0L &&
     (mode == FileFilterMode.NON_ZERO_BYTE_FILES || mode == FileFilterMode.NON_ZERO_BYTE_FILES_AND_DIRECTORIES)) {
-    return Result.success(Unit)
+    return@runCatching
   }
 
   // is text file check
   val isTextFile = isTextFile(file).getOrThrow()
   if (type == FileType.TEXT_FILES && isTextFile) {
-    return Result.success(Unit)
+    return@runCatching
   }
 
   handler(CompleteFileMetadata(
@@ -80,8 +80,6 @@ fun filterAndHandleFileMetadata(
     isDirectory = file.isDirectory,
     hash = ""
   ))
-
-  return Result.success(Unit)
 }
 
 fun walkFilterAndHandleFileMetadata(
@@ -89,19 +87,17 @@ fun walkFilterAndHandleFileMetadata(
   mode: FileFilterMode,
   type: FileType,
   handler: (CompleteFileMetadata) -> Unit
-): Result<Unit> {
-  val rootFile = createExistingFile(absoluteFilePath).getOrThrow() ?: return Result.success(Unit)
+): Result<Unit> = runCatching {
+  val rootFile = createExistingFile(absoluteFilePath).getOrThrow() ?: return@runCatching
 
   if (!rootFile.isFile && !rootFile.isDirectory) {
-    return Result.success(Unit)
+    return@runCatching
   }
 
   val files = if (rootFile.isDirectory) rootFile.walk() else sequenceOf(rootFile)
   files.forEach { file ->
     filterAndHandleFileMetadata(file, mode, type, absoluteFilePath, handler).onFailure { throw it }
   }
-
-  return Result.success(Unit)
 }
 
 fun createExistingFile(filePath: String): Result<File?> = runCatching {
