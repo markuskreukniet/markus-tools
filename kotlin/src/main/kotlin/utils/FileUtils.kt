@@ -36,37 +36,39 @@ enum class FileType {
   TEXT_FILES
 }
 
-fun isTextFile(file: File): Boolean {
+fun isTextFile(file: File): Result<Boolean> = runCatching {
   val mimeType = file.inputStream().use { inputStream ->
     URLConnection.guessContentTypeFromStream(inputStream)
   }
 
-  return mimeType?.startsWith("text") == true
+  mimeType?.startsWith("text") == true
 }
 
 fun filterAndHandleFileMetadata(
-  file: File, mode: FileFilterMode, type: FileType, absoluteFilePath: String, handler: (CompleteFileMetadata) -> Unit) {
+  file: File, mode: FileFilterMode, type: FileType, absoluteFilePath: String, handler: (CompleteFileMetadata) -> Unit
+): Result<Unit> {
   val size: Long = if (file.isFile) file.length() else 0L
 
   // is file check
   if (file.isFile && mode == FileFilterMode.DIRECTORIES) {
-    return
+    return Result.success(Unit)
   }
 
   // is directory check
   if (file.isDirectory && (mode == FileFilterMode.FILES || mode == FileFilterMode.NON_ZERO_BYTE_FILES)) {
-    return
+    return Result.success(Unit)
   }
 
   // is zero byte file check
   if (file.isFile && size == 0L &&
     (mode == FileFilterMode.NON_ZERO_BYTE_FILES || mode == FileFilterMode.NON_ZERO_BYTE_FILES_AND_DIRECTORIES)) {
-    return
+    return Result.success(Unit)
   }
 
   // is text file check
-  if (type == FileType.TEXT_FILES && isTextFile(file)) {
-    return
+  val isTextFile = isTextFile(file).getOrElse { return Result.failure(it) }
+  if (type == FileType.TEXT_FILES && isTextFile) {
+    return Result.success(Unit)
   }
 
   handler(CompleteFileMetadata(
@@ -78,6 +80,8 @@ fun filterAndHandleFileMetadata(
     isDirectory = file.isDirectory,
     hash = ""
   ))
+
+  return Result.success(Unit)
 }
 
 fun walkFilterAndHandleFileMetadata(

@@ -49,11 +49,11 @@ fun createFileMetadataByHashGroups(files: Array<FileMetadata>, onlyDuplicates: B
   }
 }
 
-fun createFileHash(filePath: String): Result<String> {
-  val file = createExistingFile(filePath).getOrElse { return Result.failure(it) } ?: return Result.success("")
+fun createFileHash(filePath: String): Result<String> = runCatching {
+  val file = createExistingFile(filePath).getOrThrow() ?: return@runCatching ""
 
   val bytes = file.readBytes()
-  val md = runCatching { MessageDigest.getInstance("SHA-256") }.getOrElse { return Result.failure(it) }
+  val md = MessageDigest.getInstance("SHA-256")
   val hashBytes = md.digest(bytes)
-  return Result.success(hashBytes.joinToString("") { "%02x".format(it) })
+  hashBytes.joinToString("") { "%02x".format(it) }
 }
