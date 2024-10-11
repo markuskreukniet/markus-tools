@@ -11,7 +11,7 @@ class DuplicateFilesKtTest {
       FileSystemNode("/path3", false)
     )
 
-    val result = getDuplicateFilesAsNewlineSeparatedString(nodes)
+    val result = getDuplicateFilesAsNewlineSeparatedString(nodes).getOrThrow() ?: return
     assertEquals("test", result)
   }
 }
