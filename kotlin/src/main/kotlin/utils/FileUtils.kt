@@ -98,7 +98,7 @@ fun walkFilterAndHandleFileMetadata(
 
   val files = if (rootFile.isDirectory) rootFile.walk() else sequenceOf(rootFile)
   files.forEach { file ->
-    filterAndHandleFileMetadata(file, mode, type, absoluteFilePath, handler).getOrThrow()
+    filterAndHandleFileMetadata(file, mode, type, absoluteFilePath, handler).onFailure { throw it }
   }
 
   return Result.success(Unit)
