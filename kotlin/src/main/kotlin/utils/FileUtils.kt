@@ -3,6 +3,11 @@ package org.example.utils
 import java.io.File
 import java.net.URLConnection
 
+data class FileSystemFile(
+  val data: String,
+  val fileMetadata: FileMetadata
+)
+
 interface FileMetadata {
   val absolutePath: String
   val size: Long
