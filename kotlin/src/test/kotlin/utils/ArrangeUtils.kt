@@ -28,7 +28,6 @@ fun createSortedFileSystemFiles(
   val files = mutableListOf<FileSystemFile>()
   val inputLine = mutableListOf<Char>()
   var isCreatingInputLine = false
-
   val trimmedRawString = rawDelimitedSemicolonString.trim()
 
   trimmedRawString.forEach { char ->
