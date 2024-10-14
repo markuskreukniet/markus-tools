@@ -24,6 +24,20 @@ fun getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes: Array<FileS
     walkFilterAndHandleFileMetadata(node.absolutePath, FileFilterMode.NON_ZERO_BYTE_FILES, FileType.ALL_FILES, handler)
   }
 
+  // TODO: createFileMetadataByHashGroups moet runCatching worden en mutableList ontangen ipv array
+  // val groups = createFileMetadataByHashGroups(files, true).getOrThrow()
+
+  // groups.forEachIndexed { indexI, group ->
+  //   if indexI > 0 {
+
+  //   }
+  //   group.forEachIndexed { indexJ, file ->
+  //     if indexJ > 0 {
+
+  //     }
+  //   }
+  // }
+
   result.append("test")
 
   return result.toString()
