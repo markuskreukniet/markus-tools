@@ -2,6 +2,15 @@ package org.example.utils
 
 import java.security.MessageDigest
 
+// writeNewline
+fun writeNewlineString(builder: StringBuilder) {
+  builder.append("\n")
+}
+
+fun writeTwoNewlineStrings(builder: StringBuilder) {
+  builder.append("\n\n")
+}
+
 fun createFileMetadataByHashGroups(
   files: MutableList<FileMetadata>, onlyDuplicates: Boolean
 ): Result<MutableList<MutableList<FileMetadata>>?> = runCatching {
