@@ -2,9 +2,11 @@ package org.example.utils
 
 import java.security.MessageDigest
 
-fun createFileMetadataByHashGroups(files: Array<FileMetadata>, onlyDuplicates: Boolean) {
+fun createFileMetadataByHashGroups(
+  files: MutableList<FileMetadata>, onlyDuplicates: Boolean
+): Result<MutableList<MutableList<FileMetadata>>?> = runCatching {
   if (files.isEmpty()) {
-    return
+    return@runCatching null
   }
 
   data class FilesByFileSize(
@@ -39,7 +41,7 @@ fun createFileMetadataByHashGroups(files: Array<FileMetadata>, onlyDuplicates: B
     if (group.files.size > 1) {
       val map = mutableMapOf<String, MutableList<FileMetadata>>()
       group.files.forEach { file ->
-        val hash = createFileHash(file.absolutePath).getOrThrow() ?: return
+        val hash = createFileHash(file.absolutePath).getOrThrow() ?: return@runCatching null
         map.getOrPut(hash) { mutableListOf() }.add(file)
       }
       map.values.forEach { hashedFiles ->
@@ -51,6 +53,8 @@ fun createFileMetadataByHashGroups(files: Array<FileMetadata>, onlyDuplicates: B
       result.add(group.files)
     }
   }
+
+  result
 }
 
 fun createFileHash(filePath: String): Result<String?> = runCatching {
