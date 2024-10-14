@@ -30,17 +30,17 @@ fun getDuplicateFilesAsNewlineSeparatedString(
 
   groups.forEachIndexed { indexI, group ->
     if (indexI > 0) {
-
+      writeTwoNewlineStrings(result)
     }
     group.forEachIndexed { indexJ, file ->
       if (indexJ > 0) {
-
+        writeNewlineString(result)
       }
-      //result.append(file.absolutePath)
+      result.append(file.absolutePath)
     }
   }
 
-  result.append("test")
-
   result.toString()
+
+  "test"
 }
