@@ -24,13 +24,15 @@ fun createFileAndFileSystemFile(directoryPath: String, inputLine: String): Resul
   )
 }
 
-fun createSortedFileSystemFiles(rawDelimitedSemicolonString: String): MutableList<FileSystemFile> {
-  return createSortedFileSystemFiles("", rawDelimitedSemicolonString)
+fun createSortedFileSystemFiles(
+  rawDelimitedSemicolonString: String
+): Result<MutableList<FileSystemFile>> = runCatching {
+  createSortedFileSystemFiles("", rawDelimitedSemicolonString).getOrThrow()
 }
 
 fun createSortedFileSystemFiles(
   directoryPath: String, rawDelimitedSemicolonString: String
-): MutableList<FileSystemFile> {
+): Result<MutableList<FileSystemFile>> = runCatching {
   val files = mutableListOf<FileSystemFile>()
   val inputLine = mutableListOf<Char>()
   var isCreatingInputLine = false
@@ -52,39 +54,39 @@ fun createSortedFileSystemFiles(
     }
   }
 
-  return files
+  files
 }
 
-// TODO: runCatching
-fun createTemporaryDirectory(): Path {
-  return Files.createTempDirectory("markus-tools kotlin test_")  // The prefix is optional
+fun createTemporaryDirectory(): Result<Path> = runCatching {
+  Files.createTempDirectory("markus-tools kotlin test_")  // The prefix is optional
 }
 
-// TODO: runCatching
 // Returns the top directory path or a null when it receives only a file name, such as jpg 0.jpg.
-fun getTopDirectoryPath(directoryPath: String): Path? {
+fun getTopDirectoryPath(directoryPath: String): Result<Path?> = runCatching {
   val path = Paths.get(directoryPath)
-  return if (path.nameCount > 0) path.getName(0) else null
+  if (path.nameCount > 0) path.getName(0) else null
 }
 
-fun writeFilesByMultipleInputs(input: String): Pair<MutableList<String>?, MutableList<FileSystemNode>?> {
+fun writeFilesByMultipleInputs(
+  input: String
+): Result<Pair<MutableList<String>?, MutableList<FileSystemNode>?>> = runCatching {
   if (input.isBlank()) {
-    return Pair(null, null)
+    return@runCatching Pair(null, null)
   }
 
-  val files = createSortedFileSystemFiles(input)
+  val files = createSortedFileSystemFiles(input).getOrThrow()
 
   if (files.size == 0) {
-    return Pair(null, null)
+    return@runCatching Pair(null, null)
   }
 
   val groups = mutableListOf<MutableList<FileSystemFile>>(mutableListOf<FileSystemFile>(files[0]))
-  var previousTopDirectoryPath = getTopDirectoryPath(files[0].completeFileMetadata.absoluteDirectoryPath)
+  var previousTopDirectoryPath = getTopDirectoryPath(files[0].completeFileMetadata.absoluteDirectoryPath).getOrThrow()
   var index = 0
 
   files.drop(1).forEach { file ->
-    val currentTopDirectoryPath = getTopDirectoryPath(file.completeFileMetadata.absoluteDirectoryPath)
-    // We can use '==' or '!=' for string-based comparison.
+    val currentTopDirectoryPath = getTopDirectoryPath(file.completeFileMetadata.absoluteDirectoryPath).getOrThrow()
+    // We can use '==' or '!=' for string-based comparison to compare the paths.
     if (currentTopDirectoryPath == null || previousTopDirectoryPath != currentTopDirectoryPath) {
       groups.add(mutableListOf<FileSystemFile>(file))
       previousTopDirectoryPath = currentTopDirectoryPath
@@ -94,9 +96,12 @@ fun writeFilesByMultipleInputs(input: String): Pair<MutableList<String>?, Mutabl
     }
   }
 
+  val temporaryDirectories = mutableListOf<Path>()
+
   groups.forEach { group ->
-    val directoryPath = createTemporaryDirectory()
+    val directoryPath = createTemporaryDirectory().getOrThrow()
+    temporaryDirectories.add(directoryPath)
   }
 
-  return Pair(mutableListOf<String>(), mutableListOf<FileSystemNode>())
+  Pair(mutableListOf<String>(), mutableListOf<FileSystemNode>())
 }
