@@ -5,7 +5,7 @@ import java.net.URLConnection
 
 data class FileSystemFile(
   val data: String,
-  val fileMetadata: FileMetadata
+  val completeFileMetadata: CompleteFileMetadata
 )
 
 interface FileMetadata {

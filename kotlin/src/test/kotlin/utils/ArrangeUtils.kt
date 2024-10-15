@@ -1,6 +1,7 @@
 package utils
 
 import org.example.utils.*
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -53,6 +54,14 @@ fun createSortedFileSystemFiles(
   return files
 }
 
+fun getRootDirectoryPath(directoryPath: String): Path {
+  var currentPath = Paths.get(directoryPath)
+  while (currentPath.parent != null) {
+    currentPath = currentPath.parent
+  }
+  return currentPath
+}
+
 fun writeFilesByMultipleInputs(input: String): Pair<MutableList<String>?, MutableList<FileSystemNode>?> {
   if (input.isBlank()) {
     return Pair(null, null)
@@ -65,7 +74,7 @@ fun writeFilesByMultipleInputs(input: String): Pair<MutableList<String>?, Mutabl
   }
 
   val groups = mutableListOf<MutableList<FileSystemFile>>(mutableListOf<FileSystemFile>(files[0]))
-  //
+  val previousRootDirectoryPath = getRootDirectoryPath(files[0].completeFileMetadata.absoluteDirectoryPath)
   val index = 0
 
   return Pair(mutableListOf<String>(), mutableListOf<FileSystemNode>())
