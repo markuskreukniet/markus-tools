@@ -14,12 +14,18 @@ fun createFileAndFileSystemFile(directoryPath: String, inputLine: String): Resul
   val name = fields[2]
   val filePath = joinedDirectoryPath.resolve(name)
   val isDirectory = name == ""
-  val result = if (fields[1] != "") Instant.from(DateTimeFormatter.ISO_DATE_TIME.parse(fields[1])).toEpochMilli()
+  val timeModified = if (fields[1] != "") Instant.from(DateTimeFormatter.ISO_DATE_TIME.parse(fields[1])).toEpochMilli()
     else 0L
 
   FileSystemFile(
     fileData, CompleteFileMetadata(
-      name, joinedDirectoryPath.toString(), filePath.toString(), result, 0L, isDirectory, ""
+      name = name,
+      absoluteDirectoryPath = joinedDirectoryPath.toString(),
+      absolutePath = filePath.toString(),
+      timeModified = timeModified,
+      size = 0L,
+      isDirectory = isDirectory,
+      hash = ""
     )
   )
 }
@@ -102,7 +108,10 @@ fun writeFilesByMultipleInputs(
     val directoryPath = createTemporaryDirectory().getOrThrow()
     temporaryDirectories.add(directoryPath)
     group.forEach { file ->
-      file.completeFileMetadata.absoluteDirectoryPath = directoryPath.resolve(file.completeFileMetadata.absoluteDirectoryPath).toString()
+      file.completeFileMetadata.absoluteDirectoryPath = directoryPath.resolve(
+        file.completeFileMetadata.absoluteDirectoryPath
+      ).toString()
+      file.completeFileMetadata.absolutePath = directoryPath.resolve(file.completeFileMetadata.absolutePath).toString()
     }
   }
 
