@@ -1,6 +1,7 @@
 package utils
 
 import org.example.utils.*
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.Instant
@@ -54,12 +55,16 @@ fun createSortedFileSystemFiles(
   return files
 }
 
-fun getRootDirectoryPath(directoryPath: String): Path {
-  var currentPath = Paths.get(directoryPath)
-  while (currentPath.parent != null) {
-    currentPath = currentPath.parent
-  }
-  return currentPath
+// TODO: runCatching
+fun createTemporaryDirectory(): Path {
+  return Files.createTempDirectory("markus-tools kotlin test_")  // The prefix is optional
+}
+
+// TODO: runCatching
+// Returns the top directory path or a null when it receives only a file name, such as jpg 0.jpg.
+fun getTopDirectoryPath(directoryPath: String): Path? {
+  val path = Paths.get(directoryPath)
+  return if (path.nameCount > 0) path.getName(0) else null
 }
 
 fun writeFilesByMultipleInputs(input: String): Pair<MutableList<String>?, MutableList<FileSystemNode>?> {
@@ -74,8 +79,24 @@ fun writeFilesByMultipleInputs(input: String): Pair<MutableList<String>?, Mutabl
   }
 
   val groups = mutableListOf<MutableList<FileSystemFile>>(mutableListOf<FileSystemFile>(files[0]))
-  val previousRootDirectoryPath = getRootDirectoryPath(files[0].completeFileMetadata.absoluteDirectoryPath)
-  val index = 0
+  var previousTopDirectoryPath = getTopDirectoryPath(files[0].completeFileMetadata.absoluteDirectoryPath)
+  var index = 0
+
+  files.drop(1).forEach { file ->
+    val currentTopDirectoryPath = getTopDirectoryPath(file.completeFileMetadata.absoluteDirectoryPath)
+    // We can use '==' or '!=' for string-based comparison.
+    if (currentTopDirectoryPath == null || previousTopDirectoryPath != currentTopDirectoryPath) {
+      groups.add(mutableListOf<FileSystemFile>(file))
+      previousTopDirectoryPath = currentTopDirectoryPath
+      index++
+    } else {
+      groups[index].add(file)
+    }
+  }
+
+  groups.forEach { group ->
+    val directoryPath = createTemporaryDirectory()
+  }
 
   return Pair(mutableListOf<String>(), mutableListOf<FileSystemNode>())
 }
