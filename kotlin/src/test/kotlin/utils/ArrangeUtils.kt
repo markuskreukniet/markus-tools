@@ -86,7 +86,7 @@ fun writeFilesByMultipleInputs(
 
   files.drop(1).forEach { file ->
     val currentTopDirectoryPath = getTopDirectoryPath(file.completeFileMetadata.absoluteDirectoryPath).getOrThrow()
-    // We can use '==' or '!=' for string-based comparison to compare the paths.
+    // We can use '==' or '!=' for string-based comparison of the paths.
     if (currentTopDirectoryPath == null || previousTopDirectoryPath != currentTopDirectoryPath) {
       groups.add(mutableListOf<FileSystemFile>(file))
       previousTopDirectoryPath = currentTopDirectoryPath
@@ -101,6 +101,9 @@ fun writeFilesByMultipleInputs(
   groups.forEach { group ->
     val directoryPath = createTemporaryDirectory().getOrThrow()
     temporaryDirectories.add(directoryPath)
+    group.forEach { file ->
+      file.completeFileMetadata.absoluteDirectoryPath = directoryPath.resolve(file.completeFileMetadata.absoluteDirectoryPath).toString()
+    }
   }
 
   Pair(mutableListOf<String>(), mutableListOf<FileSystemNode>())

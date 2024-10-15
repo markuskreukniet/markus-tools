@@ -15,7 +15,7 @@ interface FileMetadata {
 
 data class CompleteFileMetadata(
   val name: String,
-  val absoluteDirectoryPath: String,
+  var absoluteDirectoryPath: String,
   override val absolutePath: String,
   val timeModified: Long,
   override val size: Long,
