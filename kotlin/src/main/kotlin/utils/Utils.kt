@@ -30,7 +30,7 @@ fun createFileMetadataByHashGroups(
     ))
   }
 
-  val result: MutableList<MutableList<FileMetadata>> = mutableListOf()
+  val result = mutableListOf<MutableList<FileMetadata>>()
   val groups = mutableListOf<FilesByFileSize>()
   var sizeIndex = 0
 

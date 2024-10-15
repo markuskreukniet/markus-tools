@@ -22,6 +22,10 @@ fun createFileAndFileSystemFile(directoryPath: String, inputLine: String): Resul
   )
 }
 
+fun createSortedFileSystemFiles(rawDelimitedSemicolonString: String): MutableList<FileSystemFile> {
+  return createSortedFileSystemFiles("", rawDelimitedSemicolonString)
+}
+
 fun createSortedFileSystemFiles(
   directoryPath: String, rawDelimitedSemicolonString: String
 ): MutableList<FileSystemFile> {
@@ -53,6 +57,16 @@ fun writeFilesByMultipleInputs(input: String): Pair<MutableList<String>?, Mutabl
   if (input.isBlank()) {
     return Pair(null, null)
   }
+
+  val files = createSortedFileSystemFiles(input)
+
+  if (files.size == 0) {
+    return Pair(null, null)
+  }
+
+  val groups = mutableListOf<MutableList<FileSystemFile>>(mutableListOf<FileSystemFile>(files[0]))
+  //
+  val index = 0
 
   return Pair(mutableListOf<String>(), mutableListOf<FileSystemNode>())
 }
