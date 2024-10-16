@@ -1,5 +1,6 @@
 package org.example.utils
 
+import java.nio.file.Path
 import java.security.MessageDigest
 
 // writeNewline
@@ -66,7 +67,7 @@ fun createFileMetadataByHashGroups(
   result
 }
 
-fun createFileHash(filePath: String): Result<String?> = runCatching {
+fun createFileHash(filePath: Path): Result<String?> = runCatching {
   val file = createExistingFile(filePath).getOrThrow() ?: return@runCatching null
   val bytes = file.readBytes()
   val md = MessageDigest.getInstance("SHA-256")
