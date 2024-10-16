@@ -4,6 +4,7 @@ import org.example.utils.*
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.attribute.FileTime
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 
@@ -14,8 +15,7 @@ fun createFileAndFileSystemFile(directoryPath: String, inputLine: String): Resul
   val name = fields[2]
   val filePath = joinedDirectoryPath.resolve(name)
   val isDirectory = name == ""
-  val timeModified = if (fields[1] != "") Instant.from(DateTimeFormatter.ISO_DATE_TIME.parse(fields[1])).toEpochMilli()
-    else 0L
+  val timeModified = if (fields[1] != "") FileTime.from(Instant.parse(fields[1])) else null
 
   FileSystemFile(
     fileData, CompleteFileMetadata(
@@ -92,8 +92,8 @@ fun getTopDirectoryPath(directoryPath: Path): Result<Path?> = runCatching {
 
 fun asdf(file: FileSystemFile, paths: MutableList<Path>) {
   if (!file.completeFileMetadata.isDirectory) {
-    // File(filePath).writeText(content)
-    if (file.completeFileMetadata.timeModified > 0L) {
+    file.completeFileMetadata.absolutePath.toFile().writeText(file.data) // TODO: too many toFile() in codebase
+    if (file.completeFileMetadata.timeModified != null) {
 
     }
   }

@@ -2,7 +2,9 @@ package org.example.utils
 
 import java.io.File
 import java.net.URLConnection
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.attribute.FileTime
 
 data class FileSystemFile(
   val data: String,
@@ -18,7 +20,7 @@ data class CompleteFileMetadata(
   val name: String,
   var absoluteDirectoryPath: Path,
   override var absolutePath: Path,
-  val timeModified: Long,
+  val timeModified: FileTime?,
   override val size: Long,
   val isDirectory: Boolean,
   var hash: String
@@ -76,7 +78,7 @@ fun filterAndHandleFileMetadata(
     name = file.name,
     absoluteDirectoryPath = absoluteFilePath, // TODO:
     absolutePath = absoluteFilePath,
-    timeModified = file.lastModified(),
+    timeModified = Files.getLastModifiedTime(absoluteFilePath),
     size = file.length(),
     isDirectory = file.isDirectory,
     hash = ""
