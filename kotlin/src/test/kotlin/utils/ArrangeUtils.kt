@@ -90,10 +90,15 @@ fun getTopDirectoryPath(directoryPath: Path): Result<Path?> = runCatching {
 //  })
 //}
 
-fun asdf(file: FileSystemFile) {
+fun asdf(file: FileSystemFile, paths: MutableList<Path>) {
   if (!file.completeFileMetadata.isDirectory) {
+    // File(filePath).writeText(content)
+    if (file.completeFileMetadata.timeModified > 0L) {
 
+    }
   }
+
+  paths.add(file.completeFileMetadata.absolutePath)
 }
 
 fun writeFilesByMultipleInputs(
