@@ -94,7 +94,7 @@ fun walkFilterAndHandleFileMetadata(
   type: FileType,
   handler: (CompleteFileMetadata) -> Unit
 ): Result<Unit> = runCatching {
-  val rootFile = createExistingFile(absoluteFilePath).getOrThrow() ?: return@runCatching
+  val rootFile = absoluteFilePath.toFile()
 
   if (!rootFile.isFile && !rootFile.isDirectory) {
     return@runCatching
@@ -104,10 +104,4 @@ fun walkFilterAndHandleFileMetadata(
   files.forEach { file ->
     filterAndHandleFileMetadata(file, mode, type, absoluteFilePath, handler).onFailure { throw it }
   }
-}
-
-// TODO: useless?
-fun createExistingFile(filePath: Path): Result<File?> = runCatching {
-    val file = filePath.toFile()
-    if (file.exists()) file else null
 }

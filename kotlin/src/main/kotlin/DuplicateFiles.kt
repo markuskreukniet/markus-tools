@@ -1,6 +1,7 @@
 package org.example
 
 import org.example.utils.*
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -26,6 +27,7 @@ fun getDuplicateFilesAsNewlineSeparatedString(
 
   uniqueFileSystemNodes.forEach { node ->
     val absolutePath = Paths.get(node.absolutePath)
+    Files.exists(absolutePath)
     walkFilterAndHandleFileMetadata(absolutePath, FileFilterMode.NON_ZERO_BYTE_FILES, FileType.ALL_FILES, handler)
   }
 
