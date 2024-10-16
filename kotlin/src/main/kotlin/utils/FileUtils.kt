@@ -3,6 +3,8 @@ package org.example.utils
 import java.io.File
 import java.net.URLConnection
 import java.nio.file.Path
+import java.nio.file.attribute.FileTime
+import kotlin.io.path.getLastModifiedTime
 
 data class FileSystemFile(
   val data: String,
@@ -18,16 +20,11 @@ data class CompleteFileMetadata(
   val name: String,
   var absoluteDirectoryPath: Path,
   override var absolutePath: Path,
-  val timeModified: Long,
+  val timeModified: FileTime?,
   override val size: Long,
   val isDirectory: Boolean,
   var hash: String
 ) : FileMetadata
-
-data class FileSystemNode(
-  val absolutePath: String,
-  val isDirectory: Boolean
-)
 
 enum class FileFilterMode {
   FILES,
@@ -81,7 +78,7 @@ fun filterAndHandleFileMetadata(
     name = file.name,
     absoluteDirectoryPath = absoluteFilePath, // TODO:
     absolutePath = absoluteFilePath,
-    timeModified = file.lastModified(),
+    timeModified = absoluteFilePath.getLastModifiedTime(),
     size = file.length(),
     isDirectory = file.isDirectory,
     hash = ""
@@ -94,7 +91,7 @@ fun walkFilterAndHandleFileMetadata(
   type: FileType,
   handler: (CompleteFileMetadata) -> Unit
 ): Result<Unit> = runCatching {
-  val rootFile = createExistingFile(absoluteFilePath).getOrThrow() ?: return@runCatching
+  val rootFile = absoluteFilePath.toFile()
 
   if (!rootFile.isFile && !rootFile.isDirectory) {
     return@runCatching
@@ -104,10 +101,4 @@ fun walkFilterAndHandleFileMetadata(
   files.forEach { file ->
     filterAndHandleFileMetadata(file, mode, type, absoluteFilePath, handler).onFailure { throw it }
   }
-}
-
-// TODO: useless?
-fun createExistingFile(filePath: Path): Result<File?> = runCatching {
-    val file = filePath.toFile()
-    if (file.exists()) file else null
 }
