@@ -86,8 +86,10 @@ fun writeFilesByMultipleInputs(
     return@runCatching Pair(null, null)
   }
 
-  val groups = mutableListOf<MutableList<FileSystemFile>>(mutableListOf<FileSystemFile>(files[0]))
-  var previousTopDirectoryPath = getTopDirectoryPath(files[0].completeFileMetadata.absoluteDirectoryPath).getOrThrow()
+  val groups = mutableListOf<MutableList<FileSystemFile>>(mutableListOf<FileSystemFile>(files.first()))
+  var previousTopDirectoryPath = getTopDirectoryPath(
+    files.first().completeFileMetadata.absoluteDirectoryPath
+  ).getOrThrow()
   var index = 0
 
   files.drop(1).forEach { file ->
@@ -107,11 +109,17 @@ fun writeFilesByMultipleInputs(
   groups.forEach { group ->
     val directoryPath = createTemporaryDirectory().getOrThrow()
     temporaryDirectories.add(directoryPath)
+    var previousDirectoryPath = group.first().completeFileMetadata.absoluteDirectoryPath
     group.forEach { file ->
       file.completeFileMetadata.absoluteDirectoryPath = directoryPath.resolve(
         file.completeFileMetadata.absoluteDirectoryPath
       ).toString()
       file.completeFileMetadata.absolutePath = directoryPath.resolve(file.completeFileMetadata.absolutePath).toString()
+
+      if (file.completeFileMetadata.absoluteDirectoryPath != previousDirectoryPath) {
+        // Files.createDirectory(file.completeFileMetadata.absoluteDirectoryPath)
+        previousDirectoryPath = file.completeFileMetadata.absoluteDirectoryPath
+      }
     }
   }
 
