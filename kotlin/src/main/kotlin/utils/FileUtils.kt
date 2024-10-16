@@ -2,6 +2,7 @@ package org.example.utils
 
 import java.io.File
 import java.net.URLConnection
+import java.nio.file.Path
 
 data class FileSystemFile(
   val data: String,
@@ -9,14 +10,14 @@ data class FileSystemFile(
 )
 
 interface FileMetadata {
-  val absolutePath: String
+  val absolutePath: Path
   val size: Long
 }
 
 data class CompleteFileMetadata(
   val name: String,
-  var absoluteDirectoryPath: String,
-  override var absolutePath: String,
+  var absoluteDirectoryPath: Path,
+  override var absolutePath: Path,
   val timeModified: Long,
   override val size: Long,
   val isDirectory: Boolean,
@@ -50,7 +51,7 @@ fun isTextFile(file: File): Result<Boolean> = runCatching {
 }
 
 fun filterAndHandleFileMetadata(
-  file: File, mode: FileFilterMode, type: FileType, absoluteFilePath: String, handler: (CompleteFileMetadata) -> Unit
+  file: File, mode: FileFilterMode, type: FileType, absoluteFilePath: Path, handler: (CompleteFileMetadata) -> Unit
 ): Result<Unit> = runCatching {
   val size: Long = if (file.isFile) file.length() else 0L
 
@@ -78,7 +79,7 @@ fun filterAndHandleFileMetadata(
 
   handler(CompleteFileMetadata(
     name = file.name,
-    absoluteDirectoryPath = "", // TODO:
+    absoluteDirectoryPath = absoluteFilePath, // TODO:
     absolutePath = absoluteFilePath,
     timeModified = file.lastModified(),
     size = file.length(),
@@ -88,7 +89,7 @@ fun filterAndHandleFileMetadata(
 }
 
 fun walkFilterAndHandleFileMetadata(
-  absoluteFilePath: String,
+  absoluteFilePath: Path,
   mode: FileFilterMode,
   type: FileType,
   handler: (CompleteFileMetadata) -> Unit
@@ -105,7 +106,8 @@ fun walkFilterAndHandleFileMetadata(
   }
 }
 
-fun createExistingFile(filePath: String): Result<File?> = runCatching {
-    val file = File(filePath)
+// TODO: useless?
+fun createExistingFile(filePath: Path): Result<File?> = runCatching {
+    val file = filePath.toFile()
     if (file.exists()) file else null
 }

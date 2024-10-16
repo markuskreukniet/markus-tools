@@ -20,8 +20,8 @@ fun createFileAndFileSystemFile(directoryPath: String, inputLine: String): Resul
   FileSystemFile(
     fileData, CompleteFileMetadata(
       name = name,
-      absoluteDirectoryPath = joinedDirectoryPath.toString(),
-      absolutePath = filePath.toString(),
+      absoluteDirectoryPath = joinedDirectoryPath,
+      absolutePath = filePath,
       timeModified = timeModified,
       size = 0L,
       isDirectory = isDirectory,
@@ -68,9 +68,8 @@ fun createTemporaryDirectory(): Result<Path> = runCatching {
 }
 
 // Returns the top directory path or a null when it receives only a file name, such as jpg 0.jpg.
-fun getTopDirectoryPath(directoryPath: String): Result<Path?> = runCatching {
-  val path = Paths.get(directoryPath)
-  if (path.nameCount > 0) path.getName(0) else null
+fun getTopDirectoryPath(directoryPath: Path): Result<Path?> = runCatching {
+  if (directoryPath.nameCount > 0) directoryPath.getName(0) else null
 }
 
 fun writeFilesByMultipleInputs(
@@ -113,11 +112,11 @@ fun writeFilesByMultipleInputs(
     group.forEach { file ->
       file.completeFileMetadata.absoluteDirectoryPath = directoryPath.resolve(
         file.completeFileMetadata.absoluteDirectoryPath
-      ).toString()
-      file.completeFileMetadata.absolutePath = directoryPath.resolve(file.completeFileMetadata.absolutePath).toString()
+      )
+      file.completeFileMetadata.absolutePath = directoryPath.resolve(file.completeFileMetadata.absolutePath)
 
       if (file.completeFileMetadata.absoluteDirectoryPath != previousDirectoryPath) {
-        // Files.createDirectory(file.completeFileMetadata.absoluteDirectoryPath)
+        Files.createDirectory(file.completeFileMetadata.absoluteDirectoryPath)
         previousDirectoryPath = file.completeFileMetadata.absoluteDirectoryPath
       }
     }
