@@ -3,10 +3,9 @@ package org.example
 import org.example.utils.*
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 fun getDuplicateFilesAsNewlineSeparatedString(
-  uniqueFileSystemNodes: Array<FileSystemNode>
+  uniqueAbsolutePaths: Array<Path>
 ): Result<String?> = runCatching {
   data class DuplicateFileMetadata(
     override val absolutePath: Path,
@@ -25,10 +24,9 @@ fun getDuplicateFilesAsNewlineSeparatedString(
     ))
   }
 
-  uniqueFileSystemNodes.forEach { node ->
-    val absolutePath = Paths.get(node.absolutePath)
-    Files.exists(absolutePath)
-    walkFilterAndHandleFileMetadata(absolutePath, FileFilterMode.NON_ZERO_BYTE_FILES, FileType.ALL_FILES, handler)
+  uniqueAbsolutePaths.forEach { path ->
+    Files.exists(path)
+    walkFilterAndHandleFileMetadata(path, FileFilterMode.NON_ZERO_BYTE_FILES, FileType.ALL_FILES, handler)
   }
 
   val groups = createFileMetadataByHashGroups(files, true).getOrThrow() ?: return@runCatching null

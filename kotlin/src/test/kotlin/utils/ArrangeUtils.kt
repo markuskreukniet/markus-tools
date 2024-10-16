@@ -72,9 +72,33 @@ fun getTopDirectoryPath(directoryPath: Path): Result<Path?> = runCatching {
   if (directoryPath.nameCount > 0) directoryPath.getName(0) else null
 }
 
+//func testingIfFileWriteItAndAppendFileSystemNode(t *testing.T, file FileSystemFile, nodes *[]FileSystemNode) {
+//  t.Helper()
+//
+//  if !file.FileMetadata.IsDirectory {
+//    TestingWriteFile(t, file.FileMetadata.Path, file.Data)
+//    if !file.FileMetadata.TimeModified.IsZero() {
+//      if err := os.Chtimes(file.FileMetadata.Path, time.Now(), file.FileMetadata.TimeModified); err != nil {
+//      t.Errorf("Failed to change the access and modification times of the file: %v", err)
+//    }
+//    }
+//  }
+//
+//  *nodes = append(*nodes, FileSystemNode{
+//      Path:        file.FileMetadata.Path,
+//      IsDirectory: file.FileMetadata.IsDirectory,
+//  })
+//}
+
+fun asdf(file: FileSystemFile) {
+  if (!file.completeFileMetadata.isDirectory) {
+
+  }
+}
+
 fun writeFilesByMultipleInputs(
   input: String
-): Result<Pair<MutableList<String>?, MutableList<FileSystemNode>?>> = runCatching {
+): Result<Pair<MutableList<String>?, MutableList<Path>?>> = runCatching {
   if (input.isBlank()) {
     return@runCatching Pair(null, null)
   }
@@ -114,7 +138,6 @@ fun writeFilesByMultipleInputs(
         file.completeFileMetadata.absoluteDirectoryPath
       )
       file.completeFileMetadata.absolutePath = directoryPath.resolve(file.completeFileMetadata.absolutePath)
-
       if (file.completeFileMetadata.absoluteDirectoryPath != previousDirectoryPath) {
         Files.createDirectory(file.completeFileMetadata.absoluteDirectoryPath)
         previousDirectoryPath = file.completeFileMetadata.absoluteDirectoryPath
@@ -122,5 +145,5 @@ fun writeFilesByMultipleInputs(
     }
   }
 
-  Pair(mutableListOf<String>(), mutableListOf<FileSystemNode>())
+  Pair(mutableListOf<String>(), mutableListOf<Path>())
 }

@@ -24,11 +24,6 @@ data class CompleteFileMetadata(
   var hash: String
 ) : FileMetadata
 
-data class FileSystemNode(
-  val absolutePath: String,
-  val isDirectory: Boolean
-)
-
 enum class FileFilterMode {
   FILES,
   NON_ZERO_BYTE_FILES,
