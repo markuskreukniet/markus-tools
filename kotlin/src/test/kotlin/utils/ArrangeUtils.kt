@@ -4,8 +4,10 @@ import org.example.utils.*
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.attribute.FileTime
 import java.time.Instant
-import java.time.format.DateTimeFormatter
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.exists
 
 fun createFileAndFileSystemFile(directoryPath: String, inputLine: String): Result<FileSystemFile> = runCatching {
   val fields = inputLine.split(",")
@@ -14,8 +16,7 @@ fun createFileAndFileSystemFile(directoryPath: String, inputLine: String): Resul
   val name = fields[2]
   val filePath = joinedDirectoryPath.resolve(name)
   val isDirectory = name == ""
-  val timeModified = if (fields[1] != "") Instant.from(DateTimeFormatter.ISO_DATE_TIME.parse(fields[1])).toEpochMilli()
-    else 0L
+  val timeModified = if (fields[1] != "") FileTime.from(Instant.parse(fields[1])) else null
 
   FileSystemFile(
     fileData, CompleteFileMetadata(
@@ -63,6 +64,20 @@ fun createSortedFileSystemFiles(
   files
 }
 
+// TODO: it is not an arrange function
+// TODO: using .sorted might be not efficient
+fun deleteDirectoryTrees(directoryPaths: MutableList<Path>): Result<Unit> = runCatching {
+  directoryPaths.forEach { directoryPath ->
+    if (!directoryPath.exists()) {
+      return@forEach
+    }
+
+    Files.walk(directoryPath)
+      .sorted(Comparator.reverseOrder())  // Delete files before directories
+      .forEach { path -> path.deleteIfExists() }
+  }
+}
+
 fun createTemporaryDirectory(): Result<Path> = runCatching {
   Files.createTempDirectory("markus-tools kotlin test_")  // The prefix is optional
 }
@@ -72,9 +87,20 @@ fun getTopDirectoryPath(directoryPath: Path): Result<Path?> = runCatching {
   if (directoryPath.nameCount > 0) directoryPath.getName(0) else null
 }
 
+fun writeFileAndAddPath(file: FileSystemFile, paths: MutableList<Path>): Result<Unit> = runCatching {
+  if (!file.completeFileMetadata.isDirectory) {
+    file.completeFileMetadata.absolutePath.toFile().writeText(file.data) // TODO: too many toFile() in codebase
+    if (file.completeFileMetadata.timeModified != null) {
+      Files.setLastModifiedTime(file.completeFileMetadata.absolutePath, file.completeFileMetadata.timeModified)
+    }
+  }
+
+  paths.add(file.completeFileMetadata.absolutePath)
+}
+
 fun writeFilesByMultipleInputs(
   input: String
-): Result<Pair<MutableList<String>?, MutableList<FileSystemNode>?>> = runCatching {
+): Result<Pair<MutableList<Path>?, MutableList<Path>?>> = runCatching {
   if (input.isBlank()) {
     return@runCatching Pair(null, null)
   }
@@ -104,6 +130,7 @@ fun writeFilesByMultipleInputs(
   }
 
   val temporaryDirectories = mutableListOf<Path>()
+  val inputPaths = mutableListOf<Path>()
 
   groups.forEach { group ->
     val directoryPath = createTemporaryDirectory().getOrThrow()
@@ -114,13 +141,13 @@ fun writeFilesByMultipleInputs(
         file.completeFileMetadata.absoluteDirectoryPath
       )
       file.completeFileMetadata.absolutePath = directoryPath.resolve(file.completeFileMetadata.absolutePath)
-
       if (file.completeFileMetadata.absoluteDirectoryPath != previousDirectoryPath) {
-        Files.createDirectory(file.completeFileMetadata.absoluteDirectoryPath)
+        Files.createDirectories(file.completeFileMetadata.absoluteDirectoryPath)
         previousDirectoryPath = file.completeFileMetadata.absoluteDirectoryPath
       }
+      writeFileAndAddPath(file, inputPaths)
     }
   }
 
-  Pair(mutableListOf<String>(), mutableListOf<FileSystemNode>())
+  Pair(temporaryDirectories, inputPaths)
 }
