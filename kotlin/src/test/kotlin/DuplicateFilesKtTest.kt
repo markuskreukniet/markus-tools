@@ -1,17 +1,17 @@
 import org.example.getDuplicateFilesAsNewlineSeparatedString
-import org.example.utils.FileSystemNode
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.nio.file.Paths
 
 class DuplicateFilesKtTest {
   @Test
   fun `given nothing when always then result is test`() {
-    val nodes = arrayOf(
-      FileSystemNode("/path1/path2", false),
-      FileSystemNode("/path3", false)
+    val paths = arrayOf(
+      Paths.get("/path1/path2"),
+      Paths.get("/path3")
     )
 
-    val result = getDuplicateFilesAsNewlineSeparatedString(nodes).getOrThrow() ?: return
+    val result = getDuplicateFilesAsNewlineSeparatedString(paths).getOrThrow() ?: return
     assertEquals("test", result)
   }
 }

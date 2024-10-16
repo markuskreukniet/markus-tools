@@ -6,7 +6,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.attribute.FileTime
 import java.time.Instant
-import java.time.format.DateTimeFormatter
 
 fun createFileAndFileSystemFile(directoryPath: String, inputLine: String): Result<FileSystemFile> = runCatching {
   val fields = inputLine.split(",")
