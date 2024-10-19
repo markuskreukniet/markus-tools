@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test
 import utils.deleteDirectoryTrees
 import utils.writeFilesByMultipleInputs
 import java.nio.file.Paths
-import kotlin.io.path.exists
 
 class DuplicateFilesKtTest {
   @Test
   fun `given inputs when there are duplicate files then return duplicates in newline-separated string`() {
+    // arrange
     val contents = arrayOf(
       "content 1\ncontent 1",
       "content 2\ncontent 2",
@@ -26,7 +26,7 @@ class DuplicateFilesKtTest {
       directory 5/directory 6/directory 7,,txt 5-6-7.txt,${contents[2]};
       directory 8,,txt 8.txt,${contents[2]}
     """
-    val wantedOutcome = """
+    var wantedOutcome = """
       directory 1\txt 1 2.txt
       directory 2\directory 3\txt 2-3.txt
 
@@ -39,9 +39,26 @@ class DuplicateFilesKtTest {
     """
 
     val pair = writeFilesByMultipleInputs(input).getOrThrow()
-
     val temporaryDirectories = pair.first ?: fail()
+    val inputPaths = pair.second ?: fail()
+    val inputPathsArray = inputPaths.toTypedArray()
 
+    val lines = wantedOutcome.lines()
+    val trimmedLines = mutableListOf<String>()
+    lines.forEach { line ->
+      val trimmed = line.trim()
+      if (trimmed.isNotEmpty()) {
+        trimmedLines.add(trimmed)
+      }
+    }
+    wantedOutcome = trimmedLines.joinToString("\n")
+
+    // act
+    val result = getDuplicateFilesAsNewlineSeparatedString(inputPathsArray).getOrThrow() ?: fail()
+
+    // assert
+
+    // tear down
     deleteDirectoryTrees(temporaryDirectories)
 
     val paths = arrayOf(
@@ -49,7 +66,7 @@ class DuplicateFilesKtTest {
       Paths.get("/path3")
     )
 
-    val result = getDuplicateFilesAsNewlineSeparatedString(paths).getOrThrow() ?: return
+
     assertEquals("test", result)
   }
 }

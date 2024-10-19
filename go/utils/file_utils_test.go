@@ -18,7 +18,7 @@ import (
 // 		FilePathEndParts:      []string{TxtFile1},
 // 	}
 
-// 	// arrange and teardown
+// 	// arrange and tear down
 // 	directory := TestingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
 // 	defer TestingRemoveDirectoryTree(t, directory)
 // 	fullPath := filepath.Join(directory, fileSystemPathEndParts.FilePathEndParts[0])
@@ -64,7 +64,7 @@ func TestFileExists(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.TestCaseBasic.Name, func(t *testing.T) {
-			// arrange and teardown
+			// arrange and tear down
 			directory, _ := TestingWriteFilesByOneInput(t, tc.TestCaseBasic.Input)
 			defer TestingRemoveDirectoryTree(t, directory)
 
