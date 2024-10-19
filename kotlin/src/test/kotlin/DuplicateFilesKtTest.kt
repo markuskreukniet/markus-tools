@@ -25,7 +25,7 @@ class DuplicateFilesKtTest {
       directory 2/directory 3,,txt 2-3 3.txt,${contents[1]};
       directory 2/directory 4,,txt 2-4.txt,${contents[1]};
       directory 5/directory 6/directory 7,,txt 5-6-7.txt,${contents[2]};
-      directory 8,,txt 8.txt,${contents[2]}
+      directory 8,,txt 8.txt,${contents[2]};
     """
     var wantedOutcome = """
       directory 1\txt 1 2.txt
