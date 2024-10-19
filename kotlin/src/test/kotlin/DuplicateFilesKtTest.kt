@@ -3,6 +3,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import utils.deleteDirectoryTrees
 import utils.writeFilesByMultipleInputs
+import java.io.File
 import java.nio.file.Paths
 
 class DuplicateFilesKtTest {
@@ -54,12 +55,21 @@ class DuplicateFilesKtTest {
     wantedOutcome = trimmedLines.joinToString("\n")
 
     // act
-    val result = getDuplicateFilesAsNewlineSeparatedString(inputPathsArray).getOrThrow() ?: fail()
+    var outcome = getDuplicateFilesAsNewlineSeparatedString(inputPathsArray).getOrThrow() ?: fail()
 
     // assert
-    assertEquals("test", result)
+    temporaryDirectories.forEach { directory ->
+      outcome = outcome.replace("${directory.toString()}${File.separator}", "")
+    }
+
+    outcome.split("\n\n").forEach { substring ->
+      wantedOutcome = wantedOutcome.replaceFirst(substring, "")
+    }
+    wantedOutcome = wantedOutcome.replace("\n\n", "")
+
+    assertEquals(wantedOutcome, "")
 
     // tear down
-    deleteDirectoryTrees(temporaryDirectories)
+    deleteDirectoryTrees(temporaryDirectories) // TODO: does not work now
   }
 }
