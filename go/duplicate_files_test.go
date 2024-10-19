@@ -46,7 +46,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
-			// arrange and teardown
+			// arrange and tear down
 			directories, fileSystemNodes := utils.TestingWriteFilesByMultipleInputs(t, tc.Input)
 			defer utils.TestingRemoveDirectoryTrees(t, directories)
 

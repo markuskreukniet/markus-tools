@@ -45,6 +45,4 @@ fun getDuplicateFilesAsNewlineSeparatedString(
   }
 
   result.toString()
-
-  "test"
 }
