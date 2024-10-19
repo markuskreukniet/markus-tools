@@ -51,18 +51,14 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			defer utils.TestingRemoveDirectoryTrees(t, directories)
 
 			lines := strings.Split(wantedOutcome, "\n")
-			start := 0
-			end := len(lines) - 1
-			for start <= end && strings.TrimSpace(lines[start]) == "" {
-				start++
+			var trimmedLines []string
+			for _, line := range lines {
+				trimmed := strings.TrimSpace(line)
+				if trimmed != "" {
+					trimmedLines = append(trimmedLines, trimmed)
+				}
 			}
-			for end >= start && strings.TrimSpace(lines[end]) == "" {
-				end--
-			}
-			for i := start; i <= end; i++ {
-				lines[i] = strings.TrimSpace(lines[i])
-			}
-			wantedOutcome = strings.Join(lines[start:end+1], "\n")
+			wantedOutcome = strings.Join(trimmedLines, "\n")
 
 			// act
 			outcome, err := getDuplicateFilesAsNewlineSeparatedString(fileSystemNodes)
