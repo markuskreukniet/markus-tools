@@ -6,6 +6,8 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.attribute.FileTime
 import java.time.Instant
+import kotlin.io.path.deleteIfExists
+import kotlin.io.path.exists
 
 fun createFileAndFileSystemFile(directoryPath: String, inputLine: String): Result<FileSystemFile> = runCatching {
   val fields = inputLine.split(",")
@@ -60,6 +62,19 @@ fun createSortedFileSystemFiles(
   }
 
   files
+}
+
+// TODO: it is not an arrange function
+// TODO: using .sorted might be not efficient
+fun deleteDirectoryTrees(directoryPaths: MutableList<Path>): Result<Unit> = runCatching {
+  directoryPaths.forEach { directoryPath ->
+    if (!directoryPath.exists()) {
+      return@forEach  // Skip this path if it doesn't exist
+    }
+    Files.walk(directoryPath)
+      .sorted(Comparator.reverseOrder())  // Delete files before directories
+      .forEach { path -> path.deleteIfExists() }
+  }
 }
 
 fun createTemporaryDirectory(): Result<Path> = runCatching {

@@ -1,8 +1,8 @@
 package org.example
 
 import org.example.utils.*
-import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
 
 fun getDuplicateFilesAsNewlineSeparatedString(
   uniqueAbsolutePaths: Array<Path>
@@ -25,8 +25,9 @@ fun getDuplicateFilesAsNewlineSeparatedString(
   }
 
   uniqueAbsolutePaths.forEach { path ->
-    Files.exists(path)
-    walkFilterAndHandleFileMetadata(path, FileFilterMode.NON_ZERO_BYTE_FILES, FileType.ALL_FILES, handler)
+    if (path.exists()) {
+      walkFilterAndHandleFileMetadata(path, FileFilterMode.NON_ZERO_BYTE_FILES, FileType.ALL_FILES, handler)
+    }
   }
 
   val groups = createFileMetadataByHashGroups(files, true).getOrThrow() ?: return@runCatching null
