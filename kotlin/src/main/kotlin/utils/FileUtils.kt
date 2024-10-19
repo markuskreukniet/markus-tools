@@ -2,9 +2,9 @@ package org.example.utils
 
 import java.io.File
 import java.net.URLConnection
-import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.FileTime
+import kotlin.io.path.getLastModifiedTime
 
 data class FileSystemFile(
   val data: String,
@@ -78,7 +78,7 @@ fun filterAndHandleFileMetadata(
     name = file.name,
     absoluteDirectoryPath = absoluteFilePath, // TODO:
     absolutePath = absoluteFilePath,
-    timeModified = Files.getLastModifiedTime(absoluteFilePath),
+    timeModified = absoluteFilePath.getLastModifiedTime(),
     size = file.length(),
     isDirectory = file.isDirectory,
     hash = ""
