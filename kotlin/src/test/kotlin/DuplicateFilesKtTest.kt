@@ -57,16 +57,9 @@ class DuplicateFilesKtTest {
     val result = getDuplicateFilesAsNewlineSeparatedString(inputPathsArray).getOrThrow() ?: fail()
 
     // assert
+    assertEquals("test", result)
 
     // tear down
     deleteDirectoryTrees(temporaryDirectories)
-
-    val paths = arrayOf(
-      Paths.get("/path1/path2"),
-      Paths.get("/path3")
-    )
-
-
-    assertEquals("test", result)
   }
 }
