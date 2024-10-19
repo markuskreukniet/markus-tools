@@ -69,8 +69,9 @@ fun createSortedFileSystemFiles(
 fun deleteDirectoryTrees(directoryPaths: MutableList<Path>): Result<Unit> = runCatching {
   directoryPaths.forEach { directoryPath ->
     if (!directoryPath.exists()) {
-      return@forEach  // Skip this path if it doesn't exist
+      return@forEach
     }
+
     Files.walk(directoryPath)
       .sorted(Comparator.reverseOrder())  // Delete files before directories
       .forEach { path -> path.deleteIfExists() }

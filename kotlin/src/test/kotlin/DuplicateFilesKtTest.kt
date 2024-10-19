@@ -1,6 +1,7 @@
 import org.example.getDuplicateFilesAsNewlineSeparatedString
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import utils.deleteDirectoryTrees
 import utils.writeFilesByMultipleInputs
 import java.nio.file.Paths
 import kotlin.io.path.exists
@@ -41,11 +42,7 @@ class DuplicateFilesKtTest {
 
     val temporaryDirectories = pair.first ?: fail()
 
-//    temporaryDirectories.forEach { directory ->
-//      if (directory.exists()) {
-//        //
-//      }
-//    }
+    deleteDirectoryTrees(temporaryDirectories)
 
     val paths = arrayOf(
       Paths.get("/path1/path2"),
