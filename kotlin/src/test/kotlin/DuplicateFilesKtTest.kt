@@ -1,12 +1,15 @@
 import org.example.getDuplicateFilesAsNewlineSeparatedString
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import utils.deleteDirectoryTrees
 import utils.writeFilesByMultipleInputs
 import java.io.File
-import java.nio.file.Paths
+import java.nio.file.Path
 
 class DuplicateFilesKtTest {
+  private lateinit var temporaryDirectories: MutableList<Path>
+
   @Test
   fun `given inputs when there are duplicate files then return duplicates in newline-separated string`() {
     // arrange
@@ -40,7 +43,7 @@ class DuplicateFilesKtTest {
     """
 
     val pair = writeFilesByMultipleInputs(input).getOrThrow()
-    val temporaryDirectories = pair.first ?: fail()
+    temporaryDirectories = pair.first ?: fail()
     val inputPaths = pair.second ?: fail()
     val inputPathsArray = inputPaths.toTypedArray()
 
@@ -68,8 +71,10 @@ class DuplicateFilesKtTest {
     wantedOutcome = wantedOutcome.replace("\n\n", "")
 
     assertEquals(wantedOutcome, "")
+  }
 
-    // tear down
-    deleteDirectoryTrees(temporaryDirectories) // TODO: does not work now
+  @AfterEach
+  fun tearDown() {
+    deleteDirectoryTrees(temporaryDirectories)
   }
 }
