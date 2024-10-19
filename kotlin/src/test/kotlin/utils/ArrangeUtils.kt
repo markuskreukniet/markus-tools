@@ -141,7 +141,7 @@ fun writeFilesByMultipleInputs(
       )
       file.completeFileMetadata.absolutePath = directoryPath.resolve(file.completeFileMetadata.absolutePath)
       if (file.completeFileMetadata.absoluteDirectoryPath != previousDirectoryPath) {
-        Files.createDirectory(file.completeFileMetadata.absoluteDirectoryPath)
+        Files.createDirectories(file.completeFileMetadata.absoluteDirectoryPath)
         previousDirectoryPath = file.completeFileMetadata.absoluteDirectoryPath
       }
       writeFileAndAddPath(file, inputPaths)

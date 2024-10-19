@@ -37,9 +37,9 @@ class DuplicateFilesKtTest {
       directory 8\txt 8.txt
     """
 
-    // val pair = writeFilesByMultipleInputs(input).getOrThrow() // TODO: getOrThrow?
+    val pair = writeFilesByMultipleInputs(input).getOrThrow()
 
-    // val temporaryDirectories = pair.first ?: fail()
+    val temporaryDirectories = pair.first ?: fail()
 
 //    temporaryDirectories.forEach { directory ->
 //      if (directory.exists()) {
