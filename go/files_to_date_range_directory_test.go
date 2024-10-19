@@ -175,7 +175,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	// run testCases
 	for _, tc := range testCases {
 		t.Run(tc.TestCaseBasic.Name, func(t *testing.T) {
-			// arrange and teardown
+			// arrange and tear down
 			directories, nodes := utils.TestingWriteFilesByMultipleInputs(t, tc.TestCaseBasic.Input)
 			defer utils.TestingRemoveDirectoryTrees(t, directories)
 
