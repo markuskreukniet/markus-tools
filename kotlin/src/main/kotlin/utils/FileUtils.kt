@@ -47,8 +47,8 @@ fun isTextFile(file: File): Result<Boolean> = runCatching {
   mimeType?.startsWith("text") == true
 }
 
-fun getDirectoryPath(filePath: Path, isDirectory: Boolean): Result<Path> = runCatching {
-  if (isDirectory || filePath.parent == null) {
+fun getDirectoryPath(filePath: Path, isDirectory: Boolean): Path {
+  return if (isDirectory || filePath.parent == null) {
     filePath
   } else {
     filePath.parent
@@ -84,7 +84,7 @@ fun filterAndHandleFileMetadata(
 
   handler(CompleteFileMetadata(
     name = file.name,
-    absoluteDirectoryPath = getDirectoryPath(absoluteFilePath, file.isDirectory).getOrThrow(),
+    absoluteDirectoryPath = getDirectoryPath(absoluteFilePath, file.isDirectory),
     absolutePath = absoluteFilePath,
     timeModified = absoluteFilePath.getLastModifiedTime(),
     size = file.length(),
