@@ -47,10 +47,18 @@ fun isTextFile(file: File): Result<Boolean> = runCatching {
   mimeType?.startsWith("text") == true
 }
 
+fun getDirectoryPath(filePath: Path, isDirectory: Boolean): Result<Path> = runCatching {
+  if (isDirectory || filePath.parent == null) {
+    filePath
+  } else {
+    filePath.parent
+  }
+}
+
 fun filterAndHandleFileMetadata(
   file: File, mode: FileFilterMode, type: FileType, absoluteFilePath: Path, handler: (CompleteFileMetadata) -> Unit
 ): Result<Unit> = runCatching {
-  val size: Long = if (file.isFile) file.length() else 0L
+  val size = if (file.isFile) file.length() else 0L
 
   // is file check
   if (file.isFile && mode == FileFilterMode.DIRECTORIES) {
@@ -76,7 +84,7 @@ fun filterAndHandleFileMetadata(
 
   handler(CompleteFileMetadata(
     name = file.name,
-    absoluteDirectoryPath = absoluteFilePath, // TODO:
+    absoluteDirectoryPath = getDirectoryPath(absoluteFilePath, file.isDirectory).getOrThrow(),
     absolutePath = absoluteFilePath,
     timeModified = absoluteFilePath.getLastModifiedTime(),
     size = file.length(),
