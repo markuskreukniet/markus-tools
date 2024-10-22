@@ -9,24 +9,22 @@ fun getDuplicateFilesAsNewlineSeparatedString(
 ): Result<String?> = runCatching {
   data class DuplicateFileMetadata(
     override val absolutePath: Path,
-    override val size: Long,
-    var hash: String
+    override val size: Long
   ) : FileMetadata
 
   val result = StringBuilder()
   val files = mutableListOf<FileMetadata>()
 
-  val handler = fun(file: CompleteFileMetadata) {
+  val handler = fun(file: FileInfo) {
     files.add(DuplicateFileMetadata(
       absolutePath = file.absolutePath,
-      size = file.size,
-      hash = file.hash
+      size = file.size
     ))
   }
 
   uniqueAbsolutePaths.forEach { path ->
     if (path.exists()) {
-      walkFilterAndHandleFileMetadata(path, FileFilterMode.NON_ZERO_BYTE_FILES, FileType.ALL_FILES, handler)
+      walkFilterAndHandleFileInfo(path, FileFilterMode.NON_ZERO_BYTE_FILES, FileType.ALL_FILES, handler)
     }
   }
 
