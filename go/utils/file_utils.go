@@ -8,6 +8,43 @@ import (
 	"unicode"
 )
 
+type FileInfo interface {
+	GetSize() int64
+	GetAbsolutePath() string
+}
+
+// MinimalFileInfo implements FileInfo
+type MinimalFileInfo struct {
+	Size         int64
+	AbsolutePath string
+}
+
+func (info MinimalFileInfo) GetSize() int64 {
+	return info.Size
+}
+
+func (info MinimalFileInfo) GetAbsolutePath() string {
+	return info.AbsolutePath
+}
+
+// CompleteFileInfo implements FileInfo
+type CompleteFileInfo struct {
+	name                  string
+	absoluteDirectoryPath string
+	absolutePath          string
+	timeModified          time.Time
+	size                  int64
+	isDirectory           bool
+}
+
+func (info CompleteFileInfo) GetSize() int64 {
+	return info.size
+}
+
+func (info CompleteFileInfo) GetAbsolutePath() string {
+	return info.absolutePath
+}
+
 type FileSystemFile struct {
 	Data         string
 	FileMetadata FileMetadata
@@ -58,8 +95,8 @@ const (
 )
 
 const (
-	AllFiles       fileType = iota
-	PlainTextFiles          // TODO: rename to TextFiles
+	AllFiles fileType = iota
+	TextFiles
 )
 
 const FilePathSeparator = string(filepath.Separator)
@@ -68,8 +105,7 @@ func CreateDirectory(filePath string) error {
 	return os.Mkdir(filePath, 0755)
 }
 
-// TODO: isTextFile better naming
-func IsNonZeroByteFileATextFile(filePath string) (bool, error) {
+func IsTextFile(filePath string) (bool, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return false, err
@@ -112,6 +148,71 @@ func ToFileSystemFile(filePath string) (FileSystemFile, error) {
 		CreateFileMetadata(info.Name(), toDirectoryPath(filePath, isDirectory), filePath, "", info.ModTime(), info.Size(), isDirectory)), nil
 }
 
+func FilterAndHandleFileInfo(
+	info os.FileInfo, mode fileFilterMode, fileType fileType, absoluteFilePath string, handler func(FileInfo),
+) error {
+	isDir := info.IsDir()
+	isRegularFile := info.Mode().IsRegular()
+
+	var size int64
+	if isRegularFile {
+		size = info.Size()
+	}
+
+	// is file check
+	if isRegularFile && mode == Directories {
+		return nil
+	}
+
+	// is directory check
+	if isDir && (mode == files || mode == NonZeroByteFiles) {
+		return nil
+	}
+
+	// is zero byte file check
+	if isRegularFile && size == 0 && (mode == NonZeroByteFiles || mode == NonZeroByteFilesAndDirectories) {
+		return nil
+	}
+
+	// is text file check
+	if fileType == TextFiles {
+		isTextFile, err := IsTextFile(absoluteFilePath)
+		if err != nil || !isTextFile {
+			return err
+		}
+	}
+
+	handler(CompleteFileInfo{
+		name:                  info.Name(),
+		absoluteDirectoryPath: toDirectoryPath(absoluteFilePath, isDir),
+		absolutePath:          absoluteFilePath,
+		timeModified:          info.ModTime(),
+		size:                  size,
+		isDirectory:           isDir,
+	})
+
+	return nil
+}
+
+func WalkFilterAndHandleFileInfo(
+	node FileSystemNode, mode fileFilterMode, fileType fileType, handler func(FileInfo),
+) error {
+	if node.IsDirectory {
+		return filepath.Walk(node.Path, func(absoluteFilePath string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			return FilterAndHandleFileInfo(info, mode, fileType, absoluteFilePath, handler)
+		})
+	} else {
+		info, err := os.Stat(node.Path)
+		if err != nil {
+			return err
+		}
+		return FilterAndHandleFileInfo(info, mode, fileType, node.Path, handler)
+	}
+}
+
 func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileSystemFile) error) error {
 	return filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
 		if err != nil {
@@ -141,8 +242,8 @@ func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode,
 		}
 
 		// is text file check
-		if fileType == PlainTextFiles {
-			isTextFile, err := IsNonZeroByteFileATextFile(filePath)
+		if fileType == TextFiles {
+			isTextFile, err := IsTextFile(filePath)
 			if err != nil || !isTextFile {
 				return err
 			}

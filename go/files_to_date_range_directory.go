@@ -343,12 +343,12 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 			if exists {
 				// We should always create a hash of the file in the destination folder.
 				// Otherwise, we have to loop through all the files to find that file, and that found file might not have a hash yet.
-				hash, err := utils.HashFile(fullFilePath)
+				hash, err := utils.CreateFileHash(fullFilePath)
 				if err != nil {
 					return nil, err
 				}
 				if file.FileMetadata.Hash == "" {
-					file.FileMetadata.Hash, err = utils.HashFile(file.FileMetadata.Path)
+					file.FileMetadata.Hash, err = utils.CreateFileHash(file.FileMetadata.Path)
 					if err != nil {
 						return nil, err
 					}
