@@ -8,6 +8,43 @@ import (
 	"unicode"
 )
 
+type FileInfo interface {
+	Size() int64
+	AbsolutePath() string
+}
+
+// MinimalFileInfo implements FileInfo
+type MinimalFileInfo struct {
+	size         int64
+	absolutePath string
+}
+
+func (info MinimalFileInfo) Size() int64 {
+	return info.size
+}
+
+func (info MinimalFileInfo) AbsolutePath() string {
+	return info.absolutePath
+}
+
+// CompleteFileInfo implements FileInfo
+type CompleteFileInfo struct {
+	name                  string
+	absoluteDirectoryPath string
+	absolutePath          string
+	timeModified          time.Time
+	size                  int64
+	isDirectory           bool
+}
+
+func (info CompleteFileInfo) Size() int64 {
+	return info.size
+}
+
+func (info CompleteFileInfo) AbsolutePath() string {
+	return info.absolutePath
+}
+
 type FileSystemFile struct {
 	Data         string
 	FileMetadata FileMetadata
@@ -68,8 +105,7 @@ func CreateDirectory(filePath string) error {
 	return os.Mkdir(filePath, 0755)
 }
 
-// TODO: isTextFile better naming
-func IsNonZeroByteFileATextFile(filePath string) (bool, error) {
+func IsTextFile(filePath string) (bool, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return false, err
@@ -142,7 +178,7 @@ func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode,
 
 		// is text file check
 		if fileType == PlainTextFiles {
-			isTextFile, err := IsNonZeroByteFileATextFile(filePath)
+			isTextFile, err := IsTextFile(filePath)
 			if err != nil || !isTextFile {
 				return err
 			}

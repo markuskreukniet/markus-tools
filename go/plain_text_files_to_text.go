@@ -43,7 +43,7 @@ func plainTextFilesToTextToJSON(uniqueFileSystemNodes []utils.FileSystemNode) st
 	return resultToJSONFunctionResult(text)
 }
 
-// Opening a file two times is not the most efficient, but having a separate open file in isNonZeroByteFileATextFile helps with filtering.
+// Opening a file two times is not the most efficient, but having a separate open file in isTextFile helps with filtering.
 func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string, error) {
 	var filePaths []string
 
@@ -63,7 +63,7 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 				return "", err
 			}
 			if file.FileMetadata.Size > 0 {
-				isTextFile, err := utils.IsNonZeroByteFileATextFile(file.FileMetadata.Path)
+				isTextFile, err := utils.IsTextFile(file.FileMetadata.Path)
 				if err != nil {
 					return "", err
 				}
