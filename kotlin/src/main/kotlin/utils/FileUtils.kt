@@ -6,6 +6,33 @@ import java.nio.file.Path
 import java.nio.file.attribute.FileTime
 import kotlin.io.path.getLastModifiedTime
 
+data class FileData(
+  val content: String,
+  val completeFileInfo: CompleteFileInfo
+)
+
+interface FileInfo {
+  val file: File
+  val size: Long
+  val absolutePath: Path
+}
+
+data class MinimalFileInfo(
+  override val file: File,
+  override val size: Long,
+  override val absolutePath: Path
+) : FileInfo
+
+data class CompleteFileInfo(
+  override val file: File,
+  val name: String,
+  val absoluteDirectoryPath: Path,
+  override val absolutePath: Path,
+  val timeModified: FileTime?,
+  override val size: Long,
+  val isDirectory: Boolean,
+) : FileInfo
+
 data class FileSystemFile(
   val data: String,
   val completeFileMetadata: CompleteFileMetadata
@@ -55,8 +82,8 @@ fun getDirectoryPath(filePath: Path, isDirectory: Boolean): Path {
   }
 }
 
-fun filterAndHandleFileMetadata(
-  file: File, mode: FileFilterMode, type: FileType, absoluteFilePath: Path, handler: (CompleteFileMetadata) -> Unit
+fun filterAndHandleFileInfo(
+  file: File, mode: FileFilterMode, type: FileType, absoluteFilePath: Path, handler: (FileInfo) -> Unit
 ): Result<Unit> = runCatching {
   val size = if (file.isFile) file.length() else 0L
 
@@ -82,22 +109,22 @@ fun filterAndHandleFileMetadata(
     return@runCatching
   }
 
-  handler(CompleteFileMetadata(
+  handler(CompleteFileInfo(
+    file = file,
     name = file.name,
     absoluteDirectoryPath = getDirectoryPath(absoluteFilePath, file.isDirectory),
     absolutePath = absoluteFilePath,
     timeModified = absoluteFilePath.getLastModifiedTime(),
     size = file.length(),
     isDirectory = file.isDirectory,
-    hash = ""
   ))
 }
 
-fun walkFilterAndHandleFileMetadata(
+fun walkFilterAndHandleFileInfo(
   absoluteFilePath: Path,
   mode: FileFilterMode,
   type: FileType,
-  handler: (CompleteFileMetadata) -> Unit
+  handler: (FileInfo) -> Unit
 ): Result<Unit> = runCatching {
   val rootFile = absoluteFilePath.toFile()
 
@@ -107,6 +134,6 @@ fun walkFilterAndHandleFileMetadata(
 
   val files = if (rootFile.isDirectory) rootFile.walk() else sequenceOf(rootFile)
   files.forEach { file ->
-    filterAndHandleFileMetadata(file, mode, type, absoluteFilePath, handler).onFailure { throw it }
+    filterAndHandleFileInfo(file, mode, type, absoluteFilePath, handler).onFailure { throw it }
   }
 }
