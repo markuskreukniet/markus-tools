@@ -1,6 +1,6 @@
 package org.example.utils
 
-import java.nio.file.Path
+import java.io.File
 import java.security.MessageDigest
 
 // writeNewline
@@ -13,25 +13,25 @@ fun writeTwoNewlineStrings(builder: StringBuilder) {
 }
 
 fun createFileMetadataByHashGroups(
-  files: MutableList<FileMetadata>, onlyDuplicates: Boolean
-): Result<MutableList<MutableList<FileMetadata>>?> = runCatching {
+  files: MutableList<FileInfo>, onlyDuplicates: Boolean
+): Result<MutableList<MutableList<FileInfo>>?> = runCatching {
   if (files.isEmpty()) {
     return@runCatching null
   }
 
   data class FilesByFileSize(
     val fileSize: Long,
-    val files: MutableList<FileMetadata>
+    val files: MutableList<FileInfo>
   )
 
-  fun addGroup(groups: MutableList<FilesByFileSize>, file: FileMetadata) {
+  fun addGroup(groups: MutableList<FilesByFileSize>, file: FileInfo) {
     groups.add(FilesByFileSize(
       fileSize = file.size,
       files = mutableListOf(file)
     ))
   }
 
-  val result = mutableListOf<MutableList<FileMetadata>>()
+  val result = mutableListOf<MutableList<FileInfo>>()
   val groups = mutableListOf<FilesByFileSize>()
   var sizeIndex = 0
 
@@ -49,9 +49,9 @@ fun createFileMetadataByHashGroups(
 
   groups.forEach { group ->
     if (group.files.size > 1) {
-      val map = mutableMapOf<String, MutableList<FileMetadata>>()
+      val map = mutableMapOf<String, MutableList<FileInfo>>()
       group.files.forEach { file ->
-        val hash = createFileHash(file.absolutePath).getOrThrow() ?: return@runCatching null
+        val hash = createFileHash(file.file).getOrThrow() ?: return@runCatching null
         map.getOrPut(hash) { mutableListOf() }.add(file)
       }
       map.values.forEach { hashedFiles ->
@@ -67,8 +67,7 @@ fun createFileMetadataByHashGroups(
   result
 }
 
-fun createFileHash(filePath: Path): Result<String?> = runCatching {
-  val file = filePath.toFile()
+fun createFileHash(file: File): Result<String?> = runCatching {
   val bytes = file.readBytes()
   val md = MessageDigest.getInstance("SHA-256")
   val hashBytes = md.digest(bytes)
