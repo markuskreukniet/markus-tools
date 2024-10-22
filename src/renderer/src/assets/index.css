@@ -64,6 +64,16 @@ body, textarea, .button--secondary, .button--tertiary, .text-area__custom-placeh
 
 button, #navigation-bar > li {
   padding: var(--size-1-s) var(--size-1);
+  transition: opacity 0.2s ease;
+}
+
+button:active, #navigation-bar > li:active {
+  opacity: 0.6;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 ul {
@@ -88,11 +98,6 @@ h1, h2, ul, .file-system-nodes-input__submission-buttons, .references-by-urls__i
 
 #navigation-bar > li {
   min-height: calc((var(--size-1-s) * 2) + (var(--size-3) * var(--g-ratio-p)) + var(--border-width-5) * 2);
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 textarea {
@@ -128,14 +133,11 @@ textarea, .button--secondary, .text-area__custom-placeholder {
 
 .text-area__custom-placeholder {
   align-items: flex-start;
+  text-align: left;
 }
 
 .references-by-urls__input-component {
   align-items: flex-end;
-}
-
-.text-area__custom-placeholder {
-  text-align: left;
 }
 
 .display-none {
