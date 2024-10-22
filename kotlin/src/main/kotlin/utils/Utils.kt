@@ -12,7 +12,7 @@ fun writeTwoNewlineStrings(builder: StringBuilder) {
   builder.append("\n\n")
 }
 
-fun createFileMetadataByHashGroups(
+fun createFileInfoGroupsByHash(
   files: MutableList<FileInfo>, onlyDuplicates: Boolean
 ): Result<MutableList<MutableList<FileInfo>>?> = runCatching {
   if (files.isEmpty()) {
@@ -24,7 +24,7 @@ fun createFileMetadataByHashGroups(
     val files: MutableList<FileInfo>
   )
 
-  fun addGroup(groups: MutableList<FilesByFileSize>, file: FileInfo) {
+  val addGroup = fun(groups: MutableList<FilesByFileSize>, file: FileInfo) {
     groups.add(FilesByFileSize(
       fileSize = file.size,
       files = mutableListOf(file)

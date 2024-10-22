@@ -63,8 +63,9 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	// `
 
 	// // V trying to add a duplicate files to new directories
-	// contentM100 := TestingCreateContent("m 10 0")
-	// contentM101 := TestingCreateContent("m 10 1")
+	contentM100 := createTestContent("m 10 0")
+	contentM101 := createTestContent("m 10 1")
+	content10MN12 := createTestContent("10 M N 1 2") // TODO: only good naming
 	// moveDuplicateFilesToNewDirectories := `
 	// 	,2020-10-10T20:40:40Z,txt d n 0.txt,` + contentM100 + `;
 
@@ -93,20 +94,23 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	// 	directory 1/directory 2,2020-11-06T20:40:40Z,txt d e 1 2.txt,` + content112 + `;
 	// `
 
-	// // V move files to new directories
-	// // --- move files to a new date range directory to increase the date range of that directory with a different variable
-	// moveFilesToNewDirectories := `
-	// 	,2020-10-10T20:40:40Z,txt m n 0.txt,` + contentM100 + `;
-
-	// 	directory 1,2020-10-20T20:40:40Z,txt m n 1.txt,` + contentM101 + `;
-	// 	directory 1/directory 2,2020-10-22T20:40:40Z,txt m n 1 2.txt,` + TestingCreateContent("m n 10 1 2") + `;
-	// `
-
 	input := ""
 	destinationInput := ""
 	wantedOutcome := ""
 
-	// X? move files to existing directories
+	// V move files to new directories
+	input = input + `
+		,2020-10-10T20:40:40Z,txt m n 0.txt,` + contentM100 + `;
+		directory 1,2020-10-20T20:40:40Z,txt m n 1.txt,` + contentM101 + `;
+		directory 1/directory 2,2020-10-22T20:40:40Z,txt m n 1 2.txt,` + content10MN12 + `;
+	`
+	wantedOutcome = wantedOutcome + `
+		2020-10-10,2020-10-10T20:40:40Z,txt m n 0.txt,` + contentM100 + `;
+		2020-10-20 - 2020-10-22,2020-10-20T20:40:40Z,txt m n 1.txt,` + contentM101 + `;
+		2020-10-20 - 2020-10-22,2020-10-22T20:40:40Z,txt m n 1 2.txt,` + content10MN12 + `;
+	`
+
+	// V move files to existing directories
 	input = input + `
 		,2020-11-10T20:40:40Z,txt m e 0.txt,` + contentME110 + `;
 		directory 1,2020-11-20T20:40:40Z,txt m e 1.txt,` + contentME111 + `;
