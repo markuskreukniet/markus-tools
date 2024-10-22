@@ -26,32 +26,12 @@ data class MinimalFileInfo(
 data class CompleteFileInfo(
   override val file: File,
   val name: String,
-  val absoluteDirectoryPath: Path,
-  override val absolutePath: Path,
-  val timeModified: FileTime?,
-  override val size: Long,
-  val isDirectory: Boolean,
-) : FileInfo
-
-data class FileSystemFile(
-  val data: String,
-  val completeFileMetadata: CompleteFileMetadata
-)
-
-interface FileMetadata {
-  val absolutePath: Path
-  val size: Long
-}
-
-data class CompleteFileMetadata(
-  val name: String,
   var absoluteDirectoryPath: Path,
   override var absolutePath: Path,
   val timeModified: FileTime?,
   override val size: Long,
   val isDirectory: Boolean,
-  var hash: String
-) : FileMetadata
+) : FileInfo
 
 enum class FileFilterMode {
   FILES,
