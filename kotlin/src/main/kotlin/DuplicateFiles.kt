@@ -7,18 +7,14 @@ import kotlin.io.path.exists
 fun getDuplicateFilesAsNewlineSeparatedString(
   uniqueAbsolutePaths: Array<Path>
 ): Result<String?> = runCatching {
-  data class DuplicateFileMetadata(
-    override val absolutePath: Path,
-    override val size: Long
-  ) : FileMetadata
-
   val result = StringBuilder()
-  val files = mutableListOf<FileMetadata>()
+  val files = mutableListOf<FileInfo>()
 
   val handler = fun(file: FileInfo) {
-    files.add(DuplicateFileMetadata(
-      absolutePath = file.absolutePath,
-      size = file.size
+    files.add(MinimalFileInfo(
+      file = file.file,
+      size = file.size,
+      absolutePath = file.absolutePath
     ))
   }
 

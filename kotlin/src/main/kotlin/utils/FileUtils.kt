@@ -8,18 +8,30 @@ import kotlin.io.path.getLastModifiedTime
 
 data class FileData(
   val content: String,
-  val fileInfo: FileInfo
+  val completeFileInfo: CompleteFileInfo
 )
 
-data class FileInfo(
-  val file: File,
+interface FileInfo {
+  val file: File
+  val size: Long
+  val absolutePath: Path
+}
+
+data class MinimalFileInfo(
+  override val file: File,
+  override val size: Long,
+  override val absolutePath: Path
+) : FileInfo
+
+data class CompleteFileInfo(
+  override val file: File,
   val name: String,
   val absoluteDirectoryPath: Path,
-  val absolutePath: Path,
+  override val absolutePath: Path,
   val timeModified: FileTime?,
-  val size: Long,
+  override val size: Long,
   val isDirectory: Boolean,
-)
+) : FileInfo
 
 data class FileSystemFile(
   val data: String,
@@ -97,7 +109,7 @@ fun filterAndHandleFileInfo(
     return@runCatching
   }
 
-  handler(FileInfo(
+  handler(CompleteFileInfo(
     file = file,
     name = file.name,
     absoluteDirectoryPath = getDirectoryPath(absoluteFilePath, file.isDirectory),
