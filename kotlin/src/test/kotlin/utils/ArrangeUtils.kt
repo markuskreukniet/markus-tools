@@ -7,38 +7,39 @@ import java.nio.file.Paths
 import java.nio.file.attribute.FileTime
 import java.time.Instant
 
-fun createFileAndFileSystemFile(directoryPath: String, inputLine: String): Result<FileSystemFile> = runCatching {
+fun createFileAndFileSystemFile(directoryPath: String, inputLine: String): Result<FileData> = runCatching {
   val fields = inputLine.split(",")
   val joinedDirectoryPath = Paths.get(directoryPath, fields[0])
-  val fileData = fields[3]
+  val content = fields[3]
   val name = fields[2]
   val filePath = joinedDirectoryPath.resolve(name)
   val isDirectory = name == ""
   val timeModified = if (fields[1] != "") FileTime.from(Instant.parse(fields[1])) else null
 
-  FileSystemFile(
-    fileData, CompleteFileMetadata(
+  FileData(
+    content = content,
+    completeFileInfo = CompleteFileInfo(
+      file = filePath.toFile(), // The file is now unusable since the file path is not complete.
       name = name,
       absoluteDirectoryPath = joinedDirectoryPath,
       absolutePath = filePath,
       timeModified = timeModified,
       size = 0L,
       isDirectory = isDirectory,
-      hash = ""
     )
   )
 }
 
 fun createSortedFileSystemFiles(
   rawDelimitedSemicolonString: String
-): Result<MutableList<FileSystemFile>> = runCatching {
+): Result<MutableList<FileData>> = runCatching {
   createSortedFileSystemFiles("", rawDelimitedSemicolonString).getOrThrow()
 }
 
 fun createSortedFileSystemFiles(
   directoryPath: String, rawDelimitedSemicolonString: String
-): Result<MutableList<FileSystemFile>> = runCatching {
-  val files = mutableListOf<FileSystemFile>()
+): Result<MutableList<FileData>> = runCatching {
+  val files = mutableListOf<FileData>()
   val inputLine = mutableListOf<Char>()
   var isCreatingInputLine = false
   val trimmedRawString = rawDelimitedSemicolonString.trim()
@@ -71,15 +72,15 @@ fun getTopDirectoryPath(directoryPath: Path): Result<Path?> = runCatching {
   if (directoryPath.nameCount > 0) directoryPath.getName(0) else null
 }
 
-fun writeFileAndAddPath(file: FileSystemFile, paths: MutableList<Path>): Result<Unit> = runCatching {
-  if (!file.completeFileMetadata.isDirectory) {
-    file.completeFileMetadata.absolutePath.toFile().writeText(file.data) // TODO: too many toFile() in codebase
-    if (file.completeFileMetadata.timeModified != null) {
-      Files.setLastModifiedTime(file.completeFileMetadata.absolutePath, file.completeFileMetadata.timeModified)
+fun writeFileAndAddPath(file: FileData, paths: MutableList<Path>): Result<Unit> = runCatching {
+  if (!file.completeFileInfo.isDirectory) {
+    file.completeFileInfo.absolutePath.toFile().writeText(file.content)
+    if (file.completeFileInfo.timeModified != null) {
+      Files.setLastModifiedTime(file.completeFileInfo.absolutePath, file.completeFileInfo.timeModified)
     }
   }
 
-  paths.add(file.completeFileMetadata.absolutePath)
+  paths.add(file.completeFileInfo.absolutePath)
 }
 
 fun writeFilesByMultipleInputs(
@@ -95,17 +96,17 @@ fun writeFilesByMultipleInputs(
     return@runCatching Pair(null, null)
   }
 
-  val groups = mutableListOf<MutableList<FileSystemFile>>(mutableListOf<FileSystemFile>(files.first()))
+  val groups = mutableListOf<MutableList<FileData>>(mutableListOf<FileData>(files.first()))
   var previousTopDirectoryPath = getTopDirectoryPath(
-    files.first().completeFileMetadata.absoluteDirectoryPath
+    files.first().completeFileInfo.absoluteDirectoryPath
   ).getOrThrow()
   var index = 0
 
   files.drop(1).forEach { file ->
-    val currentTopDirectoryPath = getTopDirectoryPath(file.completeFileMetadata.absoluteDirectoryPath).getOrThrow()
+    val currentTopDirectoryPath = getTopDirectoryPath(file.completeFileInfo.absoluteDirectoryPath).getOrThrow()
     // We can use '==' or '!=' for string-based comparison of the paths.
     if (currentTopDirectoryPath == null || previousTopDirectoryPath != currentTopDirectoryPath) {
-      groups.add(mutableListOf<FileSystemFile>(file))
+      groups.add(mutableListOf<FileData>(file))
       previousTopDirectoryPath = currentTopDirectoryPath
       index++
     } else {
@@ -119,15 +120,15 @@ fun writeFilesByMultipleInputs(
   groups.forEach { group ->
     val directoryPath = createTemporaryDirectory().getOrThrow()
     temporaryDirectories.add(directoryPath)
-    var previousDirectoryPath = group.first().completeFileMetadata.absoluteDirectoryPath
+    var previousDirectoryPath = group.first().completeFileInfo.absoluteDirectoryPath
     group.forEach { file ->
-      file.completeFileMetadata.absoluteDirectoryPath = directoryPath.resolve(
-        file.completeFileMetadata.absoluteDirectoryPath
+      file.completeFileInfo.absoluteDirectoryPath = directoryPath.resolve(
+        file.completeFileInfo.absoluteDirectoryPath
       )
-      file.completeFileMetadata.absolutePath = directoryPath.resolve(file.completeFileMetadata.absolutePath)
-      if (file.completeFileMetadata.absoluteDirectoryPath != previousDirectoryPath) {
-        Files.createDirectories(file.completeFileMetadata.absoluteDirectoryPath)
-        previousDirectoryPath = file.completeFileMetadata.absoluteDirectoryPath
+      file.completeFileInfo.absolutePath = directoryPath.resolve(file.completeFileInfo.absolutePath)
+      if (file.completeFileInfo.absoluteDirectoryPath != previousDirectoryPath) {
+        Files.createDirectories(file.completeFileInfo.absoluteDirectoryPath)
+        previousDirectoryPath = file.completeFileInfo.absoluteDirectoryPath
       }
       writeFileAndAddPath(file, inputPaths)
     }
