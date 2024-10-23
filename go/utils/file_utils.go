@@ -152,14 +152,15 @@ func FilterAndHandleFileInfo(
 	info os.FileInfo, mode fileFilterMode, fileType fileType, absoluteFilePath string, handler func(FileInfo) error,
 ) error {
 	isDir := info.IsDir()
+	isRegularFile := info.Mode().IsRegular()
 
 	var size int64
-	if !isDir {
+	if isRegularFile {
 		size = info.Size()
 	}
 
 	// is file check
-	if !isDir && mode == Directories {
+	if isRegularFile && mode == Directories {
 		return nil
 	}
 
@@ -169,7 +170,7 @@ func FilterAndHandleFileInfo(
 	}
 
 	// is zero byte file check
-	if !isDir && size == 0 && (mode == NonZeroByteFiles || mode == NonZeroByteFilesAndDirectories) {
+	if isRegularFile && size == 0 && (mode == NonZeroByteFiles || mode == NonZeroByteFilesAndDirectories) {
 		return nil
 	}
 
@@ -189,6 +190,31 @@ func FilterAndHandleFileInfo(
 		size:                  size,
 		isDirectory:           isDir,
 	})
+
+	return nil
+}
+
+func WalkFilterAndHandleFileInfo(
+	absoluteRootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileInfo) error,
+) error {
+	rootInfo, err := os.Stat(absoluteRootFilePath)
+	if err != nil {
+		return err
+	}
+
+	// There is another 'IsDir' in 'FilterAndHandleFileInfo,' so it is not the most efficient solution.
+	// We could make it more efficient by making a different solution to walk all the directories and files.
+	// Using 'filepath.WalkDir' is probably not optimal since we need to use 'Info' on all directories and files.
+	if rootInfo.IsDir() {
+		return filepath.Walk(absoluteRootFilePath, func(absoluteFilePath string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			return FilterAndHandleFileInfo(info, mode, fileType, absoluteFilePath, handler)
+		})
+	} else if rootInfo.Mode().IsRegular() {
+		return FilterAndHandleFileInfo(rootInfo, mode, fileType, absoluteRootFilePath, handler)
+	}
 
 	return nil
 }
