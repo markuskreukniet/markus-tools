@@ -95,8 +95,8 @@ const (
 )
 
 const (
-	AllFiles       fileType = iota
-	PlainTextFiles          // TODO: rename to TextFiles
+	AllFiles fileType = iota
+	TextFiles
 )
 
 const FilePathSeparator = string(filepath.Separator)
@@ -148,6 +148,51 @@ func ToFileSystemFile(filePath string) (FileSystemFile, error) {
 		CreateFileMetadata(info.Name(), toDirectoryPath(filePath, isDirectory), filePath, "", info.ModTime(), info.Size(), isDirectory)), nil
 }
 
+func FilterAndHandleFileInfo(
+	info os.FileInfo, mode fileFilterMode, fileType fileType, absoluteFilePath string, handler func(FileInfo) error,
+) error {
+	isDir := info.IsDir()
+
+	var size int64
+	if !isDir {
+		size = info.Size()
+	}
+
+	// is file check
+	if !isDir && mode == Directories {
+		return nil
+	}
+
+	// is directory check
+	if isDir && (mode == files || mode == NonZeroByteFiles) {
+		return nil
+	}
+
+	// is zero byte file check
+	if !isDir && size == 0 && (mode == NonZeroByteFiles || mode == NonZeroByteFilesAndDirectories) {
+		return nil
+	}
+
+	// is text file check
+	if fileType == TextFiles {
+		isTextFile, err := IsTextFile(absoluteFilePath)
+		if err != nil || !isTextFile {
+			return err
+		}
+	}
+
+	handler(CompleteFileInfo{
+		name:                  info.Name(),
+		absoluteDirectoryPath: toDirectoryPath(absoluteFilePath, isDir),
+		absolutePath:          absoluteFilePath,
+		timeModified:          info.ModTime(),
+		size:                  size,
+		isDirectory:           isDir,
+	})
+
+	return nil
+}
+
 func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileSystemFile) error) error {
 	return filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
 		if err != nil {
@@ -177,7 +222,7 @@ func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode,
 		}
 
 		// is text file check
-		if fileType == PlainTextFiles {
+		if fileType == TextFiles {
 			isTextFile, err := IsTextFile(filePath)
 			if err != nil || !isTextFile {
 				return err
