@@ -30,7 +30,7 @@ data class CompleteFileInfo(
   override var absolutePath: Path,
   val timeModified: FileTime?,
   override val size: Long,
-  val isDirectory: Boolean,
+  val isDirectory: Boolean, // TODO: is isDirectory needed?
 ) : FileInfo
 
 enum class FileFilterMode {
@@ -84,9 +84,10 @@ fun filterAndHandleFileInfo(
   }
 
   // is text file check
-  val isTextFile = isTextFile(file).getOrThrow()
-  if (type == FileType.TEXT_FILES && isTextFile) {
-    return@runCatching
+  if (type == FileType.TEXT_FILES) {
+    if (!isTextFile(file).getOrThrow()) {
+      return@runCatching
+    }
   }
 
   handler(CompleteFileInfo(
