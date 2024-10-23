@@ -9,22 +9,22 @@ import (
 )
 
 type FileInfo interface {
-	Size() int64
-	AbsolutePath() string
+	GetSize() int64
+	GetAbsolutePath() string
 }
 
 // MinimalFileInfo implements FileInfo
 type MinimalFileInfo struct {
-	size         int64
-	absolutePath string
+	Size         int64
+	AbsolutePath string
 }
 
-func (info MinimalFileInfo) Size() int64 {
-	return info.size
+func (info MinimalFileInfo) GetSize() int64 {
+	return info.Size
 }
 
-func (info MinimalFileInfo) AbsolutePath() string {
-	return info.absolutePath
+func (info MinimalFileInfo) GetAbsolutePath() string {
+	return info.AbsolutePath
 }
 
 // CompleteFileInfo implements FileInfo
@@ -37,11 +37,11 @@ type CompleteFileInfo struct {
 	isDirectory           bool
 }
 
-func (info CompleteFileInfo) Size() int64 {
+func (info CompleteFileInfo) GetSize() int64 {
 	return info.size
 }
 
-func (info CompleteFileInfo) AbsolutePath() string {
+func (info CompleteFileInfo) GetAbsolutePath() string {
 	return info.absolutePath
 }
 

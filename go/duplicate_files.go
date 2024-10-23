@@ -17,6 +17,22 @@ func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []uti
 
 func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.FileSystemNode) (string, error) {
 	var result strings.Builder
+
+	// var files []utils.FileInfo
+
+	// // is the error return needed?
+	// handler := func(file utils.FileInfo) error {
+	// 	files = append(files, utils.MinimalFileInfo{
+	// 		Size:         file.GetSize(),
+	// 		AbsolutePath: file.GetAbsolutePath(),
+	// 	})
+	// 	return nil
+	// }
+
+	// for _, node := range uniqueFileSystemNodes {
+	// 	utils.WalkFilterAndHandleFileInfo(node, utils.NonZeroByteFiles, utils.AllFiles, handler)
+	// }
+
 	// TODO: should be FileMetadata
 	var files []utils.FileSystemFile
 	if err := utils.AppendNonZeroByteFiles(uniqueFileSystemNodes, &files); err != nil {
