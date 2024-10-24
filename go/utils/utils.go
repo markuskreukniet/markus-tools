@@ -26,7 +26,7 @@ func WriteTwoNewlineStrings(builder *strings.Builder) (int, error) {
 	return bytesWritten, nil
 }
 
-func createFileInfoGroupsByHash(files []FileInfo, onlyDuplicates bool) ([][]FileInfo, error) {
+func CreateFileInfoGroupsByHash(files []FileInfo, onlyDuplicates bool) ([][]FileInfo, error) {
 	if len(files) == 0 {
 		return nil, nil
 	}
