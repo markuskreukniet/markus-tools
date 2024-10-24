@@ -12,7 +12,7 @@ fun writeTwoNewlineStrings(builder: StringBuilder) {
   builder.append("\n\n")
 }
 
-fun createFileMetadataByHashGroups(
+fun createFileInfoGroupsByHash(
   files: MutableList<FileInfo>, onlyDuplicates: Boolean
 ): Result<MutableList<MutableList<FileInfo>>?> = runCatching {
   if (files.isEmpty()) {
