@@ -24,7 +24,7 @@ fun createFileInfoGroupsByHash(
     val files: MutableList<FileInfo>
   )
 
-  fun addGroup(groups: MutableList<FilesByFileSize>, file: FileInfo) {
+  val addGroup = fun(groups: MutableList<FilesByFileSize>, file: FileInfo) {
     groups.add(FilesByFileSize(
       fileSize = file.size,
       files = mutableListOf(file)
