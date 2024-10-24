@@ -149,7 +149,7 @@ func ToFileSystemFile(filePath string) (FileSystemFile, error) {
 }
 
 func FilterAndHandleFileInfo(
-	info os.FileInfo, mode fileFilterMode, fileType fileType, absoluteFilePath string, handler func(FileInfo) error,
+	info os.FileInfo, mode fileFilterMode, fileType fileType, absoluteFilePath string, handler func(FileInfo),
 ) error {
 	isDir := info.IsDir()
 	isRegularFile := info.Mode().IsRegular()
@@ -195,7 +195,7 @@ func FilterAndHandleFileInfo(
 }
 
 func WalkFilterAndHandleFileInfo(
-	node FileSystemNode, mode fileFilterMode, fileType fileType, handler func(FileInfo) error,
+	node FileSystemNode, mode fileFilterMode, fileType fileType, handler func(FileInfo),
 ) error {
 	if node.IsDirectory {
 		return filepath.Walk(node.Path, func(absoluteFilePath string, info os.FileInfo, err error) error {

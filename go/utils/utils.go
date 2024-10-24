@@ -26,6 +26,10 @@ func WriteTwoNewlineStrings(builder *strings.Builder) (int, error) {
 	return bytesWritten, nil
 }
 
+// func createFileInfoGroupsByHash() {
+
+// }
+
 // TODO: does work, but can be improved?
 func CreateFileSystemFileByHashGroups(files []FileSystemFile, onlyDuplicates bool) ([][]FileSystemFile, error) {
 	if len(files) == 0 {
@@ -84,36 +88,6 @@ func CreateFileSystemFileByHashGroups(files []FileSystemFile, onlyDuplicates boo
 
 	return result, nil
 }
-
-// func CreateDuplicateFileGroups(files []FileData) (FilesDataGroups, error) {
-// 	sort.Slice(files, func(i, j int) bool {
-// 		return files[i].FileMetadata.Size < files[j].FileMetadata.Size
-// 	})
-// 	var groups FilesDataGroups
-// 	for i := 1; i < len(files); i++ {
-// 		previousIndex := i - 1
-// 		if files[previousIndex].FileMetadata.Size == files[i].FileMetadata.Size {
-// 			var err error
-// 			if files[previousIndex].Identifier == "" {
-// 				if files[previousIndex].Identifier, err = HashFile(files[previousIndex].FileMetadata.Path); err != nil {
-// 					return nil, err
-// 				}
-// 			}
-// 			if files[i].Identifier, err = HashFile(files[i].FileMetadata.Path); err != nil {
-// 				return nil, err
-// 			}
-// 			if !groups.DidAppendByFileDataIdentifier(files[i]) {
-// 				for j := 0; j <= previousIndex; j++ {
-// 					if files[i].Identifier == files[j].Identifier {
-// 						groups = append(groups, CreateFilesDataGroup(files[i].Identifier, []FileData{files[j], files[i]}))
-// 						break
-// 					}
-// 				}
-// 			}
-// 		}
-// 	}
-// 	return groups, nil
-// }
 
 func HashFile(filePath string) (string, error) {
 	file, err := os.Open(filePath)
