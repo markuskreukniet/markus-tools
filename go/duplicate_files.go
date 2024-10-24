@@ -17,28 +17,22 @@ func getDuplicateFilesAsNewlineSeparatedStringToJSON(uniqueFileSystemNodes []uti
 
 func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.FileSystemNode) (string, error) {
 	var result strings.Builder
-	// var files []utils.FileInfo
+	var files []utils.FileInfo
 
-	// handler := func(file utils.FileInfo) {
-	// 	files = append(files, utils.MinimalFileInfo{
-	// 		Size:         file.GetSize(),
-	// 		AbsolutePath: file.GetAbsolutePath(),
-	// 	})
-	// }
-
-	// for _, node := range uniqueFileSystemNodes {
-	// 	if err := utils.WalkFilterAndHandleFileInfo(node, utils.NonZeroByteFiles, utils.AllFiles, handler); err != nil {
-	// 		return "", err
-	// 	}
-	// }
-
-	// TODO: should be FileMetadata
-	var files []utils.FileSystemFile
-	if err := utils.AppendNonZeroByteFiles(uniqueFileSystemNodes, &files); err != nil {
-		return "", err
+	handler := func(file utils.FileInfo) {
+		files = append(files, utils.MinimalFileInfo{
+			Size:         file.GetSize(),
+			AbsolutePath: file.GetAbsolutePath(),
+		})
 	}
 
-	groups, err := utils.CreateFileSystemFileByHashGroups(files, true)
+	for _, node := range uniqueFileSystemNodes {
+		if err := utils.WalkFilterAndHandleFileInfo(node, utils.NonZeroByteFiles, utils.AllFiles, handler); err != nil {
+			return "", err
+		}
+	}
+
+	groups, err := utils.CreateFileInfoGroupsByHash(files, true)
 	if err != nil {
 		return "", err
 	}
@@ -55,7 +49,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 					return "", err
 				}
 			}
-			if _, err := result.WriteString(file.FileMetadata.Path); err != nil {
+			if _, err := result.WriteString(file.GetAbsolutePath()); err != nil {
 				return "", err
 			}
 		}
