@@ -99,6 +99,7 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 	wantedOutcome := ""
 
 	// V move files to new directories
+	// Moving files to a date range and a non-date range directory improves testing.
 	input = input + `
 		,2020-10-10T20:40:40Z,txt m n 0.txt,` + contentM100 + `;
 		directory 1,2020-10-20T20:40:40Z,txt m n 1.txt,` + contentM101 + `;
