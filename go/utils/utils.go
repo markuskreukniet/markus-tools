@@ -66,7 +66,7 @@ func createFileInfoGroupsByHash(files []FileInfo, onlyDuplicates bool) ([][]File
 		if len(group.files) > 1 {
 			hashMap := make(map[string][]FileInfo)
 			for _, file := range group.files {
-				hash, err := HashFile(file.GetAbsolutePath())
+				hash, err := CreateFileHash(file.GetAbsolutePath())
 				if err != nil {
 					return nil, err
 				}
@@ -126,7 +126,7 @@ func CreateFileSystemFileByHashGroups(files []FileSystemFile, onlyDuplicates boo
 			hashMap := make(map[string][]FileSystemFile)
 			for _, file := range group.files {
 				var err error
-				if file.FileMetadata.Hash, err = HashFile(file.FileMetadata.Path); err != nil {
+				if file.FileMetadata.Hash, err = CreateFileHash(file.FileMetadata.Path); err != nil {
 					return nil, err
 				}
 				hashMap[file.FileMetadata.Hash] = append(hashMap[file.FileMetadata.Hash], file)
@@ -144,8 +144,7 @@ func CreateFileSystemFileByHashGroups(files []FileSystemFile, onlyDuplicates boo
 	return result, nil
 }
 
-// TODO: rename to createFileHash
-func HashFile(filePath string) (string, error) {
+func CreateFileHash(filePath string) (string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return "", err

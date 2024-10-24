@@ -11,7 +11,7 @@ func appendFileSystemFiles(filePath string, files *[]FileSystemFile) error {
 	handler := func(file FileSystemFile) error {
 		if !file.FileMetadata.IsDirectory {
 			var err error
-			file.FileMetadata.Hash, err = HashFile(file.FileMetadata.Path)
+			file.FileMetadata.Hash, err = CreateFileHash(file.FileMetadata.Path)
 			if err != nil {
 				return err
 			}
