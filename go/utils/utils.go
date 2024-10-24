@@ -26,9 +26,64 @@ func WriteTwoNewlineStrings(builder *strings.Builder) (int, error) {
 	return bytesWritten, nil
 }
 
-// func createFileInfoGroupsByHash() {
+func createFileInfoGroupsByHash(files []FileInfo, onlyDuplicates bool) ([][]FileInfo, error) {
+	if len(files) == 0 {
+		return nil, nil
+	}
 
-// }
+	type filesByFileSize struct {
+		fileSize int64
+		files    []FileInfo
+	}
+
+	var result [][]FileInfo
+	var groups []filesByFileSize
+	sizeIndex := 0
+
+	appendGroup := func(file FileInfo) {
+		groups = append(groups, filesByFileSize{
+			fileSize: file.GetSize(),
+			files:    []FileInfo{file},
+		})
+	}
+
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].GetSize() < files[j].GetSize()
+	})
+
+	appendGroup(files[0])
+
+	for i := 1; i < len(files); i++ {
+		if files[i].GetSize() == groups[sizeIndex].files[0].GetSize() {
+			groups[sizeIndex].files = append(groups[sizeIndex].files, files[i])
+		} else {
+			appendGroup(files[i])
+			sizeIndex++
+		}
+	}
+
+	for _, group := range groups {
+		if len(group.files) > 1 {
+			hashMap := make(map[string][]FileInfo)
+			for _, file := range group.files {
+				hash, err := HashFile(file.GetAbsolutePath())
+				if err != nil {
+					return nil, err
+				}
+				hashMap[hash] = append(hashMap[hash], file)
+			}
+			for _, hashedFiles := range hashMap {
+				if len(hashedFiles) > 1 || !onlyDuplicates {
+					result = append(result, hashedFiles)
+				}
+			}
+		} else if !onlyDuplicates {
+			result = append(result, group.files)
+		}
+	}
+
+	return result, nil
+}
 
 // TODO: does work, but can be improved?
 func CreateFileSystemFileByHashGroups(files []FileSystemFile, onlyDuplicates bool) ([][]FileSystemFile, error) {
@@ -89,6 +144,7 @@ func CreateFileSystemFileByHashGroups(files []FileSystemFile, onlyDuplicates boo
 	return result, nil
 }
 
+// TODO: rename to createFileHash
 func HashFile(filePath string) (string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
