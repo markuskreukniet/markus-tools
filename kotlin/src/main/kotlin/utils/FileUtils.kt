@@ -54,8 +54,7 @@ fun isTextFile(file: File): Result<Boolean> = runCatching {
   mimeType?.startsWith("text") == true
 }
 
-// TODO: rename to resolveDirectoryPath, also in Go?
-fun getDirectoryPath(filePath: Path, isDirectory: Boolean): Path {
+fun resolveDirectoryPath(filePath: Path, isDirectory: Boolean): Path {
   return if (isDirectory || filePath.parent == null) {
     filePath
   } else {
@@ -94,7 +93,7 @@ fun filterAndHandleFileInfo(
   handler(CompleteFileInfo(
     file = file,
     name = file.name,
-    absoluteDirectoryPath = getDirectoryPath(absoluteFilePath, file.isDirectory),
+    absoluteDirectoryPath = resolveDirectoryPath(absoluteFilePath, file.isDirectory),
     absolutePath = absoluteFilePath,
     timeModified = absoluteFilePath.getLastModifiedTime(),
     size = file.length(),
