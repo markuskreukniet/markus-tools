@@ -126,7 +126,7 @@ func IsTextFile(filePath string) (bool, error) {
 	return true, nil
 }
 
-func toDirectoryPath(filePath string, isDirectory bool) string {
+func resolveDirectoryPath(filePath string, isDirectory bool) string {
 	directoryPath := filePath
 
 	if !isDirectory {
@@ -145,7 +145,7 @@ func ToFileSystemFile(filePath string) (FileSystemFile, error) {
 	isDirectory := info.IsDir()
 
 	return CreateFileSystemFile("",
-		CreateFileMetadata(info.Name(), toDirectoryPath(filePath, isDirectory), filePath, "", info.ModTime(), info.Size(), isDirectory)), nil
+		CreateFileMetadata(info.Name(), resolveDirectoryPath(filePath, isDirectory), filePath, "", info.ModTime(), info.Size(), isDirectory)), nil
 }
 
 func FilterAndHandleFileInfo(
@@ -184,7 +184,7 @@ func FilterAndHandleFileInfo(
 
 	handler(CompleteFileInfo{
 		name:                  info.Name(),
-		absoluteDirectoryPath: toDirectoryPath(absoluteFilePath, isDir),
+		absoluteDirectoryPath: resolveDirectoryPath(absoluteFilePath, isDir),
 		absolutePath:          absoluteFilePath,
 		timeModified:          info.ModTime(),
 		size:                  size,
@@ -250,7 +250,7 @@ func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode,
 		}
 
 		if err := handler(CreateFileSystemFile("",
-			CreateFileMetadata(fileInfo.Name(), toDirectoryPath(filePath, isDir), filePath, "", fileInfo.ModTime(), size, isDir))); err != nil {
+			CreateFileMetadata(fileInfo.Name(), resolveDirectoryPath(filePath, isDir), filePath, "", fileInfo.ModTime(), size, isDir))); err != nil {
 			return err
 		}
 
