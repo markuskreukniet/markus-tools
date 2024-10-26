@@ -17,6 +17,25 @@ interface FileInfo {
   val absolutePath: Path
 }
 
+interface DuplicateFileInfo {
+  val file: File
+  val size: Long
+  val absolutePath: Path
+}
+
+data class DFFileInfo(
+  override val file: File,
+  override val size: Long,
+  override val absolutePath: Path
+) : DuplicateFileInfo
+
+data class FTDRFileInfo(
+  override val file: File,
+  override val size: Long,
+  override val absolutePath: Path,
+  val timeModified: FileTime
+) : DuplicateFileInfo
+
 data class MinimalFileInfo(
   override val file: File,
   override val size: Long,
@@ -54,7 +73,7 @@ fun isTextFile(file: File): Result<Boolean> = runCatching {
   mimeType?.startsWith("text") == true
 }
 
-fun getDirectoryPath(filePath: Path, isDirectory: Boolean): Path {
+fun resolveDirectoryPath(filePath: Path, isDirectory: Boolean): Path {
   return if (isDirectory || filePath.parent == null) {
     filePath
   } else {
@@ -93,7 +112,7 @@ fun filterAndHandleFileInfo(
   handler(CompleteFileInfo(
     file = file,
     name = file.name,
-    absoluteDirectoryPath = getDirectoryPath(absoluteFilePath, file.isDirectory),
+    absoluteDirectoryPath = resolveDirectoryPath(absoluteFilePath, file.isDirectory),
     absolutePath = absoluteFilePath,
     timeModified = absoluteFilePath.getLastModifiedTime(),
     size = file.length(),

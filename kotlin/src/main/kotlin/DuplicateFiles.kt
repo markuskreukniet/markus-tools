@@ -8,10 +8,10 @@ fun getDuplicateFilesAsNewlineSeparatedString(
   uniqueAbsolutePaths: Array<Path>
 ): Result<String?> = runCatching {
   val result = StringBuilder()
-  val files = mutableListOf<FileInfo>()
+  val files = mutableListOf<DuplicateFileInfo>()
 
   val handler = fun(file: FileInfo) {
-    files.add(MinimalFileInfo(
+    files.add(DFFileInfo(
       file = file.file,
       size = file.size,
       absolutePath = file.absolutePath
@@ -24,7 +24,7 @@ fun getDuplicateFilesAsNewlineSeparatedString(
     }
   }
 
-  val groups = createFileInfoGroupsByHash(files, true).getOrThrow() ?: return@runCatching null
+  val groups = createDuplicateFileInfoGroupsByHash(files, true).getOrThrow() ?: return@runCatching null
 
   groups.forEachIndexed { indexI, group ->
     if (indexI > 0) {
