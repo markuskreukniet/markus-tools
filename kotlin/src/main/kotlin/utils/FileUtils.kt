@@ -17,6 +17,25 @@ interface FileInfo {
   val absolutePath: Path
 }
 
+interface DuplicateFileInfo {
+  val file: File
+  val size: Long
+  val absolutePath: Path
+}
+
+data class DFFileInfo(
+  override val file: File,
+  override val size: Long,
+  override val absolutePath: Path
+) : DuplicateFileInfo
+
+data class FTDRFileInfo(
+  override val file: File,
+  override val size: Long,
+  override val absolutePath: Path,
+  val timeModified: FileTime
+) : DuplicateFileInfo
+
 data class MinimalFileInfo(
   override val file: File,
   override val size: Long,
