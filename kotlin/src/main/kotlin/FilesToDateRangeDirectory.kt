@@ -28,16 +28,6 @@ fun isValidDateRangeDirectoryName(name: String): Boolean {
   return false
 }
 
-fun appendSubtreeContents(directory: File, files: MutableList<File>, directories: MutableList<File>) {
-  directory.walk().drop(1).forEach { file ->
-    if (file.isDirectory) {
-      directories.add(file)
-    } else {
-      files.add(file)
-    }
-  }
-}
-
 fun categorizeFilesAndDirectories(
   destinationDirectory: File
 ): Result<Pair<MutableList<File>, Pair<MutableList<File>, MutableList<File>>>> = runCatching {
@@ -45,10 +35,15 @@ fun categorizeFilesAndDirectories(
   val goodDirectories = mutableListOf<File>()
   val badDirectories = mutableListOf<File>()
 
-  // TODO: naming
-  val test = fun(directories: MutableList<File>) {
+  val categorizeSubtreeContents = fun(directories: MutableList<File>) {
     directories.forEach { directory ->
-      appendSubtreeContents(directory, files, badDirectories)
+      directory.walk().drop(1).forEach { file ->
+        if (file.isDirectory) {
+          badDirectories.add(file)
+        } else {
+          files.add(file)
+        }
+      }
     }
   }
 
@@ -64,8 +59,8 @@ fun categorizeFilesAndDirectories(
     }
   }
 
-  test(goodDirectories)
-  test(badDirectories)
+  categorizeSubtreeContents(goodDirectories)
+  categorizeSubtreeContents(badDirectories)
 
   Pair(files, Pair(goodDirectories, badDirectories))
 }
