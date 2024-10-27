@@ -27,7 +27,7 @@ func isValidDateRangeDirectoryName(name string) bool {
 			return false
 		}
 		daysDifference := secondDate.Sub(firstDate).Hours() / 24
-		if daysDifference >= 1 && daysDifference <= 3 {
+		if daysDifference >= 1 {
 			return true
 		}
 	} else if isValidDateFormat(name) {

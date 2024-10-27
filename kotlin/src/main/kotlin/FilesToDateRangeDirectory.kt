@@ -5,7 +5,6 @@ import java.nio.file.Path
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import kotlin.math.abs
 
 fun isValidDateRangeDirectoryName(name: String): Boolean {
   val spacedHyphen = " - "
@@ -18,7 +17,7 @@ fun isValidDateRangeDirectoryName(name: String): Boolean {
     val nameParts = name.split(spacedHyphen)
     val firstDate = parseDate(nameParts.first()).getOrElse { return false }
     val secondDate = parseDate(nameParts[1]).getOrElse { return false }
-    if (abs(ChronoUnit.DAYS.between(firstDate, secondDate)) in 1..3) { // TODO: can be longer than three days
+    if (ChronoUnit.DAYS.between(firstDate, secondDate) >= 1) {
       return true
     }
   } else {
@@ -30,7 +29,7 @@ fun isValidDateRangeDirectoryName(name: String): Boolean {
 
 fun categorizeFilesAndDirectories(
   destinationDirectory: File
-): Result<Pair<MutableList<File>, Pair<MutableList<File>, MutableList<File>>>> = runCatching {
+): Pair<MutableList<File>, Pair<MutableList<File>, MutableList<File>>> {
   val files = mutableListOf<File>()
   val goodDirectories = mutableListOf<File>()
   val badDirectories = mutableListOf<File>()
@@ -62,9 +61,12 @@ fun categorizeFilesAndDirectories(
   categorizeSubtreeContents(goodDirectories)
   categorizeSubtreeContents(badDirectories)
 
-  Pair(files, Pair(goodDirectories, badDirectories))
+  return Pair(files, Pair(goodDirectories, badDirectories))
 }
 
-fun filesToDateRangeDirectory(uniqueAbsolutePaths: Array<Path>, destinationDirectory: Path) {
-
+fun filesToDateRangeDirectory(uniqueAbsolutePaths: Array<Path>, destinationDirectory: File) {
+  val pair = categorizeFilesAndDirectories(destinationDirectory)
+  val files = pair.first
+  val goodDirectories = pair.second.first
+  val badDirectories = pair.second.second
 }
