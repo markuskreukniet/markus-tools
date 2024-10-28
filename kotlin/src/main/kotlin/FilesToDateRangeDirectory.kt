@@ -69,4 +69,13 @@ fun filesToDateRangeDirectory(uniqueAbsolutePaths: Array<Path>, destinationDirec
   val files = pair.first
   val goodDirectories = pair.second.first
   val badDirectories = pair.second.second
+
+  // There is no need to check if the directory exists before attempting removal.
+  // badDirectories.asReversed().forEach { directory ->
+  //   directory.deleteIfExists() // runCatching? // is file or path? // deleteIfExists is also on another place same questions
+  // }
+
+  // goodDirectories.forEach { directory ->
+  //   directory.deleteIfExists() // runCatching? // is file or path? // deleteIfExists is also on another place same questions
+  // }
 }
