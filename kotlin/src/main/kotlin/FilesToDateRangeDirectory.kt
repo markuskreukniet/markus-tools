@@ -36,9 +36,22 @@ fun categorizeFilesAndDirectories(
   val goodDirectories = mutableListOf<File>()
   val badDirectories = mutableListOf<File>()
 
+  // TODO: duplicate
+//  val handler = fun(file: FileInfo) {
+//    if (file.isDirectory) {
+//      badDirectories.add(file.file)
+//    } else {
+//      files.add(file.file)
+//    }
+//  }
+
   val categorizeSubtreeContents = fun(directories: MutableList<File>) {
     directories.forEach { directory ->
       directory.walk().drop(1).forEach { file ->
+        if (!file.isFile && !file.isDirectory) {
+          // exception // duplicate code
+        }
+
         if (file.isDirectory) {
           badDirectories.add(file)
         } else {
@@ -49,6 +62,10 @@ fun categorizeFilesAndDirectories(
   }
 
   destinationDirectory.walk().maxDepth(1).forEach { file ->
+    if (!file.isFile && !file.isDirectory) {
+      // exception // duplicate code
+    }
+
     if (file.isDirectory) {
       if (isValidDateRangeDirectoryName(file.name)) {
         goodDirectories.add(file)
@@ -78,18 +95,14 @@ fun filesToDateRangeDirectory(
   val goodDirectories = pair.second.first
   val badDirectories = pair.second.second
 
+  // TODO: duplicate
   val handler = fun(file: FileInfo) {
     files.add(file.file)
   }
 
   uniqueAbsolutePaths.forEach { path ->
     if (path.exists()) {
-      val file = path.toFile()
-      if (!file.isFile && !file.isDirectory) {
-        return@runCatching
-      }
-
-      // walkFilterAndHandleFileInfo(path, FileFilterMode.NON_ZERO_BYTE_FILES, FileType.ALL_FILES, handler)
+      walkFilterAndHandleFileInfo(path, FileFilterMode.NON_ZERO_BYTE_FILES, FileType.ALL_FILES, handler)
     }
   }
 
