@@ -1,10 +1,12 @@
 package org.example
 
+import org.example.utils.*
 import java.io.File
 import java.nio.file.Path
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import kotlin.io.path.exists
 
 fun isValidDateRangeDirectoryName(name: String): Boolean {
   val spacedHyphen = " - "
@@ -64,18 +66,38 @@ fun categorizeFilesAndDirectories(
   return Pair(files, Pair(goodDirectories, badDirectories))
 }
 
-fun filesToDateRangeDirectory(uniqueAbsolutePaths: Array<Path>, destinationDirectory: File) {
+fun filesToDateRangeDirectory(
+  uniqueAbsolutePaths: Array<Path>, destinationDirectory: File
+): Result<Unit> = runCatching {
+  if (!destinationDirectory.exists()) {
+    return@runCatching
+  }
+
   val pair = categorizeFilesAndDirectories(destinationDirectory)
   val files = pair.first
   val goodDirectories = pair.second.first
   val badDirectories = pair.second.second
 
-  // There is no need to check if the directory exists before attempting removal.
-  // badDirectories.asReversed().forEach { directory ->
-  //   directory.deleteIfExists() // runCatching? // is file or path? // deleteIfExists is also on another place same questions
-  // }
+  val handler = fun(file: FileInfo) {
+    files.add(file.file)
+  }
 
-  // goodDirectories.forEach { directory ->
-  //   directory.deleteIfExists() // runCatching? // is file or path? // deleteIfExists is also on another place same questions
-  // }
+  uniqueAbsolutePaths.forEach { path ->
+    if (path.exists()) {
+      val file = path.toFile()
+      if (!file.isFile && !file.isDirectory) {
+        return@runCatching
+      }
+
+      // walkFilterAndHandleFileInfo(path, FileFilterMode.NON_ZERO_BYTE_FILES, FileType.ALL_FILES, handler)
+    }
+  }
+
+  // There is no need to check if the directory exists before attempting removal.
+  badDirectories.asReversed().forEach { directory ->
+    directory.delete()
+  }
+  goodDirectories.forEach { directory ->
+    directory.delete()
+  }
 }
