@@ -13,25 +13,25 @@ fun writeTwoNewlineStrings(builder: StringBuilder) {
 }
 
 fun createFileInfoGroupsByHash(
-  files: MutableList<FileInfo>, onlyDuplicates: Boolean
-): Result<MutableList<MutableList<FileInfo>>?> = runCatching {
+  files: MutableList<DuplicateFileInfo>, onlyDuplicates: Boolean
+): Result<MutableList<MutableList<DuplicateFileInfo>>?> = runCatching {
   if (files.isEmpty()) {
     return@runCatching null
   }
 
   data class FilesByFileSize(
     val fileSize: Long,
-    val files: MutableList<FileInfo>
+    val files: MutableList<DuplicateFileInfo>
   )
 
-  val addGroup = fun(groups: MutableList<FilesByFileSize>, file: FileInfo) {
+  val addGroup = fun(groups: MutableList<FilesByFileSize>, file: DuplicateFileInfo) {
     groups.add(FilesByFileSize(
       fileSize = file.size,
       files = mutableListOf(file)
     ))
   }
 
-  val result = mutableListOf<MutableList<FileInfo>>()
+  val result = mutableListOf<MutableList<DuplicateFileInfo>>()
   val groups = mutableListOf<FilesByFileSize>()
   var sizeIndex = 0
 
@@ -49,7 +49,7 @@ fun createFileInfoGroupsByHash(
 
   groups.forEach { group ->
     if (group.files.size > 1) {
-      val map = mutableMapOf<String, MutableList<FileInfo>>()
+      val map = mutableMapOf<String, MutableList<DuplicateFileInfo>>()
       group.files.forEach { file ->
         val hash = createFileHash(file.file).getOrThrow() ?: return@runCatching null
         map.getOrPut(hash) { mutableListOf() }.add(file)

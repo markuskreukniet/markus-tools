@@ -86,6 +86,10 @@ fun categorize(
   }
 }
 
+fun deleteDuplicateFiles(files: MutableList<FTDRFileInfo>, destinationDirectory: File) {
+
+}
+
 fun filesToDateRangeDirectory(
   uniqueAbsolutePaths: Array<Path>, destinationDirectory: File
 ): Result<Unit> = runCatching {
