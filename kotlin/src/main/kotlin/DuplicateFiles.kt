@@ -24,7 +24,7 @@ fun getDuplicateFilesAsNewlineSeparatedString(
     }
   }
 
-  val groups = createFileInfoGroupsByHash(files, true).getOrThrow() ?: return@runCatching null
+  val groups = createDuplicateFileInfoGroupsByHash(files, true).getOrThrow() ?: return@runCatching null
 
   groups.forEachIndexed { indexI, group ->
     if (indexI > 0) {
