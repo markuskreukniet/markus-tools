@@ -1,11 +1,13 @@
 package org.example
 
+import org.example.utils.FTDRFileInfo
 import java.io.File
 import java.nio.file.Path
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import kotlin.io.path.exists
+import kotlin.io.path.getLastModifiedTime
 
 val addDirectory = fun(directories: MutableList<File>, file: File) {
   directories.add(file)
@@ -91,6 +93,7 @@ fun filesToDateRangeDirectory(
     return@runCatching
   }
 
+  // TODO: duplicate values
   val pair = categorizeFilesAndDirectories(destinationDirectory)
   val files = pair.first
   val goodDirectories = pair.second.first
@@ -102,9 +105,21 @@ fun filesToDateRangeDirectory(
     }
   }
 
+  // TODO: remove this converting
+  val files2 = mutableListOf<FTDRFileInfo>()
+  files.forEach { file ->
+    val absolutePath = file.toPath().toAbsolutePath()
+    files2.add(FTDRFileInfo(
+      file = file,
+      size = file.length(),
+      absolutePath = absolutePath,
+      timeModified = absolutePath.getLastModifiedTime()
+    ))
+  }
+
   // delete duplicate files
 
-  // sort on time modified
+  files2.sortBy { it.timeModified }
 
   // There is no need to check if the directory exists before attempting removal.
   badDirectories.asReversed().forEach { directory ->

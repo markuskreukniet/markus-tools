@@ -17,6 +17,13 @@ interface FileInfo {
   val absolutePath: Path
 }
 
+data class FTDRFileInfo(
+  val file: File,
+  val size: Long,
+  val absolutePath: Path,
+  val timeModified: FileTime
+)
+
 data class MinimalFileInfo(
   override val file: File,
   override val size: Long,
