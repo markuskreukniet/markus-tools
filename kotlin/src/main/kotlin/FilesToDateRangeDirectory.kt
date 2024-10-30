@@ -1,12 +1,15 @@
 package org.example
 
-import org.example.utils.*
 import java.io.File
 import java.nio.file.Path
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import kotlin.io.path.exists
+
+val addDirectory = fun(directories: MutableList<File>, file: File) {
+  directories.add(file)
+}
 
 fun isValidDateRangeDirectoryName(name: String): Boolean {
   val spacedHyphen = " - "
@@ -36,51 +39,49 @@ fun categorizeFilesAndDirectories(
   val goodDirectories = mutableListOf<File>()
   val badDirectories = mutableListOf<File>()
 
-  // TODO: duplicate
-//  val handler = fun(file: FileInfo) {
-//    if (file.isDirectory) {
-//      badDirectories.add(file.file)
-//    } else {
-//      files.add(file.file)
-//    }
-//  }
+  val categorizeInDirectory = fun(directories: MutableList<File>, file: File) {
+    if (isValidDateRangeDirectoryName(file.name)) {
+      goodDirectories.add(file)
+    } else {
+      directories.add(file)
+    }
+  }
 
   val categorizeSubtreeContents = fun(directories: MutableList<File>) {
     directories.forEach { directory ->
       directory.walk().drop(1).forEach { file ->
-        if (!file.isFile && !file.isDirectory) {
-          // exception // duplicate code
-        }
-
-        if (file.isDirectory) {
-          badDirectories.add(file)
-        } else {
-          files.add(file)
-        }
+        categorize(file, files, badDirectories, addDirectory)
       }
     }
   }
 
   destinationDirectory.walk().maxDepth(1).forEach { file ->
-    if (!file.isFile && !file.isDirectory) {
-      // exception // duplicate code
-    }
-
-    if (file.isDirectory) {
-      if (isValidDateRangeDirectoryName(file.name)) {
-        goodDirectories.add(file)
-      } else {
-        badDirectories.add(file)
-      }
-    } else {
-      files.add(file)
-    }
+    categorize(file, files, badDirectories, categorizeInDirectory)
   }
 
   categorizeSubtreeContents(goodDirectories)
   categorizeSubtreeContents(badDirectories)
 
   return Pair(files, Pair(goodDirectories, badDirectories))
+}
+
+fun categorize(
+  file: File,
+  files: MutableList<File>,
+  badDirectories: MutableList<File>,
+  handler: (directories: MutableList<File>, file: File) -> Unit
+) {
+  if (file.isDirectory) {
+    handler(badDirectories, file)
+  } else if (file.isFile) {
+    if (file.length() > 0L) {
+      files.add(file)
+    } else {
+      // exception
+    }
+  } else {
+    // exception
+  }
 }
 
 fun filesToDateRangeDirectory(
@@ -95,16 +96,15 @@ fun filesToDateRangeDirectory(
   val goodDirectories = pair.second.first
   val badDirectories = pair.second.second
 
-  // TODO: duplicate
-  val handler = fun(file: FileInfo) {
-    files.add(file.file)
-  }
-
   uniqueAbsolutePaths.forEach { path ->
     if (path.exists()) {
-      walkFilterAndHandleFileInfo(path, FileFilterMode.NON_ZERO_BYTE_FILES, FileType.ALL_FILES, handler)
+      categorize(path.toFile(), files, badDirectories, addDirectory)
     }
   }
+
+  // delete duplicate files
+
+  // sort on time modified
 
   // There is no need to check if the directory exists before attempting removal.
   badDirectories.asReversed().forEach { directory ->
