@@ -126,7 +126,8 @@ fun deleteDuplicateFiles(
 
   groups.forEachIndexed { index, group ->
     for (handler in handlers) {
-      if (group.size > 1) {
+      // group and groups[index] are different references
+      if (groups[index].size > 1) {
         groups[index] = handler(group, badFiles)
       } else {
         files.add(group.first())
