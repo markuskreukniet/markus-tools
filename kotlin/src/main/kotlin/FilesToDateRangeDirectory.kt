@@ -1,6 +1,5 @@
 package org.example
 
-import org.example.utils.DuplicateFileInfo
 import org.example.utils.FTDRFileInfo
 import org.example.utils.createDuplicateFileInfoGroupsByHash
 import java.io.File
@@ -88,9 +87,47 @@ fun categorize(
   }
 }
 
-fun deleteDuplicateFiles(files: MutableList<FTDRFileInfo>, destinationDirectory: File) = runCatching {
+fun createHandlers() {
+  val handler = fun(files: MutableList<FTDRFileInfo>, goodFiles: MutableList<File>, badFiles: MutableList<File>) {
+    val good = mutableListOf(files.first().file)
+    val bad = mutableListOf<File>()
+    var minimumLength = files.first().file.name.length
+
+    files.drop(1).forEach { file ->
+      if (file.file.name.length < minimumLength) {
+        minimumLength = file.file.name.length
+        bad.addAll(good)
+        good.clear()
+        good.add(file.file)
+      } else if (file.file.name.length == minimumLength) {
+        good.add(file.file)
+      } else {
+        bad.add(file.file)
+      }
+    }
+
+    goodFiles.addAll(good)
+    badFiles.addAll(bad)
+  }
+}
+
+fun deleteDuplicateFiles(
+  files: MutableList<FTDRFileInfo>, destinationDirectory: File
+): Result<MutableList<FTDRFileInfo>?> = runCatching {
   val groups = createDuplicateFileInfoGroupsByHash(files, false).getOrThrow() ?: return@runCatching null
 
+  files.clear()
+
+  for (group in groups) {
+    if (group.size > 1) {
+      //
+    } else {
+      files.add(group.first())
+      break
+    }
+  }
+
+  files
 }
 
 fun filesToDateRangeDirectory(
@@ -113,7 +150,7 @@ fun filesToDateRangeDirectory(
   }
 
   // TODO: remove this converting
-  val files2 = mutableListOf<FTDRFileInfo>()
+  var files2 = mutableListOf<FTDRFileInfo>()
   files.forEach { file ->
     val absolutePath = file.toPath().toAbsolutePath()
     files2.add(FTDRFileInfo(
@@ -124,8 +161,7 @@ fun filesToDateRangeDirectory(
     ))
   }
 
-  // delete duplicate files
-
+  files2 = deleteDuplicateFiles(files2, destinationDirectory).getOrThrow() ?: return@runCatching
   files2.sortBy { it.timeModified }
 
   // There is no need to check if the directory exists before attempting removal.
