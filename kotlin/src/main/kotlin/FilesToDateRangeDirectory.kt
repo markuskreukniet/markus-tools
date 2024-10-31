@@ -87,46 +87,51 @@ fun categorize(
   }
 }
 
-fun createHandlers() {
-  val handler = fun(files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>): MutableList<FTDRFileInfo> {
+fun createHandlers(): List<(MutableList<FTDRFileInfo>, MutableList<File>) -> MutableList<FTDRFileInfo>> {
+  val categorizeOnFileNameLength = fun(
+    files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>
+  ): MutableList<FTDRFileInfo> {
     val good = mutableListOf(files.first())
-    val bad = mutableListOf<File>()
     var minimumLength = files.first().file.name.length
 
     files.drop(1).forEach { fileI ->
       if (fileI.file.name.length < minimumLength) {
         minimumLength = fileI.file.name.length
         good.forEach { fileJ ->
-          bad.add(fileJ.file)
+          badFiles.add(fileJ.file)
         }
         good.clear()
         good.add(fileI)
       } else if (fileI.file.name.length == minimumLength) {
         good.add(fileI)
       } else {
-        bad.add(fileI.file)
+        badFiles.add(fileI.file)
       }
     }
 
-    badFiles.addAll(bad)
-
     return good
   }
+
+  return listOf(categorizeOnFileNameLength)
 }
 
 fun deleteDuplicateFiles(
   files: MutableList<FTDRFileInfo>, destinationDirectory: File
 ): Result<MutableList<FTDRFileInfo>?> = runCatching {
   val groups = createDuplicateFileInfoGroupsByHash(files, false).getOrThrow() ?: return@runCatching null
+  val handlers = createHandlers()
+  val badFiles = mutableListOf<File>()
 
   files.clear()
 
-  for (group in groups) {
-    if (group.size > 1) {
-      //
-    } else {
-      files.add(group.first())
-      break
+  groups.forEachIndexed { index, group ->
+    for (handler in handlers) {
+      if (group.size > 1) {
+        groups[index] = handler(group, badFiles)
+      } else {
+        files.add(group.first())
+        break
+      }
     }
   }
 
