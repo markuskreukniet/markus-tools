@@ -88,26 +88,29 @@ fun categorize(
 }
 
 fun createHandlers() {
-  val handler = fun(files: MutableList<FTDRFileInfo>, goodFiles: MutableList<File>, badFiles: MutableList<File>) {
-    val good = mutableListOf(files.first().file)
+  val handler = fun(files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>): MutableList<FTDRFileInfo> {
+    val good = mutableListOf(files.first())
     val bad = mutableListOf<File>()
     var minimumLength = files.first().file.name.length
 
-    files.drop(1).forEach { file ->
-      if (file.file.name.length < minimumLength) {
-        minimumLength = file.file.name.length
-        bad.addAll(good)
+    files.drop(1).forEach { fileI ->
+      if (fileI.file.name.length < minimumLength) {
+        minimumLength = fileI.file.name.length
+        good.forEach { fileJ ->
+          bad.add(fileJ.file)
+        }
         good.clear()
-        good.add(file.file)
-      } else if (file.file.name.length == minimumLength) {
-        good.add(file.file)
+        good.add(fileI)
+      } else if (fileI.file.name.length == minimumLength) {
+        good.add(fileI)
       } else {
-        bad.add(file.file)
+        bad.add(fileI.file)
       }
     }
 
-    goodFiles.addAll(good)
     badFiles.addAll(bad)
+
+    return good
   }
 }
 
