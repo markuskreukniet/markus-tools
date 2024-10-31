@@ -1,6 +1,7 @@
 package org.example
 
 import org.example.utils.FTDRFileInfo
+import org.example.utils.createDuplicateFileInfoGroupsByHash
 import java.io.File
 import java.nio.file.Path
 import java.time.LocalDate
@@ -86,8 +87,56 @@ fun categorize(
   }
 }
 
-fun deleteDuplicateFiles(files: MutableList<FTDRFileInfo>, destinationDirectory: File) {
+fun createHandlers(): List<(MutableList<FTDRFileInfo>, MutableList<File>) -> MutableList<FTDRFileInfo>> {
+  val categorizeOnFileNameLength = fun(
+    files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>
+  ): MutableList<FTDRFileInfo> {
+    val good = mutableListOf(files.first())
+    var minimumLength = files.first().file.name.length
 
+    files.drop(1).forEach { fileI ->
+      if (fileI.file.name.length < minimumLength) {
+        minimumLength = fileI.file.name.length
+        good.forEach { fileJ ->
+          badFiles.add(fileJ.file)
+        }
+        good.clear()
+        good.add(fileI)
+      } else if (fileI.file.name.length == minimumLength) {
+        good.add(fileI)
+      } else {
+        badFiles.add(fileI.file)
+      }
+    }
+
+    return good
+  }
+
+  return listOf(categorizeOnFileNameLength)
+}
+
+fun deleteDuplicateFiles(
+  files: MutableList<FTDRFileInfo>, destinationDirectory: File
+): Result<MutableList<FTDRFileInfo>?> = runCatching {
+  val groups = createDuplicateFileInfoGroupsByHash(files, false).getOrThrow() ?: return@runCatching null
+  val handlers = createHandlers()
+  val badFiles = mutableListOf<File>()
+
+  files.clear()
+
+  groups.forEachIndexed { index, group ->
+    for (handler in handlers) {
+      // group and groups[index] are different references
+      if (groups[index].size > 1) {
+        groups[index] = handler(group, badFiles)
+      } else {
+        files.add(group.first())
+        break
+      }
+    }
+  }
+
+  files
 }
 
 fun filesToDateRangeDirectory(
@@ -110,7 +159,7 @@ fun filesToDateRangeDirectory(
   }
 
   // TODO: remove this converting
-  val files2 = mutableListOf<FTDRFileInfo>()
+  var files2 = mutableListOf<FTDRFileInfo>()
   files.forEach { file ->
     val absolutePath = file.toPath().toAbsolutePath()
     files2.add(FTDRFileInfo(
@@ -121,8 +170,7 @@ fun filesToDateRangeDirectory(
     ))
   }
 
-  // delete duplicate files
-
+  files2 = deleteDuplicateFiles(files2, destinationDirectory).getOrThrow() ?: return@runCatching
   files2.sortBy { it.timeModified }
 
   // There is no need to check if the directory exists before attempting removal.
