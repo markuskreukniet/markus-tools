@@ -1,6 +1,8 @@
 package org.example
 
+import org.example.utils.DuplicateFileInfo
 import org.example.utils.FTDRFileInfo
+import org.example.utils.createDuplicateFileInfoGroupsByHash
 import java.io.File
 import java.nio.file.Path
 import java.time.LocalDate
@@ -86,7 +88,8 @@ fun categorize(
   }
 }
 
-fun deleteDuplicateFiles(files: MutableList<FTDRFileInfo>, destinationDirectory: File) {
+fun deleteDuplicateFiles(files: MutableList<FTDRFileInfo>, destinationDirectory: File) = runCatching {
+  val groups = createDuplicateFileInfoGroupsByHash(files, false).getOrThrow() ?: return@runCatching null
 
 }
 
