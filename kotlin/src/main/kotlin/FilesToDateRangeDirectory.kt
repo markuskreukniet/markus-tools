@@ -87,8 +87,10 @@ fun categorize(
   }
 }
 
-fun createHandlers(): List<(MutableList<FTDRFileInfo>, MutableList<File>) -> MutableList<FTDRFileInfo>> {
-  val categorizeOnFileNameLength = fun(
+fun createHandlers(
+  destinationDirectory: File
+): List<(MutableList<FTDRFileInfo>, MutableList<File>) -> MutableList<FTDRFileInfo>> {
+  val categorizeOnShortestFileNameLength = fun(
     files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>
   ): MutableList<FTDRFileInfo> {
     val good = mutableListOf(files.first())
@@ -112,14 +114,42 @@ fun createHandlers(): List<(MutableList<FTDRFileInfo>, MutableList<File>) -> Mut
     return good
   }
 
-  return listOf(categorizeOnFileNameLength)
+  val categorizeOnValidDateRangeDirectoryName = fun(
+    files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>
+  ): MutableList<FTDRFileInfo> {
+    var goodFiles = mutableListOf<FTDRFileInfo>()
+    val tempBadFiles = mutableListOf<FTDRFileInfo>()
+
+    files.forEach { file ->
+      if (
+        file.file.parentFile.parentFile == destinationDirectory &&
+        isValidDateRangeDirectoryName(file.file.parentFile.name)
+        ) {
+        goodFiles.add(file)
+      } else {
+        tempBadFiles.add(file)
+      }
+    }
+
+    if (goodFiles.size == 0) {
+      goodFiles = tempBadFiles
+    } else {
+      tempBadFiles.forEach { file ->
+        badFiles.add(file.file)
+      }
+    }
+
+    return goodFiles
+  }
+
+  return listOf(categorizeOnShortestFileNameLength, categorizeOnValidDateRangeDirectoryName)
 }
 
 fun deleteDuplicateFiles(
   files: MutableList<FTDRFileInfo>, destinationDirectory: File
 ): Result<MutableList<FTDRFileInfo>?> = runCatching {
   val groups = createDuplicateFileInfoGroupsByHash(files, false).getOrThrow() ?: return@runCatching null
-  val handlers = createHandlers()
+  val handlers = createHandlers(destinationDirectory)
   val badFiles = mutableListOf<File>()
 
   files.clear()
