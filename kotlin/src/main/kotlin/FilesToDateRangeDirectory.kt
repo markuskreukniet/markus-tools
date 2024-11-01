@@ -117,29 +117,40 @@ fun createHandlers(
   val categorizeOnValidDateRangeDirectoryName = fun(
     files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>
   ): MutableList<FTDRFileInfo> {
-    var goodFiles = mutableListOf<FTDRFileInfo>()
+    val tempGood1Files = mutableListOf<FTDRFileInfo>()
+    val tempGood2Files = mutableListOf<FTDRFileInfo>()
     val tempBadFiles = mutableListOf<FTDRFileInfo>()
 
+    val addAllToBadFiles = fun(tempFiles: MutableList<FTDRFileInfo>) {
+      tempFiles.forEach { file ->
+        badFiles.add(file.file)
+      }
+    }
+
     files.forEach { file ->
-      if (
-        file.file.parentFile.parentFile == destinationDirectory &&
-        isValidDateRangeDirectoryName(file.file.parentFile.name)
-        ) {
-        goodFiles.add(file)
+      if (file.file.parentFile.parentFile == destinationDirectory) {
+        if (isValidDateRangeDirectoryName(file.file.parentFile.name)) {
+          tempGood2Files.add(file)
+        } else {
+          tempGood1Files.add(file)
+        }
       } else {
         tempBadFiles.add(file)
       }
     }
 
-    if (goodFiles.size == 0) {
-      goodFiles = tempBadFiles
-    } else {
-      tempBadFiles.forEach { file ->
-        badFiles.add(file.file)
-      }
+    if (tempGood2Files.isNotEmpty()) {
+      addAllToBadFiles(tempGood1Files)
+      addAllToBadFiles(tempBadFiles)
+      return tempGood2Files
     }
 
-    return goodFiles
+    if (tempGood1Files.isNotEmpty()) {
+      addAllToBadFiles(tempBadFiles)
+      return tempGood1Files
+    }
+
+    return tempBadFiles
   }
 
   return listOf(categorizeOnShortestFileNameLength, categorizeOnValidDateRangeDirectoryName)
