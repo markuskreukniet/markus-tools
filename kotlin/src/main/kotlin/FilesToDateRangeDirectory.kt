@@ -90,6 +90,12 @@ fun categorize(
 fun createHandlers(
   destinationDirectory: File
 ): List<(MutableList<FTDRFileInfo>, MutableList<File>) -> MutableList<FTDRFileInfo>> {
+  val addAllFilesInfo = fun(files: MutableList<File>, filesInfo: List<FTDRFileInfo>) {
+    filesInfo.forEach { file ->
+      files.add(file.file)
+    }
+  }
+
   val categorizeOnShortestFileNameLength = fun(
     files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>
   ): MutableList<FTDRFileInfo> {
@@ -121,12 +127,6 @@ fun createHandlers(
     val tempGood2Files = mutableListOf<FTDRFileInfo>()
     val tempBadFiles = mutableListOf<FTDRFileInfo>()
 
-    val addAllToBadFiles = fun(tempFiles: MutableList<FTDRFileInfo>) {
-      tempFiles.forEach { file ->
-        badFiles.add(file.file)
-      }
-    }
-
     files.forEach { file ->
       if (file.file.parentFile.parentFile == destinationDirectory) {
         if (isValidDateRangeDirectoryName(file.file.parentFile.name)) {
@@ -140,20 +140,51 @@ fun createHandlers(
     }
 
     if (tempGood2Files.isNotEmpty()) {
-      addAllToBadFiles(tempGood1Files)
-      addAllToBadFiles(tempBadFiles)
+      addAllFilesInfo(badFiles, tempGood1Files)
+      addAllFilesInfo(badFiles, tempBadFiles)
       return tempGood2Files
     }
 
     if (tempGood1Files.isNotEmpty()) {
-      addAllToBadFiles(tempBadFiles)
+      addAllFilesInfo(badFiles, tempBadFiles)
       return tempGood1Files
     }
 
     return tempBadFiles
   }
 
-  return listOf(categorizeOnShortestFileNameLength, categorizeOnValidDateRangeDirectoryName)
+  // TODO:
+  val categorizeOnNewestTimeModified = fun(
+    files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>
+  ): MutableList<FTDRFileInfo> {
+    val good = mutableListOf(files.first())
+    var newest = files.first().timeModified
+
+    files.drop(1).forEach { file ->
+      if (file.timeModified > newest) {
+        newest = file.timeModified
+      }
+    }
+
+    return good
+  }
+
+  val categorizeOnFirstFile = fun(
+    files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>
+  ): MutableList<FTDRFileInfo> {
+    val good = mutableListOf(files.first())
+
+    addAllFilesInfo(badFiles, files.drop(1))
+
+    return good
+  }
+
+  return listOf(
+    categorizeOnShortestFileNameLength,
+    categorizeOnValidDateRangeDirectoryName,
+    categorizeOnNewestTimeModified,
+    categorizeOnFirstFile
+  )
 }
 
 fun deleteDuplicateFiles(
