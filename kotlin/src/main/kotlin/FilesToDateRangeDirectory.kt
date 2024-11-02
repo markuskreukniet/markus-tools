@@ -96,24 +96,28 @@ fun createHandlers(
     }
   }
 
+  val addBadFilesInfoAndReplaceGoodFile  = fun(
+    badFiles: MutableList<File>, goodFiles: MutableList<FTDRFileInfo>, file: FTDRFileInfo
+  ) {
+    addAllFilesInfo(badFiles, goodFiles)
+    goodFiles.clear()
+    goodFiles.add(file)
+  }
+
   val categorizeOnShortestFileNameLength = fun(
     files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>
   ): MutableList<FTDRFileInfo> {
     val good = mutableListOf(files.first())
     var minimumLength = files.first().file.name.length
 
-    files.drop(1).forEach { fileI ->
-      if (fileI.file.name.length < minimumLength) {
-        minimumLength = fileI.file.name.length
-        good.forEach { fileJ ->
-          badFiles.add(fileJ.file)
-        }
-        good.clear()
-        good.add(fileI)
-      } else if (fileI.file.name.length == minimumLength) {
-        good.add(fileI)
+    files.drop(1).forEach { file ->
+      if (file.file.name.length < minimumLength) {
+        minimumLength = file.file.name.length
+        addBadFilesInfoAndReplaceGoodFile(badFiles, good, file)
+      } else if (file.file.name.length == minimumLength) {
+        good.add(file)
       } else {
-        badFiles.add(fileI.file)
+        badFiles.add(file.file)
       }
     }
 
@@ -153,7 +157,6 @@ fun createHandlers(
     return tempBadFiles
   }
 
-  // TODO:
   val categorizeOnNewestTimeModified = fun(
     files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>
   ): MutableList<FTDRFileInfo> {
@@ -163,6 +166,11 @@ fun createHandlers(
     files.drop(1).forEach { file ->
       if (file.timeModified > newest) {
         newest = file.timeModified
+        addBadFilesInfoAndReplaceGoodFile(badFiles, good, file)
+      } else if (file.timeModified == newest) {
+        good.add(file)
+      } else {
+        badFiles.add(file.file)
       }
     }
 
