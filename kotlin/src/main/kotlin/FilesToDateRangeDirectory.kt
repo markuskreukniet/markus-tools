@@ -3,12 +3,20 @@ package org.example
 import org.example.utils.FTDRFileInfo
 import org.example.utils.createDuplicateFileInfoGroupsByHash
 import java.io.File
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import kotlin.io.path.exists
 import kotlin.io.path.getLastModifiedTime
+
+fun getDateTimeFormatter(): Result<DateTimeFormatter> = runCatching {
+  DateTimeFormatter.ofPattern("yyyy-MM-dd")
+}
 
 val addDirectory = fun(directories: MutableList<File>, file: File) {
   directories.add(file)
@@ -18,7 +26,7 @@ fun isValidDateRangeDirectoryName(name: String): Boolean {
   val spacedHyphen = " - "
 
   val parseDate = fun(rawDate: String) = runCatching {
-    LocalDate.parse(rawDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+    LocalDate.parse(rawDate, getDateTimeFormatter().getOrThrow())
   }
 
   if (name.contains(spacedHyphen)) {
@@ -37,20 +45,20 @@ fun isValidDateRangeDirectoryName(name: String): Boolean {
 
 fun categorizeFilesAndDirectories(
   destinationDirectory: File
-): Pair<MutableList<File>, Pair<MutableList<File>, MutableList<File>>> {
+): Pair<MutableList<File>, Pair<MutableMap<String, File>, MutableList<File>>> {
   val files = mutableListOf<File>()
-  val goodDirectories = mutableListOf<File>()
+  val goodDirectoriesByName = mutableMapOf<String, File>() // TODO: is the File needed?
   val badDirectories = mutableListOf<File>()
 
   val categorizeInDirectory = fun(directories: MutableList<File>, file: File) {
     if (isValidDateRangeDirectoryName(file.name)) {
-      goodDirectories.add(file)
+      goodDirectoriesByName[file.name] = file
     } else {
       directories.add(file)
     }
   }
 
-  val categorizeSubtreeContents = fun(directories: MutableList<File>) {
+  val categorizeSubtreeContents = fun(directories: MutableCollection<File>) {
     directories.forEach { directory ->
       directory.walk().drop(1).forEach { file ->
         categorize(file, files, badDirectories, addDirectory)
@@ -62,10 +70,10 @@ fun categorizeFilesAndDirectories(
     categorize(file, files, badDirectories, categorizeInDirectory)
   }
 
-  categorizeSubtreeContents(goodDirectories)
+  categorizeSubtreeContents(goodDirectoriesByName.values)
   categorizeSubtreeContents(badDirectories)
 
-  return Pair(files, Pair(goodDirectories, badDirectories))
+  return Pair(files, Pair(goodDirectoriesByName, badDirectories))
 }
 
 fun categorize(
@@ -96,7 +104,7 @@ fun createHandlers(
     }
   }
 
-  val addBadFilesInfoAndReplaceGoodFile  = fun(
+  val addBadFilesInfoAndReplaceGoodFiles  = fun(
     badFiles: MutableList<File>, goodFiles: MutableList<FTDRFileInfo>, file: FTDRFileInfo
   ) {
     addAllFilesInfo(badFiles, goodFiles)
@@ -113,7 +121,7 @@ fun createHandlers(
     files.drop(1).forEach { file ->
       if (file.file.name.length < minimumLength) {
         minimumLength = file.file.name.length
-        addBadFilesInfoAndReplaceGoodFile(badFiles, good, file)
+        addBadFilesInfoAndReplaceGoodFiles(badFiles, good, file)
       } else if (file.file.name.length == minimumLength) {
         good.add(file)
       } else {
@@ -166,7 +174,7 @@ fun createHandlers(
     files.drop(1).forEach { file ->
       if (file.timeModified > newest) {
         newest = file.timeModified
-        addBadFilesInfoAndReplaceGoodFile(badFiles, good, file)
+        addBadFilesInfoAndReplaceGoodFiles(badFiles, good, file)
       } else if (file.timeModified == newest) {
         good.add(file)
       } else {
@@ -216,7 +224,64 @@ fun deleteDuplicateFiles(
     }
   }
 
+  badFiles.forEach { file ->
+    file.delete()
+  }
+
   files
+}
+
+fun moveFilesAndFilterGoodDirectories(
+  files: MutableList<FTDRFileInfo>, goodDirectoriesByName: MutableMap<String, File>, destinationDirectory: File
+) = runCatching {
+  if (files.size == 0) {
+    return@runCatching
+  }
+
+  files.sortBy { it.timeModified }
+
+  var group = mutableListOf(files.first())
+
+  val toFormattedString = fun(time: Instant): Result<String> = runCatching {
+    time.atZone(ZoneId.systemDefault())
+      .toLocalDate()
+      .format(getDateTimeFormatter().getOrThrow())
+  }
+
+  val moveFilesToDirectory = fun() {
+    val firstFile = group.first()
+    val lastFile = group.last()
+    var directoryName = toFormattedString(firstFile.timeModified).getOrThrow()
+    if (ChronoUnit.DAYS.between(firstFile.timeModified, lastFile.timeModified) >= 1) {
+      directoryName += " - ${toFormattedString(lastFile.timeModified).getOrThrow()}"
+    }
+    val directoryPath = Paths.get(destinationDirectory.absolutePath, directoryName)
+    if (directoryName in goodDirectoriesByName) {
+      goodDirectoriesByName.remove(directoryName)
+    } else {
+      Files.createDirectory(directoryPath)
+    }
+    group.forEach { file ->
+      val filePath = Paths.get(directoryPath.toString(), file.file.name)
+      if (filePath != file.absolutePath) {
+        Files.move(file.absolutePath, filePath)
+      }
+    }
+  }
+
+  files.drop(1).forEach { file ->
+    val lastFile = group.last()
+    if (ChronoUnit.DAYS.between(lastFile.timeModified, file.timeModified) in 0..3) {
+      group.add(file)
+    } else {
+      moveFilesToDirectory()
+      group = mutableListOf(file)
+    }
+  }
+
+  if (group.size > 0) {
+    moveFilesToDirectory()
+  }
 }
 
 fun filesToDateRangeDirectory(
@@ -226,10 +291,9 @@ fun filesToDateRangeDirectory(
     return@runCatching
   }
 
-  // TODO: duplicate values
   val pair = categorizeFilesAndDirectories(destinationDirectory)
   val files = pair.first
-  val goodDirectories = pair.second.first
+  val goodDirectoriesByName = pair.second.first
   val badDirectories = pair.second.second
 
   uniqueAbsolutePaths.forEach { path ->
@@ -246,18 +310,19 @@ fun filesToDateRangeDirectory(
       file = file,
       size = file.length(),
       absolutePath = absolutePath,
-      timeModified = absolutePath.getLastModifiedTime()
+      timeModified = absolutePath.getLastModifiedTime().toInstant()
     ))
   }
 
   files2 = deleteDuplicateFiles(files2, destinationDirectory).getOrThrow() ?: return@runCatching
-  files2.sortBy { it.timeModified }
+
+  moveFilesAndFilterGoodDirectories(files2, goodDirectoriesByName, destinationDirectory)
 
   // There is no need to check if the directory exists before attempting removal.
   badDirectories.asReversed().forEach { directory ->
     directory.delete()
   }
-  goodDirectories.forEach { directory ->
+  goodDirectoriesByName.values.forEach { directory ->
     directory.delete()
   }
 }

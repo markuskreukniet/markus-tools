@@ -38,7 +38,7 @@ func CreateFileInfoGroupsByHash(files []FileInfo, onlyDuplicates bool) ([][]File
 
 	var result [][]FileInfo
 	var groups []filesByFileSize
-	sizeIndex := 0
+	groupIndex := 0
 
 	appendGroup := func(file FileInfo) {
 		groups = append(groups, filesByFileSize{
@@ -54,11 +54,11 @@ func CreateFileInfoGroupsByHash(files []FileInfo, onlyDuplicates bool) ([][]File
 	appendGroup(files[0])
 
 	for i := 1; i < len(files); i++ {
-		if files[i].GetSize() == groups[sizeIndex].files[0].GetSize() {
-			groups[sizeIndex].files = append(groups[sizeIndex].files, files[i])
+		if files[i].GetSize() == groups[groupIndex].files[0].GetSize() {
+			groups[groupIndex].files = append(groups[groupIndex].files, files[i])
 		} else {
 			appendGroup(files[i])
-			sizeIndex++
+			groupIndex++
 		}
 	}
 
@@ -98,7 +98,7 @@ func CreateFileSystemFileByHashGroups(files []FileSystemFile, onlyDuplicates boo
 
 	var result [][]FileSystemFile
 	var groups []filesByFileSize
-	sizeIndex := 0
+	groupIndex := 0
 
 	sort.Slice(files, func(i, j int) bool {
 		return files[i].FileMetadata.Size < files[j].FileMetadata.Size
@@ -110,14 +110,14 @@ func CreateFileSystemFileByHashGroups(files []FileSystemFile, onlyDuplicates boo
 	})
 
 	for i := 1; i < len(files); i++ {
-		if files[i].FileMetadata.Size == groups[sizeIndex].files[0].FileMetadata.Size {
-			groups[sizeIndex].files = append(groups[sizeIndex].files, files[i])
+		if files[i].FileMetadata.Size == groups[groupIndex].files[0].FileMetadata.Size {
+			groups[groupIndex].files = append(groups[groupIndex].files, files[i])
 		} else {
 			groups = append(groups, filesByFileSize{
 				fileSize: files[i].FileMetadata.Size,
 				files:    []FileSystemFile{files[i]},
 			})
-			sizeIndex++
+			groupIndex++
 		}
 	}
 
