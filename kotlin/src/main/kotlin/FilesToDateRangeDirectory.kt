@@ -216,6 +216,10 @@ fun deleteDuplicateFiles(
     }
   }
 
+  badFiles.forEach { file ->
+    file.delete()
+  }
+
   files
 }
 
@@ -226,7 +230,6 @@ fun filesToDateRangeDirectory(
     return@runCatching
   }
 
-  // TODO: duplicate values
   val pair = categorizeFilesAndDirectories(destinationDirectory)
   val files = pair.first
   val goodDirectories = pair.second.first
@@ -252,6 +255,8 @@ fun filesToDateRangeDirectory(
 
   files2 = deleteDuplicateFiles(files2, destinationDirectory).getOrThrow() ?: return@runCatching
   files2.sortBy { it.timeModified }
+
+  //
 
   // There is no need to check if the directory exists before attempting removal.
   badDirectories.asReversed().forEach { directory ->
