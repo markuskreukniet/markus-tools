@@ -24,6 +24,7 @@ fun <T : DuplicateFileInfo> createDuplicateFileInfoGroupsByHash(
     val files: MutableList<T>
   )
 
+  // TODO: groups parameter is useless
   val addGroup = fun(groups: MutableList<FilesByFileSize>, file: T) {
     groups.add(FilesByFileSize(
       fileSize = file.size,
@@ -33,17 +34,17 @@ fun <T : DuplicateFileInfo> createDuplicateFileInfoGroupsByHash(
 
   val result = mutableListOf<MutableList<T>>()
   val groups = mutableListOf<FilesByFileSize>()
-  var sizeIndex = 0
+  var groupIndex = 0
 
   files.sortBy { it.size }
   addGroup(groups, files.first())
 
   files.withIndex().drop(1).forEach { (index, file) ->
-    if (file.size == groups[sizeIndex].files.first().size) {
-      groups[sizeIndex].files.add(files[index])
+    if (file.size == groups[groupIndex].files.first().size) {
+      groups[groupIndex].files.add(files[index])
     } else {
       addGroup(groups, files[index])
-      sizeIndex++
+      groupIndex++
     }
   }
 
