@@ -96,6 +96,7 @@ fun createHandlers(
     }
   }
 
+  // TODO: naming
   val addBadFilesInfoAndReplaceGoodFile  = fun(
     badFiles: MutableList<File>, goodFiles: MutableList<FTDRFileInfo>, file: FTDRFileInfo
   ) {
@@ -230,20 +231,15 @@ fun moveFilesToDirectories(files: MutableList<FTDRFileInfo>, goodDirectories: Mu
 
   files.sortBy { it.timeModified }
 
-  // TODO: to groups first is useless
-  val groups = mutableListOf<MutableList<FTDRFileInfo>>() // init with group?
-  var groupIndex = 0
-  groups.add(mutableListOf<FTDRFileInfo>(files.first()))
+  var group = mutableListOf(files.first())
 
   files.drop(1).forEach { file ->
-    val between = ChronoUnit.DAYS.between(
-      groups[groupIndex].last().timeModified.toInstant(), file.timeModified.toInstant()
-    ) // TODO: is this val needed? And naming
-    if (between in 0..3) {
-      groups[groupIndex].add(file)
+    if (ChronoUnit.DAYS.between(group.last().timeModified.toInstant(), file.timeModified.toInstant()) in 0..3) {
+      group.add(file)
     } else {
-      groups.add(mutableListOf<FTDRFileInfo>(file))
-      groupIndex++
+      // does dir already exists? if so remove from goodDirectories
+      // move files to dir
+      group = mutableListOf(file)
     }
   }
 }
