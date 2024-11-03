@@ -287,7 +287,7 @@ fun filesToDateRangeDirectory(
       file = file,
       size = file.length(),
       absolutePath = absolutePath,
-      timeModified = absolutePath.getLastModifiedTime() // TODO: should be toInstant() or something similar?
+      timeModified = absolutePath.getLastModifiedTime() // TODO: should be toInstant() or something similar (so not first to getLastModifiedTime)?
     ))
   }
 
