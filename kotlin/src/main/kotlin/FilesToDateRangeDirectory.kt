@@ -37,20 +37,20 @@ fun isValidDateRangeDirectoryName(name: String): Boolean {
 
 fun categorizeFilesAndDirectories(
   destinationDirectory: File
-): Pair<MutableList<File>, Pair<MutableList<File>, MutableList<File>>> {
+): Pair<MutableList<File>, Pair<MutableMap<String, File>, MutableList<File>>> {
   val files = mutableListOf<File>()
-  val goodDirectories = mutableListOf<File>()
+  val goodDirectoriesByName = mutableMapOf<String, File>() // TODO: is the File needed?
   val badDirectories = mutableListOf<File>()
 
   val categorizeInDirectory = fun(directories: MutableList<File>, file: File) {
     if (isValidDateRangeDirectoryName(file.name)) {
-      goodDirectories.add(file)
+      goodDirectoriesByName[file.name] = file
     } else {
       directories.add(file)
     }
   }
 
-  val categorizeSubtreeContents = fun(directories: MutableList<File>) {
+  val categorizeSubtreeContents = fun(directories: MutableCollection<File>) {
     directories.forEach { directory ->
       directory.walk().drop(1).forEach { file ->
         categorize(file, files, badDirectories, addDirectory)
@@ -62,10 +62,10 @@ fun categorizeFilesAndDirectories(
     categorize(file, files, badDirectories, categorizeInDirectory)
   }
 
-  categorizeSubtreeContents(goodDirectories)
+  categorizeSubtreeContents(goodDirectoriesByName.values)
   categorizeSubtreeContents(badDirectories)
 
-  return Pair(files, Pair(goodDirectories, badDirectories))
+  return Pair(files, Pair(goodDirectoriesByName, badDirectories))
 }
 
 fun categorize(
@@ -224,7 +224,7 @@ fun deleteDuplicateFiles(
   files
 }
 
-fun moveFilesToDirectories(files: MutableList<FTDRFileInfo>, goodDirectories: MutableList<File>) {
+fun moveFilesToDirectories(files: MutableList<FTDRFileInfo>, goodDirectoriesByName: MutableMap<String, File>) {
   if (files.size == 0) {
     return
   }
@@ -233,6 +233,7 @@ fun moveFilesToDirectories(files: MutableList<FTDRFileInfo>, goodDirectories: Mu
 
   var group = mutableListOf(files.first())
 
+  // TODO: does this work? sometimes last file does not get added?
   files.drop(1).forEach { file ->
     if (ChronoUnit.DAYS.between(group.last().timeModified.toInstant(), file.timeModified.toInstant()) in 0..3) {
       group.add(file)
@@ -253,7 +254,7 @@ fun filesToDateRangeDirectory(
 
   val pair = categorizeFilesAndDirectories(destinationDirectory)
   val files = pair.first
-  val goodDirectories = pair.second.first
+  val goodDirectoriesByName = pair.second.first
   val badDirectories = pair.second.second
 
   uniqueAbsolutePaths.forEach { path ->
@@ -282,7 +283,7 @@ fun filesToDateRangeDirectory(
   badDirectories.asReversed().forEach { directory ->
     directory.delete()
   }
-  goodDirectories.forEach { directory ->
+  goodDirectoriesByName.values.forEach { directory ->
     directory.delete()
   }
 }
