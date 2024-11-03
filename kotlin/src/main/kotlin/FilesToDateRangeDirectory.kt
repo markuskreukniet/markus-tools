@@ -5,10 +5,15 @@ import org.example.utils.createDuplicateFileInfoGroupsByHash
 import java.io.File
 import java.nio.file.Path
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import kotlin.io.path.exists
 import kotlin.io.path.getLastModifiedTime
+
+fun getDateTimeFormatter(): Result<DateTimeFormatter> = runCatching {
+  DateTimeFormatter.ofPattern("yyyy-MM-dd")
+}
 
 val addDirectory = fun(directories: MutableList<File>, file: File) {
   directories.add(file)
@@ -18,7 +23,7 @@ fun isValidDateRangeDirectoryName(name: String): Boolean {
   val spacedHyphen = " - "
 
   val parseDate = fun(rawDate: String) = runCatching {
-    LocalDate.parse(rawDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+    LocalDate.parse(rawDate, getDateTimeFormatter().getOrThrow())
   }
 
   if (name.contains(spacedHyphen)) {
@@ -233,15 +238,26 @@ fun moveFilesToDirectories(files: MutableList<FTDRFileInfo>, goodDirectoriesByNa
 
   var group = mutableListOf(files.first())
 
-  // TODO: does this work? sometimes last file does not get added?
   files.drop(1).forEach { file ->
     if (ChronoUnit.DAYS.between(group.last().timeModified.toInstant(), file.timeModified.toInstant()) in 0..3) {
       group.add(file)
     } else {
-      // does dir already exists? if so remove from goodDirectories
+      val ding = file.timeModified.toInstant()
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
+        .format(getDateTimeFormatter().getOrThrow())
+
+      // Remove if the key exists
+      goodDirectoriesByName.remove(file.file.parentFile.name)
+
       // move files to dir
+
       group = mutableListOf(file)
     }
+  }
+
+  if (group.size > 0) {
+
   }
 }
 
@@ -271,7 +287,7 @@ fun filesToDateRangeDirectory(
       file = file,
       size = file.length(),
       absolutePath = absolutePath,
-      timeModified = absolutePath.getLastModifiedTime()
+      timeModified = absolutePath.getLastModifiedTime() // TODO: should be toInstant() or something similar?
     ))
   }
 
