@@ -223,6 +223,31 @@ fun deleteDuplicateFiles(
   files
 }
 
+fun moveFilesToDirectories(files: MutableList<FTDRFileInfo>, goodDirectories: MutableList<File>) {
+  if (files.size == 0) {
+    return
+  }
+
+  files.sortBy { it.timeModified }
+
+  // TODO: to groups first is useless
+  val groups = mutableListOf<MutableList<FTDRFileInfo>>() // init with group?
+  var groupIndex = 0
+  groups.add(mutableListOf<FTDRFileInfo>(files.first()))
+
+  files.drop(1).forEach { file ->
+    val between = ChronoUnit.DAYS.between(
+      groups[groupIndex].last().timeModified.toInstant(), file.timeModified.toInstant()
+    ) // TODO: is this val needed? And naming
+    if (between in 0..3) {
+      groups[groupIndex].add(file)
+    } else {
+      groups.add(mutableListOf<FTDRFileInfo>(file))
+      groupIndex++
+    }
+  }
+}
+
 fun filesToDateRangeDirectory(
   uniqueAbsolutePaths: Array<Path>, destinationDirectory: File
 ): Result<Unit> = runCatching {
@@ -254,7 +279,6 @@ fun filesToDateRangeDirectory(
   }
 
   files2 = deleteDuplicateFiles(files2, destinationDirectory).getOrThrow() ?: return@runCatching
-  files2.sortBy { it.timeModified }
 
   //
 
