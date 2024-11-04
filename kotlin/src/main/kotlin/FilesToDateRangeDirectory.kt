@@ -230,26 +230,33 @@ fun deleteDuplicateFiles(
   files
 }
 
-fun moveFilesToDirectories(files: MutableList<FTDRFileInfo>, goodDirectoriesByName: MutableMap<String, File>) { //runCatching?
+fun moveFilesToDirectories(
+  files: MutableList<FTDRFileInfo>, goodDirectoriesByName: MutableMap<String, File>
+) = runCatching {
   if (files.size == 0) {
-    return
+    return@runCatching
   }
 
-   val toFormattedString = fun(time: Instant): Result<String> = runCatching {
-     time.atZone(ZoneId.systemDefault())
-       .toLocalDate()
-       .format(getDateTimeFormatter().getOrThrow())
-   }
+  val toFormattedString = fun(time: Instant): Result<String> = runCatching {
+    time.atZone(ZoneId.systemDefault())
+      .toLocalDate()
+      .format(getDateTimeFormatter().getOrThrow())
+  }
 
   files.sortBy { it.timeModified }
 
   var group = mutableListOf(files.first())
 
   files.drop(1).forEach { file ->
-    if (ChronoUnit.DAYS.between(group.last().timeModified.toInstant(), file.timeModified.toInstant()) in 0..3) {
+    val lastFile = group.last()
+    if (ChronoUnit.DAYS.between(lastFile.timeModified, file.timeModified) in 0..3) {
       group.add(file)
     } else {
-      val directoryName = if (ChronoUnit.DAYS.between(group.last().timeModified.toInstant(), file.timeModified.toInstant()) >= 1) "" else ""
+      val firstFile = group.first()
+      var directoryName = toFormattedString(firstFile.timeModified).getOrThrow()
+      if (ChronoUnit.DAYS.between(firstFile.timeModified, lastFile.timeModified) >= 1) {
+        directoryName = "$directoryName - ${toFormattedString(lastFile.timeModified).getOrThrow()}"
+      } // TODO: use stringBuilder?
 
       // group.first()
       // group.last()
@@ -294,7 +301,7 @@ fun filesToDateRangeDirectory(
       file = file,
       size = file.length(),
       absolutePath = absolutePath,
-      timeModified = absolutePath.getLastModifiedTime() // TODO: should be toInstant() or something similar (so not first to getLastModifiedTime)?
+      timeModified = absolutePath.getLastModifiedTime().toInstant()
     ))
   }
 
