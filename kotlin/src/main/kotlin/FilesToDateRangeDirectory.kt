@@ -255,11 +255,12 @@ fun moveFilesToDirectories(
       val firstFile = group.first()
       var directoryName = toFormattedString(firstFile.timeModified).getOrThrow()
       if (ChronoUnit.DAYS.between(firstFile.timeModified, lastFile.timeModified) >= 1) {
-        directoryName = "$directoryName - ${toFormattedString(lastFile.timeModified).getOrThrow()}"
-      } // TODO: use stringBuilder?
+        directoryName += " - ${toFormattedString(lastFile.timeModified).getOrThrow()}"
+      }
 
-      // group.first()
-      // group.last()
+      if (directoryName !in goodDirectoriesByName) {
+        // create dir
+      }
 
       // Remove if the key exists
       goodDirectoriesByName.remove(file.file.parentFile.name)
