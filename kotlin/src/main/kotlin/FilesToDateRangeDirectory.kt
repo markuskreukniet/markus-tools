@@ -229,10 +229,16 @@ fun deleteDuplicateFiles(
   files
 }
 
-fun moveFilesToDirectories(files: MutableList<FTDRFileInfo>, goodDirectoriesByName: MutableMap<String, File>) {
+fun moveFilesToDirectories(files: MutableList<FTDRFileInfo>, goodDirectoriesByName: MutableMap<String, File>) { //runCatching?
   if (files.size == 0) {
     return
   }
+
+  // val toFormattedString(iets: iets): String = runCatching {
+  //   iets.atZone(ZoneId.systemDefault())
+  //   .toLocalDate()
+  //   .format(getDateTimeFormatter().getOrThrow())
+  // }
 
   files.sortBy { it.timeModified }
 
@@ -242,10 +248,20 @@ fun moveFilesToDirectories(files: MutableList<FTDRFileInfo>, goodDirectoriesByNa
     if (ChronoUnit.DAYS.between(group.last().timeModified.toInstant(), file.timeModified.toInstant()) in 0..3) {
       group.add(file)
     } else {
-      val ding = file.timeModified.toInstant()
-        .atZone(ZoneId.systemDefault())
-        .toLocalDate()
-        .format(getDateTimeFormatter().getOrThrow())
+      // val result = if (condition) valueIfTrue else valueIfFalse
+
+      // var ding: String
+      // if (ChronoUnit.DAYS.between(group.last().timeModified.toInstant(), file.timeModified.toInstant()) >= 1) {
+
+      // }
+
+      // group.first()
+      // group.last()
+
+      // val ding = file.timeModified.toInstant()
+      //   .atZone(ZoneId.systemDefault())
+      //   .toLocalDate()
+      //   .format(getDateTimeFormatter().getOrThrow())
 
       // Remove if the key exists
       goodDirectoriesByName.remove(file.file.parentFile.name)
