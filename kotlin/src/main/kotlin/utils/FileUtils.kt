@@ -4,6 +4,7 @@ import java.io.File
 import java.net.URLConnection
 import java.nio.file.Path
 import java.nio.file.attribute.FileTime
+import java.time.Instant
 import kotlin.io.path.getLastModifiedTime
 
 data class FileData(
@@ -33,7 +34,7 @@ data class FTDRFileInfo(
   override val file: File,
   override val size: Long,
   override val absolutePath: Path,
-  val timeModified: FileTime
+  val timeModified: Instant
 ) : DuplicateFileInfo
 
 data class MinimalFileInfo(

@@ -14,7 +14,7 @@ fun getDuplicateFilesAsNewlineSeparatedString(
     files.add(DFFileInfo(
       file = file.file,
       size = file.size,
-      absolutePath = file.absolutePath
+      absolutePath = file.absolutePath // TODO: why not use file.file.absolutePath? // TODO: also update DFFileInfo then?
     ))
   }
 
