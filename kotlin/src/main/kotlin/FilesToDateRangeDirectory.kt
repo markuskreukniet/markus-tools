@@ -4,6 +4,7 @@ import org.example.utils.FTDRFileInfo
 import org.example.utils.createDuplicateFileInfoGroupsByHash
 import java.io.File
 import java.nio.file.Path
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -234,11 +235,11 @@ fun moveFilesToDirectories(files: MutableList<FTDRFileInfo>, goodDirectoriesByNa
     return
   }
 
-  // val toFormattedString(iets: iets): String = runCatching {
-  //   iets.atZone(ZoneId.systemDefault())
-  //   .toLocalDate()
-  //   .format(getDateTimeFormatter().getOrThrow())
-  // }
+   val toFormattedString = fun(time: Instant): Result<String> = runCatching {
+     time.atZone(ZoneId.systemDefault())
+       .toLocalDate()
+       .format(getDateTimeFormatter().getOrThrow())
+   }
 
   files.sortBy { it.timeModified }
 
@@ -248,20 +249,10 @@ fun moveFilesToDirectories(files: MutableList<FTDRFileInfo>, goodDirectoriesByNa
     if (ChronoUnit.DAYS.between(group.last().timeModified.toInstant(), file.timeModified.toInstant()) in 0..3) {
       group.add(file)
     } else {
-      // val result = if (condition) valueIfTrue else valueIfFalse
-
-      // var ding: String
-      // if (ChronoUnit.DAYS.between(group.last().timeModified.toInstant(), file.timeModified.toInstant()) >= 1) {
-
-      // }
+      val directoryName = if (ChronoUnit.DAYS.between(group.last().timeModified.toInstant(), file.timeModified.toInstant()) >= 1) "" else ""
 
       // group.first()
       // group.last()
-
-      // val ding = file.timeModified.toInstant()
-      //   .atZone(ZoneId.systemDefault())
-      //   .toLocalDate()
-      //   .format(getDateTimeFormatter().getOrThrow())
 
       // Remove if the key exists
       goodDirectoriesByName.remove(file.file.parentFile.name)
