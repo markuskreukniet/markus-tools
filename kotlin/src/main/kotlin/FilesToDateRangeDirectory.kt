@@ -249,8 +249,9 @@ fun moveFilesToDirectories(
       .format(getDateTimeFormatter().getOrThrow())
   }
 
-  val moveFilesToDirectory = fun(lastFile: FTDRFileInfo) {
+  val moveFilesToDirectory = fun() {
     val firstFile = group.first()
+    val lastFile = group.last()
     var directoryName = toFormattedString(firstFile.timeModified).getOrThrow()
     if (ChronoUnit.DAYS.between(firstFile.timeModified, lastFile.timeModified) >= 1) {
       directoryName += " - ${toFormattedString(lastFile.timeModified).getOrThrow()}"
@@ -261,9 +262,11 @@ fun moveFilesToDirectories(
     } else {
       Files.createDirectory(directoryPath)
     }
-
     group.forEach { file ->
-      // if (directoryPath + file.file.name !exists) {Files.move()}
+      val filePath = Paths.get(directoryPath.toString(), file.file.name)
+      if (filePath != file.absolutePath) {
+        Files.move(file.absolutePath, filePath)
+      }
     }
   }
 
@@ -272,13 +275,13 @@ fun moveFilesToDirectories(
     if (ChronoUnit.DAYS.between(lastFile.timeModified, file.timeModified) in 0..3) {
       group.add(file)
     } else {
-      moveFilesToDirectory(lastFile)
+      moveFilesToDirectory()
       group = mutableListOf(file)
     }
   }
 
   if (group.size > 0) {
-    moveFilesToDirectory(group.last())
+    moveFilesToDirectory()
   }
 }
 
