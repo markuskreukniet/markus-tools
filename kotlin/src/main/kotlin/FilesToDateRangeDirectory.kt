@@ -3,7 +3,9 @@ package org.example
 import org.example.utils.FTDRFileInfo
 import org.example.utils.createDuplicateFileInfoGroupsByHash
 import java.io.File
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -231,7 +233,7 @@ fun deleteDuplicateFiles(
 }
 
 fun moveFilesToDirectories(
-  files: MutableList<FTDRFileInfo>, goodDirectoriesByName: MutableMap<String, File>
+  files: MutableList<FTDRFileInfo>, goodDirectoriesByName: MutableMap<String, File>, destinationDirectory: File
 ) = runCatching {
   if (files.size == 0) {
     return@runCatching
@@ -258,12 +260,16 @@ fun moveFilesToDirectories(
         directoryName += " - ${toFormattedString(lastFile.timeModified).getOrThrow()}"
       }
 
-      if (directoryName !in goodDirectoriesByName) {
-        // create dir
+      val directoryPath = Paths.get(destinationDirectory.absolutePath, directoryName)
+      if (directoryName in goodDirectoriesByName) {
+        goodDirectoriesByName.remove(directoryName)
+      } else {
+        Files.createDirectory(directoryPath)
       }
 
-      // Remove if the key exists
-      goodDirectoriesByName.remove(file.file.parentFile.name)
+//      group.forEach { ding ->
+//        Files.move()
+//      }
 
       // move files to dir
 
