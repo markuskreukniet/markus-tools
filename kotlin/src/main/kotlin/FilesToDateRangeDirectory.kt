@@ -239,46 +239,46 @@ fun moveFilesToDirectories(
     return@runCatching
   }
 
+  files.sortBy { it.timeModified }
+
+  var group = mutableListOf(files.first())
+
   val toFormattedString = fun(time: Instant): Result<String> = runCatching {
     time.atZone(ZoneId.systemDefault())
       .toLocalDate()
       .format(getDateTimeFormatter().getOrThrow())
   }
 
-  files.sortBy { it.timeModified }
+  val moveFilesToDirectory = fun(lastFile: FTDRFileInfo) {
+    val firstFile = group.first()
+    var directoryName = toFormattedString(firstFile.timeModified).getOrThrow()
+    if (ChronoUnit.DAYS.between(firstFile.timeModified, lastFile.timeModified) >= 1) {
+      directoryName += " - ${toFormattedString(lastFile.timeModified).getOrThrow()}"
+    }
+    val directoryPath = Paths.get(destinationDirectory.absolutePath, directoryName)
+    if (directoryName in goodDirectoriesByName) {
+      goodDirectoriesByName.remove(directoryName)
+    } else {
+      Files.createDirectory(directoryPath)
+    }
 
-  var group = mutableListOf(files.first())
+    group.forEach { file ->
+      // if (directoryPath + file.file.name !exists) {Files.move()}
+    }
+  }
 
   files.drop(1).forEach { file ->
     val lastFile = group.last()
     if (ChronoUnit.DAYS.between(lastFile.timeModified, file.timeModified) in 0..3) {
       group.add(file)
     } else {
-      val firstFile = group.first()
-      var directoryName = toFormattedString(firstFile.timeModified).getOrThrow()
-      if (ChronoUnit.DAYS.between(firstFile.timeModified, lastFile.timeModified) >= 1) {
-        directoryName += " - ${toFormattedString(lastFile.timeModified).getOrThrow()}"
-      }
-
-      val directoryPath = Paths.get(destinationDirectory.absolutePath, directoryName)
-      if (directoryName in goodDirectoriesByName) {
-        goodDirectoriesByName.remove(directoryName)
-      } else {
-        Files.createDirectory(directoryPath)
-      }
-
-//      group.forEach { ding ->
-//        Files.move()
-//      }
-
-      // move files to dir
-
+      moveFilesToDirectory(lastFile)
       group = mutableListOf(file)
     }
   }
 
   if (group.size > 0) {
-
+    moveFilesToDirectory(group.last())
   }
 }
 
