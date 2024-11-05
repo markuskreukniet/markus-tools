@@ -14,6 +14,8 @@ import java.time.temporal.ChronoUnit
 import kotlin.io.path.exists
 import kotlin.io.path.getLastModifiedTime
 
+// TODO: check runCatching for every function
+
 fun getDateTimeFormatter(): Result<DateTimeFormatter> = runCatching {
   DateTimeFormatter.ofPattern("yyyy-MM-dd")
 }
@@ -45,8 +47,8 @@ fun isValidDateRangeDirectoryName(name: String): Boolean {
 
 fun categorizeFilesAndDirectories(
   destinationDirectory: File
-): Pair<MutableList<File>, Pair<MutableMap<String, File>, MutableList<File>>> {
-  val files = mutableListOf<File>()
+): Pair<MutableList<FTDRFileInfo>, Pair<MutableMap<String, File>, MutableList<File>>> {
+  val files = mutableListOf<FTDRFileInfo>()
   val goodDirectoriesByName = mutableMapOf<String, File>() // TODO: is the File needed?
   val badDirectories = mutableListOf<File>()
 
@@ -78,7 +80,7 @@ fun categorizeFilesAndDirectories(
 
 fun categorize(
   file: File,
-  files: MutableList<File>,
+  files: MutableList<FTDRFileInfo>,
   badDirectories: MutableList<File>,
   handler: (directories: MutableList<File>, file: File) -> Unit
 ) {
@@ -86,7 +88,13 @@ fun categorize(
     handler(badDirectories, file)
   } else if (file.isFile) {
     if (file.length() > 0L) {
-      files.add(file)
+      val absolutePath = file.toPath().toAbsolutePath()
+      files.add(FTDRFileInfo(
+        file = file,
+        size = file.length(),
+        absolutePath = absolutePath,
+        timeModified = absolutePath.getLastModifiedTime().toInstant()
+      ))
     } else {
       // exception
     }
@@ -205,8 +213,8 @@ fun createHandlers(
 
 fun deleteDuplicateFiles(
   files: MutableList<FTDRFileInfo>, destinationDirectory: File
-): Result<MutableList<FTDRFileInfo>?> = runCatching {
-  val groups = createDuplicateFileInfoGroupsByHash(files, false).getOrThrow() ?: return@runCatching null
+): Result<Unit> = runCatching {
+  val groups = createDuplicateFileInfoGroupsByHash(files, false).getOrThrow() ?: return@runCatching
   val handlers = createHandlers(destinationDirectory)
   val badFiles = mutableListOf<File>()
 
@@ -227,8 +235,6 @@ fun deleteDuplicateFiles(
   badFiles.forEach { file ->
     file.delete()
   }
-
-  files
 }
 
 fun moveFilesAndFilterGoodDirectories(
@@ -302,21 +308,8 @@ fun filesToDateRangeDirectory(
     }
   }
 
-  // TODO: remove this converting
-  var files2 = mutableListOf<FTDRFileInfo>()
-  files.forEach { file ->
-    val absolutePath = file.toPath().toAbsolutePath()
-    files2.add(FTDRFileInfo(
-      file = file,
-      size = file.length(),
-      absolutePath = absolutePath,
-      timeModified = absolutePath.getLastModifiedTime().toInstant()
-    ))
-  }
-
-  files2 = deleteDuplicateFiles(files2, destinationDirectory).getOrThrow() ?: return@runCatching
-
-  moveFilesAndFilterGoodDirectories(files2, goodDirectoriesByName, destinationDirectory)
+  deleteDuplicateFiles(files, destinationDirectory).getOrThrow()
+  moveFilesAndFilterGoodDirectories(files, goodDirectoriesByName, destinationDirectory)
 
   // There is no need to check if the directory exists before attempting removal.
   badDirectories.asReversed().forEach { directory ->
