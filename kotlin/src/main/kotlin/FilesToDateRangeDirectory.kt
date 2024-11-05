@@ -104,8 +104,7 @@ fun createHandlers(
     }
   }
 
-  // TODO: naming
-  val addBadFilesInfoAndReplaceGoodFile  = fun(
+  val addBadFilesInfoAndReplaceGoodFiles  = fun(
     badFiles: MutableList<File>, goodFiles: MutableList<FTDRFileInfo>, file: FTDRFileInfo
   ) {
     addAllFilesInfo(badFiles, goodFiles)
@@ -122,7 +121,7 @@ fun createHandlers(
     files.drop(1).forEach { file ->
       if (file.file.name.length < minimumLength) {
         minimumLength = file.file.name.length
-        addBadFilesInfoAndReplaceGoodFile(badFiles, good, file)
+        addBadFilesInfoAndReplaceGoodFiles(badFiles, good, file)
       } else if (file.file.name.length == minimumLength) {
         good.add(file)
       } else {
@@ -175,7 +174,7 @@ fun createHandlers(
     files.drop(1).forEach { file ->
       if (file.timeModified > newest) {
         newest = file.timeModified
-        addBadFilesInfoAndReplaceGoodFile(badFiles, good, file)
+        addBadFilesInfoAndReplaceGoodFiles(badFiles, good, file)
       } else if (file.timeModified == newest) {
         good.add(file)
       } else {
@@ -232,7 +231,7 @@ fun deleteDuplicateFiles(
   files
 }
 
-fun moveFilesToDirectories(
+fun moveFilesAndFilterGoodDirectories(
   files: MutableList<FTDRFileInfo>, goodDirectoriesByName: MutableMap<String, File>, destinationDirectory: File
 ) = runCatching {
   if (files.size == 0) {
@@ -317,7 +316,7 @@ fun filesToDateRangeDirectory(
 
   files2 = deleteDuplicateFiles(files2, destinationDirectory).getOrThrow() ?: return@runCatching
 
-  //
+  moveFilesAndFilterGoodDirectories(files2, goodDirectoriesByName, destinationDirectory)
 
   // There is no need to check if the directory exists before attempting removal.
   badDirectories.asReversed().forEach { directory ->
