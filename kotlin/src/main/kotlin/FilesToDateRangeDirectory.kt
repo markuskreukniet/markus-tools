@@ -47,14 +47,14 @@ fun isValidDateRangeDirectoryName(name: String): Boolean {
 
 fun categorizeFilesAndDirectories(
   destinationDirectory: File
-): Pair<MutableList<FTDRFileInfo>, Pair<MutableMap<String, File>, MutableList<File>>> {
+): Pair<MutableList<FTDRFileInfo>, Pair<MutableSet<File>, MutableList<File>>> {
   val files = mutableListOf<FTDRFileInfo>()
-  val goodDirectoriesByName = mutableMapOf<String, File>() // TODO: is the File needed?
+  val goodDirectories = mutableSetOf<File>()
   val badDirectories = mutableListOf<File>()
 
   val categorizeInDirectory = fun(directories: MutableList<File>, file: File) {
     if (isValidDateRangeDirectoryName(file.name)) {
-      goodDirectoriesByName[file.name] = file
+      goodDirectories.add(file)
     } else {
       directories.add(file)
     }
@@ -72,10 +72,10 @@ fun categorizeFilesAndDirectories(
     categorize(file, files, badDirectories, categorizeInDirectory)
   }
 
-  categorizeSubtreeContents(goodDirectoriesByName.values)
+  categorizeSubtreeContents(goodDirectories)
   categorizeSubtreeContents(badDirectories)
 
-  return Pair(files, Pair(goodDirectoriesByName, badDirectories))
+  return Pair(files, Pair(goodDirectories, badDirectories))
 }
 
 fun categorize(
@@ -238,7 +238,7 @@ fun deleteDuplicateFiles(
 }
 
 fun moveFilesAndFilterGoodDirectories(
-  files: MutableList<FTDRFileInfo>, goodDirectoriesByName: MutableMap<String, File>, destinationDirectory: File
+  files: MutableList<FTDRFileInfo>, goodDirectories: MutableSet<File>, destinationDirectory: File
 ) = runCatching {
   if (files.size == 0) {
     return@runCatching
@@ -261,14 +261,14 @@ fun moveFilesAndFilterGoodDirectories(
     if (ChronoUnit.DAYS.between(firstFile.timeModified, lastFile.timeModified) >= 1) {
       directoryName += " - ${toFormattedString(lastFile.timeModified).getOrThrow()}"
     }
-    val directoryPath = Paths.get(destinationDirectory.absolutePath, directoryName)
-    if (directoryName in goodDirectoriesByName) {
-      goodDirectoriesByName.remove(directoryName)
+    val directory = File(destinationDirectory.absolutePath, directoryName)
+    if (directory in goodDirectories) {
+      goodDirectories.remove(directory)
     } else {
-      Files.createDirectory(directoryPath)
+      directory.mkdir()
     }
     group.forEach { file ->
-      val filePath = Paths.get(directoryPath.toString(), file.file.name)
+      val filePath = Paths.get(directory.toString(), file.file.name)
       if (filePath != file.absolutePath) {
         Files.move(file.absolutePath, filePath)
       }
@@ -299,7 +299,7 @@ fun filesToDateRangeDirectory(
 
   val pair = categorizeFilesAndDirectories(destinationDirectory)
   val files = pair.first
-  val goodDirectoriesByName = pair.second.first
+  val goodDirectories = pair.second.first
   val badDirectories = pair.second.second
 
   uniqueAbsolutePaths.forEach { path ->
@@ -309,13 +309,13 @@ fun filesToDateRangeDirectory(
   }
 
   deleteDuplicateFiles(files, destinationDirectory).getOrThrow()
-  moveFilesAndFilterGoodDirectories(files, goodDirectoriesByName, destinationDirectory)
+  moveFilesAndFilterGoodDirectories(files, goodDirectories, destinationDirectory)
 
   // There is no need to check if the directory exists before attempting removal.
   badDirectories.asReversed().forEach { directory ->
     directory.delete()
   }
-  goodDirectoriesByName.values.forEach { directory ->
+  goodDirectories.forEach { directory ->
     directory.delete()
   }
 }
