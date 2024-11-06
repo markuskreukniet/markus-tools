@@ -28,7 +28,7 @@ $ npm run dev
 
 <!--
 TODO: how to install: IntelliJ IDEA, OpenJDK (if it is used)
-TODO: JUnit, how to to name unit tests,iven-When-Then
+TODO: JUnit, how to to name unit tests, given-When-Then
 -->
 
 ### Unit Testing
