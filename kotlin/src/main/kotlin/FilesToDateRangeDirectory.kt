@@ -83,7 +83,7 @@ fun categorize(
   files: MutableList<FTDRFileInfo>,
   badDirectories: MutableList<File>,
   handler: (directories: MutableList<File>, file: File) -> Unit
-) {
+) = runCatching {
   if (file.isDirectory) {
     handler(badDirectories, file)
   } else if (file.isFile) {
@@ -96,10 +96,10 @@ fun categorize(
         timeModified = absolutePath.getLastModifiedTime().toInstant()
       ))
     } else {
-      // exception
+      // TODO: exception
     }
   } else {
-    // exception
+    // TODO: exception
   }
 }
 
@@ -257,16 +257,19 @@ fun moveFilesAndFilterGoodDirectories(
   val moveFilesToDirectory = fun() {
     val firstFile = group.first()
     val lastFile = group.last()
+
     var directoryName = toFormattedString(firstFile.timeModified).getOrThrow()
     if (ChronoUnit.DAYS.between(firstFile.timeModified, lastFile.timeModified) >= 1) {
       directoryName += " - ${toFormattedString(lastFile.timeModified).getOrThrow()}"
     }
+
     val directory = File(destinationDirectory.absolutePath, directoryName)
     if (directory in goodDirectories) {
       goodDirectories.remove(directory)
     } else {
       directory.mkdir()
     }
+
     group.forEach { file ->
       val filePath = Paths.get(directory.toString(), file.file.name)
       if (filePath != file.absolutePath) {
