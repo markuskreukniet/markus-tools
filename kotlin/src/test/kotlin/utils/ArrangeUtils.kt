@@ -30,13 +30,13 @@ fun createFileData(directoryPath: String, inputLine: String): Result<FileData> =
   )
 }
 
-fun createSortedFileSystemFiles(
+fun createFileSystemFiles(
   rawDelimitedSemicolonString: String
 ): Result<MutableList<FileData>> = runCatching {
-  createSortedFileSystemFiles("", rawDelimitedSemicolonString).getOrThrow()
+  createFileSystemFiles("", rawDelimitedSemicolonString).getOrThrow()
 }
 
-fun createSortedFileSystemFiles(
+fun createFileSystemFiles(
   directoryPath: String, rawDelimitedSemicolonString: String
 ): Result<MutableList<FileData>> = runCatching {
   val files = mutableListOf<FileData>()
@@ -59,8 +59,6 @@ fun createSortedFileSystemFiles(
       isCreatingInputLine = true
     }
   }
-
-  files.sortBy { it.completeFileInfo.absolutePath }
 
   files
 }
@@ -85,20 +83,34 @@ fun writeFileAndAddPath(file: FileData, paths: MutableList<Path>): Result<Unit> 
   paths.add(file.completeFileInfo.absolutePath)
 }
 
-fun writeFilesByMultipleInputs(
-  input: String
-): Result<Pair<MutableList<Path>?, MutableList<Path>?>> = runCatching {
+fun writeFilesBySingleInput(input: String): Result<Pair<String?, MutableList<Path>?>> = runCatching {
   if (input.isBlank()) {
     return@runCatching Pair(null, null)
   }
 
-  val files = createSortedFileSystemFiles(input).getOrThrow()
+  val files = createFileSystemFiles(input).getOrThrow()
 
   if (files.size == 0) {
     return@runCatching Pair(null, null)
   }
 
-  val groups = mutableListOf<MutableList<FileData>>(mutableListOf<FileData>(files.first()))
+  Pair(null, null)
+}
+
+fun writeFilesByMultipleInputs(input: String): Result<Pair<MutableList<Path>?, MutableList<Path>?>> = runCatching {
+  if (input.isBlank()) {
+    return@runCatching Pair(null, null)
+  }
+
+  val files = createFileSystemFiles(input).getOrThrow()
+
+  if (files.size == 0) {
+    return@runCatching Pair(null, null)
+  }
+
+  files.sortBy { it.completeFileInfo.absolutePath }
+
+  val groups = mutableListOf(mutableListOf(files.first()))
   var previousTopDirectoryPath = getTopDirectoryPath(
     files.first().completeFileInfo.absoluteDirectoryPath
   ).getOrThrow()
@@ -108,7 +120,7 @@ fun writeFilesByMultipleInputs(
     val currentTopDirectoryPath = getTopDirectoryPath(file.completeFileInfo.absoluteDirectoryPath).getOrThrow()
     // We can use '==' or '!=' for string-based comparison of the paths.
     if (currentTopDirectoryPath == null || previousTopDirectoryPath != currentTopDirectoryPath) {
-      groups.add(mutableListOf<FileData>(file))
+      groups.add(mutableListOf(file))
       previousTopDirectoryPath = currentTopDirectoryPath
       index++
     } else {
