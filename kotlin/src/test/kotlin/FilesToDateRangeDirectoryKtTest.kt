@@ -1,0 +1,22 @@
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Test
+import utils.deleteDirectoryTrees
+import java.nio.file.Path
+
+class FilesToDateRangeDirectoryKtTest {
+  private lateinit var temporaryDirectories: MutableList<Path>
+
+  @Test
+  fun `given - when - then -`() {
+    // arrange
+
+    // act
+
+    // assert
+  }
+
+  @AfterEach
+  fun tearDown() {
+    deleteDirectoryTrees(temporaryDirectories)
+  }
+}
