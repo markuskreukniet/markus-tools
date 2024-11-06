@@ -7,7 +7,7 @@ import java.nio.file.Paths
 import java.nio.file.attribute.FileTime
 import java.time.Instant
 
-fun createFileAndFileSystemFile(directoryPath: String, inputLine: String): Result<FileData> = runCatching {
+fun createFileData(directoryPath: String, inputLine: String): Result<FileData> = runCatching {
   val fields = inputLine.split(",")
   val joinedDirectoryPath = Paths.get(directoryPath, fields[0])
   val content = fields[3]
@@ -49,7 +49,7 @@ fun createSortedFileSystemFiles(
       if (char != ';') {
         inputLine.add(char)
       } else {
-        val file = createFileAndFileSystemFile(directoryPath, inputLine.joinToString("")).getOrThrow()
+        val file = createFileData(directoryPath, inputLine.joinToString("")).getOrThrow()
         files.add(file)
         inputLine.clear()
         isCreatingInputLine = false
@@ -59,6 +59,8 @@ fun createSortedFileSystemFiles(
       isCreatingInputLine = true
     }
   }
+
+  files.sortBy { it.completeFileInfo.absolutePath }
 
   files
 }

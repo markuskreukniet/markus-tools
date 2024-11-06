@@ -11,6 +11,7 @@ class FilesToDateRangeDirectoryKtTest {
     // arrange
 
     // act
+    // val outcome = filesToDateRangeDirectory(inputPathsArray, ).getOrThrow() ?: fail()
 
     // assert
   }
