@@ -30,6 +30,7 @@ data class DFFileInfo(
   override val absolutePath: Path
 ) : DuplicateFileInfo
 
+// TODO: rename to DateRangeFileInfo
 data class FTDRFileInfo(
   override val file: File,
   override val size: Long,
