@@ -208,79 +208,99 @@ func isDirectoryChild(filePath, childFilePath string) (bool, error) {
 	return !strings.HasPrefix(path, "..") && !strings.Contains(path, utils.FilePathSeparator), nil
 }
 
-func appendPathsAndFilesByReadingDirectoryTree(path string, paths *[]string, files *[]utils.FileSystemFile) error {
-	handler := func(_, path string, stack *[]string) {
-		*paths = append(*paths, path)
-		*stack = append(*stack, path)
-	}
-
-	stack := []string{path}
-	for len(stack) > 0 {
-		path := stack[len(stack)-1]
-		stack = stack[:len(stack)-1]
-		if err := appendPathsAndFilesByReadingDirectory(path, handler, files, &stack); err != nil {
-			return err
-		}
-	}
-	return nil
+// TODO: naming
+type dateRangeArg struct {
+	directoryName string
+	filePath      string
 }
 
-func appendPathsAndFilesByReadingDirectory(path string, handler func(string, string, *[]string), files *[]utils.FileSystemFile, stack *[]string) error {
-	entries, err := os.ReadDir(path)
-	if err != nil {
-		return err
-	}
-	for _, entry := range entries {
-		name := entry.Name()
-		fullPath := filepath.Join(path, name)
-		if entry.IsDir() {
-			handler(name, fullPath, stack)
+func addDirectory(directories *[]string, arg dateRangeArg) {
+	*directories = append(*directories, arg.filePath)
+}
+
+func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRangeFileInfo, []string, []string, error) {
+	var files []utils.DateRangeFileInfo
+	var goodDirectoryPaths []string
+	var badDirectoryPaths []string
+
+	categorizeInDirectory := func(directoryPaths *[]string, arg dateRangeArg) {
+		if isValidDateRangeDirectoryName(arg.directoryName) {
+			goodDirectoryPaths = append(goodDirectoryPaths, arg.filePath)
 		} else {
-			info, err := entry.Info()
+			*directoryPaths = append(*directoryPaths, arg.filePath)
+		}
+	}
+
+	// TODO: remove, also in Kotlin
+	categorizeSubtreeContents := func(directoryPaths []string) error {
+		for _, path := range directoryPaths {
+			err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+
+				if path != filePath {
+					categorize(info, filePath, &files, &badDirectoryPaths, addDirectory)
+				}
+
+				return nil
+			})
 			if err != nil {
 				return err
 			}
-			*files = append(*files,
-				utils.CreateFileSystemFile("",
-					utils.CreateFileMetadata(info.Name(), path, fullPath, "", info.ModTime(), info.Size(), false)))
 		}
-	}
-	return nil
-}
 
-// garbage collection: handler
-func createFilesAndDirectoryFilePaths(filePath string) ([]utils.FileSystemFile, []string, []string, error) {
-	var files []utils.FileSystemFile
-	var goodDirectoryFilePaths []string
-	var badDirectoryFilePaths []string
-
-	handler := func(name, path string, _ *[]string) {
-		if isValidDateRangeDirectoryName(name) {
-			goodDirectoryFilePaths = append(goodDirectoryFilePaths, path)
-		} else {
-			badDirectoryFilePaths = append(badDirectoryFilePaths, path)
-		}
+		return nil
 	}
 
-	if err := appendPathsAndFilesByReadingDirectory(filePath, handler, &files, nil); err != nil {
+	entries, err := os.ReadDir(destinationDirectory)
+	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	handler = func(_, path string, _ *[]string) {
-		badDirectoryFilePaths = append(badDirectoryFilePaths, path)
-	}
-
-	for _, path := range goodDirectoryFilePaths {
-		if err := appendPathsAndFilesByReadingDirectory(path, handler, &files, nil); err != nil {
+	for _, entry := range entries {
+		info, err := entry.Info()
+		if err != nil {
 			return nil, nil, nil, err
 		}
+		categorize(
+			info, filepath.Join(destinationDirectory, entry.Name()), &files, &badDirectoryPaths, categorizeInDirectory,
+		)
 	}
 
-	for _, path := range badDirectoryFilePaths {
-		appendPathsAndFilesByReadingDirectoryTree(path, &badDirectoryFilePaths, &files)
+	categorizeSubtreeContents(append(goodDirectoryPaths, badDirectoryPaths...))
+
+	return files, goodDirectoryPaths, badDirectoryPaths, nil
+}
+
+func categorize(
+	info os.FileInfo,
+	filePath string,
+	files *[]utils.DateRangeFileInfo,
+	badDirectoryPaths *[]string,
+	handler func(*[]string, dateRangeArg),
+) error {
+	if info.IsDir() {
+		handler(badDirectoryPaths, dateRangeArg{
+			directoryName: filepath.Base(filePath),
+			filePath:      filePath,
+		})
+	} else if info.Mode().IsRegular() {
+		size := info.Size()
+		if size > 0 {
+			*files = append(*files, utils.DateRangeFileInfo{
+				Size:         size,
+				Path:         filePath,
+				TimeModified: info.ModTime(),
+			})
+		} else {
+			// TODO: error
+		}
+	} else {
+		// TODO: error
 	}
 
-	return files, goodDirectoryFilePaths, badDirectoryFilePaths, nil
+	return nil
 }
 
 // TODO: Does not work efficient, could be done without making groups?
@@ -374,9 +394,18 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 }
 
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
-	files, goodDirectoryFilePaths, badDirectoryFilePaths, err := createFilesAndDirectoryFilePaths(destinationDirectory)
+	filesNew, goodDirectoryFilePaths, badDirectoryFilePaths, err := categorizeFilesAndDirectories(destinationDirectory)
 	if err != nil {
 		return err
+	}
+
+	// TODO: remove this converting
+	var files []utils.FileSystemFile
+	for _, file := range filesNew {
+		files = append(files, utils.FileSystemFile{
+			Data:         "",
+			FileMetadata: utils.CreateFileMetadata(filepath.Base(file.Path), filepath.Dir(file.Path), file.Path, "", file.TimeModified, file.Size, false),
+		})
 	}
 
 	if err := utils.AppendNonZeroByteFiles(uniqueFileSystemNodes, &files); err != nil {
