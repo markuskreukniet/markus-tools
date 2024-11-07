@@ -8,6 +8,12 @@ import (
 	"unicode"
 )
 
+type DateRangeFileInfo struct {
+	Size         int64
+	Path         string
+	TimeModified time.Time
+}
+
 type FileInfo interface {
 	GetSize() int64
 	GetAbsolutePath() string
@@ -126,7 +132,7 @@ func IsTextFile(filePath string) (bool, error) {
 	return true, nil
 }
 
-func resolveDirectoryPath(filePath string, isDirectory bool) string {
+func ResolveDirectoryPath(filePath string, isDirectory bool) string {
 	directoryPath := filePath
 
 	if !isDirectory {
@@ -145,7 +151,7 @@ func ToFileSystemFile(filePath string) (FileSystemFile, error) {
 	isDirectory := info.IsDir()
 
 	return CreateFileSystemFile("",
-		CreateFileMetadata(info.Name(), resolveDirectoryPath(filePath, isDirectory), filePath, "", info.ModTime(), info.Size(), isDirectory)), nil
+		CreateFileMetadata(info.Name(), ResolveDirectoryPath(filePath, isDirectory), filePath, "", info.ModTime(), info.Size(), isDirectory)), nil
 }
 
 func FilterAndHandleFileInfo(
@@ -184,7 +190,7 @@ func FilterAndHandleFileInfo(
 
 	handler(CompleteFileInfo{
 		name:                  info.Name(),
-		absoluteDirectoryPath: resolveDirectoryPath(absoluteFilePath, isDir),
+		absoluteDirectoryPath: ResolveDirectoryPath(absoluteFilePath, isDir),
 		absolutePath:          absoluteFilePath,
 		timeModified:          info.ModTime(),
 		size:                  size,
@@ -250,7 +256,7 @@ func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode,
 		}
 
 		if err := handler(CreateFileSystemFile("",
-			CreateFileMetadata(fileInfo.Name(), resolveDirectoryPath(filePath, isDir), filePath, "", fileInfo.ModTime(), size, isDir))); err != nil {
+			CreateFileMetadata(fileInfo.Name(), ResolveDirectoryPath(filePath, isDir), filePath, "", fileInfo.ModTime(), size, isDir))); err != nil {
 			return err
 		}
 

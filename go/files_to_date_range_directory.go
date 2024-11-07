@@ -248,8 +248,104 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 	return nil
 }
 
-// garbage collection: handler
-func createFilesAndDirectoryFilePaths(filePath string) ([]utils.FileSystemFile, []string, []string, error) {
+// TODO: naming
+// type dateRangeArg struct {
+// 	directoryName string
+// 	filePath      string
+// }
+
+// func addDirectory(directories []string, arg dateRangeArg) {
+// 	directories = append(directories, arg.filePath)
+// }
+
+// func categorizeFilesAndDirectoriesNew(destinationDirectory string) ([]utils.DateRangeFileInfo, []string, []string, error) {
+// 	var files []utils.DateRangeFileInfo
+// 	var goodDirectoryPaths []string
+// 	var badDirectoryPaths []string
+
+// 	categorizeInDirectory := func(directoryPaths []string, arg dateRangeArg) {
+// 		if isValidDateRangeDirectoryName(arg.directoryName) {
+// 			goodDirectoryPaths = append(goodDirectoryPaths, arg.filePath)
+// 		} else {
+// 			directoryPaths = append(directoryPaths, arg.filePath)
+// 		}
+// 	}
+
+// 	categorizeSubtreeContents := func(directoryPaths []string) error {
+// 		for _, path := range directoryPaths {
+// 			err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
+// 				if err != nil {
+// 					return err
+// 				}
+
+// 				if path != filePath {
+// 					categorize(info, filePath, files, badDirectoryPaths, addDirectory)
+// 				}
+
+// 				return nil
+// 			})
+// 			if err != nil {
+// 				return err
+// 			}
+// 		}
+
+// 		return nil
+// 	}
+
+// 	entries, err := os.ReadDir(destinationDirectory)
+// 	if err != nil {
+// 		return nil, nil, nil, err
+// 	}
+
+// 	for _, entry := range entries {
+// 		info, err := entry.Info()
+// 		if err != nil {
+// 			return nil, nil, nil, err
+// 		}
+// 		categorize(
+// 			info, filepath.Join(destinationDirectory, entry.Name()), files, badDirectoryPaths, categorizeInDirectory,
+// 		)
+// 	}
+
+// 	categorizeSubtreeContents(goodDirectoryPaths)
+// 	categorizeSubtreeContents(badDirectoryPaths)
+
+// 	return files, goodDirectoryPaths, badDirectoryPaths, nil
+// }
+
+// func categorize(
+// 	info os.FileInfo,
+// 	filePath string,
+// 	files []utils.DateRangeFileInfo,
+// 	badDirectoryPaths []string,
+// 	handler func([]string, dateRangeArg),
+// ) error {
+// 	isDirectory := info.IsDir()
+
+// 	if isDirectory {
+// 		handler(badDirectoryPaths, dateRangeArg{
+// 			directoryName: utils.ResolveDirectoryPath(filePath, isDirectory),
+// 			filePath:      filePath,
+// 		})
+// 	} else if info.Mode().IsRegular() {
+// 		size := info.Size()
+// 		if size > 0 {
+// 			files = append(files, utils.DateRangeFileInfo{
+// 				Size:         size,
+// 				Path:         filePath,
+// 				TimeModified: info.ModTime(),
+// 			})
+// 		} else {
+// 			// TODO: error
+// 		}
+// 	} else {
+// 		// TODO: error
+// 	}
+
+// 	return nil
+// }
+
+func categorizeFilesAndDirectories(filePath string) ([]utils.FileSystemFile, []string, []string, error) {
 	var files []utils.FileSystemFile
 	var goodDirectoryFilePaths []string
 	var badDirectoryFilePaths []string
@@ -374,7 +470,7 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 }
 
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
-	files, goodDirectoryFilePaths, badDirectoryFilePaths, err := createFilesAndDirectoryFilePaths(destinationDirectory)
+	files, goodDirectoryFilePaths, badDirectoryFilePaths, err := categorizeFilesAndDirectories(destinationDirectory)
 	if err != nil {
 		return err
 	}
