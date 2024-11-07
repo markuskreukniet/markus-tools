@@ -24,24 +24,20 @@ interface DuplicateFileInfo {
   val absolutePath: Path
 }
 
+// TODO: rename?
 data class DFFileInfo(
   override val file: File,
   override val size: Long,
   override val absolutePath: Path
 ) : DuplicateFileInfo
 
+// TODO: rename to DateRangeFileInfo
 data class FTDRFileInfo(
   override val file: File,
   override val size: Long,
   override val absolutePath: Path,
   val timeModified: Instant
 ) : DuplicateFileInfo
-
-data class MinimalFileInfo(
-  override val file: File,
-  override val size: Long,
-  override val absolutePath: Path
-) : FileInfo
 
 data class CompleteFileInfo(
   override val file: File,

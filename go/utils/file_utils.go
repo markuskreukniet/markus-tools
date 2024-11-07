@@ -8,9 +8,15 @@ import (
 	"unicode"
 )
 
-type FileInfo interface {
+type DuplicateFileInfo interface {
 	GetSize() int64
 	GetAbsolutePath() string
+}
+
+type DateRangeFileInfo struct {
+	Size         int64
+	Path         string
+	TimeModified time.Time
 }
 
 // MinimalFileInfo implements FileInfo
@@ -149,7 +155,7 @@ func ToFileSystemFile(filePath string) (FileSystemFile, error) {
 }
 
 func FilterAndHandleFileInfo(
-	info os.FileInfo, mode fileFilterMode, fileType fileType, absoluteFilePath string, handler func(FileInfo),
+	info os.FileInfo, mode fileFilterMode, fileType fileType, absoluteFilePath string, handler func(DuplicateFileInfo),
 ) error {
 	isDir := info.IsDir()
 	isRegularFile := info.Mode().IsRegular()
@@ -195,7 +201,7 @@ func FilterAndHandleFileInfo(
 }
 
 func WalkFilterAndHandleFileInfo(
-	node FileSystemNode, mode fileFilterMode, fileType fileType, handler func(FileInfo),
+	node FileSystemNode, mode fileFilterMode, fileType fileType, handler func(DuplicateFileInfo),
 ) error {
 	if node.IsDirectory {
 		return filepath.Walk(node.Path, func(absoluteFilePath string, info os.FileInfo, err error) error {
@@ -256,29 +262,6 @@ func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode,
 
 		return nil
 	})
-}
-
-func AppendNonZeroByteFiles(nodes []FileSystemNode, files *[]FileSystemFile) error {
-	handler := func(file FileSystemFile) error {
-		*files = append(*files, file)
-		return nil
-	}
-
-	for _, node := range nodes {
-		if node.IsDirectory {
-			if err := WalkFilterAndHandleFileSystemFile(node.Path, NonZeroByteFiles, AllFiles, handler); err != nil {
-				return err
-			}
-		} else {
-			file, err := ToFileSystemFile(node.Path)
-			if err != nil {
-				return err
-			}
-			handler(file)
-		}
-	}
-
-	return nil
 }
 
 func FileExists(filePath string) (bool, error) {
