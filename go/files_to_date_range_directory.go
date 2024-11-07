@@ -248,14 +248,14 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 	return nil
 }
 
-// func categorizeFilesAndDirectoriesNew(filePath string) ([]utils.FileSystemFile, []string, []string, error) {
+// func categorizeFilesAndDirectoriesNew(destinationDirectory string) ([]utils.FileSystemFile, []string, []string, error) {
 // 	var files []utils.FileSystemFile
-// 	var goodDirectoryFilePaths []string
-// 	var badDirectoryFilePaths []string
+// 	var goodDirectoryPaths []string
+// 	var badDirectoryPaths []string
 
 // 	categorizeInDirectory := func(directoryPaths []string, directoryName, filePath string) {
 // 		if isValidDateRangeDirectoryName(directoryName) {
-// 			goodDirectoryFilePaths = append(goodDirectoryFilePaths, filePath)
+// 			goodDirectoryPaths = append(goodDirectoryPaths, filePath)
 // 		} else {
 // 			directoryPaths = append(directoryPaths, filePath)
 // 		}
@@ -282,25 +282,19 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 // 		return nil
 // 	}
 
-// 	// if err := appendPathsAndFilesByReadingDirectory(filePath, handler, &files, nil); err != nil {
-// 	// 	return nil, nil, nil, err
-// 	// }
+// 	entries, err := os.ReadDir(destinationDirectory)
+// 	if err != nil {
+// 		return nil, nil, nil, err
+// 	}
 
-// 	// handler = func(_, path string, _ *[]string) {
-// 	// 	badDirectoryFilePaths = append(badDirectoryFilePaths, path)
-// 	// }
+// 	for _, entry := range entries {
+// 		// categorize()
+// 	}
 
-// 	// for _, path := range goodDirectoryFilePaths {
-// 	// 	if err := appendPathsAndFilesByReadingDirectory(path, handler, &files, nil); err != nil {
-// 	// 		return nil, nil, nil, err
-// 	// 	}
-// 	// }
+// 	categorizeSubtreeContents(goodDirectoryPaths)
+// 	categorizeSubtreeContents(badDirectoryPaths)
 
-// 	// for _, path := range badDirectoryFilePaths {
-// 	// 	appendPathsAndFilesByReadingDirectoryTree(path, &badDirectoryFilePaths, &files)
-// 	// }
-
-// 	return files, goodDirectoryFilePaths, badDirectoryFilePaths, nil
+// 	return files, goodDirectoryPaths, badDirectoryPaths, nil
 // }
 
 func categorizeFilesAndDirectories(filePath string) ([]utils.FileSystemFile, []string, []string, error) {
