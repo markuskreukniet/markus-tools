@@ -240,7 +240,7 @@ fun deleteDuplicateFiles(
 fun moveFilesAndFilterGoodDirectories(
   files: MutableList<FTDRFileInfo>, goodDirectories: MutableSet<File>, destinationDirectory: File
 ) = runCatching {
-  if (files.size == 0) {
+  if (files.isEmpty()) {
     return@runCatching
   }
 
