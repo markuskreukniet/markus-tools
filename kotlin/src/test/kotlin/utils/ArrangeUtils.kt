@@ -72,29 +72,43 @@ fun getTopDirectoryPath(directoryPath: Path): Result<Path?> = runCatching {
   if (directoryPath.nameCount > 0) directoryPath.getName(0) else null
 }
 
-fun writeFileAndAddPath(file: FileData, paths: MutableList<Path>): Result<Unit> = runCatching {
-  if (!file.completeFileInfo.isDirectory) {
-    file.completeFileInfo.absolutePath.toFile().writeText(file.content)
-    if (file.completeFileInfo.timeModified != null) {
-      Files.setLastModifiedTime(file.completeFileInfo.absolutePath, file.completeFileInfo.timeModified)
-    }
+fun writeFile(file: FileData): Result<Unit> = runCatching {
+  if (file.completeFileInfo.isDirectory) {
+    return@runCatching
   }
 
-  paths.add(file.completeFileInfo.absolutePath)
+  file.completeFileInfo.absolutePath.toFile().writeText(file.content)
+  if (file.completeFileInfo.timeModified != null) {
+    Files.setLastModifiedTime(file.completeFileInfo.absolutePath, file.completeFileInfo.timeModified)
+  }
 }
 
-fun writeFilesBySingleInput(input: String): Result<Pair<String?, MutableList<Path>?>> = runCatching {
+fun resolveAbsolutePaths(directoryPath: Path, file: FileData) {
+  file.completeFileInfo.absoluteDirectoryPath = directoryPath.resolve(
+    file.completeFileInfo.absoluteDirectoryPath
+  )
+  file.completeFileInfo.absolutePath = directoryPath.resolve(file.completeFileInfo.absolutePath)
+}
+
+fun writeFilesBySingleInput(input: String): Result<Path?> = runCatching {
   if (input.isBlank()) {
-    return@runCatching Pair(null, null)
+    return@runCatching null
   }
 
   val files = createFileSystemFiles(input).getOrThrow()
 
-  if (files.size == 0) {
-    return@runCatching Pair(null, null)
+  if (files.isEmpty()) {
+    return@runCatching null
   }
 
-  Pair(null, null)
+  val directoryPath = createTemporaryDirectory().getOrThrow()
+
+  files.forEach { file ->
+    resolveAbsolutePaths(directoryPath, file)
+    writeFile(file)
+  }
+
+  directoryPath
 }
 
 fun writeFilesByMultipleInputs(input: String): Result<Pair<MutableList<Path>?, MutableList<Path>?>> = runCatching {
@@ -104,7 +118,7 @@ fun writeFilesByMultipleInputs(input: String): Result<Pair<MutableList<Path>?, M
 
   val files = createFileSystemFiles(input).getOrThrow()
 
-  if (files.size == 0) {
+  if (files.isEmpty()) {
     return@runCatching Pair(null, null)
   }
 
@@ -136,15 +150,13 @@ fun writeFilesByMultipleInputs(input: String): Result<Pair<MutableList<Path>?, M
     temporaryDirectories.add(directoryPath)
     var previousDirectoryPath = group.first().completeFileInfo.absoluteDirectoryPath
     group.forEach { file ->
-      file.completeFileInfo.absoluteDirectoryPath = directoryPath.resolve(
-        file.completeFileInfo.absoluteDirectoryPath
-      )
-      file.completeFileInfo.absolutePath = directoryPath.resolve(file.completeFileInfo.absolutePath)
+      resolveAbsolutePaths(directoryPath, file)
       if (file.completeFileInfo.absoluteDirectoryPath != previousDirectoryPath) {
         Files.createDirectories(file.completeFileInfo.absoluteDirectoryPath)
         previousDirectoryPath = file.completeFileInfo.absoluteDirectoryPath
       }
-      writeFileAndAddPath(file, inputPaths)
+      writeFile(file)
+      inputPaths.add(file.completeFileInfo.absolutePath)
     }
   }
 
