@@ -72,8 +72,11 @@ fun categorizeFilesAndDirectories(
     categorize(file, files, badDirectories, categorizeInDirectory)
   }
 
-  categorizeSubtreeContents(goodDirectories)
-  categorizeSubtreeContents(badDirectories)
+  val directories: MutableCollection<File> = mutableListOf()
+  directories.addAll(goodDirectories)
+  directories.addAll(badDirectories)
+
+  categorizeSubtreeContents(directories)
 
   return Pair(files, Pair(goodDirectories, badDirectories))
 }
@@ -82,16 +85,17 @@ fun categorize(
   file: File,
   files: MutableList<FTDRFileInfo>,
   badDirectories: MutableList<File>,
-  handler: (directories: MutableList<File>, file: File) -> Unit
+  handler: (MutableList<File>, File) -> Unit
 ) = runCatching {
   if (file.isDirectory) {
     handler(badDirectories, file)
   } else if (file.isFile) {
-    if (file.length() > 0L) {
+    val size = file.length()
+    if (size > 0L) {
       val absolutePath = file.toPath().toAbsolutePath()
       files.add(FTDRFileInfo(
         file = file,
-        size = file.length(),
+        size = size,
         absolutePath = absolutePath,
         timeModified = absolutePath.getLastModifiedTime().toInstant()
       ))
