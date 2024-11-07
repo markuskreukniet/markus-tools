@@ -8,6 +8,12 @@ import (
 	"unicode"
 )
 
+type DateRangeFileInfo struct {
+	Size         int64
+	Path         string
+	TimeModified time.Time
+}
+
 type FileInfo interface {
 	GetSize() int64
 	GetAbsolutePath() string

@@ -9,6 +9,9 @@ class FilesToDateRangeDirectoryKtTest {
   @Test
   fun `given - when - then -`() {
     // arrange
+    // var destinationInput = ""
+
+    // val destination = writeFilesBySingleInput(destinationInput).getOrThrow()
 
     // act
     // val outcome = filesToDateRangeDirectory(inputPathsArray, ).getOrThrow() ?: fail()
