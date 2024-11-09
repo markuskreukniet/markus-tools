@@ -60,14 +60,6 @@ fun categorizeFilesAndDirectories(
     }
   }
 
-  val categorizeSubtreeContents = fun(directories: MutableCollection<File>) {
-    directories.forEach { directory ->
-      directory.walk().drop(1).forEach { file ->
-        categorize(file, files, badDirectories, addDirectory)
-      }
-    }
-  }
-
   destinationDirectory.walk().maxDepth(1).forEach { file ->
     categorize(file, files, badDirectories, categorizeInDirectory)
   }
@@ -76,7 +68,11 @@ fun categorizeFilesAndDirectories(
   directories.addAll(goodDirectories)
   directories.addAll(badDirectories)
 
-  categorizeSubtreeContents(directories)
+  directories.forEach { directory ->
+    directory.walk().drop(1).forEach { file ->
+      categorize(file, files, badDirectories, addDirectory)
+    }
+  }
 
   return Pair(files, Pair(goodDirectories, badDirectories))
 }
