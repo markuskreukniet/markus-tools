@@ -392,6 +392,14 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		return err
 	}
 
+	for _, node := range uniqueFileSystemNodes {
+		info, err := os.Stat(node.Path)
+		if err != nil {
+			return err
+		}
+		categorize(info, node.Path, &filesNew, &badDirectoryFilePaths, addDirectory)
+	}
+
 	// TODO: remove this converting
 	var files []utils.FileSystemFile
 	for _, file := range filesNew {
@@ -399,10 +407,6 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 			Data:         "",
 			FileMetadata: utils.CreateFileMetadata(filepath.Base(file.Path), filepath.Dir(file.Path), file.Path, "", file.TimeModified, file.Size, false),
 		})
-	}
-
-	if err := utils.AppendNonZeroByteFiles(uniqueFileSystemNodes, &files); err != nil {
-		return err
 	}
 
 	files, err = filterAndDeleteDuplicateFiles(files, destinationDirectory)
