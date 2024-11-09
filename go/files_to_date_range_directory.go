@@ -320,11 +320,9 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 // 	badDirectoryPaths []string,
 // 	handler func([]string, dateRangeArg),
 // ) error {
-// 	isDirectory := info.IsDir()
-
-// 	if isDirectory {
+// 	if info.IsDir() {
 // 		handler(badDirectoryPaths, dateRangeArg{
-// 			directoryName: utils.ResolveDirectoryPath(filePath, isDirectory),
+// 			directoryName: filepath.Base(filePath),
 // 			filePath:      filePath,
 // 		})
 // 	} else if info.Mode().IsRegular() {
