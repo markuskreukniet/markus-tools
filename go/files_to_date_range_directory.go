@@ -470,6 +470,24 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 }
 
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
+	// filesNew, goodDirectoryFilePathsNew, badDirectoryFilePathsNew, err := categorizeFilesAndDirectoriesNew(destinationDirectory)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// println("filesNew", filesNew)
+	// println("goodDirectoryFilePathsNew", goodDirectoryFilePathsNew)
+	// println("badDirectoryFilePathsNew", badDirectoryFilePathsNew)
+
+	// // TODO: remove this converting
+	// var files []utils.FileSystemFile
+	// for _, file := range filesNew {
+	// 	files = append(files, utils.FileSystemFile{
+	// 		Data:         "",
+	// 		FileMetadata: utils.CreateFileMetadata(filepath.Base(file.Path), filepath.Dir(file.Path), file.Path, "", file.TimeModified, file.Size, false),
+	// 	})
+	// }
+
 	files, goodDirectoryFilePaths, badDirectoryFilePaths, err := categorizeFilesAndDirectories(destinationDirectory)
 	if err != nil {
 		return err
