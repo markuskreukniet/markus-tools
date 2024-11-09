@@ -279,7 +279,7 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 // 				}
 
 // 				if path != filePath {
-// 					categorize(info, filePath, files, &badDirectoryPaths, addDirectory)
+// 					categorize(info, filePath, &files, &badDirectoryPaths, addDirectory)
 // 				}
 
 // 				return nil
@@ -303,7 +303,7 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 // 			return nil, nil, nil, err
 // 		}
 // 		categorize(
-// 			info, filepath.Join(destinationDirectory, entry.Name()), files, &badDirectoryPaths, categorizeInDirectory,
+// 			info, filepath.Join(destinationDirectory, entry.Name()), &files, &badDirectoryPaths, categorizeInDirectory,
 // 		)
 // 	}
 
@@ -316,7 +316,7 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 // func categorize(
 // 	info os.FileInfo,
 // 	filePath string,
-// 	files []utils.DateRangeFileInfo,
+// 	files *[]utils.DateRangeFileInfo,
 // 	badDirectoryPaths *[]string,
 // 	handler func(*[]string, dateRangeArg),
 // ) error {
@@ -328,7 +328,7 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 // 	} else if info.Mode().IsRegular() {
 // 		size := info.Size()
 // 		if size > 0 {
-// 			files = append(files, utils.DateRangeFileInfo{
+// 			*files = append(*files, utils.DateRangeFileInfo{
 // 				Size:         size,
 // 				Path:         filePath,
 // 				TimeModified: info.ModTime(),
