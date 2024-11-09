@@ -254,8 +254,8 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 // 	filePath      string
 // }
 
-// func addDirectory(directories []string, arg dateRangeArg) {
-// 	directories = append(directories, arg.filePath)
+// func addDirectory(directories *[]string, arg dateRangeArg) {
+// 	*directories = append(*directories, arg.filePath)
 // }
 
 // func categorizeFilesAndDirectoriesNew(destinationDirectory string) ([]utils.DateRangeFileInfo, []string, []string, error) {
@@ -263,11 +263,11 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 // 	var goodDirectoryPaths []string
 // 	var badDirectoryPaths []string
 
-// 	categorizeInDirectory := func(directoryPaths []string, arg dateRangeArg) {
+// 	categorizeInDirectory := func(directoryPaths *[]string, arg dateRangeArg) {
 // 		if isValidDateRangeDirectoryName(arg.directoryName) {
 // 			goodDirectoryPaths = append(goodDirectoryPaths, arg.filePath)
 // 		} else {
-// 			directoryPaths = append(directoryPaths, arg.filePath)
+// 			*directoryPaths = append(*directoryPaths, arg.filePath)
 // 		}
 // 	}
 
@@ -279,7 +279,7 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 // 				}
 
 // 				if path != filePath {
-// 					categorize(info, filePath, files, badDirectoryPaths, addDirectory)
+// 					categorize(info, filePath, files, &badDirectoryPaths, addDirectory)
 // 				}
 
 // 				return nil
@@ -303,7 +303,7 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 // 			return nil, nil, nil, err
 // 		}
 // 		categorize(
-// 			info, filepath.Join(destinationDirectory, entry.Name()), files, badDirectoryPaths, categorizeInDirectory,
+// 			info, filepath.Join(destinationDirectory, entry.Name()), files, &badDirectoryPaths, categorizeInDirectory,
 // 		)
 // 	}
 
@@ -317,8 +317,8 @@ func appendPathsAndFilesByReadingDirectory(path string, handler func(string, str
 // 	info os.FileInfo,
 // 	filePath string,
 // 	files []utils.DateRangeFileInfo,
-// 	badDirectoryPaths []string,
-// 	handler func([]string, dateRangeArg),
+// 	badDirectoryPaths *[]string,
+// 	handler func(*[]string, dateRangeArg),
 // ) error {
 // 	if info.IsDir() {
 // 		handler(badDirectoryPaths, dateRangeArg{
