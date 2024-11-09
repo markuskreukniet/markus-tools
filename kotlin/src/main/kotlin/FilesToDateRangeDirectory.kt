@@ -72,8 +72,11 @@ fun categorizeFilesAndDirectories(
     categorize(file, files, badDirectories, categorizeInDirectory)
   }
 
-  categorizeSubtreeContents(goodDirectories)
-  categorizeSubtreeContents(badDirectories)
+  val directories: MutableCollection<File> = mutableListOf()
+  directories.addAll(goodDirectories)
+  directories.addAll(badDirectories)
+
+  categorizeSubtreeContents(directories)
 
   return Pair(files, Pair(goodDirectories, badDirectories))
 }
