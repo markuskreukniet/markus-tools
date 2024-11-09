@@ -231,28 +231,6 @@ func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRan
 		}
 	}
 
-	// TODO: remove, also in Kotlin
-	categorizeSubtreeContents := func(directoryPaths []string) error {
-		for _, path := range directoryPaths {
-			err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
-				if err != nil {
-					return err
-				}
-
-				if path != filePath {
-					categorize(info, filePath, &files, &badDirectoryPaths, addDirectory)
-				}
-
-				return nil
-			})
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
-	}
-
 	entries, err := os.ReadDir(destinationDirectory)
 	if err != nil {
 		return nil, nil, nil, err
@@ -268,7 +246,22 @@ func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRan
 		)
 	}
 
-	categorizeSubtreeContents(append(goodDirectoryPaths, badDirectoryPaths...))
+	for _, path := range append(goodDirectoryPaths, badDirectoryPaths...) {
+		err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if path != filePath {
+				categorize(info, filePath, &files, &badDirectoryPaths, addDirectory)
+			}
+
+			return nil
+		})
+		if err != nil {
+			return nil, nil, nil, err
+		}
+	}
 
 	return files, goodDirectoryPaths, badDirectoryPaths, nil
 }
