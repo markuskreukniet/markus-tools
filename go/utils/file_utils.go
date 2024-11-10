@@ -10,27 +10,37 @@ import (
 
 type DuplicateFileInfo interface {
 	GetSize() int64
-	GetAbsolutePath() string
+	GetPath() string
 }
 
+// DateRangeFileInfo implements DuplicateFileInfo
 type DateRangeFileInfo struct {
 	Size         int64
 	Path         string
+	Name         string
 	TimeModified time.Time
 }
 
-// MinimalFileInfo implements FileInfo
-type MinimalFileInfo struct {
-	Size         int64
-	AbsolutePath string
-}
-
-func (info MinimalFileInfo) GetSize() int64 {
+func (info DateRangeFileInfo) GetSize() int64 {
 	return info.Size
 }
 
-func (info MinimalFileInfo) GetAbsolutePath() string {
-	return info.AbsolutePath
+func (info DateRangeFileInfo) GetPath() string {
+	return info.Path
+}
+
+// DuplicateFilesFileInfo implements DuplicateFileInfo
+type DuplicateFilesFileInfo struct {
+	Size int64
+	Path string
+}
+
+func (info DuplicateFilesFileInfo) GetSize() int64 {
+	return info.Size
+}
+
+func (info DuplicateFilesFileInfo) GetPath() string {
+	return info.Path
 }
 
 // CompleteFileInfo implements FileInfo
@@ -47,7 +57,7 @@ func (info CompleteFileInfo) GetSize() int64 {
 	return info.size
 }
 
-func (info CompleteFileInfo) GetAbsolutePath() string {
+func (info CompleteFileInfo) GetPath() string {
 	return info.absolutePath
 }
 
