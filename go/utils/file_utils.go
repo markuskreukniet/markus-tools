@@ -8,15 +8,15 @@ import (
 	"unicode"
 )
 
+type DuplicateFileInfo interface {
+	GetSize() int64
+	GetAbsolutePath() string
+}
+
 type DateRangeFileInfo struct {
 	Size         int64
 	Path         string
 	TimeModified time.Time
-}
-
-type FileInfo interface {
-	GetSize() int64
-	GetAbsolutePath() string
 }
 
 // MinimalFileInfo implements FileInfo
@@ -155,7 +155,7 @@ func ToFileSystemFile(filePath string) (FileSystemFile, error) {
 }
 
 func FilterAndHandleFileInfo(
-	info os.FileInfo, mode fileFilterMode, fileType fileType, absoluteFilePath string, handler func(FileInfo),
+	info os.FileInfo, mode fileFilterMode, fileType fileType, absoluteFilePath string, handler func(DuplicateFileInfo),
 ) error {
 	isDir := info.IsDir()
 	isRegularFile := info.Mode().IsRegular()
@@ -201,7 +201,7 @@ func FilterAndHandleFileInfo(
 }
 
 func WalkFilterAndHandleFileInfo(
-	node FileSystemNode, mode fileFilterMode, fileType fileType, handler func(FileInfo),
+	node FileSystemNode, mode fileFilterMode, fileType fileType, handler func(DuplicateFileInfo),
 ) error {
 	if node.IsDirectory {
 		return filepath.Walk(node.Path, func(absoluteFilePath string, info os.FileInfo, err error) error {
