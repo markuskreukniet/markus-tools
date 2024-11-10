@@ -32,7 +32,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 		}
 	}
 
-	groups, err := utils.CreateFileInfoGroupsByHash(files, true)
+	groups, err := utils.CreateDuplicateFileInfoGroupsByHash(files, true)
 	if err != nil {
 		return "", err
 	}
