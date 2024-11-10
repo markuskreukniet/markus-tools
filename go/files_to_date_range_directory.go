@@ -386,6 +386,15 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 	return filePaths, nil
 }
 
+// func deleteDuplicateFiles(files []utils.DateRangeFileInfo, destinationDirectory string) error {
+// 	groups, err := utils.CreateDuplicateFileInfoGroupsByHash(files, false)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	return nil
+// }
+
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
 	filesNew, goodDirectoryFilePaths, badDirectoryFilePaths, err := categorizeFilesAndDirectories(destinationDirectory)
 	if err != nil {
