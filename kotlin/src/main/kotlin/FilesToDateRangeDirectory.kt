@@ -112,7 +112,7 @@ fun createHandlers(
     }
   }
 
-  val addBadFilesInfoAndReplaceGoodFiles  = fun(
+  val addBadFilesInfoAndReplaceGoodFiles = fun(
     badFiles: MutableList<File>, goodFiles: MutableList<FTDRFileInfo>, file: FTDRFileInfo
   ) {
     addAllFilesInfo(badFiles, goodFiles)

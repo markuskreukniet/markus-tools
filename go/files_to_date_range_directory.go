@@ -284,6 +284,7 @@ func categorize(
 			*files = append(*files, utils.DateRangeFileInfo{
 				Size:         size,
 				Path:         filePath,
+				Name:         info.Name(),
 				TimeModified: info.ModTime(),
 			})
 		} else {
@@ -385,6 +386,48 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 
 	return filePaths, nil
 }
+
+func createHandlers(
+	destinationDirectory string) []func([]utils.DateRangeFileInfo, []utils.DateRangeFileInfo,
+) []utils.DateRangeFileInfo {
+	// func
+
+	// func
+
+	categorizeOnShortestFileNameLength := func(
+		files []utils.DateRangeFileInfo, badFiles []utils.DateRangeFileInfo,
+	) []utils.DateRangeFileInfo {
+		good := []utils.DateRangeFileInfo{files[0]}
+		var minimumLength = len(files[0].Name)
+
+		for i := 1; i < len(files); i++ {
+			nameLength := len(files[i].Name)
+			if nameLength < minimumLength {
+				minimumLength = nameLength
+				// TODO: addBadFilesInfoAndReplaceGoodFiles
+			} else if nameLength == minimumLength {
+				good = append(good, files[i])
+			} else {
+				badFiles = append(badFiles, files[i])
+			}
+		}
+
+		return good
+	}
+
+	return []func([]utils.DateRangeFileInfo, []utils.DateRangeFileInfo) []utils.DateRangeFileInfo{
+		categorizeOnShortestFileNameLength,
+	}
+}
+
+// func deleteDuplicateFiles(files []utils.DateRangeFileInfo, destinationDirectory string) error {
+// 	groups, err := utils.CreateDuplicateFileInfoGroupsByHash(files, false)
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	return nil
+// }
 
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
 	filesNew, goodDirectoryFilePaths, badDirectoryFilePaths, err := categorizeFilesAndDirectories(destinationDirectory)
