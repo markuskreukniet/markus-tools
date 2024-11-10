@@ -20,9 +20,9 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 	var files []utils.DuplicateFileInfo
 
 	handler := func(file utils.DuplicateFileInfo) {
-		files = append(files, utils.MinimalFileInfo{
-			Size:         file.GetSize(),
-			AbsolutePath: file.GetAbsolutePath(),
+		files = append(files, utils.DuplicateFilesFileInfo{
+			Size: file.GetSize(),
+			Path: file.GetPath(),
 		})
 	}
 
@@ -49,7 +49,7 @@ func getDuplicateFilesAsNewlineSeparatedString(uniqueFileSystemNodes []utils.Fil
 					return "", err
 				}
 			}
-			if _, err := result.WriteString(file.GetAbsolutePath()); err != nil {
+			if _, err := result.WriteString(file.GetPath()); err != nil {
 				return "", err
 			}
 		}
