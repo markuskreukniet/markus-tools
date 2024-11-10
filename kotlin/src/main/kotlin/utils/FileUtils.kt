@@ -24,6 +24,7 @@ interface DuplicateFileInfo {
   val absolutePath: Path
 }
 
+// TODO: rename?
 data class DFFileInfo(
   override val file: File,
   override val size: Long,
