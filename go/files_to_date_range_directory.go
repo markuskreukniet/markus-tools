@@ -386,6 +386,19 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 	return filePaths, nil
 }
 
+// func createHandlers(destinationDirectory string) []func() {
+// 	//
+
+// 	//
+
+// 	categorizeOnShortestFileNameLength := func(
+// 		files []utils.DateRangeFileInfo, badFiles []utils.DateRangeFileInfo,
+// 	) []utils.DateRangeFileInfo {
+// 		good := files[0]
+// 		// var minimumLength = good
+// 	}
+// }
+
 // func deleteDuplicateFiles(files []utils.DateRangeFileInfo, destinationDirectory string) error {
 // 	groups, err := utils.CreateDuplicateFileInfoGroupsByHash(files, false)
 // 	if err != nil {
