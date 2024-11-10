@@ -39,12 +39,6 @@ data class FTDRFileInfo(
   val timeModified: Instant
 ) : DuplicateFileInfo
 
-data class MinimalFileInfo(
-  override val file: File,
-  override val size: Long,
-  override val absolutePath: Path
-) : FileInfo
-
 data class CompleteFileInfo(
   override val file: File,
   val name: String,
