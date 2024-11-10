@@ -26,24 +26,30 @@ func WriteTwoNewlineStrings(builder *strings.Builder) (int, error) {
 	return bytesWritten, nil
 }
 
-func CreateFileInfoGroupsByHash(files []FileInfo, onlyDuplicates bool) ([][]FileInfo, error) {
+// func createDuplicateFileInfoGroupsByHash[T DuplicateFileInfo](files []T) ([][]T, error) {
+// 	if len(files) == 0 {
+// 		return nil, nil
+// 	}
+// }
+
+func CreateFileInfoGroupsByHash(files []DuplicateFileInfo, onlyDuplicates bool) ([][]DuplicateFileInfo, error) {
 	if len(files) == 0 {
 		return nil, nil
 	}
 
 	type filesByFileSize struct {
 		fileSize int64
-		files    []FileInfo
+		files    []DuplicateFileInfo
 	}
 
-	var result [][]FileInfo
+	var result [][]DuplicateFileInfo
 	var groups []filesByFileSize
 	groupIndex := 0
 
-	appendGroup := func(file FileInfo) {
+	appendGroup := func(file DuplicateFileInfo) {
 		groups = append(groups, filesByFileSize{
 			fileSize: file.GetSize(),
-			files:    []FileInfo{file},
+			files:    []DuplicateFileInfo{file},
 		})
 	}
 
@@ -64,7 +70,7 @@ func CreateFileInfoGroupsByHash(files []FileInfo, onlyDuplicates bool) ([][]File
 
 	for _, group := range groups {
 		if len(group.files) > 1 {
-			hashMap := make(map[string][]FileInfo)
+			hashMap := make(map[string][]DuplicateFileInfo)
 			for _, file := range group.files {
 				hash, err := CreateFileHash(file.GetAbsolutePath())
 				if err != nil {
