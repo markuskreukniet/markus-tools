@@ -66,7 +66,7 @@ func CreateDuplicateFileInfoGroupsByHash[T DuplicateFileInfo](files []T, onlyDup
 		if len(group.files) > 1 {
 			hashMap := make(map[string][]T)
 			for _, file := range group.files {
-				hash, err := CreateFileHash(file.GetAbsolutePath())
+				hash, err := CreateFileHash(file.GetPath())
 				if err != nil {
 					return nil, err
 				}
