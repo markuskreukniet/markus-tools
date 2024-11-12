@@ -388,14 +388,17 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 }
 
 func createHandlers(
-	destinationDirectory string) []func([]utils.DateRangeFileInfo, []utils.DateRangeFileInfo,
+	destinationDirectory string) []func([]utils.DateRangeFileInfo, *[]utils.DateRangeFileInfo,
 ) []utils.DateRangeFileInfo {
-	// func
-
-	// func
+	appendBadFilesAndReplaceGoodFiles := func(
+		badFiles *[]utils.DateRangeFileInfo, goodFiles *[]utils.DateRangeFileInfo, file utils.DateRangeFileInfo,
+	) {
+		*badFiles = append(*badFiles, *goodFiles...)
+		goodFiles = &[]utils.DateRangeFileInfo{file}
+	}
 
 	categorizeOnShortestFileNameLength := func(
-		files []utils.DateRangeFileInfo, badFiles []utils.DateRangeFileInfo,
+		files []utils.DateRangeFileInfo, badFiles *[]utils.DateRangeFileInfo,
 	) []utils.DateRangeFileInfo {
 		good := []utils.DateRangeFileInfo{files[0]}
 		var minimumLength = len(files[0].Name)
@@ -404,18 +407,18 @@ func createHandlers(
 			nameLength := len(files[i].Name)
 			if nameLength < minimumLength {
 				minimumLength = nameLength
-				// TODO: addBadFilesInfoAndReplaceGoodFiles
+				appendBadFilesAndReplaceGoodFiles(badFiles, &good, files[i])
 			} else if nameLength == minimumLength {
 				good = append(good, files[i])
 			} else {
-				badFiles = append(badFiles, files[i])
+				*badFiles = append(*badFiles, files[i])
 			}
 		}
 
 		return good
 	}
 
-	return []func([]utils.DateRangeFileInfo, []utils.DateRangeFileInfo) []utils.DateRangeFileInfo{
+	return []func([]utils.DateRangeFileInfo, *[]utils.DateRangeFileInfo) []utils.DateRangeFileInfo{
 		categorizeOnShortestFileNameLength,
 	}
 }
