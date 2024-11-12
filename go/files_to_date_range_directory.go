@@ -455,8 +455,28 @@ func createHandlers(
 		return tempBadFiles
 	}
 
+	categorizeOnNewestTimeModified := func(
+		files []utils.DateRangeFileInfo, badFiles *[]utils.DateRangeFileInfo,
+	) []utils.DateRangeFileInfo {
+		good := []utils.DateRangeFileInfo{files[0]}
+		newest := files[0].TimeModified
+
+		for i := 1; i < len(files); i++ {
+			if files[i].TimeModified.After(newest) {
+				newest = files[i].TimeModified
+				appendBadFilesAndReplaceGoodFiles(badFiles, &good, files[i])
+			} else if files[i].TimeModified.Equal(newest) {
+				good = append(good, files[i])
+			} else {
+				*badFiles = append(*badFiles, files[i])
+			}
+		}
+
+		return good
+	}
+
 	return []func([]utils.DateRangeFileInfo, *[]utils.DateRangeFileInfo) []utils.DateRangeFileInfo{
-		categorizeOnShortestFileNameLength, categorizeOnValidDateRangeDirectoryName,
+		categorizeOnShortestFileNameLength, categorizeOnValidDateRangeDirectoryName, categorizeOnNewestTimeModified,
 	}
 }
 
