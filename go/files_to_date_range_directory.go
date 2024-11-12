@@ -284,7 +284,6 @@ func categorize(
 			*files = append(*files, utils.DateRangeFileInfo{
 				Size:         size,
 				Path:         filePath,
-				Name:         info.Name(),
 				TimeModified: info.ModTime(),
 			})
 		} else {
@@ -400,11 +399,15 @@ func createHandlers(
 	categorizeOnShortestFileNameLength := func(
 		files []utils.DateRangeFileInfo, badFiles *[]utils.DateRangeFileInfo,
 	) []utils.DateRangeFileInfo {
+		getNameLength := func(file utils.DateRangeFileInfo) int {
+			return len(filepath.Base(file.Path))
+		}
+
 		good := []utils.DateRangeFileInfo{files[0]}
-		var minimumLength = len(files[0].Name)
+		var minimumLength = getNameLength(files[0])
 
 		for i := 1; i < len(files); i++ {
-			nameLength := len(files[i].Name)
+			nameLength := getNameLength(files[i])
 			if nameLength < minimumLength {
 				minimumLength = nameLength
 				appendBadFilesAndReplaceGoodFiles(badFiles, &good, files[i])
@@ -418,8 +421,42 @@ func createHandlers(
 		return good
 	}
 
+	categorizeOnValidDateRangeDirectoryName := func(
+		files []utils.DateRangeFileInfo, badFiles *[]utils.DateRangeFileInfo,
+	) []utils.DateRangeFileInfo {
+		var tempGood1Files []utils.DateRangeFileInfo
+		var tempGood2Files []utils.DateRangeFileInfo
+		var tempBadFiles []utils.DateRangeFileInfo
+
+		for _, file := range files {
+			directoryPath := filepath.Dir(file.Path)
+			if filepath.Dir(directoryPath) == destinationDirectory {
+				if isValidDateRangeDirectoryName(directoryPath) {
+					tempGood2Files = append(tempGood2Files, file)
+				} else {
+					tempGood1Files = append(tempGood1Files, file)
+				}
+			} else {
+				tempBadFiles = append(tempBadFiles, file)
+			}
+		}
+
+		if len(tempGood2Files) > 0 {
+			*badFiles = append(*badFiles, tempGood1Files...)
+			*badFiles = append(*badFiles, tempBadFiles...)
+			return tempGood2Files
+		}
+
+		if len(tempGood1Files) > 0 {
+			*badFiles = append(*badFiles, tempBadFiles...)
+			return tempGood1Files
+		}
+
+		return tempBadFiles
+	}
+
 	return []func([]utils.DateRangeFileInfo, *[]utils.DateRangeFileInfo) []utils.DateRangeFileInfo{
-		categorizeOnShortestFileNameLength,
+		categorizeOnShortestFileNameLength, categorizeOnValidDateRangeDirectoryName,
 	}
 }
 
