@@ -393,7 +393,7 @@ func createHandlers(
 		badFiles *[]utils.DateRangeFileInfo, goodFiles *[]utils.DateRangeFileInfo, file utils.DateRangeFileInfo,
 	) {
 		*badFiles = append(*badFiles, *goodFiles...)
-		goodFiles = &[]utils.DateRangeFileInfo{file}
+		*goodFiles = []utils.DateRangeFileInfo{file}
 	}
 
 	categorizeOnShortestFileNameLength := func(
@@ -510,7 +510,7 @@ func deleteDuplicateFiles(files *[]utils.DateRangeFileInfo, destinationDirectory
 			if len(groups[index]) > 1 {
 				groups[index] = handler(group, &badFiles)
 			} else {
-				*files = append(*files, group[0])
+				*files = append(*files, groups[index][0])
 				break
 			}
 		}
@@ -539,9 +539,9 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		categorize(info, node.Path, &filesNew, &badDirectoryFilePaths, addDirectory)
 	}
 
-	// if err := deleteDuplicateFiles(&filesNew, destinationDirectory); err != nil {
-	// 	return err
-	// }
+	if err := deleteDuplicateFiles(&filesNew, destinationDirectory); err != nil {
+		return err
+	}
 
 	// TODO: remove this converting
 	var files []utils.FileSystemFile
@@ -552,10 +552,10 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		})
 	}
 
-	files, err = filterAndDeleteDuplicateFiles(files, destinationDirectory)
-	if err != nil {
-		return err
-	}
+	// files, err = filterAndDeleteDuplicateFiles(files, destinationDirectory)
+	// if err != nil {
+	// 	return err
+	// }
 
 	sort.Slice(files, func(i, j int) bool {
 		return files[i].FileMetadata.TimeModified.Before(files[j].FileMetadata.TimeModified)
