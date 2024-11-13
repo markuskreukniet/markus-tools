@@ -493,14 +493,37 @@ func createHandlers(
 	}
 }
 
-// func deleteDuplicateFiles(files []utils.DateRangeFileInfo, destinationDirectory string) error {
-// 	groups, err := utils.CreateDuplicateFileInfoGroupsByHash(files, false)
-// 	if err != nil {
-// 		return err
-// 	}
+func deleteDuplicateFiles(files *[]utils.DateRangeFileInfo, destinationDirectory string) error {
+	groups, err := utils.CreateDuplicateFileInfoGroupsByHash(*files, false)
+	if err != nil {
+		return err
+	}
 
-// 	return nil
-// }
+	handlers := createHandlers(destinationDirectory)
+	var badFiles []utils.DateRangeFileInfo
+
+	*files = (*files)[:0]
+
+	for index, group := range groups {
+		for _, handler := range handlers {
+			// group and groups[index] are different references
+			if len(groups[index]) > 1 {
+				groups[index] = handler(group, &badFiles)
+			} else {
+				*files = append(*files, group[0])
+				break
+			}
+		}
+	}
+
+	for _, file := range badFiles {
+		if err := os.Remove(file.GetPath()); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
 	filesNew, goodDirectoryFilePaths, badDirectoryFilePaths, err := categorizeFilesAndDirectories(destinationDirectory)
@@ -515,6 +538,10 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		}
 		categorize(info, node.Path, &filesNew, &badDirectoryFilePaths, addDirectory)
 	}
+
+	// if err := deleteDuplicateFiles(&filesNew, destinationDirectory); err != nil {
+	// 	return err
+	// }
 
 	// TODO: remove this converting
 	var files []utils.FileSystemFile
