@@ -475,8 +475,21 @@ func createHandlers(
 		return good
 	}
 
+	categorizeOnFirstFile := func(
+		files []utils.DateRangeFileInfo, badFiles *[]utils.DateRangeFileInfo,
+	) []utils.DateRangeFileInfo {
+		good := []utils.DateRangeFileInfo{files[0]}
+
+		*badFiles = append(*badFiles, files[1:]...)
+
+		return good
+	}
+
 	return []func([]utils.DateRangeFileInfo, *[]utils.DateRangeFileInfo) []utils.DateRangeFileInfo{
-		categorizeOnShortestFileNameLength, categorizeOnValidDateRangeDirectoryName, categorizeOnNewestTimeModified,
+		categorizeOnShortestFileNameLength,
+		categorizeOnValidDateRangeDirectoryName,
+		categorizeOnNewestTimeModified,
+		categorizeOnFirstFile,
 	}
 }
 
