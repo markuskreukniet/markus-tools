@@ -147,6 +147,10 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 		return filePaths, nil
 	}
 
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].FileMetadata.TimeModified.Before(files[j].FileMetadata.TimeModified)
+	})
+
 	groups := [][]utils.FileSystemFile{{files[0]}}
 	groupIndex := 0
 
@@ -367,8 +371,22 @@ func deleteDuplicateFiles(files *[]utils.DateRangeFileInfo, destinationDirectory
 	return nil
 }
 
+func moveFilesAndFilterGoodDirectories(
+	files []utils.DateRangeFileInfo, goodDirectoryPaths []string, destinationDirectory string,
+) {
+	if len(files) == 0 {
+		return
+	}
+
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].TimeModified.Before(files[j].TimeModified)
+	})
+
+	return
+}
+
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
-	filesNew, goodDirectoryFilePaths, badDirectoryFilePaths, err := categorizeFilesAndDirectories(destinationDirectory)
+	filesNew, goodDirectoryPaths, badDirectoryPaths, err := categorizeFilesAndDirectories(destinationDirectory)
 	if err != nil {
 		return err
 	}
@@ -378,7 +396,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		if err != nil {
 			return err
 		}
-		categorize(info, node.Path, &filesNew, &badDirectoryFilePaths, addDirectory)
+		categorize(info, node.Path, &filesNew, &badDirectoryPaths, addDirectory)
 	}
 
 	if err := deleteDuplicateFiles(&filesNew, destinationDirectory); err != nil {
@@ -394,25 +412,21 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		})
 	}
 
-	sort.Slice(files, func(i, j int) bool {
-		return files[i].FileMetadata.TimeModified.Before(files[j].FileMetadata.TimeModified)
-	})
-
 	// TODO: goodDirectoryFilePaths should work with reference?
-	goodDirectoryFilePaths, err = moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files, goodDirectoryFilePaths, destinationDirectory)
+	goodDirectoryPaths, err = moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files, goodDirectoryPaths, destinationDirectory)
 	if err != nil {
 		return err
 	}
 
 	// Remove the bad empty directories
 	// There is no need to check if the directory exists before attempting removal.
-	for i := len(badDirectoryFilePaths) - 1; i >= 0; i-- {
-		if err := os.Remove(badDirectoryFilePaths[i]); err != nil {
+	for i := len(badDirectoryPaths) - 1; i >= 0; i-- {
+		if err := os.Remove(badDirectoryPaths[i]); err != nil {
 			return err
 		}
 	}
 
-	for _, path := range goodDirectoryFilePaths {
+	for _, path := range goodDirectoryPaths {
 		if err := os.Remove(path); err != nil {
 			return err
 		}
