@@ -510,7 +510,7 @@ func deleteDuplicateFiles(files *[]utils.DateRangeFileInfo, destinationDirectory
 			if len(groups[index]) > 1 {
 				groups[index] = handler(group, &badFiles)
 			} else {
-				*files = append(*files, group[0])
+				*files = append(*files, groups[index][0])
 				break
 			}
 		}
