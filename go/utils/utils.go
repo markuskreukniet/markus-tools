@@ -53,11 +53,11 @@ func CreateDuplicateFileInfoGroupsByHash[T DuplicateFileInfo](files []T, onlyDup
 
 	appendGroup(files[0])
 
-	for i := 1; i < len(files); i++ {
-		if files[i].GetSize() == groups[groupIndex].files[0].GetSize() {
-			groups[groupIndex].files = append(groups[groupIndex].files, files[i])
+	for _, file := range files[1:] {
+		if file.GetSize() == groups[groupIndex].files[0].GetSize() {
+			groups[groupIndex].files = append(groups[groupIndex].files, file)
 		} else {
-			appendGroup(files[i])
+			appendGroup(file)
 			groupIndex++
 		}
 	}
@@ -109,13 +109,13 @@ func CreateFileSystemFileByHashGroups(files []FileSystemFile, onlyDuplicates boo
 		files:    []FileSystemFile{files[0]},
 	})
 
-	for i := 1; i < len(files); i++ {
-		if files[i].FileMetadata.Size == groups[groupIndex].files[0].FileMetadata.Size {
-			groups[groupIndex].files = append(groups[groupIndex].files, files[i])
+	for _, file := range files[1:] {
+		if file.FileMetadata.Size == groups[groupIndex].files[0].FileMetadata.Size {
+			groups[groupIndex].files = append(groups[groupIndex].files, file)
 		} else {
 			groups = append(groups, filesByFileSize{
-				fileSize: files[i].FileMetadata.Size,
-				files:    []FileSystemFile{files[i]},
+				fileSize: file.FileMetadata.Size,
+				files:    []FileSystemFile{file},
 			})
 			groupIndex++
 		}
