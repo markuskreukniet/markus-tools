@@ -251,15 +251,15 @@ func createHandlers(
 		good := []utils.DateRangeFileInfo{files[0]}
 		var minimumLength = getNameLength(files[0])
 
-		for i := 1; i < len(files); i++ {
-			nameLength := getNameLength(files[i])
+		for _, file := range files[1:] {
+			nameLength := getNameLength(file)
 			if nameLength < minimumLength {
 				minimumLength = nameLength
-				appendBadFilesAndReplaceGoodFiles(badFiles, &good, files[i])
+				appendBadFilesAndReplaceGoodFiles(badFiles, &good, file)
 			} else if nameLength == minimumLength {
-				good = append(good, files[i])
+				good = append(good, file)
 			} else {
-				*badFiles = append(*badFiles, files[i])
+				*badFiles = append(*badFiles, file)
 			}
 		}
 
@@ -306,14 +306,14 @@ func createHandlers(
 		good := []utils.DateRangeFileInfo{files[0]}
 		newest := files[0].TimeModified
 
-		for i := 1; i < len(files); i++ {
-			if files[i].TimeModified.After(newest) {
-				newest = files[i].TimeModified
-				appendBadFilesAndReplaceGoodFiles(badFiles, &good, files[i])
-			} else if files[i].TimeModified.Equal(newest) {
-				good = append(good, files[i])
+		for _, file := range files[1:] {
+			if file.TimeModified.After(newest) {
+				newest = file.TimeModified
+				appendBadFilesAndReplaceGoodFiles(badFiles, &good, file)
+			} else if file.TimeModified.Equal(newest) {
+				good = append(good, file)
 			} else {
-				*badFiles = append(*badFiles, files[i])
+				*badFiles = append(*badFiles, file)
 			}
 		}
 
@@ -382,6 +382,8 @@ func moveFilesAndFilterGoodDirectories(
 	})
 
 	group := []utils.DateRangeFileInfo{files[0]}
+
+	// TODO: search for i := 1
 
 	for _, file := range files[1:] {
 		lastFile := group[len(group)-1]
