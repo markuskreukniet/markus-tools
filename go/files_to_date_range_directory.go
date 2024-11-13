@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"os"
 	"path/filepath"
 	"sort"
@@ -37,7 +36,7 @@ func isValidDateRangeDirectoryName(name string) bool {
 }
 
 func isWithin72Hours(olderTime, newerTime time.Time) bool {
-	return math.Abs(olderTime.Sub(newerTime).Hours()) <= 72
+	return newerTime.Sub(olderTime).Hours() <= 72
 }
 
 func createDirectoryDateRangeName(startTime, endTime time.Time) string {
@@ -381,6 +380,19 @@ func moveFilesAndFilterGoodDirectories(
 	sort.Slice(files, func(i, j int) bool {
 		return files[i].TimeModified.Before(files[j].TimeModified)
 	})
+
+	group := []utils.DateRangeFileInfo{files[0]}
+
+	for _, file := range files[1:] {
+		lastFile := group[len(group)-1]
+		if file.TimeModified.Sub(lastFile.TimeModified).Hours() <= 72 {
+			group = append(group, file)
+		}
+
+		// func isWithin72Hours(olderTime, newerTime time.Time) bool {
+		// 	return newerTime.Sub(olderTime).Hours() <= 72
+		// }
+	}
 
 	return
 }
