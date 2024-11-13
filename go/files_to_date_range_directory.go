@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 	"os"
 	"path/filepath"
 	"sort"
@@ -37,12 +36,12 @@ func isValidDateRangeDirectoryName(name string) bool {
 }
 
 func isWithin72Hours(olderTime, newerTime time.Time) bool {
-	return math.Abs(olderTime.Sub(newerTime).Hours()) <= 72
+	return newerTime.Sub(olderTime).Hours() <= 72
 }
 
 func createDirectoryDateRangeName(startTime, endTime time.Time) string {
-	start := toDateFormat(startTime)
-	end := toDateFormat(endTime)
+	start := formatDate(startTime)
+	end := formatDate(endTime)
 
 	if start == end {
 		return start
@@ -63,10 +62,12 @@ func addDirectory(directories *[]string, arg dateRangeArg) {
 func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRangeFileInfo, []string, []string, error) {
 	var files []utils.DateRangeFileInfo
 	var goodDirectoryPaths []string
+	// goodDirectoryPaths := make(map[string]struct{})
 	var badDirectoryPaths []string
 
 	categorizeInDirectory := func(directoryPaths *[]string, arg dateRangeArg) {
 		if isValidDateRangeDirectoryName(arg.directoryName) {
+			// goodDirectoryPaths[arg.filePath] = struct{}{}
 			goodDirectoryPaths = append(goodDirectoryPaths, arg.filePath)
 		} else {
 			*directoryPaths = append(*directoryPaths, arg.filePath)
@@ -88,7 +89,15 @@ func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRan
 		)
 	}
 
-	for _, path := range append(goodDirectoryPaths, badDirectoryPaths...) {
+	directories := make([]string, len(badDirectoryPaths)+len(goodDirectoryPaths))
+	copy(directories, badDirectoryPaths)
+	copy(directories[len(badDirectoryPaths):], goodDirectoryPaths)
+
+	// for path := range goodDirectoryPaths {
+	// 	directories = append(directories, path)
+	// }
+
+	for _, path := range directories {
 		err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
@@ -147,6 +156,10 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 		return filePaths, nil
 	}
 
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].FileMetadata.TimeModified.Before(files[j].FileMetadata.TimeModified)
+	})
+
 	groups := [][]utils.FileSystemFile{{files[0]}}
 	groupIndex := 0
 
@@ -165,7 +178,7 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 		lengthMinusOne := length - 1
 		var name string
 		if group[0].FileMetadata.TimeModified == group[lengthMinusOne].FileMetadata.TimeModified {
-			name = toDateFormat(group[0].FileMetadata.TimeModified)
+			name = formatDate(group[0].FileMetadata.TimeModified)
 		} else {
 			name = createDirectoryDateRangeName(group[0].FileMetadata.TimeModified, group[lengthMinusOne].FileMetadata.TimeModified)
 		}
@@ -248,15 +261,15 @@ func createHandlers(
 		good := []utils.DateRangeFileInfo{files[0]}
 		var minimumLength = getNameLength(files[0])
 
-		for i := 1; i < len(files); i++ {
-			nameLength := getNameLength(files[i])
+		for _, file := range files[1:] {
+			nameLength := getNameLength(file)
 			if nameLength < minimumLength {
 				minimumLength = nameLength
-				appendBadFilesAndReplaceGoodFiles(badFiles, &good, files[i])
+				appendBadFilesAndReplaceGoodFiles(badFiles, &good, file)
 			} else if nameLength == minimumLength {
-				good = append(good, files[i])
+				good = append(good, file)
 			} else {
-				*badFiles = append(*badFiles, files[i])
+				*badFiles = append(*badFiles, file)
 			}
 		}
 
@@ -303,14 +316,14 @@ func createHandlers(
 		good := []utils.DateRangeFileInfo{files[0]}
 		newest := files[0].TimeModified
 
-		for i := 1; i < len(files); i++ {
-			if files[i].TimeModified.After(newest) {
-				newest = files[i].TimeModified
-				appendBadFilesAndReplaceGoodFiles(badFiles, &good, files[i])
-			} else if files[i].TimeModified.Equal(newest) {
-				good = append(good, files[i])
+		for _, file := range files[1:] {
+			if file.TimeModified.After(newest) {
+				newest = file.TimeModified
+				appendBadFilesAndReplaceGoodFiles(badFiles, &good, file)
+			} else if file.TimeModified.Equal(newest) {
+				good = append(good, file)
 			} else {
-				*badFiles = append(*badFiles, files[i])
+				*badFiles = append(*badFiles, file)
 			}
 		}
 
@@ -367,8 +380,55 @@ func deleteDuplicateFiles(files *[]utils.DateRangeFileInfo, destinationDirectory
 	return nil
 }
 
+// TODO: rename destinationDirectory to destinationDirectoryPath on other places
+func moveFilesAndFilterGoodDirectories(
+	files []utils.DateRangeFileInfo, goodDirectoryPaths []string, destinationDirectoryPath string,
+) {
+	if len(files) == 0 {
+		return
+	}
+
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].TimeModified.Before(files[j].TimeModified)
+	})
+
+	group := []utils.DateRangeFileInfo{files[0]}
+
+	formatTimeModified := func(file utils.DateRangeFileInfo) string {
+		return file.TimeModified.Format(dateLayout)
+	}
+
+	moveFilesToDirectory := func() {
+		firstFile := group[0]
+		lastFile := group[len(group)-1]
+
+		directoryName := formatTimeModified(firstFile)
+		if lastFile.TimeModified.Sub(firstFile.TimeModified).Hours() >= 24 {
+			directoryName += fmt.Sprintf(" - %s", formatTimeModified(lastFile))
+		}
+
+		// joinedDirectoryPath := filepath.Join(destinationDirectoryPath, directoryName)
+	}
+
+	// TODO: search for i := 1
+
+	for _, file := range files[1:] {
+		lastFile := group[len(group)-1]
+		if file.TimeModified.Sub(lastFile.TimeModified).Hours() <= 72 {
+			group = append(group, file)
+		} else {
+			moveFilesToDirectory()
+			group = []utils.DateRangeFileInfo{file}
+		}
+	}
+
+	if len(group) > 0 {
+		moveFilesToDirectory()
+	}
+}
+
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
-	filesNew, goodDirectoryFilePaths, badDirectoryFilePaths, err := categorizeFilesAndDirectories(destinationDirectory)
+	filesNew, goodDirectoryPaths, badDirectoryPaths, err := categorizeFilesAndDirectories(destinationDirectory)
 	if err != nil {
 		return err
 	}
@@ -378,7 +438,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		if err != nil {
 			return err
 		}
-		categorize(info, node.Path, &filesNew, &badDirectoryFilePaths, addDirectory)
+		categorize(info, node.Path, &filesNew, &badDirectoryPaths, addDirectory)
 	}
 
 	if err := deleteDuplicateFiles(&filesNew, destinationDirectory); err != nil {
@@ -394,25 +454,21 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		})
 	}
 
-	sort.Slice(files, func(i, j int) bool {
-		return files[i].FileMetadata.TimeModified.Before(files[j].FileMetadata.TimeModified)
-	})
-
 	// TODO: goodDirectoryFilePaths should work with reference?
-	goodDirectoryFilePaths, err = moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files, goodDirectoryFilePaths, destinationDirectory)
+	goodDirectoryPaths, err = moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files, goodDirectoryPaths, destinationDirectory)
 	if err != nil {
 		return err
 	}
 
 	// Remove the bad empty directories
 	// There is no need to check if the directory exists before attempting removal.
-	for i := len(badDirectoryFilePaths) - 1; i >= 0; i-- {
-		if err := os.Remove(badDirectoryFilePaths[i]); err != nil {
+	for i := len(badDirectoryPaths) - 1; i >= 0; i-- {
+		if err := os.Remove(badDirectoryPaths[i]); err != nil {
 			return err
 		}
 	}
 
-	for _, path := range goodDirectoryFilePaths {
+	for _, path := range goodDirectoryPaths {
 		if err := os.Remove(path); err != nil {
 			return err
 		}
@@ -421,7 +477,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	return nil
 }
 
-func toDateFormat(time time.Time) string {
+func formatDate(time time.Time) string {
 	return time.Format(dateLayout)
 }
 
