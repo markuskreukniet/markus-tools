@@ -226,7 +226,7 @@ fun deleteDuplicateFiles(
       if (groups[index].size > 1) {
         groups[index] = handler(group, badFiles)
       } else {
-        files.add(group.first())
+        files.add(groups[index].first())
         break
       }
     }
