@@ -62,10 +62,12 @@ func addDirectory(directories *[]string, arg dateRangeArg) {
 func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRangeFileInfo, []string, []string, error) {
 	var files []utils.DateRangeFileInfo
 	var goodDirectoryPaths []string
+	// goodDirectoryPaths := make(map[string]struct{})
 	var badDirectoryPaths []string
 
 	categorizeInDirectory := func(directoryPaths *[]string, arg dateRangeArg) {
 		if isValidDateRangeDirectoryName(arg.directoryName) {
+			// goodDirectoryPaths[arg.filePath] = struct{}{}
 			goodDirectoryPaths = append(goodDirectoryPaths, arg.filePath)
 		} else {
 			*directoryPaths = append(*directoryPaths, arg.filePath)
@@ -86,6 +88,12 @@ func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRan
 			info, filepath.Join(destinationDirectory, entry.Name()), &files, &badDirectoryPaths, categorizeInDirectory,
 		)
 	}
+
+	// directories := badDirectoryPaths
+
+	// for key := range goodDirectoryPaths {
+	// 	directories = append(directories, key)
+	// }
 
 	for _, path := range append(goodDirectoryPaths, badDirectoryPaths...) {
 		err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
