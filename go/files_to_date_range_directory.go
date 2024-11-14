@@ -370,8 +370,9 @@ func deleteDuplicateFiles(files *[]utils.DateRangeFileInfo, destinationDirectory
 	return nil
 }
 
+// TODO: rename destinationDirectory to destinationDirectoryPath on other places
 func moveFilesAndFilterGoodDirectories(
-	files []utils.DateRangeFileInfo, goodDirectoryPaths []string, destinationDirectory string,
+	files []utils.DateRangeFileInfo, goodDirectoryPaths []string, destinationDirectoryPath string,
 ) {
 	if len(files) == 0 {
 		return
@@ -383,14 +384,21 @@ func moveFilesAndFilterGoodDirectories(
 
 	group := []utils.DateRangeFileInfo{files[0]}
 
-	// toFormattedString := func(time time.Time) string {
+	formatTimeModified := func(file utils.DateRangeFileInfo) string {
+		return file.TimeModified.Format(dateLayout)
+	}
 
-	// }
+	moveFilesToDirectory := func() {
+		firstFile := group[0]
+		lastFile := group[len(group)-1]
 
-	// moveFilesToDirectory := func() {
-	// 	firstFile := group[0]
-	// 	lastFile := group[len(group)-1]
-	// }
+		directoryName := formatTimeModified(firstFile)
+		if lastFile.TimeModified.Sub(firstFile.TimeModified).Hours() >= 24 {
+			directoryName += fmt.Sprintf(" - %s", formatTimeModified(lastFile))
+		}
+
+		// joinedDirectoryPath := filepath.Join(destinationDirectoryPath, directoryName)
+	}
 
 	// TODO: search for i := 1
 
@@ -399,13 +407,13 @@ func moveFilesAndFilterGoodDirectories(
 		if file.TimeModified.Sub(lastFile.TimeModified).Hours() <= 72 {
 			group = append(group, file)
 		} else {
-			// moveFilesToDirectory()
+			moveFilesToDirectory()
 			group = []utils.DateRangeFileInfo{file}
 		}
 	}
 
 	if len(group) > 0 {
-		// moveFilesToDirectory()
+		moveFilesToDirectory()
 	}
 }
 

@@ -6,7 +6,6 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -248,8 +247,8 @@ fun moveFilesAndFilterGoodDirectories(
 
   var group = mutableListOf(files.first())
 
-  val toFormattedString = fun(time: Instant): Result<String> = runCatching {
-    time.atZone(ZoneId.systemDefault())
+  val formatTimeModified = fun(file: FTDRFileInfo): Result<String> = runCatching {
+    file.timeModified.atZone(ZoneId.systemDefault())
       .toLocalDate()
       .format(getDateTimeFormatter().getOrThrow())
   }
@@ -258,20 +257,20 @@ fun moveFilesAndFilterGoodDirectories(
     val firstFile = group.first()
     val lastFile = group.last()
 
-    var directoryName = toFormattedString(firstFile.timeModified).getOrThrow()
+    var directoryName = formatTimeModified(firstFile).getOrThrow()
     if (ChronoUnit.DAYS.between(firstFile.timeModified, lastFile.timeModified) >= 1) {
-      directoryName += " - ${toFormattedString(lastFile.timeModified).getOrThrow()}"
+      directoryName += " - ${formatTimeModified(lastFile).getOrThrow()}"
     }
 
-    val directory = File(destinationDirectory.absolutePath, directoryName)
-    if (directory in goodDirectories) {
-      goodDirectories.remove(directory)
+    val joinedDirectory = File(destinationDirectory.absolutePath, directoryName)
+    if (joinedDirectory in goodDirectories) {
+      goodDirectories.remove(joinedDirectory)
     } else {
-      directory.mkdir()
+      joinedDirectory.mkdir()
     }
 
     group.forEach { file ->
-      val filePath = Paths.get(directory.toString(), file.file.name)
+      val filePath = Paths.get(joinedDirectory.toString(), file.file.name)
       if (filePath != file.absolutePath) {
         Files.move(file.absolutePath, filePath)
       }
