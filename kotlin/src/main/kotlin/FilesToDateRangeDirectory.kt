@@ -27,7 +27,7 @@ val addDirectory = fun(directories: MutableList<File>, file: File) {
 fun isValidDateRangeDirectoryName(name: String): Boolean {
   val spacedHyphen = " - "
 
-  val parseDate = fun(rawDate: String) = runCatching {
+  val parseDate = fun(rawDate: String): Result<LocalDate> = runCatching {
     LocalDate.parse(rawDate, getDateTimeFormatter().getOrThrow())
   }
 

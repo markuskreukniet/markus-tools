@@ -40,8 +40,8 @@ func isWithin72Hours(olderTime, newerTime time.Time) bool {
 }
 
 func createDirectoryDateRangeName(startTime, endTime time.Time) string {
-	start := toDateFormat(startTime)
-	end := toDateFormat(endTime)
+	start := formatDate(startTime)
+	end := formatDate(endTime)
 
 	if start == end {
 		return start
@@ -168,7 +168,7 @@ func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.F
 		lengthMinusOne := length - 1
 		var name string
 		if group[0].FileMetadata.TimeModified == group[lengthMinusOne].FileMetadata.TimeModified {
-			name = toDateFormat(group[0].FileMetadata.TimeModified)
+			name = formatDate(group[0].FileMetadata.TimeModified)
 		} else {
 			name = createDirectoryDateRangeName(group[0].FileMetadata.TimeModified, group[lengthMinusOne].FileMetadata.TimeModified)
 		}
@@ -383,20 +383,30 @@ func moveFilesAndFilterGoodDirectories(
 
 	group := []utils.DateRangeFileInfo{files[0]}
 
+	// toFormattedString := func(time time.Time) string {
+
+	// }
+
+	// moveFilesToDirectory := func() {
+	// 	firstFile := group[0]
+	// 	lastFile := group[len(group)-1]
+	// }
+
 	// TODO: search for i := 1
 
 	for _, file := range files[1:] {
 		lastFile := group[len(group)-1]
 		if file.TimeModified.Sub(lastFile.TimeModified).Hours() <= 72 {
 			group = append(group, file)
+		} else {
+			// moveFilesToDirectory()
+			group = []utils.DateRangeFileInfo{file}
 		}
-
-		// func isWithin72Hours(olderTime, newerTime time.Time) bool {
-		// 	return newerTime.Sub(olderTime).Hours() <= 72
-		// }
 	}
 
-	return
+	if len(group) > 0 {
+		// moveFilesToDirectory()
+	}
 }
 
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
@@ -449,7 +459,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	return nil
 }
 
-func toDateFormat(time time.Time) string {
+func formatDate(time time.Time) string {
 	return time.Format(dateLayout)
 }
 
