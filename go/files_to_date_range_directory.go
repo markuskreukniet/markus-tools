@@ -93,6 +93,8 @@ func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRan
 	copy(directories, badDirectoryPaths)
 	copy(directories[len(badDirectoryPaths):], goodDirectoryPaths)
 
+	// directories := append([]string{}, badDirectoryPaths...)
+
 	// for path := range goodDirectoryPaths {
 	// 	directories = append(directories, path)
 	// }
