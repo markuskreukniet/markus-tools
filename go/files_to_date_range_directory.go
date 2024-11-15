@@ -89,13 +89,15 @@ func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRan
 		)
 	}
 
-	// directories := badDirectoryPaths
+	directories := make([]string, len(badDirectoryPaths)+len(goodDirectoryPaths))
+	copy(directories, badDirectoryPaths)
+	copy(directories[len(badDirectoryPaths):], goodDirectoryPaths)
 
-	// for key := range goodDirectoryPaths {
-	// 	directories = append(directories, key)
+	// for path := range goodDirectoryPaths {
+	// 	directories = append(directories, path)
 	// }
 
-	for _, path := range append(goodDirectoryPaths, badDirectoryPaths...) {
+	for _, path := range directories {
 		err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
