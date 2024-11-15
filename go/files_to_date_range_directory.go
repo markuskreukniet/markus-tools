@@ -59,16 +59,14 @@ func addDirectory(directories *[]string, arg dateRangeArg) {
 	*directories = append(*directories, arg.filePath)
 }
 
-func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRangeFileInfo, []string, []string, error) {
+func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRangeFileInfo, map[string]struct{}, []string, error) {
 	var files []utils.DateRangeFileInfo
-	var goodDirectoryPaths []string
-	// goodDirectoryPaths := make(map[string]struct{})
+	goodDirectoryPaths := make(map[string]struct{})
 	var badDirectoryPaths []string
 
 	categorizeInDirectory := func(directoryPaths *[]string, arg dateRangeArg) {
 		if isValidDateRangeDirectoryName(arg.directoryName) {
-			// goodDirectoryPaths[arg.filePath] = struct{}{}
-			goodDirectoryPaths = append(goodDirectoryPaths, arg.filePath)
+			goodDirectoryPaths[arg.filePath] = struct{}{}
 		} else {
 			*directoryPaths = append(*directoryPaths, arg.filePath)
 		}
@@ -89,15 +87,11 @@ func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRan
 		)
 	}
 
-	directories := make([]string, len(badDirectoryPaths)+len(goodDirectoryPaths))
-	copy(directories, badDirectoryPaths)
-	copy(directories[len(badDirectoryPaths):], goodDirectoryPaths)
+	directories := append([]string{}, badDirectoryPaths...)
 
-	// directories := append([]string{}, badDirectoryPaths...)
-
-	// for path := range goodDirectoryPaths {
-	// 	directories = append(directories, path)
-	// }
+	for path := range goodDirectoryPaths {
+		directories = append(directories, path)
+	}
 
 	for _, path := range directories {
 		err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
@@ -430,7 +424,7 @@ func moveFilesAndFilterGoodDirectories(
 }
 
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
-	filesNew, goodDirectoryPaths, badDirectoryPaths, err := categorizeFilesAndDirectories(destinationDirectory)
+	filesNew, goodDirectoryPathsNew, badDirectoryPaths, err := categorizeFilesAndDirectories(destinationDirectory)
 	if err != nil {
 		return err
 	}
@@ -454,6 +448,10 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 			Data:         "",
 			FileMetadata: utils.CreateFileMetadata(filepath.Base(file.Path), filepath.Dir(file.Path), file.Path, "", file.TimeModified, file.Size, false),
 		})
+	}
+	var goodDirectoryPaths []string
+	for path := range goodDirectoryPathsNew {
+		goodDirectoryPaths = append(goodDirectoryPaths, path)
 	}
 
 	// TODO: goodDirectoryFilePaths should work with reference?
