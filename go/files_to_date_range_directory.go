@@ -59,16 +59,14 @@ func addDirectory(directories *[]string, arg dateRangeArg) {
 	*directories = append(*directories, arg.filePath)
 }
 
-func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRangeFileInfo, []string, []string, error) {
+func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRangeFileInfo, map[string]struct{}, []string, error) {
 	var files []utils.DateRangeFileInfo
-	var goodDirectoryPaths []string
-	// goodDirectoryPaths := make(map[string]struct{})
+	goodDirectoryPaths := make(map[string]struct{})
 	var badDirectoryPaths []string
 
 	categorizeInDirectory := func(directoryPaths *[]string, arg dateRangeArg) {
 		if isValidDateRangeDirectoryName(arg.directoryName) {
-			// goodDirectoryPaths[arg.filePath] = struct{}{}
-			goodDirectoryPaths = append(goodDirectoryPaths, arg.filePath)
+			goodDirectoryPaths[arg.filePath] = struct{}{}
 		} else {
 			*directoryPaths = append(*directoryPaths, arg.filePath)
 		}
@@ -89,13 +87,11 @@ func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRan
 		)
 	}
 
-	directories := make([]string, len(badDirectoryPaths)+len(goodDirectoryPaths))
-	copy(directories, badDirectoryPaths)
-	copy(directories[len(badDirectoryPaths):], goodDirectoryPaths)
+	directories := append([]string{}, badDirectoryPaths...)
 
-	// for path := range goodDirectoryPaths {
-	// 	directories = append(directories, path)
-	// }
+	for path := range goodDirectoryPaths {
+		directories = append(directories, path)
+	}
 
 	for _, path := range directories {
 		err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
@@ -382,10 +378,10 @@ func deleteDuplicateFiles(files *[]utils.DateRangeFileInfo, destinationDirectory
 
 // TODO: rename destinationDirectory to destinationDirectoryPath on other places
 func moveFilesAndFilterGoodDirectories(
-	files []utils.DateRangeFileInfo, goodDirectoryPaths []string, destinationDirectoryPath string,
-) {
+	files []utils.DateRangeFileInfo, goodDirectoryPaths map[string]struct{}, destinationDirectoryPath string,
+) error {
 	if len(files) == 0 {
-		return
+		return nil
 	}
 
 	sort.Slice(files, func(i, j int) bool {
@@ -398,7 +394,7 @@ func moveFilesAndFilterGoodDirectories(
 		return file.TimeModified.Format(dateLayout)
 	}
 
-	moveFilesToDirectory := func() {
+	moveFilesToDirectory := func() error {
 		firstFile := group[0]
 		lastFile := group[len(group)-1]
 
@@ -407,7 +403,21 @@ func moveFilesAndFilterGoodDirectories(
 			directoryName += fmt.Sprintf(" - %s", formatTimeModified(lastFile))
 		}
 
-		// joinedDirectoryPath := filepath.Join(destinationDirectoryPath, directoryName)
+		joinedDirectoryPath := filepath.Join(destinationDirectoryPath, directoryName)
+
+		if _, exists := goodDirectoryPaths[joinedDirectoryPath]; exists {
+			delete(goodDirectoryPaths, joinedDirectoryPath)
+		} else {
+			if err := utils.CreateDirectory(joinedDirectoryPath); err != nil {
+				return err
+			}
+		}
+
+		for _, file := range group {
+			// filepath.Join(joinedDirectoryPath, file.)
+		}
+
+		return nil
 	}
 
 	// TODO: search for i := 1
@@ -417,18 +427,24 @@ func moveFilesAndFilterGoodDirectories(
 		if file.TimeModified.Sub(lastFile.TimeModified).Hours() <= 72 {
 			group = append(group, file)
 		} else {
-			moveFilesToDirectory()
+			if err := moveFilesToDirectory(); err != nil {
+				return err
+			}
 			group = []utils.DateRangeFileInfo{file}
 		}
 	}
 
 	if len(group) > 0 {
-		moveFilesToDirectory()
+		if err := moveFilesToDirectory(); err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
-	filesNew, goodDirectoryPaths, badDirectoryPaths, err := categorizeFilesAndDirectories(destinationDirectory)
+	filesNew, goodDirectoryPathsNew, badDirectoryPaths, err := categorizeFilesAndDirectories(destinationDirectory)
 	if err != nil {
 		return err
 	}
@@ -452,6 +468,10 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 			Data:         "",
 			FileMetadata: utils.CreateFileMetadata(filepath.Base(file.Path), filepath.Dir(file.Path), file.Path, "", file.TimeModified, file.Size, false),
 		})
+	}
+	var goodDirectoryPaths []string
+	for path := range goodDirectoryPathsNew {
+		goodDirectoryPaths = append(goodDirectoryPaths, path)
 	}
 
 	// TODO: goodDirectoryFilePaths should work with reference?
