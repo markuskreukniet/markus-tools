@@ -63,9 +63,7 @@ fun categorizeFilesAndDirectories(
     categorize(file, files, badDirectories, categorizeInDirectory)
   }
 
-  val directories: MutableCollection<File> = mutableListOf()
-  directories.addAll(goodDirectories)
-  directories.addAll(badDirectories)
+  val directories: Collection<File> = goodDirectories + badDirectories
 
   directories.forEach { directory ->
     directory.walk().drop(1).forEach { file ->
