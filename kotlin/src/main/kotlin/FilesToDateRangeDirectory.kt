@@ -251,6 +251,7 @@ fun moveFilesAndFilterGoodDirectories(
       .format(getDateTimeFormatter().getOrThrow())
   }
 
+  // TODO: can Files.move fail, is so add runCatching
   val moveFilesToDirectory = fun() {
     val firstFile = group.first()
     val lastFile = group.last()
