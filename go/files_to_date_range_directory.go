@@ -417,7 +417,12 @@ func moveFilesAndFilterGoodDirectories(
 		}
 
 		for _, file := range group {
-			filepath.Join(joinedDirectoryPath, file.Name) // TODO:
+			joinedFilePath := filepath.Join(joinedDirectoryPath, file.Name)
+			if joinedFilePath != file.Path {
+				if err := os.Rename(file.Path, joinedFilePath); err != nil {
+					return err
+				}
+			}
 		}
 
 		return nil
