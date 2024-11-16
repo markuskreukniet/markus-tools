@@ -469,6 +469,10 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		return err
 	}
 
+	// if err := moveFilesAndFilterGoodDirectories(filesNew, goodDirectoryPathsNew, destinationDirectory); err != nil {
+	// 	return err
+	// }
+
 	// TODO: remove this converting
 	var files []utils.FileSystemFile
 	for _, file := range filesNew {
