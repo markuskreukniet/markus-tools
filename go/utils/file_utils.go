@@ -17,6 +17,7 @@ type DuplicateFileInfo interface {
 type DateRangeFileInfo struct {
 	Size         int64
 	Path         string
+	Name         string
 	TimeModified time.Time
 }
 
