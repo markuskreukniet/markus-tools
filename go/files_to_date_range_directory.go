@@ -417,7 +417,12 @@ func moveFilesAndFilterGoodDirectories(
 		}
 
 		for _, file := range group {
-			filepath.Join(joinedDirectoryPath, file.Name) // TODO:
+			joinedFilePath := filepath.Join(joinedDirectoryPath, file.Name)
+			if joinedFilePath != file.Path {
+				if err := os.Rename(file.Path, joinedFilePath); err != nil {
+					return err
+				}
+			}
 		}
 
 		return nil
@@ -463,6 +468,10 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	if err := deleteDuplicateFiles(&filesNew, destinationDirectory); err != nil {
 		return err
 	}
+
+	// if err := moveFilesAndFilterGoodDirectories(filesNew, goodDirectoryPathsNew, destinationDirectory); err != nil {
+	// 	return err
+	// }
 
 	// TODO: remove this converting
 	var files []utils.FileSystemFile
