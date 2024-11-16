@@ -120,9 +120,11 @@ func categorize(
 	badDirectoryPaths *[]string,
 	handler func(*[]string, dateRangeArg),
 ) error {
+	name := filepath.Base(filePath)
+
 	if info.IsDir() {
 		handler(badDirectoryPaths, dateRangeArg{
-			directoryName: filepath.Base(filePath),
+			directoryName: name,
 			filePath:      filePath,
 		})
 	} else if info.Mode().IsRegular() {
@@ -131,6 +133,7 @@ func categorize(
 			*files = append(*files, utils.DateRangeFileInfo{
 				Size:         size,
 				Path:         filePath,
+				Name:         name,
 				TimeModified: info.ModTime(),
 			})
 		} else {
@@ -251,7 +254,7 @@ func createHandlers(
 		files []utils.DateRangeFileInfo, badFiles *[]utils.DateRangeFileInfo,
 	) []utils.DateRangeFileInfo {
 		getNameLength := func(file utils.DateRangeFileInfo) int {
-			return len(filepath.Base(file.Path))
+			return len(file.Name)
 		}
 
 		good := []utils.DateRangeFileInfo{files[0]}
@@ -414,7 +417,7 @@ func moveFilesAndFilterGoodDirectories(
 		}
 
 		for _, file := range group {
-			// filepath.Join(joinedDirectoryPath, file.)
+			filepath.Join(joinedDirectoryPath, file.Name) // TODO:
 		}
 
 		return nil
@@ -466,7 +469,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	for _, file := range filesNew {
 		files = append(files, utils.FileSystemFile{
 			Data:         "",
-			FileMetadata: utils.CreateFileMetadata(filepath.Base(file.Path), filepath.Dir(file.Path), file.Path, "", file.TimeModified, file.Size, false),
+			FileMetadata: utils.CreateFileMetadata(file.Name, filepath.Dir(file.Path), file.Path, "", file.TimeModified, file.Size, false),
 		})
 	}
 	var goodDirectoryPaths []string
