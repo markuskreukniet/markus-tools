@@ -413,6 +413,10 @@ func moveFilesAndFilterGoodDirectories(
 			}
 		}
 
+		for _, file := range group {
+			// filepath.Join(joinedDirectoryPath, file.)
+		}
+
 		return nil
 	}
 
