@@ -470,7 +470,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		return err
 	}
 
-	// if err := moveFilesAndFilterGoodDirectories(filesNew, goodDirectoryPathsNew, destinationDirectory); err != nil {
+	// if err := moveFilesAndFilterGoodDirectories(filesNew, &goodDirectoryPathsNew, destinationDirectory); err != nil {
 	// 	return err
 	// }
 
