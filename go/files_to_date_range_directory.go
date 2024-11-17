@@ -381,7 +381,7 @@ func deleteDuplicateFiles(files *[]utils.DateRangeFileInfo, destinationDirectory
 
 // TODO: rename destinationDirectory to destinationDirectoryPath on other places
 func moveFilesAndFilterGoodDirectories(
-	files []utils.DateRangeFileInfo, goodDirectoryPaths map[string]struct{}, destinationDirectoryPath string,
+	files []utils.DateRangeFileInfo, goodDirectoryPaths *map[string]struct{}, destinationDirectoryPath string,
 ) error {
 	if len(files) == 0 {
 		return nil
@@ -408,8 +408,8 @@ func moveFilesAndFilterGoodDirectories(
 
 		joinedDirectoryPath := filepath.Join(destinationDirectoryPath, directoryName)
 
-		if _, exists := goodDirectoryPaths[joinedDirectoryPath]; exists {
-			delete(goodDirectoryPaths, joinedDirectoryPath)
+		if _, exists := (*goodDirectoryPaths)[joinedDirectoryPath]; exists {
+			delete(*goodDirectoryPaths, joinedDirectoryPath)
 		} else {
 			if err := utils.CreateDirectory(joinedDirectoryPath); err != nil {
 				return err
