@@ -429,6 +429,7 @@ func moveFilesAndFilterGoodDirectories(
 	}
 
 	// TODO: search for i := 1
+	// TODO: duplicate code does not work on Linux
 
 	for _, file := range files[1:] {
 		lastFile := group[len(group)-1]
