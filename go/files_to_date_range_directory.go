@@ -391,6 +391,9 @@ func moveFilesAndFilterGoodDirectories(
 		return files[i].TimeModified.Before(files[j].TimeModified)
 	})
 
+	// TODO: also do this set logic in Kotlin
+	// TODO: Grammar: a set is not ordered, so we can´t take the first value for example. But it has O(1) access time. So we need a set and a slice.
+	// fileNames := map[string]struct{}{files[0].Name: struct{}{}}
 	group := []utils.DateRangeFileInfo{files[0]}
 
 	formatTimeModified := func(file utils.DateRangeFileInfo) string {
