@@ -440,12 +440,15 @@ func moveFilesAndFilterGoodDirectories(
 
 	// TODO: search for i := 1 for range files[1:]
 	// TODO: duplicate code does not work on Linux
+	// TODO: also fix in Kotlin code
 
 	for i := 1; i < len(files); i++ {
 		lastFile := group[len(group)-1]
 		if files[i].TimeModified.Sub(lastFile.TimeModified).Hours() <= 72 {
 			if _, exists := fileNames[files[i].Name]; exists {
-				files[i].Name = files[i].Name + " 2" // TODO: with 2 might also exists
+				extension := filepath.Ext(files[i].Name)
+				name := strings.TrimSuffix(files[i].Name, extension) + " 2" + extension // TODO: with " 2" might also exists
+				files[i].Name = name
 			}
 			fileNames[files[i].Name] = struct{}{}
 			group = append(group, files[i])
@@ -467,7 +470,7 @@ func moveFilesAndFilterGoodDirectories(
 }
 
 func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
-	filesNew, goodDirectoryPathsNew, badDirectoryPaths, err := categorizeFilesAndDirectories(destinationDirectory)
+	files, goodDirectoryPaths, badDirectoryPaths, err := categorizeFilesAndDirectories(destinationDirectory)
 	if err != nil {
 		return err
 	}
@@ -477,33 +480,14 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		if err != nil {
 			return err
 		}
-		categorize(info, node.Path, &filesNew, &badDirectoryPaths, addDirectory)
+		categorize(info, node.Path, &files, &badDirectoryPaths, addDirectory)
 	}
 
-	if err := deleteDuplicateFiles(&filesNew, destinationDirectory); err != nil {
+	if err := deleteDuplicateFiles(&files, destinationDirectory); err != nil {
 		return err
 	}
 
-	// if err := moveFilesAndFilterGoodDirectories(filesNew, &goodDirectoryPathsNew, destinationDirectory); err != nil {
-	// 	return err
-	// }
-
-	// TODO: remove this converting
-	var files []utils.FileSystemFile
-	for _, file := range filesNew {
-		files = append(files, utils.FileSystemFile{
-			Data:         "",
-			FileMetadata: utils.CreateFileMetadata(file.Name, filepath.Dir(file.Path), file.Path, "", file.TimeModified, file.Size, false),
-		})
-	}
-	var goodDirectoryPaths []string
-	for path := range goodDirectoryPathsNew {
-		goodDirectoryPaths = append(goodDirectoryPaths, path)
-	}
-
-	// TODO: goodDirectoryFilePaths should work with reference?
-	goodDirectoryPaths, err = moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files, goodDirectoryPaths, destinationDirectory)
-	if err != nil {
+	if err := moveFilesAndFilterGoodDirectories(files, &goodDirectoryPaths, destinationDirectory); err != nil {
 		return err
 	}
 
@@ -515,7 +499,7 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		}
 	}
 
-	for _, path := range goodDirectoryPaths {
+	for path := range goodDirectoryPaths {
 		if err := os.Remove(path); err != nil {
 			return err
 		}
