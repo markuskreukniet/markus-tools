@@ -393,8 +393,13 @@ func moveFilesAndFilterGoodDirectories(
 
 	// TODO: also do this set logic in Kotlin
 	// TODO: Grammar: a set is not ordered, so we can´t take the first value for example. But it has O(1) access time. So we need a set and a slice.
-	// fileNames := map[string]struct{}{files[0].Name: struct{}{}}
-	group := []utils.DateRangeFileInfo{files[0]}
+	var fileNames map[string]struct{}
+	var group []utils.DateRangeFileInfo
+
+	replaceFileNamesAndGroup := func(file utils.DateRangeFileInfo) {
+		fileNames = map[string]struct{}{file.Name: {}}
+		group = []utils.DateRangeFileInfo{file}
+	}
 
 	formatTimeModified := func(file utils.DateRangeFileInfo) string {
 		return file.TimeModified.Format(dateLayout)
@@ -431,18 +436,24 @@ func moveFilesAndFilterGoodDirectories(
 		return nil
 	}
 
-	// TODO: search for i := 1
+	replaceFileNamesAndGroup(files[0])
+
+	// TODO: search for i := 1 for range files[1:]
 	// TODO: duplicate code does not work on Linux
 
-	for _, file := range files[1:] {
+	for i := 1; i < len(files); i++ {
 		lastFile := group[len(group)-1]
-		if file.TimeModified.Sub(lastFile.TimeModified).Hours() <= 72 {
-			group = append(group, file)
+		if files[i].TimeModified.Sub(lastFile.TimeModified).Hours() <= 72 {
+			if _, exists := fileNames[files[i].Name]; exists {
+				files[i].Name = files[i].Name + " 2" // TODO: with 2 might also exists
+			}
+			fileNames[files[i].Name] = struct{}{}
+			group = append(group, files[i])
 		} else {
 			if err := moveFilesToDirectory(); err != nil {
 				return err
 			}
-			group = []utils.DateRangeFileInfo{file}
+			replaceFileNamesAndGroup(files[i])
 		}
 	}
 
