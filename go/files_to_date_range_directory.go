@@ -295,7 +295,8 @@ func moveFilesAndFilterGoodDirectories(
 	})
 
 	// TODO: also do this set logic in Kotlin
-	// TODO: Grammar: a set is not ordered, so we can´t take the first value for example. But it has O(1) access time. So we need a set and a slice.
+	// A set provides O(1) access time but is unordered, so we cannot reliably retrieve the first value, for example.
+	// To maintain order, we also use a slice alongside the set.
 	var fileNames map[string]struct{}
 	var group []utils.DateRangeFileInfo
 
