@@ -243,7 +243,15 @@ fun moveFilesAndFilterGoodDirectories(
 
   files.sortBy { it.timeModified }
 
-  var group = mutableListOf(files.first())
+  var fileNames = mutableSetOf<String>()
+  var group = mutableListOf<FTDRFileInfo>()
+
+  val replaceFileNamesAndGroup = fun(file: FTDRFileInfo) {
+    fileNames = mutableSetOf(file.file.name)
+    group = mutableListOf(file)
+  }
+
+  replaceFileNamesAndGroup(files.first())
 
   val formatTimeModified = fun(file: FTDRFileInfo): Result<String> = runCatching {
     file.timeModified.atZone(ZoneId.systemDefault())
@@ -279,10 +287,12 @@ fun moveFilesAndFilterGoodDirectories(
   files.drop(1).forEach { file ->
     val lastFile = group.last()
     if (ChronoUnit.DAYS.between(lastFile.timeModified, file.timeModified) in 0..3) {
+      // TODO: exists check, see go code
+      fileNames.add(file.file.name)
       group.add(file)
     } else {
       moveFilesToDirectory()
-      group = mutableListOf(file)
+      replaceFileNamesAndGroup(file)
     }
   }
 
