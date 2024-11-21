@@ -13,9 +13,16 @@ import (
 
 const dateLayout = "2006-01-02" // YYYY-MM-DD
 
-// TODO: check with kotlin code
 func isValidDateRangeDirectoryName(name string) bool {
 	const spacedHyphen = " - "
+
+	parseDate := func(rawDate string) (time.Time, error) {
+		date, err := time.Parse(dateLayout, rawDate)
+		if err != nil {
+			return time.Time{}, err
+		}
+		return date, nil
+	}
 
 	if strings.Contains(name, spacedHyphen) {
 		nameParts := strings.Split(name, spacedHyphen)
@@ -31,8 +38,10 @@ func isValidDateRangeDirectoryName(name string) bool {
 		if daysDifference >= 1 {
 			return true
 		}
-	} else if isValidDateFormat(name) {
-		return true
+	} else {
+		if _, err := parseDate(name); err == nil {
+			return true
+		}
 	}
 	return false
 }
@@ -400,17 +409,4 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	}
 
 	return nil
-}
-
-func parseDate(rawDate string) (time.Time, error) {
-	date, err := time.Parse(dateLayout, rawDate)
-	if err != nil {
-		return time.Time{}, err
-	}
-	return date, nil
-}
-
-func isValidDateFormat(rawDate string) bool {
-	_, err := parseDate(rawDate)
-	return err == nil
 }
