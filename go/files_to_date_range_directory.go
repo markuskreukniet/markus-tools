@@ -11,10 +11,12 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
-const spacedHyphen = " - "
 const dateLayout = "2006-01-02" // YYYY-MM-DD
 
+// TODO: check with kotlin code
 func isValidDateRangeDirectoryName(name string) bool {
+	const spacedHyphen = " - "
+
 	if strings.Contains(name, spacedHyphen) {
 		nameParts := strings.Split(name, spacedHyphen)
 		firstDate, err := parseDate(nameParts[0])
@@ -33,20 +35,6 @@ func isValidDateRangeDirectoryName(name string) bool {
 		return true
 	}
 	return false
-}
-
-func isWithin72Hours(olderTime, newerTime time.Time) bool {
-	return newerTime.Sub(olderTime).Hours() <= 72
-}
-
-func createDirectoryDateRangeName(startTime, endTime time.Time) string {
-	start := formatDate(startTime)
-	end := formatDate(endTime)
-
-	if start == end {
-		return start
-	}
-	return fmt.Sprintf("%s - %s", start, end)
 }
 
 // TODO: naming
@@ -144,100 +132,6 @@ func categorize(
 	}
 
 	return nil
-}
-
-// TODO: Does not work efficient, could be done without making groups?
-// garbage collection: length, groups, groupIndex
-func moveFilesToDateRangeDirectoriesAndRemoveUsedGoodDirectories(files []utils.FileSystemFile, filePaths []string, filePath string) ([]string, error) {
-	length := len(files)
-
-	if length == 0 {
-		return filePaths, nil
-	}
-
-	sort.Slice(files, func(i, j int) bool {
-		return files[i].FileMetadata.TimeModified.Before(files[j].FileMetadata.TimeModified)
-	})
-
-	groups := [][]utils.FileSystemFile{{files[0]}}
-	groupIndex := 0
-
-	for i := 1; i < length; i++ {
-		iMinusOne := i - 1
-		if isWithin72Hours(files[iMinusOne].FileMetadata.TimeModified, files[i].FileMetadata.TimeModified) {
-			groups[groupIndex] = append(groups[groupIndex], files[i])
-		} else {
-			groupIndex++
-			groups = append(groups, []utils.FileSystemFile{files[i]})
-		}
-	}
-
-	for _, group := range groups {
-		length = len(group)
-		lengthMinusOne := length - 1
-		var name string
-		if group[0].FileMetadata.TimeModified == group[lengthMinusOne].FileMetadata.TimeModified {
-			name = formatDate(group[0].FileMetadata.TimeModified)
-		} else {
-			name = createDirectoryDateRangeName(group[0].FileMetadata.TimeModified, group[lengthMinusOne].FileMetadata.TimeModified)
-		}
-		directoryFilePath := filepath.Join(filePath, name)
-		isDirectoryFound := false
-		for j, path := range filePaths {
-			if path == directoryFilePath {
-				isDirectoryFound = true
-				filePaths[j] = filePaths[len(filePaths)-1]
-				filePaths = filePaths[:len(filePaths)-1]
-				break
-			}
-		}
-
-		// TODO: should CreateDirectory create a dir with the same rights as parent dir?
-		if !isDirectoryFound {
-			if err := utils.CreateDirectory(directoryFilePath); err != nil {
-				return nil, err
-			}
-		}
-
-		// TODO clean and make it more efficient
-		// add files
-		for _, file := range group {
-			fullFilePath := filepath.Join(directoryFilePath, file.FileMetadata.Name)
-			exists, err := utils.FileExists(fullFilePath)
-			if err != nil {
-				return nil, err
-			}
-			if exists {
-				// We should always create a hash of the file in the destination folder.
-				// Otherwise, we have to loop through all the files to find that file, and that found file might not have a hash yet.
-				hash, err := utils.CreateFileHash(fullFilePath)
-				if err != nil {
-					return nil, err
-				}
-				if file.FileMetadata.Hash == "" {
-					file.FileMetadata.Hash, err = utils.CreateFileHash(file.FileMetadata.Path)
-					if err != nil {
-						return nil, err
-					}
-				}
-				if hash != file.FileMetadata.Hash {
-					extension := filepath.Ext(file.FileMetadata.Name)
-					nameWithoutExtension := strings.TrimSuffix(file.FileMetadata.Name, extension)
-					fullFilePath = filepath.Join(directoryFilePath, nameWithoutExtension+" 2"+extension)
-
-					if err := os.Rename(file.FileMetadata.Path, fullFilePath); err != nil {
-						return nil, err
-					}
-				}
-			} else {
-				if err := os.Rename(file.FileMetadata.Path, fullFilePath); err != nil {
-					return nil, err
-				}
-			}
-		}
-	}
-
-	return filePaths, nil
 }
 
 func createHandlers(
@@ -506,10 +400,6 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 	}
 
 	return nil
-}
-
-func formatDate(time time.Time) string {
-	return time.Format(dateLayout)
 }
 
 func parseDate(rawDate string) (time.Time, error) {
