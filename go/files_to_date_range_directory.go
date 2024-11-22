@@ -351,6 +351,24 @@ func moveFilesAndFilterGoodDirectories(
 		if files[i].TimeModified.Sub(lastFile.TimeModified).Hours() <= 72 {
 			if _, exists := fileNames[files[i].Name]; exists {
 				extension := filepath.Ext(files[i].Name)
+
+				//
+				// disambiguationNumber := 2
+				// for {
+				// 	name := strings.TrimSuffix(files[i].Name, extension) +
+				// 		fmt.Sprintf(" %d", disambiguationNumber) +
+				// 		extension
+				// 	if _, exists := fileNames[name]; exists {
+				// 		if disambiguationNumber == 9 {
+				// 			// TODO: error
+				// 		}
+				// 		disambiguationNumber++
+				// 	} else {
+				// 		break
+				// 	}
+				// }
+				//
+
 				files[i].Name = strings.TrimSuffix(files[i].Name, extension) + " 2" + extension // TODO: with " 2" might also exists
 			}
 			fileNames[files[i].Name] = struct{}{}
