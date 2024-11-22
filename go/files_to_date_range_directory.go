@@ -351,8 +351,7 @@ func moveFilesAndFilterGoodDirectories(
 		if files[i].TimeModified.Sub(lastFile.TimeModified).Hours() <= 72 {
 			if _, exists := fileNames[files[i].Name]; exists {
 				extension := filepath.Ext(files[i].Name)
-				name := strings.TrimSuffix(files[i].Name, extension) + " 2" + extension // TODO: with " 2" might also exists
-				files[i].Name = name
+				files[i].Name = strings.TrimSuffix(files[i].Name, extension) + " 2" + extension // TODO: with " 2" might also exists
 			}
 			fileNames[files[i].Name] = struct{}{}
 			group = append(group, files[i])
