@@ -342,7 +342,6 @@ func moveFilesAndFilterGoodDirectories(
 
 	replaceFileNamesAndGroup(files[0])
 
-	// TODO: search for i := 1 for range files[1:]
 	// TODO: also fix in Kotlin code
 
 	for i := 1; i < len(files); i++ {

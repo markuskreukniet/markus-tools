@@ -82,11 +82,11 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 		if err != nil {
 			return "", err
 		}
-		for i := 1; i < length; i++ {
+		for _, path := range filePaths[1:] {
 			if _, err := utils.WriteTwoNewlineStrings(&result); err != nil {
 				return "", err
 			}
-			if err = addFilePathBaseAndAllLinesToBuilder(filePaths[i], &result); err != nil {
+			if err = addFilePathBaseAndAllLinesToBuilder(path, &result); err != nil {
 				return "", err
 			}
 		}
