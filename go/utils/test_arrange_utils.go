@@ -203,14 +203,14 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 	previousRootDirectoryPath := toRootDirectoryPath(files[0].FileMetadata.DirectoryPath)
 	index := 0
 
-	for i := 1; i < length; i++ {
-		rootDirectoryPath := toRootDirectoryPath(files[i].FileMetadata.DirectoryPath)
+	for _, file := range files[1:] {
+		rootDirectoryPath := toRootDirectoryPath(file.FileMetadata.DirectoryPath)
 		if rootDirectoryPath == "." || rootDirectoryPath != previousRootDirectoryPath {
-			fileGroups = append(fileGroups, []FileSystemFile{files[i]})
+			fileGroups = append(fileGroups, []FileSystemFile{file})
 			previousRootDirectoryPath = rootDirectoryPath
 			index++
 		} else {
-			fileGroups[index] = append(fileGroups[index], files[i])
+			fileGroups[index] = append(fileGroups[index], file)
 		}
 	}
 
