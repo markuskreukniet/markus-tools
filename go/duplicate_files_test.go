@@ -56,7 +56,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			for _, line := range lines {
 				trimmed := strings.TrimSpace(line)
 				if trimmed != "" {
-					trimmedLines = append(trimmedLines, filepath.FromSlash(trimmed))
+					trimmedLines = append(trimmedLines, filepath.FromSlash(trimmed)) // TODO: also do this FromSlash fix in Kotlin
 				}
 			}
 			wantedOutcome = strings.Join(trimmedLines, "\n")
