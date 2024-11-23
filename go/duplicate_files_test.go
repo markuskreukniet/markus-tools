@@ -1,6 +1,7 @@
 package main
 
 import (
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -29,15 +30,15 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 		directory 8,,txt 8.txt,` + contents[2] + `;
 	`
 	wantedOutcome := `
-		directory 1\txt 1 2.txt
-		directory 2\directory 3\txt 2-3.txt
+		directory 1/txt 1 2.txt
+		directory 2/directory 3/txt 2-3.txt
 
-		directory 2\directory 3\txt 2-3 2.txt
-		directory 2\directory 3\txt 2-3 3.txt
-		directory 2\directory 4\txt 2-4.txt
+		directory 2/directory 3/txt 2-3 2.txt
+		directory 2/directory 3/txt 2-3 3.txt
+		directory 2/directory 4/txt 2-4.txt
 
-		directory 5\directory 6\directory 7\txt 5-6-7.txt
-		directory 8\txt 8.txt
+		directory 5/directory 6/directory 7/txt 5-6-7.txt
+		directory 8/txt 8.txt
 	`
 	testCases := []utils.TestCaseBasic{
 		utils.CreateTestCaseBasic("Basic", input, wantedOutcome, false),
@@ -55,7 +56,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			for _, line := range lines {
 				trimmed := strings.TrimSpace(line)
 				if trimmed != "" {
-					trimmedLines = append(trimmedLines, trimmed)
+					trimmedLines = append(trimmedLines, filepath.FromSlash(trimmed))
 				}
 			}
 			wantedOutcome = strings.Join(trimmedLines, "\n")
