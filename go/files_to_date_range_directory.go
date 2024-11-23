@@ -359,6 +359,7 @@ func moveFilesAndFilterGoodDirectories(
 						break
 					}
 				}
+				// TODO:, now this disambiguationNumber check happens always
 				// disambiguationNumber == 10 // TODO: error
 			}
 			fileNames[files[i].Name] = struct{}{}
