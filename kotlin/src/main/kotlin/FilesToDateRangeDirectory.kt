@@ -284,10 +284,16 @@ fun moveFilesAndFilterGoodDirectories(
     }
   }
 
-  files.drop(1).forEach { file ->
+  files.withIndex().drop(1).forEach { (index, file) ->
     val lastFile = group.last()
     if (ChronoUnit.DAYS.between(lastFile.timeModified, file.timeModified) in 0..3) {
       // TODO: exists check, see go code
+
+      if (file.file.name in fileNames) {
+        //file.file.extension
+        //file.file.nameWithoutExtension = "${file.file.nameWithoutExtension} 2"
+      }
+
       fileNames.add(file.file.name)
       group.add(file)
     } else {
