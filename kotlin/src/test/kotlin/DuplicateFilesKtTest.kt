@@ -6,6 +6,7 @@ import utils.deleteDirectoryTrees
 import utils.writeFilesByMultipleInputs
 import java.io.File
 import java.nio.file.Path
+import java.nio.file.Paths
 
 class DuplicateFilesKtTest {
   private lateinit var temporaryDirectories: MutableList<Path>
@@ -31,15 +32,15 @@ class DuplicateFilesKtTest {
       directory 8,,txt 8.txt,${contents[2]};
     """
     var wantedOutcome = """
-      directory 1\txt 1 2.txt
-      directory 2\directory 3\txt 2-3.txt
+      directory 1/txt 1 2.txt
+      directory 2/directory 3/txt 2-3.txt
 
-      directory 2\directory 3\txt 2-3 2.txt
-      directory 2\directory 3\txt 2-3 3.txt
-      directory 2\directory 4\txt 2-4.txt
+      directory 2/directory 3/txt 2-3 2.txt
+      directory 2/directory 3/txt 2-3 3.txt
+      directory 2/directory 4/txt 2-4.txt
 
-      directory 5\directory 6\directory 7\txt 5-6-7.txt
-      directory 8\txt 8.txt
+      directory 5/directory 6/directory 7/txt 5-6-7.txt
+      directory 8/txt 8.txt
     """
 
     val pair = writeFilesByMultipleInputs(input).getOrThrow()
@@ -52,7 +53,8 @@ class DuplicateFilesKtTest {
     lines.forEach { line ->
       val trimmed = line.trim()
       if (trimmed.isNotEmpty()) {
-        trimmedLines.add(trimmed)
+        // 'Paths.get().toString()' converts a slash-separated path to the native path format for the current operating system.
+        trimmedLines.add(Paths.get(trimmed).toString())
       }
     }
     wantedOutcome = trimmedLines.joinToString("\n")
