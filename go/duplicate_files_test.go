@@ -56,7 +56,8 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			for _, line := range lines {
 				trimmed := strings.TrimSpace(line)
 				if trimmed != "" {
-					// 'filepath.FromSlash' converts a slash-separated path to the native path format for the current operating system.
+					// 'filepath.FromSlash'
+					// converts a slash-separated path to the native path format for the current operating system.
 					trimmedLines = append(trimmedLines, filepath.FromSlash(trimmed))
 				}
 			}
