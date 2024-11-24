@@ -53,7 +53,8 @@ class DuplicateFilesKtTest {
     lines.forEach { line ->
       val trimmed = line.trim()
       if (trimmed.isNotEmpty()) {
-        // 'Paths.get().toString()' converts a slash-separated path to the native path format for the current operating system.
+        // 'Paths.get().toString()'
+        // converts a slash-separated path to the native path format for the current operating system.
         trimmedLines.add(Paths.get(trimmed).toString())
       }
     }
