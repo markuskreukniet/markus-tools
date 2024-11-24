@@ -56,7 +56,9 @@ func addDirectory(directories *[]string, arg dateRangeArg) {
 	*directories = append(*directories, arg.filePath)
 }
 
-func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRangeFileInfo, map[string]struct{}, []string, error) {
+func categorizeFilesAndDirectories(
+	destinationDirectoryPath string,
+) ([]utils.DateRangeFileInfo, map[string]struct{}, []string, error) {
 	var files []utils.DateRangeFileInfo
 	goodDirectoryPaths := make(map[string]struct{})
 	var badDirectoryPaths []string
@@ -69,7 +71,7 @@ func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRan
 		}
 	}
 
-	entries, err := os.ReadDir(destinationDirectory)
+	entries, err := os.ReadDir(destinationDirectoryPath)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -80,7 +82,11 @@ func categorizeFilesAndDirectories(destinationDirectory string) ([]utils.DateRan
 			return nil, nil, nil, err
 		}
 		categorize(
-			info, filepath.Join(destinationDirectory, entry.Name()), &files, &badDirectoryPaths, categorizeInDirectory,
+			info,
+			filepath.Join(destinationDirectoryPath, entry.Name()),
+			&files,
+			&badDirectoryPaths,
+			categorizeInDirectory,
 		)
 	}
 
@@ -144,7 +150,7 @@ func categorize(
 }
 
 func createHandlers(
-	destinationDirectory string) []func([]utils.DateRangeFileInfo, *[]utils.DateRangeFileInfo,
+	destinationDirectoryPath string) []func([]utils.DateRangeFileInfo, *[]utils.DateRangeFileInfo,
 ) []utils.DateRangeFileInfo {
 	appendBadFilesAndReplaceGoodFiles := func(
 		badFiles *[]utils.DateRangeFileInfo, goodFiles *[]utils.DateRangeFileInfo, file utils.DateRangeFileInfo,
@@ -187,7 +193,7 @@ func createHandlers(
 
 		for _, file := range files {
 			directoryPath := filepath.Dir(file.Path)
-			if filepath.Dir(directoryPath) == destinationDirectory {
+			if filepath.Dir(directoryPath) == destinationDirectoryPath {
 				if isValidDateRangeDirectoryName(directoryPath) {
 					tempGood2Files = append(tempGood2Files, file)
 				} else {
@@ -383,8 +389,8 @@ func moveFilesAndFilterGoodDirectories(
 	return nil
 }
 
-func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectory string) error {
-	files, goodDirectoryPaths, badDirectoryPaths, err := categorizeFilesAndDirectories(destinationDirectory)
+func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectoryPath string) error {
+	files, goodDirectoryPaths, badDirectoryPaths, err := categorizeFilesAndDirectories(destinationDirectoryPath)
 	if err != nil {
 		return err
 	}
@@ -397,11 +403,11 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 		categorize(info, node.Path, &files, &badDirectoryPaths, addDirectory)
 	}
 
-	if err := deleteDuplicateFiles(&files, destinationDirectory); err != nil {
+	if err := deleteDuplicateFiles(&files, destinationDirectoryPath); err != nil {
 		return err
 	}
 
-	if err := moveFilesAndFilterGoodDirectories(files, &goodDirectoryPaths, destinationDirectory); err != nil {
+	if err := moveFilesAndFilterGoodDirectories(files, &goodDirectoryPaths, destinationDirectoryPath); err != nil {
 		return err
 	}
 
