@@ -256,13 +256,13 @@ func createHandlers(
 	}
 }
 
-func deleteDuplicateFiles(files *[]utils.DateRangeFileInfo, destinationDirectory string) error {
+func deleteDuplicateFiles(files *[]utils.DateRangeFileInfo, destinationDirectoryPath string) error {
 	groups, err := utils.CreateDuplicateFileInfoGroupsByHash(*files, false)
 	if err != nil {
 		return err
 	}
 
-	handlers := createHandlers(destinationDirectory)
+	handlers := createHandlers(destinationDirectoryPath)
 	var badFiles []utils.DateRangeFileInfo
 
 	*files = (*files)[:0]
@@ -288,7 +288,6 @@ func deleteDuplicateFiles(files *[]utils.DateRangeFileInfo, destinationDirectory
 	return nil
 }
 
-// TODO: rename destinationDirectory to destinationDirectoryPath on other places
 func moveFilesAndFilterGoodDirectories(
 	files []utils.DateRangeFileInfo, goodDirectoryPaths *map[string]struct{}, destinationDirectoryPath string,
 ) error {
