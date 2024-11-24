@@ -351,16 +351,18 @@ func moveFilesAndFilterGoodDirectories(
 				extension := filepath.Ext(files[i].Name)
 				nameWithoutExtension := strings.TrimSuffix(files[i].Name, extension)
 
-				// TODO: disambiguationNumber should start at 1?
-				for disambiguationNumber := 2; disambiguationNumber <= 9; disambiguationNumber++ {
+				// TODO: disambiguationNumber should start at 0 or 1?
+				disambiguationNumber := 2
+				for ; disambiguationNumber <= 9; disambiguationNumber++ {
 					name := fmt.Sprintf("%s %d%s", nameWithoutExtension, disambiguationNumber, extension)
 					if _, exists := fileNames[name]; !exists {
 						files[i].Name = name
 						break
 					}
 				}
-				// TODO:, now this disambiguationNumber check happens always
-				// disambiguationNumber == 10 // TODO: error
+				if disambiguationNumber == 10 {
+					// TODO: error
+				}
 			}
 			fileNames[files[i].Name] = struct{}{}
 			group = append(group, files[i])
