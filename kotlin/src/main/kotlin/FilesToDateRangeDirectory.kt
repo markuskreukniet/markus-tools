@@ -292,8 +292,16 @@ fun moveFilesAndFilterGoodDirectories(
       // TODO: search on ${
 
       if (file.file.name in fileNames) {
-        for (disambiguationNumber in 2..9) {
+        var disambiguationNumber = -1
+        for (i in 2..9) { // TODO: is this the right loop?
+          disambiguationNumber = i
           file.newName = "$file.file.nameWithoutExtension ${disambiguationNumber}.$file.file.extension"
+          if (file.newName in fileNames) {
+            break
+          }
+        }
+        if (disambiguationNumber == 9) {
+          // TODO: exception
         }
       }
 
