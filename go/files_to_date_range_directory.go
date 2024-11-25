@@ -362,7 +362,7 @@ func moveFilesAndFilterGoodDirectories(
 						break
 					}
 				}
-				if disambiguationNumber == 10 {
+				if disambiguationNumber == 9 {
 					// TODO: error
 				}
 			}
