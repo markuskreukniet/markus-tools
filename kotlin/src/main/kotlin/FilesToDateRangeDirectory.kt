@@ -90,7 +90,8 @@ fun categorize(
         file = file,
         size = size,
         absolutePath = absolutePath,
-        timeModified = absolutePath.getLastModifiedTime().toInstant()
+        timeModified = absolutePath.getLastModifiedTime().toInstant(),
+        newName = null
       ))
     } else {
       // TODO: exception
@@ -288,10 +289,12 @@ fun moveFilesAndFilterGoodDirectories(
     val lastFile = group.last()
     if (ChronoUnit.DAYS.between(lastFile.timeModified, file.timeModified) in 0..3) {
       // TODO: exists check, see go code
+      // TODO: search on ${
 
       if (file.file.name in fileNames) {
-        //file.file.extension
-        //file.file.nameWithoutExtension = "${file.file.nameWithoutExtension} 2"
+        for (disambiguationNumber in 2..9) {
+          file.newName = "$file.file.nameWithoutExtension ${disambiguationNumber}.$file.file.extension"
+        }
       }
 
       fileNames.add(file.file.name)
