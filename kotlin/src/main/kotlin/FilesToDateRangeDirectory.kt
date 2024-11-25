@@ -292,20 +292,22 @@ fun moveFilesAndFilterGoodDirectories(
       // TODO: search on ${
 
       if (file.file.name in fileNames) {
-        var disambiguationNumber = -1
-        for (i in 2..9) { // TODO: is this the right loop?
-          disambiguationNumber = i
-          file.newName = "$file.file.nameWithoutExtension ${disambiguationNumber}.$file.file.extension"
-          if (file.newName in fileNames) {
+        var disambiguationNumber = 2
+        while (disambiguationNumber <= 9) {
+          val name = "$file.file.nameWithoutExtension ${disambiguationNumber}.$file.file.extension"
+          file.newName = name
+          if (name !in fileNames) {
+            fileNames.add(name)
             break
           }
+          disambiguationNumber++
         }
         if (disambiguationNumber == 9) {
           // TODO: exception
         }
+      } else {
+        fileNames.add(file.file.name)
       }
-
-      fileNames.add(file.file.name)
       group.add(file)
     } else {
       moveFilesToDirectory()
