@@ -260,8 +260,7 @@ fun moveFilesAndFilterGoodDirectories(
       .format(getDateTimeFormatter().getOrThrow())
   }
 
-  // TODO: can Files.move fail, is so add runCatching
-  val moveFilesToDirectory = fun() {
+  val moveFilesToDirectory = fun() = runCatching {
     val firstFile = group.first()
     val lastFile = group.last()
 
@@ -289,7 +288,7 @@ fun moveFilesAndFilterGoodDirectories(
     }
   }
 
-  files.withIndex().drop(1).forEach { (index, file) ->
+  files.drop(1).forEach { file ->
     val lastFile = group.last()
     if (ChronoUnit.DAYS.between(lastFile.timeModified, file.timeModified) in 0..3) {
       // TODO: search on ${
