@@ -299,7 +299,6 @@ func moveFilesAndFilterGoodDirectories(
 		return files[i].TimeModified.Before(files[j].TimeModified)
 	})
 
-	// TODO: also do this set logic in Kotlin
 	// A set provides O(1) access time but is unordered, so we cannot reliably retrieve the first value, for example.
 	// To maintain order, we also use a slice alongside the set.
 	var fileNames map[string]struct{}
@@ -346,8 +345,6 @@ func moveFilesAndFilterGoodDirectories(
 	}
 
 	replaceFileNamesAndGroup(files[0])
-
-	// TODO: also fix in Kotlin code
 
 	for i := 1; i < len(files); i++ {
 		lastFile := group[len(group)-1]
