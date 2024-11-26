@@ -58,8 +58,8 @@ func addDirectory(directories *[]string, arg directoryNameAndFilePath) {
 
 func categorizeFilesAndDirectories(
 	destinationDirectoryPath string,
-) ([]utils.DateRangeFileInfo, map[string]struct{}, []string, error) {
-	var files []utils.DateRangeFileInfo
+) ([]utils.FDateRangeFileInfo, map[string]struct{}, []string, error) {
+	var files []utils.FDateRangeFileInfo
 	goodDirectoryPaths := make(map[string]struct{})
 	var badDirectoryPaths []string
 
@@ -119,7 +119,7 @@ func categorizeFilesAndDirectories(
 func categorize(
 	info os.FileInfo,
 	filePath string,
-	files *[]utils.DateRangeFileInfo,
+	files *[]utils.FDateRangeFileInfo,
 	badDirectoryPaths *[]string,
 	handler func(*[]string, directoryNameAndFilePath),
 ) error {
@@ -133,7 +133,7 @@ func categorize(
 	} else if info.Mode().IsRegular() {
 		size := info.Size()
 		if size > 0 {
-			*files = append(*files, utils.DateRangeFileInfo{
+			*files = append(*files, utils.FDateRangeFileInfo{
 				Size:         size,
 				Path:         filePath,
 				Name:         name,
@@ -150,23 +150,23 @@ func categorize(
 }
 
 func createHandlers(
-	destinationDirectoryPath string) []func([]utils.DateRangeFileInfo, *[]utils.DateRangeFileInfo,
-) []utils.DateRangeFileInfo {
+	destinationDirectoryPath string) []func([]utils.FDateRangeFileInfo, *[]utils.FDateRangeFileInfo,
+) []utils.FDateRangeFileInfo {
 	appendBadFilesAndReplaceGoodFiles := func(
-		badFiles *[]utils.DateRangeFileInfo, goodFiles *[]utils.DateRangeFileInfo, file utils.DateRangeFileInfo,
+		badFiles *[]utils.FDateRangeFileInfo, goodFiles *[]utils.FDateRangeFileInfo, file utils.FDateRangeFileInfo,
 	) {
 		*badFiles = append(*badFiles, *goodFiles...)
-		*goodFiles = []utils.DateRangeFileInfo{file}
+		*goodFiles = []utils.FDateRangeFileInfo{file}
 	}
 
 	categorizeOnShortestFileNameLength := func(
-		files []utils.DateRangeFileInfo, badFiles *[]utils.DateRangeFileInfo,
-	) []utils.DateRangeFileInfo {
-		getNameLength := func(file utils.DateRangeFileInfo) int {
+		files []utils.FDateRangeFileInfo, badFiles *[]utils.FDateRangeFileInfo,
+	) []utils.FDateRangeFileInfo {
+		getNameLength := func(file utils.FDateRangeFileInfo) int {
 			return len(file.Name)
 		}
 
-		good := []utils.DateRangeFileInfo{files[0]}
+		good := []utils.FDateRangeFileInfo{files[0]}
 		var minimumLength = getNameLength(files[0])
 
 		for _, file := range files[1:] {
@@ -185,11 +185,11 @@ func createHandlers(
 	}
 
 	categorizeOnValidDateRangeDirectoryName := func(
-		files []utils.DateRangeFileInfo, badFiles *[]utils.DateRangeFileInfo,
-	) []utils.DateRangeFileInfo {
-		var tempGood1Files []utils.DateRangeFileInfo
-		var tempGood2Files []utils.DateRangeFileInfo
-		var tempBadFiles []utils.DateRangeFileInfo
+		files []utils.FDateRangeFileInfo, badFiles *[]utils.FDateRangeFileInfo,
+	) []utils.FDateRangeFileInfo {
+		var tempGood1Files []utils.FDateRangeFileInfo
+		var tempGood2Files []utils.FDateRangeFileInfo
+		var tempBadFiles []utils.FDateRangeFileInfo
 
 		for _, file := range files {
 			directoryPath := filepath.Dir(file.Path)
@@ -219,9 +219,9 @@ func createHandlers(
 	}
 
 	categorizeOnNewestTimeModified := func(
-		files []utils.DateRangeFileInfo, badFiles *[]utils.DateRangeFileInfo,
-	) []utils.DateRangeFileInfo {
-		good := []utils.DateRangeFileInfo{files[0]}
+		files []utils.FDateRangeFileInfo, badFiles *[]utils.FDateRangeFileInfo,
+	) []utils.FDateRangeFileInfo {
+		good := []utils.FDateRangeFileInfo{files[0]}
 		newest := files[0].TimeModified
 
 		for _, file := range files[1:] {
@@ -239,16 +239,16 @@ func createHandlers(
 	}
 
 	categorizeOnFirstFile := func(
-		files []utils.DateRangeFileInfo, badFiles *[]utils.DateRangeFileInfo,
-	) []utils.DateRangeFileInfo {
-		good := []utils.DateRangeFileInfo{files[0]}
+		files []utils.FDateRangeFileInfo, badFiles *[]utils.FDateRangeFileInfo,
+	) []utils.FDateRangeFileInfo {
+		good := []utils.FDateRangeFileInfo{files[0]}
 
 		*badFiles = append(*badFiles, files[1:]...)
 
 		return good
 	}
 
-	return []func([]utils.DateRangeFileInfo, *[]utils.DateRangeFileInfo) []utils.DateRangeFileInfo{
+	return []func([]utils.FDateRangeFileInfo, *[]utils.FDateRangeFileInfo) []utils.FDateRangeFileInfo{
 		categorizeOnShortestFileNameLength,
 		categorizeOnValidDateRangeDirectoryName,
 		categorizeOnNewestTimeModified,
@@ -256,14 +256,14 @@ func createHandlers(
 	}
 }
 
-func deleteDuplicateFiles(files *[]utils.DateRangeFileInfo, destinationDirectoryPath string) error {
+func deleteDuplicateFiles(files *[]utils.FDateRangeFileInfo, destinationDirectoryPath string) error {
 	groups, err := utils.CreateDuplicateFileInfoGroupsByHash(*files, false)
 	if err != nil {
 		return err
 	}
 
 	handlers := createHandlers(destinationDirectoryPath)
-	var badFiles []utils.DateRangeFileInfo
+	var badFiles []utils.FDateRangeFileInfo
 
 	*files = (*files)[:0]
 
@@ -289,7 +289,7 @@ func deleteDuplicateFiles(files *[]utils.DateRangeFileInfo, destinationDirectory
 }
 
 func moveFilesAndFilterGoodDirectories(
-	files []utils.DateRangeFileInfo, goodDirectoryPaths *map[string]struct{}, destinationDirectoryPath string,
+	files []utils.FDateRangeFileInfo, goodDirectoryPaths *map[string]struct{}, destinationDirectoryPath string,
 ) error {
 	if len(files) == 0 {
 		return nil
@@ -302,14 +302,14 @@ func moveFilesAndFilterGoodDirectories(
 	// A set provides O(1) access time but is unordered, so we cannot reliably retrieve the first value, for example.
 	// To maintain order, we also use a slice alongside the set.
 	var fileNames map[string]struct{}
-	var group []utils.DateRangeFileInfo
+	var group []utils.FDateRangeFileInfo
 
-	replaceFileNamesAndGroup := func(file utils.DateRangeFileInfo) {
+	replaceFileNamesAndGroup := func(file utils.FDateRangeFileInfo) {
 		fileNames = map[string]struct{}{file.Name: {}}
-		group = []utils.DateRangeFileInfo{file}
+		group = []utils.FDateRangeFileInfo{file}
 	}
 
-	formatTimeModified := func(file utils.DateRangeFileInfo) string {
+	formatTimeModified := func(file utils.FDateRangeFileInfo) string {
 		return file.TimeModified.Format(dateLayout)
 	}
 
