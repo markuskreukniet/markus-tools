@@ -46,13 +46,13 @@ func isValidDateRangeDirectoryName(name string) bool {
 	return false
 }
 
-// TODO: naming
-type dateRangeArg struct {
+// The fields in this 'struct' align with the properties of a File instance that we needed in the Kotlin version.
+type directoryNameAndFilePath struct {
 	directoryName string
 	filePath      string
 }
 
-func addDirectory(directories *[]string, arg dateRangeArg) {
+func addDirectory(directories *[]string, arg directoryNameAndFilePath) {
 	*directories = append(*directories, arg.filePath)
 }
 
@@ -63,7 +63,7 @@ func categorizeFilesAndDirectories(
 	goodDirectoryPaths := make(map[string]struct{})
 	var badDirectoryPaths []string
 
-	categorizeInDirectory := func(directoryPaths *[]string, arg dateRangeArg) {
+	categorizeInDirectory := func(directoryPaths *[]string, arg directoryNameAndFilePath) {
 		if isValidDateRangeDirectoryName(arg.directoryName) {
 			goodDirectoryPaths[arg.filePath] = struct{}{}
 		} else {
@@ -121,12 +121,12 @@ func categorize(
 	filePath string,
 	files *[]utils.DateRangeFileInfo,
 	badDirectoryPaths *[]string,
-	handler func(*[]string, dateRangeArg),
+	handler func(*[]string, directoryNameAndFilePath),
 ) error {
 	name := filepath.Base(filePath)
 
 	if info.IsDir() {
-		handler(badDirectoryPaths, dateRangeArg{
+		handler(badDirectoryPaths, directoryNameAndFilePath{
 			directoryName: name,
 			filePath:      filePath,
 		})
