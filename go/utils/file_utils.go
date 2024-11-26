@@ -8,38 +8,40 @@ import (
 	"unicode"
 )
 
+// The F prefix of a struct name means feature.
+
 type DuplicateFileInfo interface {
 	GetSize() int64
 	GetPath() string
 }
 
-// DateRangeFileInfo implements DuplicateFileInfo
-type DateRangeFileInfo struct {
+// FDateRangeFileInfo implements DuplicateFileInfo
+type FDateRangeFileInfo struct {
 	Size         int64
 	Path         string
 	Name         string
 	TimeModified time.Time
 }
 
-func (info DateRangeFileInfo) GetSize() int64 {
+func (info FDateRangeFileInfo) GetSize() int64 {
 	return info.Size
 }
 
-func (info DateRangeFileInfo) GetPath() string {
+func (info FDateRangeFileInfo) GetPath() string {
 	return info.Path
 }
 
-// DuplicateFilesFileInfo implements DuplicateFileInfo
-type DuplicateFilesFileInfo struct {
+// FDuplicateFilesFileInfo implements DuplicateFileInfo
+type FDuplicateFilesFileInfo struct {
 	Size int64
 	Path string
 }
 
-func (info DuplicateFilesFileInfo) GetSize() int64 {
+func (info FDuplicateFilesFileInfo) GetSize() int64 {
 	return info.Size
 }
 
-func (info DuplicateFilesFileInfo) GetPath() string {
+func (info FDuplicateFilesFileInfo) GetPath() string {
 	return info.Path
 }
 
