@@ -11,11 +11,13 @@ fun getDuplicateFilesAsNewlineSeparatedString(
   val files = mutableListOf<DuplicateFileInfo>()
 
   val handler = fun(file: FileInfo) {
-    files.add(DFFileInfo(
+    files.add(
+      FDuplicateFilesFileInfo(
       file = file.file,
       size = file.size,
       absolutePath = file.absolutePath // TODO: why not use file.file.absolutePath? // TODO: also update DFFileInfo then?
-    ))
+    )
+    )
   }
 
   uniqueAbsolutePaths.forEach { path ->
