@@ -244,8 +244,8 @@ fun moveFilesAndFilterGoodDirectories(
 
   files.sortBy { it.timeModified }
 
-  // A set provides O(1) access time but is unordered, so we cannot reliably retrieve the first value, for example.
-  // To maintain order, we also use a list alongside the set.
+  // In Kotlin, a mutableSet provides O(1) access time and is ordered.
+  // However, we still need to be able to look up file names, so we use a mutableSet and a mutableList.
   var fileNames = mutableSetOf<String>()
   var group = mutableListOf<FTDRFileInfo>()
 
