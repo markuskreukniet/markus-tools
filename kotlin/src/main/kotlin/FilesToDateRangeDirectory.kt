@@ -244,6 +244,8 @@ fun moveFilesAndFilterGoodDirectories(
 
   files.sortBy { it.timeModified }
 
+  // A set provides O(1) access time but is unordered, so we cannot reliably retrieve the first value, for example.
+  // To maintain order, we also use a list alongside the set.
   var fileNames = mutableSetOf<String>()
   var group = mutableListOf<FTDRFileInfo>()
 
