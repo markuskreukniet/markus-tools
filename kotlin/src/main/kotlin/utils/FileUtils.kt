@@ -7,6 +7,8 @@ import java.nio.file.attribute.FileTime
 import java.time.Instant
 import kotlin.io.path.getLastModifiedTime
 
+// The F prefix of a class name means feature.
+
 data class FileData(
   val content: String,
   val completeFileInfo: CompleteFileInfo
@@ -24,15 +26,13 @@ interface DuplicateFileInfo {
   val absolutePath: Path
 }
 
-// TODO: rename?
-data class DFFileInfo(
+data class FDuplicateFilesFileInfo(
   override val file: File,
   override val size: Long,
   override val absolutePath: Path // TODO: should not be absolutePath?
 ) : DuplicateFileInfo
 
-// TODO: rename to DateRangeFileInfo
-data class FTDRFileInfo(
+data class FDateRangeFileInfo(
   override val file: File,
   override val size: Long,
   override val absolutePath: Path,
