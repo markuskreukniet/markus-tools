@@ -1,6 +1,6 @@
 package org.example
 
-import org.example.utils.FTDRFileInfo
+import org.example.utils.DateRangeFileInfo
 import org.example.utils.createDuplicateFileInfoGroupsByHash
 import java.io.File
 import java.nio.file.Files
@@ -46,8 +46,8 @@ fun isValidDateRangeDirectoryName(name: String): Boolean {
 
 fun categorizeFilesAndDirectories(
   destinationDirectory: File
-): Pair<MutableList<FTDRFileInfo>, Pair<MutableSet<File>, MutableList<File>>> {
-  val files = mutableListOf<FTDRFileInfo>()
+): Pair<MutableList<DateRangeFileInfo>, Pair<MutableSet<File>, MutableList<File>>> {
+  val files = mutableListOf<DateRangeFileInfo>()
   val goodDirectories = mutableSetOf<File>()
   val badDirectories = mutableListOf<File>()
 
@@ -76,7 +76,7 @@ fun categorizeFilesAndDirectories(
 
 fun categorize(
   file: File,
-  files: MutableList<FTDRFileInfo>,
+  files: MutableList<DateRangeFileInfo>,
   badDirectories: MutableList<File>,
   handler: (MutableList<File>, File) -> Unit
 ) = runCatching {
@@ -86,7 +86,7 @@ fun categorize(
     val size = file.length()
     if (size > 0L) {
       val absolutePath = file.toPath().toAbsolutePath()
-      files.add(FTDRFileInfo(
+      files.add(DateRangeFileInfo(
         file = file,
         size = size,
         absolutePath = absolutePath,
@@ -103,15 +103,15 @@ fun categorize(
 
 fun createHandlers(
   destinationDirectory: File
-): List<(MutableList<FTDRFileInfo>, MutableList<File>) -> MutableList<FTDRFileInfo>> {
-  val addAllFilesInfo = fun(files: MutableList<File>, filesInfo: List<FTDRFileInfo>) {
+): List<(MutableList<DateRangeFileInfo>, MutableList<File>) -> MutableList<DateRangeFileInfo>> {
+  val addAllFilesInfo = fun(files: MutableList<File>, filesInfo: List<DateRangeFileInfo>) {
     filesInfo.forEach { file ->
       files.add(file.file)
     }
   }
 
   val addBadFilesInfoAndReplaceGoodFiles = fun(
-    badFiles: MutableList<File>, goodFiles: MutableList<FTDRFileInfo>, file: FTDRFileInfo
+    badFiles: MutableList<File>, goodFiles: MutableList<DateRangeFileInfo>, file: DateRangeFileInfo
   ) {
     addAllFilesInfo(badFiles, goodFiles)
     goodFiles.clear()
@@ -119,8 +119,8 @@ fun createHandlers(
   }
 
   val categorizeOnShortestFileNameLength = fun(
-    files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>
-  ): MutableList<FTDRFileInfo> {
+    files: MutableList<DateRangeFileInfo>, badFiles: MutableList<File>
+  ): MutableList<DateRangeFileInfo> {
     val good = mutableListOf(files.first())
     var minimumLength = files.first().file.name.length
 
@@ -139,11 +139,11 @@ fun createHandlers(
   }
 
   val categorizeOnValidDateRangeDirectoryName = fun(
-    files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>
-  ): MutableList<FTDRFileInfo> {
-    val tempGood1Files = mutableListOf<FTDRFileInfo>()
-    val tempGood2Files = mutableListOf<FTDRFileInfo>()
-    val tempBadFiles = mutableListOf<FTDRFileInfo>()
+    files: MutableList<DateRangeFileInfo>, badFiles: MutableList<File>
+  ): MutableList<DateRangeFileInfo> {
+    val tempGood1Files = mutableListOf<DateRangeFileInfo>()
+    val tempGood2Files = mutableListOf<DateRangeFileInfo>()
+    val tempBadFiles = mutableListOf<DateRangeFileInfo>()
 
     files.forEach { file ->
       if (file.file.parentFile.parentFile == destinationDirectory) {
@@ -172,8 +172,8 @@ fun createHandlers(
   }
 
   val categorizeOnNewestTimeModified = fun(
-    files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>
-  ): MutableList<FTDRFileInfo> {
+    files: MutableList<DateRangeFileInfo>, badFiles: MutableList<File>
+  ): MutableList<DateRangeFileInfo> {
     val good = mutableListOf(files.first())
     var newest = files.first().timeModified
 
@@ -192,8 +192,8 @@ fun createHandlers(
   }
 
   val categorizeOnFirstFile = fun(
-    files: MutableList<FTDRFileInfo>, badFiles: MutableList<File>
-  ): MutableList<FTDRFileInfo> {
+    files: MutableList<DateRangeFileInfo>, badFiles: MutableList<File>
+  ): MutableList<DateRangeFileInfo> {
     val good = mutableListOf(files.first())
 
     addAllFilesInfo(badFiles, files.drop(1))
@@ -210,7 +210,7 @@ fun createHandlers(
 }
 
 fun deleteDuplicateFiles(
-  files: MutableList<FTDRFileInfo>, destinationDirectory: File
+  files: MutableList<DateRangeFileInfo>, destinationDirectory: File
 ): Result<Unit> = runCatching {
   val groups = createDuplicateFileInfoGroupsByHash(files, false).getOrThrow() ?: return@runCatching
   val handlers = createHandlers(destinationDirectory)
@@ -236,7 +236,7 @@ fun deleteDuplicateFiles(
 }
 
 fun moveFilesAndFilterGoodDirectories(
-  files: MutableList<FTDRFileInfo>, goodDirectories: MutableSet<File>, destinationDirectory: File
+  files: MutableList<DateRangeFileInfo>, goodDirectories: MutableSet<File>, destinationDirectory: File
 ) = runCatching {
   if (files.isEmpty()) {
     return@runCatching
@@ -247,16 +247,16 @@ fun moveFilesAndFilterGoodDirectories(
   // In Kotlin, a mutableSet provides O(1) access time and is ordered.
   // However, we still need to be able to look up file names, so we use a mutableSet and a mutableList.
   var fileNames = mutableSetOf<String>()
-  var group = mutableListOf<FTDRFileInfo>()
+  var group = mutableListOf<DateRangeFileInfo>()
 
-  val replaceFileNamesAndGroup = fun(file: FTDRFileInfo) {
+  val replaceFileNamesAndGroup = fun(file: DateRangeFileInfo) {
     fileNames = mutableSetOf(file.file.name)
     group = mutableListOf(file)
   }
 
   replaceFileNamesAndGroup(files.first())
 
-  val formatTimeModified = fun(file: FTDRFileInfo): Result<String> = runCatching {
+  val formatTimeModified = fun(file: DateRangeFileInfo): Result<String> = runCatching {
     file.timeModified.atZone(ZoneId.systemDefault())
       .toLocalDate()
       .format(getDateTimeFormatter().getOrThrow())
