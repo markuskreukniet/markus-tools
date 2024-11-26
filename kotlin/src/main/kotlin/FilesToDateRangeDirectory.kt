@@ -278,9 +278,13 @@ fun moveFilesAndFilterGoodDirectories(
     }
 
     group.forEach { file ->
-      val filePath = Paths.get(joinedDirectory.toString(), file.file.name)
-      if (filePath != file.absolutePath) {
-        Files.move(file.absolutePath, filePath)
+      if (file.newName == null) {
+        val filePath = Paths.get(joinedDirectory.toString(), file.file.name)
+        if (filePath != file.absolutePath) {
+          Files.move(file.absolutePath, filePath)
+        }
+      } else {
+        Files.move(file.absolutePath, Paths.get(joinedDirectory.toString(), file.newName))
       }
     }
   }
@@ -288,7 +292,6 @@ fun moveFilesAndFilterGoodDirectories(
   files.withIndex().drop(1).forEach { (index, file) ->
     val lastFile = group.last()
     if (ChronoUnit.DAYS.between(lastFile.timeModified, file.timeModified) in 0..3) {
-      // TODO: exists check, see go code
       // TODO: search on ${
 
       if (file.file.name in fileNames) {
