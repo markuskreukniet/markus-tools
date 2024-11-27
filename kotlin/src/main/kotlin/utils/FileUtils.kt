@@ -17,34 +17,31 @@ data class FileData(
 interface FileInfo {
   val file: File
   val size: Long
-  val absolutePath: Path
 }
 
 interface DuplicateFileInfo {
   val file: File
   val size: Long
-  val absolutePath: Path
 }
 
 data class FDuplicateFilesFileInfo(
   override val file: File,
   override val size: Long,
-  override val absolutePath: Path // TODO: should not be absolutePath?
 ) : DuplicateFileInfo
 
 data class FDateRangeFileInfo(
   override val file: File,
   override val size: Long,
-  override val absolutePath: Path,
+  val absolutePath: Path, // TODO: is absolutePath good naming?
   val timeModified: Instant,
   var newName: String? // We need the 'newName' property because we cannot change the name of a File instance directly.
 ) : DuplicateFileInfo
 
+// TODO: check for useless properties
 data class CompleteFileInfo(
   override val file: File,
   val name: String,
   var absoluteDirectoryPath: Path,
-  override var absolutePath: Path,
   val timeModified: FileTime?,
   override val size: Long,
   val isDirectory: Boolean, // TODO: is isDirectory needed?
@@ -111,7 +108,6 @@ fun filterAndHandleFileInfo(
     file = file,
     name = file.name,
     absoluteDirectoryPath = resolveDirectoryPath(absoluteFilePath, file.isDirectory),
-    absolutePath = absoluteFilePath,
     timeModified = absoluteFilePath.getLastModifiedTime(),
     size = file.length(),
     isDirectory = file.isDirectory,
