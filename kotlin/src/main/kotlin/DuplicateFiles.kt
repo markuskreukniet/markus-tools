@@ -13,10 +13,9 @@ fun getDuplicateFilesAsNewlineSeparatedString(
   val handler = fun(file: FileInfo) {
     files.add(
       FDuplicateFilesFileInfo(
-      file = file.file,
-      size = file.size,
-      absolutePath = file.absolutePath // TODO: why not use file.file.absolutePath? // TODO: also update DFFileInfo then?
-    )
+        file = file.file,
+        size = file.size
+      )
     )
   }
 
@@ -36,7 +35,7 @@ fun getDuplicateFilesAsNewlineSeparatedString(
       if (indexJ > 0) {
         writeNewlineString(result)
       }
-      result.append(file.absolutePath)
+      result.append(file.file.absolutePath)
     }
   }
 
