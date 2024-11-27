@@ -24,7 +24,6 @@ fun createFileData(directoryPath: String, inputLine: String): Result<FileData> =
       absolutePath = filePath,
       timeModified = timeModified,
       size = 0L,
-      isDirectory = isDirectory,
     )
   )
 }
@@ -72,7 +71,7 @@ fun getTopDirectoryPath(directoryPath: Path): Result<Path?> = runCatching {
 }
 
 fun writeFile(file: FileData): Result<Unit> = runCatching {
-  if (file.completeFileInfo.isDirectory) {
+  if (file.completeFileInfo.file.isDirectory) {
     return@runCatching
   }
 
