@@ -7,6 +7,8 @@ import java.nio.file.attribute.FileTime
 import java.time.Instant
 import kotlin.io.path.getLastModifiedTime
 
+// The F prefix of a class name means feature.
+
 data class FileData(
   val content: String,
   val completeFileInfo: CompleteFileInfo
