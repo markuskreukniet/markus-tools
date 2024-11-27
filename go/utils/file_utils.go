@@ -31,17 +31,17 @@ func (info FDateRangeFileInfo) GetPath() string {
 	return info.Path
 }
 
-// DuplicateFilesFileInfo implements DuplicateFileInfo
-type DuplicateFilesFileInfo struct {
+// FDuplicateFilesFileInfo implements DuplicateFileInfo
+type FDuplicateFilesFileInfo struct {
 	Size int64
 	Path string
 }
 
-func (info DuplicateFilesFileInfo) GetSize() int64 {
+func (info FDuplicateFilesFileInfo) GetSize() int64 {
 	return info.Size
 }
 
-func (info DuplicateFilesFileInfo) GetPath() string {
+func (info FDuplicateFilesFileInfo) GetPath() string {
 	return info.Path
 }
 
