@@ -20,7 +20,6 @@ fun createFileData(directoryPath: String, inputLine: String): Result<FileData> =
     content = content,
     completeFileInfo = CompleteFileInfo(
       file = filePath.toFile(), // The file is now unusable since the file path is not complete.
-      name = name,
       absoluteDirectoryPath = joinedDirectoryPath,
       absolutePath = filePath,
       timeModified = timeModified,
