@@ -40,11 +40,10 @@ data class FDateRangeFileInfo(
 // TODO: check for useless properties
 data class CompleteFileInfo(
   override val file: File,
+  override val size: Long,
   var absolutePath: Path,
   var absoluteDirectoryPath: Path,
   val timeModified: FileTime?,
-  override val size: Long,
-  val isDirectory: Boolean, // TODO: is isDirectory needed?
 ) : FileInfo
 
 enum class FileFilterMode {
@@ -106,11 +105,10 @@ fun filterAndHandleFileInfo(
 
   handler(CompleteFileInfo(
     file = file,
+    size = file.length(),
     absolutePath = absoluteFilePath,
     absoluteDirectoryPath = resolveDirectoryPath(absoluteFilePath, file.isDirectory),
-    timeModified = absoluteFilePath.getLastModifiedTime(),
-    size = file.length(),
-    isDirectory = file.isDirectory,
+    timeModified = absoluteFilePath.getLastModifiedTime()
   ))
 }
 
