@@ -65,7 +65,7 @@ class DuplicateFilesKtTest {
 
     // assert
     temporaryDirectories.forEach { directory ->
-      outcome = outcome.replace("${directory.toString()}${File.separator}", "")
+      outcome = outcome.replace("$directory${File.separator}", "")
     }
 
     outcome.split("\n\n").forEach { substring ->

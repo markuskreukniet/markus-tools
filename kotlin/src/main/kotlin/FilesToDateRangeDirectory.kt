@@ -293,8 +293,6 @@ fun moveFilesAndFilterGoodDirectories(
   files.drop(1).forEach { file ->
     val lastFile = group.last()
     if (ChronoUnit.DAYS.between(lastFile.timeModified, file.timeModified) in 0..3) {
-      // TODO: search on ${
-
       if (file.file.name in fileNames) {
         var disambiguationNumber = 2
         while (disambiguationNumber <= 9) {
