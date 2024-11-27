@@ -76,9 +76,7 @@ fun writeFile(file: FileData): Result<Unit> = runCatching {
   }
 
   file.completeFileInfo.absolutePath.toFile().writeText(file.content)
-  if (file.completeFileInfo.timeModified != null) {
-    Files.setLastModifiedTime(file.completeFileInfo.absolutePath, file.completeFileInfo.timeModified)
-  }
+  file.completeFileInfo.timeModified?.let { Files.setLastModifiedTime(file.completeFileInfo.absolutePath, it) }
 }
 
 fun resolveAbsolutePaths(directoryPath: Path, file: FileData) {
