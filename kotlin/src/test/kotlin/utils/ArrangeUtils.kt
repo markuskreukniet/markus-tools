@@ -20,12 +20,10 @@ fun createFileData(directoryPath: String, inputLine: String): Result<FileData> =
     content = content,
     completeFileInfo = CompleteFileInfo(
       file = filePath.toFile(), // The file is now unusable since the file path is not complete.
-      name = name,
       absoluteDirectoryPath = joinedDirectoryPath,
       absolutePath = filePath,
       timeModified = timeModified,
       size = 0L,
-      isDirectory = isDirectory,
     )
   )
 }
@@ -73,7 +71,7 @@ fun getTopDirectoryPath(directoryPath: Path): Result<Path?> = runCatching {
 }
 
 fun writeFile(file: FileData): Result<Unit> = runCatching {
-  if (file.completeFileInfo.isDirectory) {
+  if (file.completeFileInfo.file.isDirectory) {
     return@runCatching
   }
 
