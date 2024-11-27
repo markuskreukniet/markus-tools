@@ -37,7 +37,6 @@ data class FDateRangeFileInfo(
   var newName: String? // We need the 'newName' property because we cannot change the name of a File instance directly.
 ) : DuplicateFileInfo
 
-// TODO: check for useless properties
 data class CompleteFileInfo(
   override val file: File,
   override val size: Long,
