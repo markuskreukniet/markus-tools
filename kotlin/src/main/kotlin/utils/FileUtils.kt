@@ -32,7 +32,7 @@ data class FDuplicateFilesFileInfo(
 data class FDateRangeFileInfo(
   override val file: File,
   override val size: Long,
-  val absolutePath: Path, // TODO: is absolutePath good naming?
+  val path: Path,
   val timeModified: Instant,
   var newName: String? // We need the 'newName' property because we cannot change the name of a File instance directly.
 ) : DuplicateFileInfo
@@ -40,8 +40,8 @@ data class FDateRangeFileInfo(
 data class CompleteFileInfo(
   override val file: File,
   override val size: Long,
-  var absolutePath: Path,
-  var absoluteDirectoryPath: Path,
+  var absolutePath: Path, // TODO: is absolutePath good naming?
+  var absoluteDirectoryPath: Path, // TODO: is absolutePath good naming?
   val timeModified: FileTime?,
 ) : FileInfo
 
