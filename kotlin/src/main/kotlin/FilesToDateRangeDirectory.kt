@@ -85,12 +85,12 @@ fun categorize(
   } else if (file.isFile) {
     val size = file.length()
     if (size > 0L) {
-      val absolutePath = file.toPath().toAbsolutePath()
+      val path = file.toPath()
       files.add(FDateRangeFileInfo(
         file = file,
         size = size,
-        absolutePath = absolutePath,
-        timeModified = absolutePath.getLastModifiedTime().toInstant(),
+        path = path,
+        timeModified = path.getLastModifiedTime().toInstant(),
         newName = null
       ))
     } else {
@@ -271,7 +271,7 @@ fun moveFilesAndFilterGoodDirectories(
       directoryName += " - ${formatTimeModified(lastFile).getOrThrow()}"
     }
 
-    val joinedDirectory = File(destinationDirectory.absolutePath, directoryName)
+    val joinedDirectory = File(destinationDirectory.path, directoryName)
     if (joinedDirectory in goodDirectories) {
       goodDirectories.remove(joinedDirectory)
     } else {
@@ -281,11 +281,11 @@ fun moveFilesAndFilterGoodDirectories(
     group.forEach { file ->
       if (file.newName == null) {
         val filePath = Paths.get(joinedDirectory.toString(), file.file.name)
-        if (filePath != file.absolutePath) {
-          Files.move(file.absolutePath, filePath)
+        if (filePath != file.path) {
+          Files.move(file.path, filePath)
         }
       } else {
-        Files.move(file.absolutePath, Paths.get(joinedDirectory.toString(), file.newName))
+        Files.move(file.path, Paths.get(joinedDirectory.toString(), file.newName))
       }
     }
   }
