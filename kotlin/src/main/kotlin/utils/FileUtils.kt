@@ -40,8 +40,8 @@ data class FDateRangeFileInfo(
 data class CompleteFileInfo(
   override val file: File,
   override val size: Long,
-  var absolutePath: Path, // TODO: is absolutePath good naming?
-  var absoluteDirectoryPath: Path, // TODO: is absolutePath good naming?
+  var absolutePath: Path,
+  var absoluteDirectoryPath: Path,
   val timeModified: FileTime?,
 ) : FileInfo
 
