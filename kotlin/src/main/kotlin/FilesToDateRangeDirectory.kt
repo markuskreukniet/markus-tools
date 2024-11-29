@@ -103,7 +103,8 @@ fun categorize(
 
 fun createHandlers(
   destinationDirectory: File
-): List<(MutableList<FDateRangeFileInfo>, MutableList<File>) -> MutableList<FDateRangeFileInfo>> {
+): Result<List<(MutableList<FDateRangeFileInfo>, MutableList<File>) ->
+Result<MutableList<FDateRangeFileInfo>>>> = runCatching {
   val addAllFilesInfo = fun(files: MutableList<File>, filesInfo: List<FDateRangeFileInfo>) {
     filesInfo.forEach { file ->
       files.add(file.file)
@@ -120,7 +121,7 @@ fun createHandlers(
 
   val categorizeOnShortestFileNameLength = fun(
     files: MutableList<FDateRangeFileInfo>, badFiles: MutableList<File>
-  ): MutableList<FDateRangeFileInfo> {
+  ): Result<MutableList<FDateRangeFileInfo>> = runCatching {
     val good = mutableListOf(files.first()) // TODO: first() can give exception
     var minimumLength = files.first().file.name.length
 
@@ -135,12 +136,12 @@ fun createHandlers(
       }
     }
 
-    return good
+    good
   }
 
   val categorizeOnValidDateRangeDirectoryName = fun(
     files: MutableList<FDateRangeFileInfo>, badFiles: MutableList<File>
-  ): MutableList<FDateRangeFileInfo> {
+  ): Result<MutableList<FDateRangeFileInfo>> {
     val tempGood1Files = mutableListOf<FDateRangeFileInfo>()
     val tempGood2Files = mutableListOf<FDateRangeFileInfo>()
     val tempBadFiles = mutableListOf<FDateRangeFileInfo>()
@@ -160,20 +161,20 @@ fun createHandlers(
     if (tempGood2Files.isNotEmpty()) {
       addAllFilesInfo(badFiles, tempGood1Files)
       addAllFilesInfo(badFiles, tempBadFiles)
-      return tempGood2Files
+      return Result.success(tempGood2Files)
     }
 
     if (tempGood1Files.isNotEmpty()) {
       addAllFilesInfo(badFiles, tempBadFiles)
-      return tempGood1Files
+      return Result.success(tempGood1Files)
     }
 
-    return tempBadFiles
+    return Result.success(tempBadFiles)
   }
 
   val categorizeOnNewestTimeModified = fun(
     files: MutableList<FDateRangeFileInfo>, badFiles: MutableList<File>
-  ): MutableList<FDateRangeFileInfo> {
+  ): Result<MutableList<FDateRangeFileInfo>> = runCatching {
     val good = mutableListOf(files.first())
     var newest = files.first().timeModified
 
@@ -188,20 +189,20 @@ fun createHandlers(
       }
     }
 
-    return good
+    good
   }
 
   val categorizeOnFirstFile = fun(
     files: MutableList<FDateRangeFileInfo>, badFiles: MutableList<File>
-  ): MutableList<FDateRangeFileInfo> {
+  ): Result<MutableList<FDateRangeFileInfo>> = runCatching {
     val good = mutableListOf(files.first())
 
     addAllFilesInfo(badFiles, files.drop(1))
 
-    return good
+    good
   }
 
-  return listOf(
+  listOf(
     categorizeOnShortestFileNameLength,
     categorizeOnValidDateRangeDirectoryName,
     categorizeOnNewestTimeModified,
@@ -213,7 +214,7 @@ fun deleteDuplicateFiles(
   files: MutableList<FDateRangeFileInfo>, destinationDirectory: File
 ): Result<Unit> = runCatching {
   val groups = createDuplicateFileInfoGroupsByHash(files, false).getOrThrow() ?: return@runCatching
-  val handlers = createHandlers(destinationDirectory)
+  val handlers = createHandlers(destinationDirectory).getOrThrow()
   val badFiles = mutableListOf<File>()
 
   files.clear()
@@ -222,7 +223,7 @@ fun deleteDuplicateFiles(
     for (handler in handlers) {
       // group and groups[index] are different references
       if (groups[index].size > 1) {
-        groups[index] = handler(group, badFiles)
+        groups[index] = handler(group, badFiles).getOrThrow()
       } else {
         files.add(groups[index].first())
         break
