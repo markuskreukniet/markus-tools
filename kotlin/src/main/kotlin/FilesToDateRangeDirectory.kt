@@ -46,7 +46,7 @@ fun isValidDateRangeDirectoryName(name: String): Boolean {
 
 fun categorizeFilesAndDirectories(
   destinationDirectory: File
-): Pair<MutableList<FDateRangeFileInfo>, Pair<MutableSet<File>, MutableList<File>>> {
+): Result<Pair<MutableList<FDateRangeFileInfo>, Pair<MutableSet<File>, MutableList<File>>>> = runCatching {
   val files = mutableListOf<FDateRangeFileInfo>()
   val goodDirectories = mutableSetOf<File>()
   val badDirectories = mutableListOf<File>()
@@ -71,7 +71,7 @@ fun categorizeFilesAndDirectories(
     }
   }
 
-  return Pair(files, Pair(goodDirectories, badDirectories))
+  Pair(files, Pair(goodDirectories, badDirectories))
 }
 
 fun categorize(
@@ -121,7 +121,7 @@ fun createHandlers(
   val categorizeOnShortestFileNameLength = fun(
     files: MutableList<FDateRangeFileInfo>, badFiles: MutableList<File>
   ): MutableList<FDateRangeFileInfo> {
-    val good = mutableListOf(files.first())
+    val good = mutableListOf(files.first()) // TODO: first() can give exception
     var minimumLength = files.first().file.name.length
 
     files.drop(1).forEach { file ->
@@ -329,7 +329,7 @@ fun filesToDateRangeDirectory(
     return@runCatching
   }
 
-  val pair = categorizeFilesAndDirectories(destinationDirectory)
+  val pair = categorizeFilesAndDirectories(destinationDirectory).getOrThrow()
   val files = pair.first
   val goodDirectories = pair.second.first
   val badDirectories = pair.second.second
