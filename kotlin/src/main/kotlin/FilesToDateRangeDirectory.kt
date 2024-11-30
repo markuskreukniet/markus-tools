@@ -13,8 +13,6 @@ import java.time.temporal.ChronoUnit
 import kotlin.io.path.exists
 import kotlin.io.path.getLastModifiedTime
 
-// TODO: check runCatching for every function
-
 fun getDateTimeFormatter(): Result<DateTimeFormatter> = runCatching {
   DateTimeFormatter.ofPattern("yyyy-MM-dd")
 }
@@ -122,7 +120,7 @@ Result<MutableList<FDateRangeFileInfo>>>> = runCatching {
   val categorizeOnShortestFileNameLength = fun(
     files: MutableList<FDateRangeFileInfo>, badFiles: MutableList<File>
   ): Result<MutableList<FDateRangeFileInfo>> = runCatching {
-    val good = mutableListOf(files.first()) // TODO: first() can give exception
+    val good = mutableListOf(files.first())
     var minimumLength = files.first().file.name.length
 
     files.drop(1).forEach { file ->

@@ -9,16 +9,6 @@ import kotlin.io.path.getLastModifiedTime
 
 // The F prefix of a class name means feature.
 
-data class FileData(
-  val content: String,
-  val completeFileInfo: CompleteFileInfo
-)
-
-interface FileInfo {
-  val file: File
-  val size: Long
-}
-
 interface DuplicateFileInfo {
   val file: File
   val size: Long
@@ -37,13 +27,23 @@ data class FDateRangeFileInfo(
   var newName: String? // We need the 'newName' property because we cannot change the name of a File instance directly.
 ) : DuplicateFileInfo
 
+data class FTextFilesFileInfo(
+  val file: File,
+  val absolutePath: Path
+)
+
 data class CompleteFileInfo(
-  override val file: File,
-  override val size: Long,
+  val file: File,
+  val size: Long,
   var absolutePath: Path,
   var absoluteDirectoryPath: Path,
   val timeModified: FileTime?,
-) : FileInfo
+)
+
+data class FileData(
+  val content: String,
+  val completeFileInfo: CompleteFileInfo
+)
 
 enum class FileFilterMode {
   FILES,
@@ -75,7 +75,7 @@ fun resolveDirectoryPath(filePath: Path, isDirectory: Boolean): Path {
 }
 
 fun filterAndHandleFileInfo(
-  file: File, mode: FileFilterMode, type: FileType, absoluteFilePath: Path, handler: (FileInfo) -> Unit
+  file: File, mode: FileFilterMode, type: FileType, absoluteFilePath: Path, handler: (CompleteFileInfo) -> Unit
 ): Result<Unit> = runCatching {
   val size = if (file.isFile) file.length() else 0L
 
@@ -115,7 +115,7 @@ fun walkFilterAndHandleFileInfo(
   absoluteFilePath: Path,
   mode: FileFilterMode,
   type: FileType,
-  handler: (FileInfo) -> Unit
+  handler: (CompleteFileInfo) -> Unit
 ): Result<Unit> = runCatching {
   val rootFile = absoluteFilePath.toFile()
 
