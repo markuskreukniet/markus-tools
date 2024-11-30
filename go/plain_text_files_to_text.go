@@ -9,14 +9,21 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
-func readLinesAddToBuilder(filePath string, builder *strings.Builder) error {
+// WIP refactor
+
+func addBaseAndLines(filePath string, builder *strings.Builder) error {
+	if _, err := builder.WriteString(filepath.Base(filePath)); err != nil {
+		return err
+	}
+
 	file, err := os.Open(filePath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-	// TODO: os.ReadFile is better?
+
 	scanner := bufio.NewScanner(file)
+
 	for scanner.Scan() {
 		if _, err := utils.WriteNewlineString(builder); err != nil {
 			return err
@@ -25,14 +32,8 @@ func readLinesAddToBuilder(filePath string, builder *strings.Builder) error {
 			return err
 		}
 	}
-	return scanner.Err()
-}
 
-func addFilePathBaseAndAllLinesToBuilder(filePath string, builder *strings.Builder) error {
-	if _, err := builder.WriteString(filepath.Base(filePath)); err != nil {
-		return err
-	}
-	return readLinesAddToBuilder(filePath, builder)
+	return scanner.Err()
 }
 
 func plainTextFilesToTextToJSON(uniqueFileSystemNodes []utils.FileSystemNode) string {
@@ -45,6 +46,23 @@ func plainTextFilesToTextToJSON(uniqueFileSystemNodes []utils.FileSystemNode) st
 
 // Opening a file two times is not the most efficient, but having a separate open file in isTextFile helps with filtering.
 func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string, error) {
+	// var files []utils.FTextFilesFileInfo
+
+	// handler := func(file utils.CompleteFileInfo) {
+	// 	files = append(files, utils.FTextFilesFileInfo{
+	// 		Name: file.Name,
+	// 		Path: file.Name,
+	// 	})
+	// }
+
+	// for _, node := range uniqueFileSystemNodes {
+	// 	if err :=
+	// 		utils.WalkFilterAndHandleFileInfo(node, utils.NonZeroByteFiles, utils.TextFiles, handler); err != nil {
+	// 		return "", err
+	// 	}
+	// }
+
+	//
 	var filePaths []string
 
 	for _, node := range uniqueFileSystemNodes {
@@ -78,7 +96,7 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 	length := len(filePaths)
 
 	if length > 0 {
-		err := addFilePathBaseAndAllLinesToBuilder(filePaths[0], &result)
+		err := addBaseAndLines(filePaths[0], &result)
 		if err != nil {
 			return "", err
 		}
@@ -86,7 +104,7 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 			if _, err := utils.WriteTwoNewlineStrings(&result); err != nil {
 				return "", err
 			}
-			if err = addFilePathBaseAndAllLinesToBuilder(path, &result); err != nil {
+			if err = addBaseAndLines(path, &result); err != nil {
 				return "", err
 			}
 		}
