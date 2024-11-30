@@ -9,14 +9,15 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
-func readLinesAddToBuilder(filePath string, builder *strings.Builder) error {
+func addReadLines(filePath string, builder *strings.Builder) error {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-	// TODO: os.ReadFile is better?
+
 	scanner := bufio.NewScanner(file)
+
 	for scanner.Scan() {
 		if _, err := utils.WriteNewlineString(builder); err != nil {
 			return err
@@ -25,6 +26,7 @@ func readLinesAddToBuilder(filePath string, builder *strings.Builder) error {
 			return err
 		}
 	}
+
 	return scanner.Err()
 }
 
@@ -32,7 +34,7 @@ func addFilePathBaseAndAllLinesToBuilder(filePath string, builder *strings.Build
 	if _, err := builder.WriteString(filepath.Base(filePath)); err != nil {
 		return err
 	}
-	return readLinesAddToBuilder(filePath, builder)
+	return addReadLines(filePath, builder)
 }
 
 func plainTextFilesToTextToJSON(uniqueFileSystemNodes []utils.FileSystemNode) string {
