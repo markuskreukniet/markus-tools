@@ -45,22 +45,27 @@ func (info FDuplicateFilesFileInfo) GetPath() string {
 	return info.Path
 }
 
+type FTextFilesFileInfo struct {
+	Name string
+	Path string
+}
+
 // CompleteFileInfo implements FileInfo
 type CompleteFileInfo struct {
-	name                  string
-	absoluteDirectoryPath string
-	absolutePath          string
-	timeModified          time.Time
-	size                  int64
-	isDirectory           bool
+	Name                  string
+	AbsoluteDirectoryPath string
+	AbsolutePath          string
+	TimeModified          time.Time
+	Size                  int64
+	IsDirectory           bool
 }
 
 func (info CompleteFileInfo) GetSize() int64 {
-	return info.size
+	return info.Size
 }
 
 func (info CompleteFileInfo) GetPath() string {
-	return info.absolutePath
+	return info.AbsolutePath
 }
 
 type FileSystemFile struct {
@@ -167,7 +172,7 @@ func ToFileSystemFile(filePath string) (FileSystemFile, error) {
 }
 
 func FilterAndHandleFileInfo(
-	info os.FileInfo, mode fileFilterMode, fileType fileType, absoluteFilePath string, handler func(DuplicateFileInfo),
+	info os.FileInfo, mode fileFilterMode, fileType fileType, absoluteFilePath string, handler func(CompleteFileInfo),
 ) error {
 	isDir := info.IsDir()
 	isRegularFile := info.Mode().IsRegular()
@@ -201,19 +206,19 @@ func FilterAndHandleFileInfo(
 	}
 
 	handler(CompleteFileInfo{
-		name:                  info.Name(),
-		absoluteDirectoryPath: resolveDirectoryPath(absoluteFilePath, isDir),
-		absolutePath:          absoluteFilePath,
-		timeModified:          info.ModTime(),
-		size:                  size,
-		isDirectory:           isDir,
+		Name:                  info.Name(),
+		AbsoluteDirectoryPath: resolveDirectoryPath(absoluteFilePath, isDir),
+		AbsolutePath:          absoluteFilePath,
+		TimeModified:          info.ModTime(),
+		Size:                  size,
+		IsDirectory:           isDir,
 	})
 
 	return nil
 }
 
 func WalkFilterAndHandleFileInfo(
-	node FileSystemNode, mode fileFilterMode, fileType fileType, handler func(DuplicateFileInfo),
+	node FileSystemNode, mode fileFilterMode, fileType fileType, handler func(CompleteFileInfo),
 ) error {
 	if node.IsDirectory {
 		return filepath.Walk(node.Path, func(absoluteFilePath string, info os.FileInfo, err error) error {
