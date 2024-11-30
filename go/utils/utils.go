@@ -85,65 +85,6 @@ func CreateDuplicateFileInfoGroupsByHash[T DuplicateFileInfo](files []T, onlyDup
 	return result, nil
 }
 
-// TODO: does work, but can be improved?
-func CreateFileSystemFileByHashGroups(files []FileSystemFile, onlyDuplicates bool) ([][]FileSystemFile, error) {
-	if len(files) == 0 {
-		return nil, nil
-	}
-
-	type filesByFileSize struct {
-		fileSize int64
-		files    []FileSystemFile
-	}
-
-	var result [][]FileSystemFile
-	var groups []filesByFileSize
-	groupIndex := 0
-
-	sort.Slice(files, func(i, j int) bool {
-		return files[i].FileMetadata.Size < files[j].FileMetadata.Size
-	})
-
-	groups = append(groups, filesByFileSize{
-		fileSize: files[0].FileMetadata.Size,
-		files:    []FileSystemFile{files[0]},
-	})
-
-	for _, file := range files[1:] {
-		if file.FileMetadata.Size == groups[groupIndex].files[0].FileMetadata.Size {
-			groups[groupIndex].files = append(groups[groupIndex].files, file)
-		} else {
-			groups = append(groups, filesByFileSize{
-				fileSize: file.FileMetadata.Size,
-				files:    []FileSystemFile{file},
-			})
-			groupIndex++
-		}
-	}
-
-	for _, group := range groups {
-		if len(group.files) > 1 {
-			hashMap := make(map[string][]FileSystemFile)
-			for _, file := range group.files {
-				var err error
-				if file.FileMetadata.Hash, err = CreateFileHash(file.FileMetadata.Path); err != nil {
-					return nil, err
-				}
-				hashMap[file.FileMetadata.Hash] = append(hashMap[file.FileMetadata.Hash], file)
-			}
-			for _, hashedFiles := range hashMap {
-				if len(hashedFiles) > 1 || !onlyDuplicates {
-					result = append(result, hashedFiles)
-				}
-			}
-		} else if !onlyDuplicates {
-			result = append(result, group.files)
-		}
-	}
-
-	return result, nil
-}
-
 func CreateFileHash(filePath string) (string, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -158,4 +99,8 @@ func CreateFileHash(filePath string) (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(hashGenerator.Sum(nil)), nil
+}
+
+func IsBlank(s string) bool {
+	return s == ""
 }

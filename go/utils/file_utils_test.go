@@ -22,7 +22,7 @@ import (
 // 	directory := TestingCreateTempFileSystemStructureOrGetEmptyString(t, fileSystemPathEndParts)
 // 	defer TestingRemoveDirectoryTree(t, directory)
 // 	fullPath := filepath.Join(directory, fileSystemPathEndParts.FilePathEndParts[0])
-// 	writtenContent := TestingWriteFileWithContentAndIndex(t, fullPath, 0)
+// 	writtenContent := WriteFileWithContentAndIndex(t, fullPath, 0)
 // 	nonExistentFilePath := filepath.Join(directory, TxtFileNonExistent1)
 
 // 	// act
@@ -65,14 +65,14 @@ func TestFileExists(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.TestCaseBasic.Name, func(t *testing.T) {
 			// arrange and tear down
-			directory, _ := TestingWriteFilesByOneInput(t, tc.TestCaseBasic.Input)
-			defer TestingRemoveDirectoryTree(t, directory)
+			directory := WriteFilesBySingleInput(t, tc.TestCaseBasic.Input)
+			defer TMustRemoveAll(t, directory)
 
-			files := CreateSortedFileSystemFiles(t, directory, tc.TestCaseBasic.Input)
+			files := createFilesData(t, directory, tc.TestCaseBasic.Input)
 
 			for _, file := range files {
 				// act
-				exists, err := FileExists(file.FileMetadata.Path)
+				exists, err := FileExists(file.CompleteFileInfo.AbsolutePath)
 				if err != nil {
 					t.Errorf("FileExists error")
 				}

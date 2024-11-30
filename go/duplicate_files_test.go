@@ -48,8 +48,8 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			// arrange and tear down
-			directories, fileSystemNodes := utils.TestingWriteFilesByMultipleInputs(t, tc.Input)
-			defer utils.TestingRemoveDirectoryTrees(t, directories)
+			directories, fileSystemNodes := utils.WriteFilesByMultipleInputs(t, tc.Input)
+			defer utils.RemoveDirectoryTrees(t, directories)
 
 			lines := strings.Split(wantedOutcome, "\n")
 			var trimmedLines []string
@@ -78,7 +78,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 				wantedOutcome = strings.Replace(wantedOutcome, substring, "", 1)
 			}
 
-			utils.TestingAssertEqualStrings(t, strings.ReplaceAll(wantedOutcome, "\n\n", ""), "")
+			utils.TMustAssertEqualStrings(t, strings.ReplaceAll(wantedOutcome, "\n\n", ""), "")
 		})
 	}
 }
