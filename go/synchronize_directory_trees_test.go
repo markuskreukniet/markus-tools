@@ -37,16 +37,16 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.TestCaseBasic.Name, func(t *testing.T) {
 			// arrange and tear down
-			sourceDirectory, _ := utils.TestingWriteFilesByOneInput(t, tc.TestCaseBasic.Input)
-			defer utils.TestingRemoveDirectoryTree(t, sourceDirectory)
-			destinationDirectory, _ := utils.TestingWriteFilesByOneInput(t, tc.SecondInput)
-			defer utils.TestingRemoveDirectoryTree(t, destinationDirectory)
+			sourceDirectory := utils.WriteFilesBySingleInput(t, tc.TestCaseBasic.Input)
+			defer utils.TMustRemoveAll(t, sourceDirectory)
+			destinationDirectory := utils.WriteFilesBySingleInput(t, tc.SecondInput)
+			defer utils.TMustRemoveAll(t, destinationDirectory)
 
 			// act
 			err := synchronizeDirectoryTrees(sourceDirectory, destinationDirectory)
 
 			// assert
-			utils.TestingAssertErrorToWantError(t, err, tc.TestCaseBasic.WantErr)
+			utils.TMustAssertError(t, err, tc.TestCaseBasic.WantErr)
 
 			areIdentical, err := utils.AreFileTreeDescendantsIdentical(sourceDirectory, destinationDirectory)
 			if err != nil {
@@ -113,9 +113,9 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			result, err := joinOutputBasePathWithRelativeInputPath(tc.inputBasePath, tc.inputFullPath, tc.outputBasePath)
-			utils.TestingAssertErrorToWantError(t, err, tc.wantErr)
+			utils.TMustAssertError(t, err, tc.wantErr)
 			if err == nil {
-				utils.TestingAssertEqualStrings(t, tc.want, result)
+				utils.TMustAssertEqualStrings(t, tc.want, result)
 			}
 		})
 	}
