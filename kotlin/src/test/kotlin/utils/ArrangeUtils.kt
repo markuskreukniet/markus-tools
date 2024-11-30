@@ -7,13 +7,12 @@ import java.nio.file.Paths
 import java.nio.file.attribute.FileTime
 import java.time.Instant
 
-fun createFileData(directoryPath: String, inputLine: String): Result<FileData> = runCatching {
+fun createFileData(directoryPath: Path?, inputLine: String): Result<FileData> = runCatching {
   val fields = inputLine.split(",")
-  val joinedDirectoryPath = Paths.get(directoryPath, fields[0])
+  val joinedDirectoryPath = Paths.get(directoryPath?.toString() ?: "", fields[0])
   val content = fields[3]
   val name = fields[2]
   val filePath = joinedDirectoryPath.resolve(name)
-  val isDirectory = name == ""
   val timeModified = if (fields[1] != "") FileTime.from(Instant.parse(fields[1])) else null
 
   FileData(
@@ -23,19 +22,19 @@ fun createFileData(directoryPath: String, inputLine: String): Result<FileData> =
       absoluteDirectoryPath = joinedDirectoryPath,
       absolutePath = filePath,
       timeModified = timeModified,
-      size = 0L,
+      size = 0L // TODO: convert content to size?
     )
   )
 }
 
-fun createFileSystemFiles(
+fun createFilesData(
   rawDelimitedSemicolonString: String
 ): Result<MutableList<FileData>> = runCatching {
-  createFileSystemFiles("", rawDelimitedSemicolonString).getOrThrow()
+  createFilesData(null, rawDelimitedSemicolonString).getOrThrow()
 }
 
-fun createFileSystemFiles(
-  directoryPath: String, rawDelimitedSemicolonString: String
+fun createFilesData(
+  directoryPath: Path?, rawDelimitedSemicolonString: String
 ): Result<MutableList<FileData>> = runCatching {
   val files = mutableListOf<FileData>()
   val inputLine = mutableListOf<Char>()
@@ -47,8 +46,7 @@ fun createFileSystemFiles(
       if (char != ';') {
         inputLine.add(char)
       } else {
-        val file = createFileData(directoryPath, inputLine.joinToString("")).getOrThrow()
-        files.add(file)
+        files.add(createFileData(directoryPath, inputLine.joinToString("")).getOrThrow())
         inputLine.clear()
         isCreatingInputLine = false
       }
@@ -65,8 +63,8 @@ fun createTemporaryDirectory(): Result<Path> = runCatching {
   Files.createTempDirectory("markus-tools kotlin test_")  // The prefix is optional
 }
 
-// Returns the top directory path or a null when it receives only a file name, such as jpg 0.jpg.
-fun getTopDirectoryPath(directoryPath: Path): Result<Path?> = runCatching {
+// Returns the first path segment or a null when it receives only a file name, such as jpg 0.jpg.
+fun getFirstPathSegment(directoryPath: Path): Result<Path?> = runCatching {
   if (directoryPath.nameCount > 0) directoryPath.getName(0) else null
 }
 
@@ -79,40 +77,12 @@ fun writeFile(file: FileData): Result<Unit> = runCatching {
   file.completeFileInfo.timeModified?.let { Files.setLastModifiedTime(file.completeFileInfo.absolutePath, it) }
 }
 
-fun resolveAbsolutePaths(directoryPath: Path, file: FileData) {
-  file.completeFileInfo.absoluteDirectoryPath = directoryPath.resolve(
-    file.completeFileInfo.absoluteDirectoryPath
-  )
-  file.completeFileInfo.absolutePath = directoryPath.resolve(file.completeFileInfo.absolutePath)
-}
-
-fun writeFilesBySingleInput(input: String): Result<Path?> = runCatching {
-  if (input.isBlank()) {
-    return@runCatching null
-  }
-
-  val files = createFileSystemFiles(input).getOrThrow()
-
-  if (files.isEmpty()) {
-    return@runCatching null
-  }
-
-  val directoryPath = createTemporaryDirectory().getOrThrow()
-
-  files.forEach { file ->
-    resolveAbsolutePaths(directoryPath, file)
-    writeFile(file)
-  }
-
-  directoryPath
-}
-
 fun writeFilesByMultipleInputs(input: String): Result<Pair<MutableList<Path>?, MutableList<Path>?>> = runCatching {
   if (input.isBlank()) {
     return@runCatching Pair(null, null)
   }
 
-  val files = createFileSystemFiles(input).getOrThrow()
+  val files = createFilesData(input).getOrThrow()
 
   if (files.isEmpty()) {
     return@runCatching Pair(null, null)
@@ -121,35 +91,38 @@ fun writeFilesByMultipleInputs(input: String): Result<Pair<MutableList<Path>?, M
   files.sortBy { it.completeFileInfo.absolutePath }
 
   val groups = mutableListOf(mutableListOf(files.first()))
-  var previousTopDirectoryPath = getTopDirectoryPath(
+  var previousSegment = getFirstPathSegment(
     files.first().completeFileInfo.absoluteDirectoryPath
   ).getOrThrow()
   var index = 0
 
   files.drop(1).forEach { file ->
-    val currentTopDirectoryPath = getTopDirectoryPath(file.completeFileInfo.absoluteDirectoryPath).getOrThrow()
+    val currentSegment = getFirstPathSegment(file.completeFileInfo.absoluteDirectoryPath).getOrThrow()
     // We can use '==' or '!=' for string-based comparison of the paths.
-    if (currentTopDirectoryPath == null || previousTopDirectoryPath != currentTopDirectoryPath) {
+    if (currentSegment == null || previousSegment != currentSegment) {
       groups.add(mutableListOf(file))
-      previousTopDirectoryPath = currentTopDirectoryPath
+      previousSegment = currentSegment
       index++
     } else {
       groups[index].add(file)
     }
   }
 
+  previousSegment = null
   val temporaryDirectories = mutableListOf<Path>()
   val inputPaths = mutableListOf<Path>()
 
   groups.forEach { group ->
     val directoryPath = createTemporaryDirectory().getOrThrow()
     temporaryDirectories.add(directoryPath)
-    var previousDirectoryPath = group.first().completeFileInfo.absoluteDirectoryPath
     group.forEach { file ->
-      resolveAbsolutePaths(directoryPath, file)
-      if (file.completeFileInfo.absoluteDirectoryPath != previousDirectoryPath) {
+      file.completeFileInfo.absoluteDirectoryPath = directoryPath.resolve(
+        file.completeFileInfo.absoluteDirectoryPath
+      )
+      file.completeFileInfo.absolutePath = directoryPath.resolve(file.completeFileInfo.absolutePath)
+      if (file.completeFileInfo.absoluteDirectoryPath != previousSegment) {
         Files.createDirectories(file.completeFileInfo.absoluteDirectoryPath)
-        previousDirectoryPath = file.completeFileInfo.absoluteDirectoryPath
+        previousSegment = file.completeFileInfo.absoluteDirectoryPath
       }
       writeFile(file)
       inputPaths.add(file.completeFileInfo.absolutePath)
