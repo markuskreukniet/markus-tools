@@ -45,53 +45,23 @@ func (info FDuplicateFilesFileInfo) GetPath() string {
 	return info.Path
 }
 
-// CompleteFileInfo implements FileInfo
+type FTextFilesFileInfo struct {
+	Name         string
+	AbsolutePath string
+}
+
 type CompleteFileInfo struct {
-	name                  string
-	absoluteDirectoryPath string
-	absolutePath          string
-	timeModified          time.Time
-	size                  int64
-	isDirectory           bool
+	Name                  string
+	AbsoluteDirectoryPath string
+	AbsolutePath          string
+	TimeModified          time.Time
+	Size                  int64
+	IsDirectory           bool
 }
 
-func (info CompleteFileInfo) GetSize() int64 {
-	return info.size
-}
-
-func (info CompleteFileInfo) GetPath() string {
-	return info.absolutePath
-}
-
-type FileSystemFile struct {
-	Data         string
-	FileMetadata FileMetadata
-}
-
-func CreateFileSystemFile(data string, metadata FileMetadata) FileSystemFile {
-	return FileSystemFile{
-		Data:         data,
-		FileMetadata: metadata,
-	}
-}
-
-type FileMetadata struct {
-	Name, DirectoryPath, Path, Hash string
-	TimeModified                    time.Time
-	Size                            int64
-	IsDirectory                     bool // It should be a file type, but there is no use case.
-}
-
-func CreateFileMetadata(name, directoryPath, path, hash string, timeModified time.Time, size int64, isDirectory bool) FileMetadata {
-	return FileMetadata{
-		Name:          name,
-		DirectoryPath: directoryPath, // TODO: absoluteDirectoryPath better naming?
-		Path:          path,          // TODO: absolutePath better naming?
-		TimeModified:  timeModified,
-		Size:          size,
-		IsDirectory:   isDirectory,
-		Hash:          hash,
-	}
+type FileData struct {
+	Content          string
+	CompleteFileInfo CompleteFileInfo
 }
 
 type FileSystemNode struct {
@@ -130,7 +100,8 @@ func IsTextFile(filePath string) (bool, error) {
 	}
 	defer file.Close()
 
-	// Read the first 512 or less to check for non-text characters. DetectContentType of package 'net/http' works with a similar check.
+	// Read the first 512 or less to check for non-text characters.
+	// DetectContentType of package 'net/http' works with a similar check.
 	bytes := make([]byte, 512)
 	numberOfBytesRead, err := file.Read(bytes)
 	if err != nil && err != io.EOF {
@@ -154,20 +125,8 @@ func resolveDirectoryPath(filePath string, isDirectory bool) string {
 	return directoryPath
 }
 
-func ToFileSystemFile(filePath string) (FileSystemFile, error) {
-	info, err := os.Stat(filePath)
-	if err != nil {
-		return FileSystemFile{}, err
-	}
-
-	isDirectory := info.IsDir()
-
-	return CreateFileSystemFile("",
-		CreateFileMetadata(info.Name(), resolveDirectoryPath(filePath, isDirectory), filePath, "", info.ModTime(), info.Size(), isDirectory)), nil
-}
-
 func FilterAndHandleFileInfo(
-	info os.FileInfo, mode fileFilterMode, fileType fileType, absoluteFilePath string, handler func(DuplicateFileInfo),
+	info os.FileInfo, mode fileFilterMode, fileType fileType, absoluteFilePath string, handler func(CompleteFileInfo),
 ) error {
 	isDir := info.IsDir()
 	isRegularFile := info.Mode().IsRegular()
@@ -201,27 +160,32 @@ func FilterAndHandleFileInfo(
 	}
 
 	handler(CompleteFileInfo{
-		name:                  info.Name(),
-		absoluteDirectoryPath: resolveDirectoryPath(absoluteFilePath, isDir),
-		absolutePath:          absoluteFilePath,
-		timeModified:          info.ModTime(),
-		size:                  size,
-		isDirectory:           isDir,
+		Name:                  info.Name(),
+		AbsoluteDirectoryPath: resolveDirectoryPath(absoluteFilePath, isDir),
+		AbsolutePath:          absoluteFilePath,
+		TimeModified:          info.ModTime(),
+		Size:                  size,
+		IsDirectory:           isDir,
 	})
 
 	return nil
 }
 
+func WalkFilterAndHandleFileInfoDirectory(
+	filePath string, mode fileFilterMode, fileType fileType, handler func(CompleteFileInfo)) error {
+	return filepath.Walk(filePath, func(absoluteFilePath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		return FilterAndHandleFileInfo(info, mode, fileType, absoluteFilePath, handler)
+	})
+}
+
 func WalkFilterAndHandleFileInfo(
-	node FileSystemNode, mode fileFilterMode, fileType fileType, handler func(DuplicateFileInfo),
+	node FileSystemNode, mode fileFilterMode, fileType fileType, handler func(CompleteFileInfo),
 ) error {
 	if node.IsDirectory {
-		return filepath.Walk(node.Path, func(absoluteFilePath string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			return FilterAndHandleFileInfo(info, mode, fileType, absoluteFilePath, handler)
-		})
+		return WalkFilterAndHandleFileInfoDirectory(node.Path, mode, fileType, handler)
 	} else {
 		info, err := os.Stat(node.Path)
 		if err != nil {
@@ -229,51 +193,6 @@ func WalkFilterAndHandleFileInfo(
 		}
 		return FilterAndHandleFileInfo(info, mode, fileType, node.Path, handler)
 	}
-}
-
-func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileSystemFile) error) error {
-	return filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		isDir := fileInfo.IsDir()
-
-		var size int64
-		if !isDir {
-			size = fileInfo.Size()
-		}
-
-		// is file check
-		if !isDir && mode == Directories {
-			return nil
-		}
-
-		// is directory check
-		if isDir && (mode == files || mode == NonZeroByteFiles) {
-			return nil
-		}
-
-		// is zero byte file check
-		if !isDir && size == 0 && (mode == NonZeroByteFiles || mode == NonZeroByteFilesAndDirectories) {
-			return nil
-		}
-
-		// is text file check
-		if fileType == TextFiles {
-			isTextFile, err := IsTextFile(filePath)
-			if err != nil || !isTextFile {
-				return err
-			}
-		}
-
-		if err := handler(CreateFileSystemFile("",
-			CreateFileMetadata(fileInfo.Name(), resolveDirectoryPath(filePath, isDir), filePath, "", fileInfo.ModTime(), size, isDir))); err != nil {
-			return err
-		}
-
-		return nil
-	})
 }
 
 func FileExists(filePath string) (bool, error) {
