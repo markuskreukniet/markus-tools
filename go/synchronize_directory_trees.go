@@ -25,20 +25,20 @@ func joinOutputBasePathWithRelativeInputPath(inputBasePath, inputFullPath, outpu
 	return filepath.Join(outputBasePath, relativePath), nil
 }
 
-func getFilePathModificationTimeMapFromDirectoryTree(rootFilePath string) (map[string]time.Time, error) {
+func getFilePathModificationTimeMapFromDirectoryTree(directoryPath string) (map[string]time.Time, error) {
 	filePathModificationTimeMap := make(map[string]time.Time)
 
-	handler := func(file utils.FileSystemFile) error {
-		filePathModificationTimeMap[file.FileMetadata.Path] = file.FileMetadata.TimeModified
-		return nil
+	handler := func(file utils.CompleteFileInfo) {
+		filePathModificationTimeMap[file.AbsolutePath] = file.TimeModified
 	}
 
-	err := utils.WalkFilterAndHandleFileSystemFile(rootFilePath, utils.FilesAndDirectories, utils.AllFiles, handler)
+	err := utils.WalkFilterAndHandleFileInfoDirectory(directoryPath, utils.FilesAndDirectories, utils.AllFiles, handler)
 	return filePathModificationTimeMap, err
 }
 
 // Copying files in this function could be faster with buffering.
-// However, to determine an optimal buffer size for copying a file, we need to know the block size of the storage device.
+// However, to determine an optimal buffer size for copying a file,
+// we need to know the block size of the storage device.
 // Determining such block sizes is relatively hard with only official Go packages.
 func copyFileWithFileMode(sourceFilePath string, destinationFilePath string, fileMode fs.FileMode) error {
 	sourceFile, err := os.Open(sourceFilePath)
@@ -62,7 +62,7 @@ func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) err
 	if err != nil {
 		return err
 	}
-	// TODO: should use WalkFilterAndHandleFileSystemFile?
+
 	if err = filepath.Walk(sourceDirectory, func(sourceFilePath string, fileInfo os.FileInfo, err error) error {
 		if err != nil {
 			return err
