@@ -10,7 +10,7 @@ fun getDuplicateFilesAsNewlineSeparatedString(
   val result = StringBuilder()
   val files = mutableListOf<DuplicateFileInfo>()
 
-  val handler = fun(file: FileInfo) {
+  val handler = fun(file: CompleteFileInfo) {
     files.add(
       FDuplicateFilesFileInfo(
         file = file.file,
@@ -20,9 +20,7 @@ fun getDuplicateFilesAsNewlineSeparatedString(
   }
 
   uniqueAbsolutePaths.forEach { path ->
-    if (path.exists()) {
-      walkFilterAndHandleFileInfo(path, FileFilterMode.NON_ZERO_BYTE_FILES, FileType.ALL_FILES, handler)
-    }
+    walkFilterAndHandleFileInfo(path, FileFilterMode.NON_ZERO_BYTE_FILES, FileType.ALL_FILES, handler)
   }
 
   val groups = createDuplicateFileInfoGroupsByHash(files, true).getOrThrow() ?: return@runCatching null
