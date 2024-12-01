@@ -9,7 +9,9 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
-func addReadLines(filePath string, builder *strings.Builder) error {
+// WIP refactor
+
+func addLines(filePath string, builder *strings.Builder) error {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return err
@@ -30,11 +32,12 @@ func addReadLines(filePath string, builder *strings.Builder) error {
 	return scanner.Err()
 }
 
-func addFilePathBaseAndAllLinesToBuilder(filePath string, builder *strings.Builder) error {
+func addBaseAndLines(filePath string, builder *strings.Builder) error {
 	if _, err := builder.WriteString(filepath.Base(filePath)); err != nil {
 		return err
 	}
-	return addReadLines(filePath, builder)
+
+	return addLines(filePath, builder)
 }
 
 func plainTextFilesToTextToJSON(uniqueFileSystemNodes []utils.FileSystemNode) string {
@@ -80,7 +83,7 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 	length := len(filePaths)
 
 	if length > 0 {
-		err := addFilePathBaseAndAllLinesToBuilder(filePaths[0], &result)
+		err := addBaseAndLines(filePaths[0], &result)
 		if err != nil {
 			return "", err
 		}
@@ -88,7 +91,7 @@ func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string,
 			if _, err := utils.WriteTwoNewlineStrings(&result); err != nil {
 				return "", err
 			}
-			if err = addFilePathBaseAndAllLinesToBuilder(path, &result); err != nil {
+			if err = addBaseAndLines(path, &result); err != nil {
 				return "", err
 			}
 		}
