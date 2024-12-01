@@ -2,7 +2,6 @@ package org.example
 
 import org.example.utils.*
 import java.nio.file.Path
-import kotlin.io.path.exists
 
 fun getDuplicateFilesAsNewlineSeparatedString(
   uniqueAbsolutePaths: Array<Path>
