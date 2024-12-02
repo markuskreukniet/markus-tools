@@ -3,7 +3,7 @@ package org.example
 import org.example.utils.*
 import java.nio.file.Path
 
-fun plainTextFilesToText(uniqueAbsolutePaths: Array<Path>): String? {
+fun plainTextFilesToText(uniqueAbsolutePaths: Array<Path>): Result<String?> = runCatching {
   val files = mutableListOf<FTextFilesFileInfo>()
 
   val handler = fun(file: CompleteFileInfo) {
@@ -20,10 +20,26 @@ fun plainTextFilesToText(uniqueAbsolutePaths: Array<Path>): String? {
   }
 
   if (files.isEmpty()) {
-    return null
+    return@runCatching null
   }
 
   val result = StringBuilder()
 
-  return  result.toString()
+  val addNameAndLines = fun(file: FTextFilesFileInfo) {
+    result.append(file.file.name)
+
+    file.file.forEachLine { line ->
+      writeNewlineString(result)
+      result.append(line)
+    }
+  }
+
+  addNameAndLines(files.first())
+
+  files.drop(1).forEach { file ->
+    writeTwoNewlineStrings(result)
+    addNameAndLines(file)
+  }
+
+  result.toString()
 }

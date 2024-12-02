@@ -11,7 +11,11 @@ import (
 
 // WIP refactor
 
-func addLines(filePath string, builder *strings.Builder) error {
+func addBaseAndLines(filePath string, builder *strings.Builder) error {
+	if _, err := builder.WriteString(filepath.Base(filePath)); err != nil {
+		return err
+	}
+
 	file, err := os.Open(filePath)
 	if err != nil {
 		return err
@@ -30,14 +34,6 @@ func addLines(filePath string, builder *strings.Builder) error {
 	}
 
 	return scanner.Err()
-}
-
-func addBaseAndLines(filePath string, builder *strings.Builder) error {
-	if _, err := builder.WriteString(filepath.Base(filePath)); err != nil {
-		return err
-	}
-
-	return addLines(filePath, builder)
 }
 
 func plainTextFilesToTextToJSON(uniqueFileSystemNodes []utils.FileSystemNode) string {
