@@ -46,6 +46,23 @@ func plainTextFilesToTextToJSON(uniqueFileSystemNodes []utils.FileSystemNode) st
 
 // Opening a file two times is not the most efficient, but having a separate open file in isTextFile helps with filtering.
 func plainTextFilesToText(uniqueFileSystemNodes []utils.FileSystemNode) (string, error) {
+	// var files []utils.FTextFilesFileInfo
+
+	// handler := func(file utils.CompleteFileInfo) {
+	// 	files = append(files, utils.FTextFilesFileInfo{
+	// 		Name: file.Name,
+	// 		Path: file.Name,
+	// 	})
+	// }
+
+	// for _, node := range uniqueFileSystemNodes {
+	// 	if err :=
+	// 		utils.WalkFilterAndHandleFileInfo(node, utils.NonZeroByteFiles, utils.TextFiles, handler); err != nil {
+	// 		return "", err
+	// 	}
+	// }
+
+	//
 	var filePaths []string
 
 	for _, node := range uniqueFileSystemNodes {
