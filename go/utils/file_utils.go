@@ -46,8 +46,8 @@ func (info FDuplicateFilesFileInfo) GetPath() string {
 }
 
 type FTextFilesFileInfo struct {
-	Name string
-	Path string
+	Name         string
+	AbsolutePath string
 }
 
 // CompleteFileInfo implements FileInfo
@@ -157,18 +157,6 @@ func resolveDirectoryPath(filePath string, isDirectory bool) string {
 	}
 
 	return directoryPath
-}
-
-func ToFileSystemFile(filePath string) (FileSystemFile, error) {
-	info, err := os.Stat(filePath)
-	if err != nil {
-		return FileSystemFile{}, err
-	}
-
-	isDirectory := info.IsDir()
-
-	return CreateFileSystemFile("",
-		CreateFileMetadata(info.Name(), resolveDirectoryPath(filePath, isDirectory), filePath, "", info.ModTime(), info.Size(), isDirectory)), nil
 }
 
 func FilterAndHandleFileInfo(
