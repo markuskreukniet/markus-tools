@@ -205,16 +205,21 @@ func FilterAndHandleFileInfo(
 	return nil
 }
 
+func WalkFilterAndHandleFileInfoDirectory(
+	filePath string, mode fileFilterMode, fileType fileType, handler func(CompleteFileInfo)) error {
+	return filepath.Walk(filePath, func(absoluteFilePath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		return FilterAndHandleFileInfo(info, mode, fileType, absoluteFilePath, handler)
+	})
+}
+
 func WalkFilterAndHandleFileInfo(
 	node FileSystemNode, mode fileFilterMode, fileType fileType, handler func(CompleteFileInfo),
 ) error {
 	if node.IsDirectory {
-		return filepath.Walk(node.Path, func(absoluteFilePath string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			return FilterAndHandleFileInfo(info, mode, fileType, absoluteFilePath, handler)
-		})
+		return WalkFilterAndHandleFileInfoDirectory(node.Path, mode, fileType, handler)
 	} else {
 		info, err := os.Stat(node.Path)
 		if err != nil {
