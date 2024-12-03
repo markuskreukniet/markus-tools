@@ -25,15 +25,14 @@ func joinOutputBasePathWithRelativeInputPath(inputBasePath, inputFullPath, outpu
 	return filepath.Join(outputBasePath, relativePath), nil
 }
 
-func getFilePathModificationTimeMapFromDirectoryTree(rootFilePath string) (map[string]time.Time, error) {
+func getFilePathModificationTimeMapFromDirectoryTree(directoryPath string) (map[string]time.Time, error) {
 	filePathModificationTimeMap := make(map[string]time.Time)
 
-	handler := func(file utils.FileSystemFile) error {
-		filePathModificationTimeMap[file.FileMetadata.Path] = file.FileMetadata.TimeModified
-		return nil
+	handler := func(file utils.CompleteFileInfo) {
+		filePathModificationTimeMap[file.AbsolutePath] = file.TimeModified
 	}
 
-	err := utils.WalkFilterAndHandleFileSystemFile(rootFilePath, utils.FilesAndDirectories, utils.AllFiles, handler)
+	err := utils.WalkFilterAndHandleFileInfoDirectory(directoryPath, utils.FilesAndDirectories, utils.AllFiles, handler)
 	return filePathModificationTimeMap, err
 }
 
@@ -62,7 +61,7 @@ func synchronizeDirectoryTrees(sourceDirectory, destinationDirectory string) err
 	if err != nil {
 		return err
 	}
-	// TODO: should use WalkFilterAndHandleFileSystemFile?
+
 	if err = filepath.Walk(sourceDirectory, func(sourceFilePath string, fileInfo os.FileInfo, err error) error {
 		if err != nil {
 			return err
