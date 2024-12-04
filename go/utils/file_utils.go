@@ -59,16 +59,6 @@ type CompleteFileInfo struct {
 	IsDirectory           bool
 }
 
-type CompleteFileInfoCalculated struct {
-	FileInfo CompleteFileInfo // TODO: Info is better naming?
-	Hash     string
-}
-
-type CompleteFileData struct {
-	Content            string
-	FileInfoCalculated CompleteFileInfoCalculated
-}
-
 type FileSystemFile struct {
 	Data         string
 	FileMetadata FileMetadata
@@ -228,51 +218,6 @@ func WalkFilterAndHandleFileInfo(
 		}
 		return FilterAndHandleFileInfo(info, mode, fileType, node.Path, handler)
 	}
-}
-
-func WalkFilterAndHandleFileSystemFile(rootFilePath string, mode fileFilterMode, fileType fileType, handler func(FileSystemFile) error) error {
-	return filepath.Walk(rootFilePath, func(filePath string, fileInfo os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-
-		isDir := fileInfo.IsDir()
-
-		var size int64
-		if !isDir {
-			size = fileInfo.Size()
-		}
-
-		// is file check
-		if !isDir && mode == Directories {
-			return nil
-		}
-
-		// is directory check
-		if isDir && (mode == files || mode == NonZeroByteFiles) {
-			return nil
-		}
-
-		// is zero byte file check
-		if !isDir && size == 0 && (mode == NonZeroByteFiles || mode == NonZeroByteFilesAndDirectories) {
-			return nil
-		}
-
-		// is text file check
-		if fileType == TextFiles {
-			isTextFile, err := IsTextFile(filePath)
-			if err != nil || !isTextFile {
-				return err
-			}
-		}
-
-		if err := handler(CreateFileSystemFile("",
-			CreateFileMetadata(fileInfo.Name(), resolveDirectoryPath(filePath, isDir), filePath, "", fileInfo.ModTime(), size, isDir))); err != nil {
-			return err
-		}
-
-		return nil
-	})
 }
 
 func FileExists(filePath string) (bool, error) {
