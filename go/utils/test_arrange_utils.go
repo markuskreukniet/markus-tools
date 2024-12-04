@@ -11,12 +11,137 @@ import (
 	"unicode"
 )
 
+func createFileData(directoryPath, inputLine string) (FileData, error) {
+	fields := strings.Split(inputLine, ",")
+	directoryPath = filepath.Join(directoryPath, filepath.FromSlash(fields[0]))
+	content := fields[3]
+	name := fields[2]
+	filePath := filepath.Join(directoryPath, name)
+	isDirectory := name == ""
+
+	var timeModified time.Time
+	if fields[1] != "" {
+		var err error
+		timeModified, err = time.Parse(time.RFC3339, fields[1])
+		if err != nil {
+			return FileData{}, err
+		}
+	}
+
+	return FileData{
+		Content: content,
+		CompleteFileInfo: CompleteFileInfo{
+			Name:                  name,
+			AbsoluteDirectoryPath: directoryPath, // TODO: here it is not an absolute path
+			AbsolutePath:          filePath,
+			TimeModified:          timeModified,
+			Size:                  0, // TODO: convert content to size?
+			IsDirectory:           isDirectory,
+		},
+	}, nil
+}
+
+func tMustCreateFileData(t *testing.T, directoryPath, inputLine string) FileData {
+	result, err := createFileData(directoryPath, inputLine)
+	return TMust(t, result, err)
+}
+
+func createFilesDataWithEmptyDirectoryPath(t *testing.T, rawDelimitedSemicolonString string) []FileData {
+	return createFilesData(t, "", rawDelimitedSemicolonString)
+}
+
+func createFilesData(t *testing.T, directoryPath, rawDelimitedSemicolonString string) []FileData {
+	var files []FileData
+	var inputLine []rune
+	isCreatingInputLine := false
+	rawDelimitedSemicolonString = strings.TrimSpace(rawDelimitedSemicolonString)
+
+	for _, r := range rawDelimitedSemicolonString {
+		if isCreatingInputLine {
+			if r != ';' {
+				inputLine = append(inputLine, r)
+			} else {
+				files = append(files, tMustCreateFileData(t, directoryPath, string(inputLine)))
+				inputLine = nil
+				isCreatingInputLine = false
+			}
+		} else if !unicode.IsSpace(r) {
+			inputLine = append(inputLine, r)
+			isCreatingInputLine = true
+		}
+	}
+
+	return files
+}
+
+func WriteFilesBySingleInput(t *testing.T, input string) string {
+	if IsBlank(input) {
+		return ""
+	}
+
+	files := createFilesDataWithEmptyDirectoryPath(t, input)
+
+	if len(files) == 0 {
+		return ""
+	}
+
+	// TODO: order files first, or create set, or check if directory exists?
+	var previousDirectoryPath string
+	directoryPath := tMustCreateTemporaryDirectory(t)
+
+	for _, file := range files {
+		joinAbsolutePaths(directoryPath, &file)
+		if previousDirectoryPath != file.CompleteFileInfo.AbsoluteDirectoryPath {
+			tMustCreateDirectoryAll(t, file.CompleteFileInfo.AbsoluteDirectoryPath)
+			previousDirectoryPath = file.CompleteFileInfo.AbsoluteDirectoryPath
+		}
+		if !file.CompleteFileInfo.IsDirectory {
+			writeFileAndChangeFileTimes(t, file)
+		}
+	}
+
+	return directoryPath
+}
+
+func tMustCreateTemporaryDirectory(t *testing.T) string {
+	result, err := os.MkdirTemp("", "markus-tools go test")
+	return TMust(t, result, err)
+}
+
+func joinAbsolutePaths(directoryPath string, file *FileData) {
+	file.CompleteFileInfo.AbsoluteDirectoryPath =
+		filepath.Join(directoryPath, file.CompleteFileInfo.AbsoluteDirectoryPath)
+	file.CompleteFileInfo.AbsolutePath = filepath.Join(directoryPath, file.CompleteFileInfo.AbsolutePath)
+}
+
+// TODO: should receive FileData?
+func tMustWriteFile(t *testing.T, filePath string, content string) {
+	TMustErr(t, os.WriteFile(filePath, []byte(content), 0666))
+}
+
+func tMustCreateDirectoryAll(t *testing.T, filePath string) {
+	TMustErr(t, os.MkdirAll(filePath, 0755))
+}
+
+func changeFileTimes(file FileData) error {
+	return os.Chtimes(file.CompleteFileInfo.AbsolutePath, time.Now(), file.CompleteFileInfo.TimeModified)
+}
+
+func tMustChangeFileTimes(t *testing.T, file FileData) {
+	TMustErr(t, changeFileTimes(file))
+}
+
+func writeFileAndChangeFileTimes(t *testing.T, file FileData) {
+	tMustWriteFile(t, file.CompleteFileInfo.AbsolutePath, file.Content)
+	tMustChangeFileTimes(t, file)
+}
+
+// old
 func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine string) FileSystemFile {
 	t.Helper()
 
 	fields := strings.Split(inputLine, ",")
-
-	directoryPath = ToFilePathFromSlashAndJoin(directoryPath, fields[0])
+	directoryPath = filepath.Join(directoryPath, filepath.FromSlash(fields[0]))
 	data := fields[3]
 	name := fields[2]
 	filePath := filepath.Join(directoryPath, name)
@@ -24,12 +149,17 @@ func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine stri
 
 	var timeModified time.Time
 	if fields[1] != "" {
-		timeModified = TestingParseTime(t, fields[1])
+		var err error
+		timeModified, err = time.Parse(time.RFC3339, fields[1])
+		if err != nil {
+			t.Errorf("Failed to parse time: %v", err)
+		}
 	}
 
 	return CreateFileSystemFile(data, CreateFileMetadata(name, directoryPath, filePath, "", timeModified, 0, isDirectory))
 }
 
+// old
 func CreateSortedFileSystemFiles(t *testing.T, directoryPath, rawDelimitedSemicolonString string) []FileSystemFile {
 	t.Helper()
 
@@ -102,49 +232,17 @@ func CreateTestCaseBasic(name, input, wantedOutcome string, wantErr bool) TestCa
 	}
 }
 
-// TODO: wrong naming
-func TestingWriteFileWithContentAndIndex(t *testing.T, filePath string, index int) string {
-	t.Helper()
+func WriteFileWithContentAndIndex(t *testing.T, filePath string, index int) string {
 	writtenContent := fmt.Sprintf("content %d", index)
-	TestingWriteFile(t, filePath, writtenContent)
+	tMustWriteFile(t, filePath, writtenContent)
 	return writtenContent
-}
-
-// TODO: should only receive t and file?
-func TestingWriteFile(t *testing.T, filePath string, content string) {
-	t.Helper()
-	if err := os.WriteFile(filePath, []byte(content), 0666); err != nil {
-		t.Errorf("Failed to write file content: %v", err)
-	}
-}
-
-// TODO: is it an arrange function?
-// TODO: wrong naming, testing forgotten
-func ToFilePathFromSlashAndJoin(filePath, filePathEndPart string) string {
-	return filepath.Join(filePath, filepath.FromSlash(filePathEndPart))
-}
-
-func TestingCreateDirectoryAll(t *testing.T, filePath string) {
-	t.Helper()
-	if err := os.MkdirAll(filePath, 0755); err != nil {
-		t.Errorf("Failed to create a directory in the temporary directory: %v", err)
-	}
-}
-
-func TestingParseTime(t *testing.T, timeString string) time.Time {
-	t.Helper()
-	parsedTime, err := time.Parse(time.RFC3339, timeString)
-	if err != nil {
-		t.Errorf("Failed to parse time: %v", err)
-	}
-	return parsedTime
 }
 
 func testingIfFileWriteItAndAppendFileSystemNode(t *testing.T, file FileSystemFile, nodes *[]FileSystemNode) {
 	t.Helper()
 
 	if !file.FileMetadata.IsDirectory {
-		TestingWriteFile(t, file.FileMetadata.Path, file.Data)
+		tMustWriteFile(t, file.FileMetadata.Path, file.Data)
 		if !file.FileMetadata.TimeModified.IsZero() {
 			if err := os.Chtimes(file.FileMetadata.Path, time.Now(), file.FileMetadata.TimeModified); err != nil {
 				t.Errorf("Failed to change the access and modification times of the file: %v", err)
@@ -156,19 +254,6 @@ func testingIfFileWriteItAndAppendFileSystemNode(t *testing.T, file FileSystemFi
 		Path:        file.FileMetadata.Path,
 		IsDirectory: file.FileMetadata.IsDirectory,
 	})
-}
-
-func isInputEmpty(input string) bool {
-	return input == ""
-}
-
-func CreateTemporaryDirectory(t *testing.T) string {
-	t.Helper()
-	temporaryDirectory, err := os.MkdirTemp("", "markus-tools go test")
-	if err != nil {
-		t.Errorf("Failed to create a temporary directory: %v", err)
-	}
-	return temporaryDirectory
 }
 
 func toRootDirectoryPath(filePath string) string {
@@ -188,7 +273,7 @@ func toRootDirectoryPath(filePath string) string {
 func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []FileSystemNode) {
 	t.Helper()
 
-	if isInputEmpty(input) {
+	if IsBlank(input) {
 		return nil, nil
 	}
 
@@ -219,13 +304,13 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 	var previousDirectoryPath string
 
 	for _, group := range fileGroups {
-		directory := CreateTemporaryDirectory(t)
+		directory := tMustCreateTemporaryDirectory(t)
 		temporaryDirectories = append(temporaryDirectories, directory)
 		for i, file := range group {
 			file.FileMetadata.DirectoryPath = filepath.Join(directory, file.FileMetadata.DirectoryPath)
 			file.FileMetadata.Path = filepath.Join(directory, file.FileMetadata.Path)
 			if i == 0 || file.FileMetadata.DirectoryPath != previousDirectoryPath {
-				TestingCreateDirectoryAll(t, file.FileMetadata.DirectoryPath)
+				tMustCreateDirectoryAll(t, file.FileMetadata.DirectoryPath)
 			}
 			previousDirectoryPath = file.FileMetadata.DirectoryPath
 			testingIfFileWriteItAndAppendFileSystemNode(t, file, &fileSystemNodes)
@@ -241,18 +326,18 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 func TestingWriteFilesByOneInput(t *testing.T, input string) (string, []FileSystemNode) {
 	t.Helper()
 
-	if isInputEmpty(input) {
+	if IsBlank(input) {
 		return "", nil
 	}
 
 	var nodes []FileSystemNode
 	var previousDirectoryPath string
-	directory := CreateTemporaryDirectory(t)
+	directory := tMustCreateTemporaryDirectory(t)
 	files := CreateSortedFileSystemFiles(t, directory, input)
 
 	for i := range files {
 		if previousDirectoryPath != files[i].FileMetadata.DirectoryPath {
-			TestingCreateDirectoryAll(t, files[i].FileMetadata.DirectoryPath)
+			tMustCreateDirectoryAll(t, files[i].FileMetadata.DirectoryPath)
 			previousDirectoryPath = files[i].FileMetadata.DirectoryPath
 		}
 		testingIfFileWriteItAndAppendFileSystemNode(t, files[i], &nodes)

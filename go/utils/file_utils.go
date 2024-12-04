@@ -59,6 +59,11 @@ type CompleteFileInfo struct {
 	IsDirectory           bool
 }
 
+type FileData struct {
+	Content          string
+	CompleteFileInfo CompleteFileInfo
+}
+
 type FileSystemFile struct {
 	Data         string
 	FileMetadata FileMetadata
@@ -126,7 +131,8 @@ func IsTextFile(filePath string) (bool, error) {
 	}
 	defer file.Close()
 
-	// Read the first 512 or less to check for non-text characters. DetectContentType of package 'net/http' works with a similar check.
+	// Read the first 512 or less to check for non-text characters.
+	// DetectContentType of package 'net/http' works with a similar check.
 	bytes := make([]byte, 512)
 	numberOfBytesRead, err := file.Read(bytes)
 	if err != nil && err != io.EOF {

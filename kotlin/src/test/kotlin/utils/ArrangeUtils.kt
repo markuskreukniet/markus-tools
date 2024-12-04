@@ -13,7 +13,6 @@ fun createFileData(directoryPath: String, inputLine: String): Result<FileData> =
   val content = fields[3]
   val name = fields[2]
   val filePath = joinedDirectoryPath.resolve(name)
-  val isDirectory = name == ""
   val timeModified = if (fields[1] != "") FileTime.from(Instant.parse(fields[1])) else null
 
   FileData(
@@ -23,18 +22,18 @@ fun createFileData(directoryPath: String, inputLine: String): Result<FileData> =
       absoluteDirectoryPath = joinedDirectoryPath,
       absolutePath = filePath,
       timeModified = timeModified,
-      size = 0L,
+      size = 0L // TODO: convert content to size?
     )
   )
 }
 
-fun createFileSystemFiles(
+fun createFilesData(
   rawDelimitedSemicolonString: String
 ): Result<MutableList<FileData>> = runCatching {
-  createFileSystemFiles("", rawDelimitedSemicolonString).getOrThrow()
+  createFilesData("", rawDelimitedSemicolonString).getOrThrow()
 }
 
-fun createFileSystemFiles(
+fun createFilesData(
   directoryPath: String, rawDelimitedSemicolonString: String
 ): Result<MutableList<FileData>> = runCatching {
   val files = mutableListOf<FileData>()
@@ -47,8 +46,7 @@ fun createFileSystemFiles(
       if (char != ';') {
         inputLine.add(char)
       } else {
-        val file = createFileData(directoryPath, inputLine.joinToString("")).getOrThrow()
-        files.add(file)
+        files.add(createFileData(directoryPath, inputLine.joinToString("")).getOrThrow())
         inputLine.clear()
         isCreatingInputLine = false
       }
@@ -91,7 +89,7 @@ fun writeFilesBySingleInput(input: String): Result<Path?> = runCatching {
     return@runCatching null
   }
 
-  val files = createFileSystemFiles(input).getOrThrow()
+  val files = createFilesData(input).getOrThrow()
 
   if (files.isEmpty()) {
     return@runCatching null
@@ -112,7 +110,7 @@ fun writeFilesByMultipleInputs(input: String): Result<Pair<MutableList<Path>?, M
     return@runCatching Pair(null, null)
   }
 
-  val files = createFileSystemFiles(input).getOrThrow()
+  val files = createFilesData(input).getOrThrow()
 
   if (files.isEmpty()) {
     return@runCatching Pair(null, null)
