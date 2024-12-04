@@ -60,9 +60,15 @@ type CompleteFileInfo struct {
 }
 
 type CompleteFileInfoCalculated struct {
-	CompleteFileInfo CompleteFileInfo
-	Hash             string
+	FileInfo CompleteFileInfo // TODO: Info is better naming?
+	Hash     string
 }
+
+type CompleteFileData struct {
+	Content            string
+	FileInfoCalculated CompleteFileInfoCalculated
+}
+
 type FileSystemFile struct {
 	Data         string
 	FileMetadata FileMetadata

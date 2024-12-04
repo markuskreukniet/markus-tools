@@ -9,11 +9,6 @@ import kotlin.io.path.getLastModifiedTime
 
 // The F prefix of a class name means feature.
 
-data class FileData(
-  val content: String,
-  val completeFileInfo: CompleteFileInfo
-)
-
 interface DuplicateFileInfo {
   val file: File
   val size: Long
@@ -43,6 +38,13 @@ data class CompleteFileInfo(
   var absolutePath: Path,
   var absoluteDirectoryPath: Path,
   val timeModified: FileTime?,
+)
+
+// TODO: same as GO? CompleteFileInfoCalculated and CompleteFileData?
+
+data class FileData(
+  val content: String,
+  val completeFileInfo: CompleteFileInfo
 )
 
 enum class FileFilterMode {
