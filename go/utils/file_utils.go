@@ -126,7 +126,8 @@ func IsTextFile(filePath string) (bool, error) {
 	}
 	defer file.Close()
 
-	// Read the first 512 or less to check for non-text characters. DetectContentType of package 'net/http' works with a similar check.
+	// Read the first 512 or less to check for non-text characters.
+	// DetectContentType of package 'net/http' works with a similar check.
 	bytes := make([]byte, 512)
 	numberOfBytesRead, err := file.Read(bytes)
 	if err != nil && err != io.EOF {
