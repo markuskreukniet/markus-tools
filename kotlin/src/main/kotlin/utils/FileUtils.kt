@@ -40,8 +40,6 @@ data class CompleteFileInfo(
   val timeModified: FileTime?,
 )
 
-// TODO: same as GO?
-
 data class FileData(
   val content: String,
   val completeFileInfo: CompleteFileInfo
