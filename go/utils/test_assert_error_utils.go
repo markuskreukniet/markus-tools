@@ -7,58 +7,58 @@ import (
 	"testing"
 )
 
-func appendFileSystemFiles(filePath string, files *[]FileSystemFile) error {
-	handler := func(file FileSystemFile) error {
-		if !file.FileMetadata.IsDirectory {
-			var err error
-			file.FileMetadata.Hash, err = CreateFileHash(file.FileMetadata.Path)
-			if err != nil {
-				return err
-			}
-		}
+func appendFiles(filePath string, files *[]CompleteFileInfo) error {
+	handler := func(file CompleteFileInfo) {
 		*files = append(*files, file)
-		return nil
 	}
 
-	if err := WalkFilterAndHandleFileSystemFile(filePath, NonZeroByteFilesAndDirectories, AllFiles, handler); err != nil {
-		return err
-	}
-
-	return nil
+	return WalkFilterAndHandleFileInfoDirectory(filePath, NonZeroByteFilesAndDirectories, AllFiles, handler)
 }
 
-func areFileSystemFilesExtraIdentical(fileI, fileJ FileSystemFile, filePathI, filePathJ string) (bool, error) {
-	// FileMetadata
+func areFilesIdentical(fileI, fileJ CompleteFileInfo, filePathI, filePathJ string) (bool, error) {
 	// TODO: compare TimeModified
-	if fileI.FileMetadata.IsDirectory != fileJ.FileMetadata.IsDirectory ||
-		fileI.FileMetadata.Name != fileJ.FileMetadata.Name ||
-		fileI.FileMetadata.Size != fileJ.FileMetadata.Size ||
-		fileI.FileMetadata.Hash != fileJ.FileMetadata.Hash {
+	if fileI.IsDirectory != fileJ.IsDirectory ||
+		fileI.Name != fileJ.Name ||
+		fileI.Size != fileJ.Size {
 		return false, nil
 	}
 
-	relativeI, err := filepath.Rel(filePathI, fileI.FileMetadata.Path)
+	relativeI, err := filepath.Rel(filePathI, fileI.AbsolutePath)
 	if err != nil {
 		return false, err
 	}
 
-	relativeJ, err := filepath.Rel(filePathJ, fileJ.FileMetadata.Path)
+	relativeJ, err := filepath.Rel(filePathJ, fileJ.AbsolutePath)
 	if err != nil {
 		return false, err
 	}
 
-	// FileSystemFile
-	if relativeI != relativeJ ||
-		fileI.Data != fileJ.Data {
+	if relativeI != relativeJ {
 		return false, nil
+	}
+
+	if !fileI.IsDirectory && !fileJ.IsDirectory {
+		hashI, err := CreateFileHash(fileI.AbsolutePath)
+		if err != nil {
+			return false, err
+		}
+
+		hashJ, err := CreateFileHash(fileJ.AbsolutePath)
+		if err != nil {
+			return false, err
+		}
+
+		if hashI != hashJ {
+			return false, nil
+		}
 	}
 
 	return true, nil
 }
 
-func sortFileSystemFilesExtraOnName(files *[]FileSystemFile) {
+func sortFilesOnName(files *[]CompleteFileInfo) {
 	sort.Slice(*files, func(i, j int) bool {
-		return (*files)[i].FileMetadata.Name < (*files)[j].FileMetadata.Name
+		return (*files)[i].Name < (*files)[j].Name
 	})
 }
 
@@ -67,12 +67,12 @@ func AreFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) 
 		return false, nil
 	}
 
-	var filesI, filesJ []FileSystemFile
+	var filesI, filesJ []CompleteFileInfo
 
-	if err := appendFileSystemFiles(filePathI, &filesI); err != nil {
+	if err := appendFiles(filePathI, &filesI); err != nil {
 		return false, err
 	}
-	if err := appendFileSystemFiles(filePathJ, &filesJ); err != nil {
+	if err := appendFiles(filePathJ, &filesJ); err != nil {
 		return false, err
 	}
 
@@ -82,14 +82,14 @@ func AreFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) 
 		return false, nil
 	}
 
-	filesI[0].FileMetadata.Name = ""
-	filesJ[0].FileMetadata.Name = ""
+	filesI[0].Name = ""
+	filesJ[0].Name = ""
 
-	sortFileSystemFilesExtraOnName(&filesI)
-	sortFileSystemFilesExtraOnName(&filesJ)
+	sortFilesOnName(&filesI)
+	sortFilesOnName(&filesJ)
 
 	for i := 1; i < length; i++ {
-		areIdentical, err := areFileSystemFilesExtraIdentical(filesI[i], filesJ[i], filePathI, filePathJ)
+		areIdentical, err := areFilesIdentical(filesI[i], filesJ[i], filePathI, filePathJ)
 		if err != nil {
 			return false, err
 		}
