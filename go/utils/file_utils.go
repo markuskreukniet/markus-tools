@@ -50,7 +50,6 @@ type FTextFilesFileInfo struct {
 	AbsolutePath string
 }
 
-// CompleteFileInfo implements FileInfo
 type CompleteFileInfo struct {
 	Name                  string
 	AbsoluteDirectoryPath string
@@ -60,14 +59,10 @@ type CompleteFileInfo struct {
 	IsDirectory           bool
 }
 
-func (info CompleteFileInfo) GetSize() int64 {
-	return info.Size
+type CompleteFileInfoCalculated struct {
+	CompleteFileInfo CompleteFileInfo
+	Hash             string
 }
-
-func (info CompleteFileInfo) GetPath() string {
-	return info.AbsolutePath
-}
-
 type FileSystemFile struct {
 	Data         string
 	FileMetadata FileMetadata
