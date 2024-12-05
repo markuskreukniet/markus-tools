@@ -11,12 +11,42 @@ import (
 	"unicode"
 )
 
+// fun createFileData(directoryPath: String, inputLine: String): Result<FileData> = runCatching {
+// 	val fields = inputLine.split(",")
+// 	val joinedDirectoryPath = Paths.get(directoryPath, fields[0])
+// 	val content = fields[3]
+// 	val name = fields[2]
+// 	val filePath = joinedDirectoryPath.resolve(name)
+// 	val isDirectory = name == ""
+// 	val timeModified = if (fields[1] != "") FileTime.from(Instant.parse(fields[1])) else null
+
+// 	FileData(
+// 	  content = content,
+// 	  completeFileInfo = CompleteFileInfo(
+// 		file = filePath.toFile(), // The file is now unusable since the file path is not complete.
+// 		absoluteDirectoryPath = joinedDirectoryPath,
+// 		absolutePath = filePath,
+// 		timeModified = timeModified,
+// 		size = 0L,
+// 	  )
+// 	)
+//   }
+
+// func createFileData(t *testing.T, directoryPath, inputLine string) FileData {
+// 	t.Helper()
+
+// 	fields := strings.Split(inputLine, ",")
+
+// 	// return
+// }
+
+//
+
 func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine string) FileSystemFile {
 	t.Helper()
 
 	fields := strings.Split(inputLine, ",")
-
-	directoryPath = ToFilePathFromSlashAndJoin(directoryPath, fields[0])
+	directoryPath = filepath.Join(directoryPath, filepath.FromSlash(fields[0]))
 	data := fields[3]
 	name := fields[2]
 	filePath := filepath.Join(directoryPath, name)
@@ -116,12 +146,6 @@ func TestingWriteFile(t *testing.T, filePath string, content string) {
 	if err := os.WriteFile(filePath, []byte(content), 0666); err != nil {
 		t.Errorf("Failed to write file content: %v", err)
 	}
-}
-
-// TODO: is it an arrange function?
-// TODO: wrong naming, testing forgotten
-func ToFilePathFromSlashAndJoin(filePath, filePathEndPart string) string {
-	return filepath.Join(filePath, filepath.FromSlash(filePathEndPart))
 }
 
 func TestingCreateDirectoryAll(t *testing.T, filePath string) {
