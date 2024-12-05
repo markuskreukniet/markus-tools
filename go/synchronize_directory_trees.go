@@ -37,7 +37,8 @@ func getFilePathModificationTimeMapFromDirectoryTree(directoryPath string) (map[
 }
 
 // Copying files in this function could be faster with buffering.
-// However, to determine an optimal buffer size for copying a file, we need to know the block size of the storage device.
+// However, to determine an optimal buffer size for copying a file,
+// we need to know the block size of the storage device.
 // Determining such block sizes is relatively hard with only official Go packages.
 func copyFileWithFileMode(sourceFilePath string, destinationFilePath string, fileMode fs.FileMode) error {
 	sourceFile, err := os.Open(sourceFilePath)
