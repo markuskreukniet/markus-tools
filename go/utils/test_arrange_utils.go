@@ -11,12 +11,69 @@ import (
 	"unicode"
 )
 
+// fun createFileData(directoryPath: String, inputLine: String): Result<FileData> = runCatching {
+// 	val fields = inputLine.split(",")
+// 	val joinedDirectoryPath = Paths.get(directoryPath, fields[0])
+// 	val content = fields[3]
+// 	val name = fields[2]
+// 	val filePath = joinedDirectoryPath.resolve(name)
+// 	val isDirectory = name == ""
+// 	val timeModified = if (fields[1] != "") FileTime.from(Instant.parse(fields[1])) else null
+
+// 	FileData(
+// 	  content = content,
+// 	  completeFileInfo = CompleteFileInfo(
+// 		file = filePath.toFile(), // The file is now unusable since the file path is not complete.
+// 		absoluteDirectoryPath = joinedDirectoryPath,
+// 		absolutePath = filePath,
+// 		timeModified = timeModified,
+// 		size = 0L,
+// 	  )
+// 	)
+//   }
+
+func createFileData(directoryPath, inputLine string) (FileData, error) {
+	fields := strings.Split(inputLine, ",")
+	directoryPath = filepath.Join(directoryPath, filepath.FromSlash(fields[0]))
+	content := fields[3]
+	name := fields[2]
+	filePath := filepath.Join(directoryPath, name)
+	isDirectory := name == ""
+
+	var timeModified time.Time
+	if fields[1] != "" {
+		var err error
+		timeModified, err = time.Parse(time.RFC3339, fields[1])
+		if err != nil {
+			return FileData{}, err
+		}
+	}
+
+	return FileData{
+		Content: content,
+		CompleteFileInfo: CompleteFileInfo{
+			Name:                  name,
+			AbsoluteDirectoryPath: directoryPath,
+			AbsolutePath:          filePath,
+			TimeModified:          timeModified,
+			Size:                  0, // TODO: convert content to size?
+			IsDirectory:           isDirectory,
+		},
+	}, nil
+}
+
+// TODO: use must patter in Kotlin?
+
+func tMustCreateFileData(t *testing.T, directoryPath, inputLine string) FileData {
+	fileData, err := createFileData(directoryPath, inputLine)
+	return TMust(t, fileData, err)
+}
+
 func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine string) FileSystemFile {
 	t.Helper()
 
 	fields := strings.Split(inputLine, ",")
-
-	directoryPath = ToFilePathFromSlashAndJoin(directoryPath, fields[0])
+	directoryPath = filepath.Join(directoryPath, filepath.FromSlash(fields[0]))
 	data := fields[3]
 	name := fields[2]
 	filePath := filepath.Join(directoryPath, name)
@@ -24,7 +81,11 @@ func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine stri
 
 	var timeModified time.Time
 	if fields[1] != "" {
-		timeModified = TestingParseTime(t, fields[1])
+		var err error
+		timeModified, err = time.Parse(time.RFC3339, fields[1])
+		if err != nil {
+			t.Errorf("Failed to parse time: %v", err)
+		}
 	}
 
 	return CreateFileSystemFile(data, CreateFileMetadata(name, directoryPath, filePath, "", timeModified, 0, isDirectory))
@@ -118,26 +179,11 @@ func TestingWriteFile(t *testing.T, filePath string, content string) {
 	}
 }
 
-// TODO: is it an arrange function?
-// TODO: wrong naming, testing forgotten
-func ToFilePathFromSlashAndJoin(filePath, filePathEndPart string) string {
-	return filepath.Join(filePath, filepath.FromSlash(filePathEndPart))
-}
-
 func TestingCreateDirectoryAll(t *testing.T, filePath string) {
 	t.Helper()
 	if err := os.MkdirAll(filePath, 0755); err != nil {
 		t.Errorf("Failed to create a directory in the temporary directory: %v", err)
 	}
-}
-
-func TestingParseTime(t *testing.T, timeString string) time.Time {
-	t.Helper()
-	parsedTime, err := time.Parse(time.RFC3339, timeString)
-	if err != nil {
-		t.Errorf("Failed to parse time: %v", err)
-	}
-	return parsedTime
 }
 
 func testingIfFileWriteItAndAppendFileSystemNode(t *testing.T, file FileSystemFile, nodes *[]FileSystemNode) {
