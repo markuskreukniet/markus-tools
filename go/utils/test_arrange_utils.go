@@ -11,27 +11,6 @@ import (
 	"unicode"
 )
 
-// fun createFileData(directoryPath: String, inputLine: String): Result<FileData> = runCatching {
-// 	val fields = inputLine.split(",")
-// 	val joinedDirectoryPath = Paths.get(directoryPath, fields[0])
-// 	val content = fields[3]
-// 	val name = fields[2]
-// 	val filePath = joinedDirectoryPath.resolve(name)
-// 	val isDirectory = name == ""
-// 	val timeModified = if (fields[1] != "") FileTime.from(Instant.parse(fields[1])) else null
-
-// 	FileData(
-// 	  content = content,
-// 	  completeFileInfo = CompleteFileInfo(
-// 		file = filePath.toFile(), // The file is now unusable since the file path is not complete.
-// 		absoluteDirectoryPath = joinedDirectoryPath,
-// 		absolutePath = filePath,
-// 		timeModified = timeModified,
-// 		size = 0L,
-// 	  )
-// 	)
-//   }
-
 func createFileData(directoryPath, inputLine string) (FileData, error) {
 	fields := strings.Split(inputLine, ",")
 	directoryPath = filepath.Join(directoryPath, filepath.FromSlash(fields[0]))
@@ -61,8 +40,6 @@ func createFileData(directoryPath, inputLine string) (FileData, error) {
 		},
 	}, nil
 }
-
-// TODO: use must patter in Kotlin?
 
 func tMustCreateFileData(t *testing.T, directoryPath, inputLine string) FileData {
 	fileData, err := createFileData(directoryPath, inputLine)

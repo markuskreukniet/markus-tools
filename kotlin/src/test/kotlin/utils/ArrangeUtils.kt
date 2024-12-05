@@ -13,7 +13,6 @@ fun createFileData(directoryPath: String, inputLine: String): Result<FileData> =
   val content = fields[3]
   val name = fields[2]
   val filePath = joinedDirectoryPath.resolve(name)
-  val isDirectory = name == ""
   val timeModified = if (fields[1] != "") FileTime.from(Instant.parse(fields[1])) else null
 
   FileData(
@@ -28,13 +27,13 @@ fun createFileData(directoryPath: String, inputLine: String): Result<FileData> =
   )
 }
 
-fun createFileSystemFiles(
+fun createFilesData(
   rawDelimitedSemicolonString: String
 ): Result<MutableList<FileData>> = runCatching {
-  createFileSystemFiles("", rawDelimitedSemicolonString).getOrThrow()
+  createFilesData("", rawDelimitedSemicolonString).getOrThrow()
 }
 
-fun createFileSystemFiles(
+fun createFilesData(
   directoryPath: String, rawDelimitedSemicolonString: String
 ): Result<MutableList<FileData>> = runCatching {
   val files = mutableListOf<FileData>()
@@ -91,7 +90,7 @@ fun writeFilesBySingleInput(input: String): Result<Path?> = runCatching {
     return@runCatching null
   }
 
-  val files = createFileSystemFiles(input).getOrThrow()
+  val files = createFilesData(input).getOrThrow()
 
   if (files.isEmpty()) {
     return@runCatching null
@@ -112,7 +111,7 @@ fun writeFilesByMultipleInputs(input: String): Result<Pair<MutableList<Path>?, M
     return@runCatching Pair(null, null)
   }
 
-  val files = createFileSystemFiles(input).getOrThrow()
+  val files = createFilesData(input).getOrThrow()
 
   if (files.isEmpty()) {
     return@runCatching Pair(null, null)
