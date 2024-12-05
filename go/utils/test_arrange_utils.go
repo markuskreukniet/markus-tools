@@ -32,10 +32,15 @@ import (
 // 	)
 //   }
 
-// func createFileData(t *testing.T, directoryPath, inputLine string) FileData {
+// func mustCreateFileData(t *testing.T, directoryPath, inputLine string) FileData {
 // 	t.Helper()
 
 // 	fields := strings.Split(inputLine, ",")
+// 	directoryPath = filepath.Join(directoryPath, filepath.FromSlash(fields[0]))
+// 	data := fields[3]
+// 	name := fields[2]
+// 	filePath := filepath.Join(directoryPath, name)
+// 	isDirectory := name == ""
 
 // 	// return
 // }
@@ -54,7 +59,11 @@ func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine stri
 
 	var timeModified time.Time
 	if fields[1] != "" {
-		timeModified = TestingParseTime(t, fields[1])
+		var err error
+		timeModified, err = time.Parse(time.RFC3339, fields[1])
+		if err != nil {
+			t.Errorf("Failed to parse time: %v", err)
+		}
 	}
 
 	return CreateFileSystemFile(data, CreateFileMetadata(name, directoryPath, filePath, "", timeModified, 0, isDirectory))
@@ -153,15 +162,6 @@ func TestingCreateDirectoryAll(t *testing.T, filePath string) {
 	if err := os.MkdirAll(filePath, 0755); err != nil {
 		t.Errorf("Failed to create a directory in the temporary directory: %v", err)
 	}
-}
-
-func TestingParseTime(t *testing.T, timeString string) time.Time {
-	t.Helper()
-	parsedTime, err := time.Parse(time.RFC3339, timeString)
-	if err != nil {
-		t.Errorf("Failed to parse time: %v", err)
-	}
-	return parsedTime
 }
 
 func testingIfFileWriteItAndAppendFileSystemNode(t *testing.T, file FileSystemFile, nodes *[]FileSystemNode) {
