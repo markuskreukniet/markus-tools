@@ -59,6 +59,11 @@ type CompleteFileInfo struct {
 	IsDirectory           bool
 }
 
+type FileData struct {
+	Content          string
+	CompleteFileInfo CompleteFileInfo
+}
+
 type FileSystemFile struct {
 	Data         string
 	FileMetadata FileMetadata
