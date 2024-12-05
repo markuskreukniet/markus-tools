@@ -23,7 +23,7 @@ fun createFileData(directoryPath: String, inputLine: String): Result<FileData> =
       absoluteDirectoryPath = joinedDirectoryPath,
       absolutePath = filePath,
       timeModified = timeModified,
-      size = 0L,
+      size = 0L // TODO: convert content to size?
     )
   )
 }
