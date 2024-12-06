@@ -100,3 +100,7 @@ func CreateFileHash(filePath string) (string, error) {
 	}
 	return hex.EncodeToString(hashGenerator.Sum(nil)), nil
 }
+
+func IsBlank(s string) bool {
+	return s == ""
+}

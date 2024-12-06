@@ -15,6 +15,14 @@ func TMust[T any](t *testing.T, v T, err error) T {
 	return v
 }
 
+func TMustErr(t *testing.T, err error) {
+	t.Helper()
+
+	if err != nil {
+		t.Fatalf("error: %v", err)
+	}
+}
+
 func TestingWriteString(t *testing.T, stringToWrite string, builder *strings.Builder) {
 	t.Helper()
 	if _, err := builder.WriteString(stringToWrite); err != nil {

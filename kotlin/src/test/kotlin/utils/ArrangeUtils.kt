@@ -46,8 +46,7 @@ fun createFilesData(
       if (char != ';') {
         inputLine.add(char)
       } else {
-        val file = createFileData(directoryPath, inputLine.joinToString("")).getOrThrow()
-        files.add(file)
+        files.add(createFileData(directoryPath, inputLine.joinToString("")).getOrThrow())
         inputLine.clear()
         isCreatingInputLine = false
       }
