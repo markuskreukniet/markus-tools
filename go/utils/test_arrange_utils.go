@@ -42,10 +42,74 @@ func createFileData(directoryPath, inputLine string) (FileData, error) {
 }
 
 func tMustCreateFileData(t *testing.T, directoryPath, inputLine string) FileData {
-	fileData, err := createFileData(directoryPath, inputLine)
-	return TMust(t, fileData, err)
+	result, err := createFileData(directoryPath, inputLine)
+	return TMust(t, result, err)
 }
 
+func createFilesDataWithEmptyDirectoryPath(t *testing.T, rawDelimitedSemicolonString string) []FileData {
+	return createFilesData(t, "", rawDelimitedSemicolonString)
+}
+
+func createFilesData(t *testing.T, directoryPath, rawDelimitedSemicolonString string) []FileData {
+	var files []FileData
+	var inputLine []rune
+	isCreatingInputLine := false
+	rawDelimitedSemicolonString = strings.TrimSpace(rawDelimitedSemicolonString)
+
+	for _, r := range rawDelimitedSemicolonString {
+		if isCreatingInputLine {
+			if r != ';' {
+				inputLine = append(inputLine, r)
+			} else {
+				files = append(files, tMustCreateFileData(t, directoryPath, string(inputLine)))
+				inputLine = nil
+				isCreatingInputLine = false
+			}
+		} else if !unicode.IsSpace(r) {
+			inputLine = append(inputLine, r)
+			isCreatingInputLine = true
+		}
+	}
+
+	return files
+}
+
+func writeFilesBySingleInput(t *testing.T, input string) string {
+	if IsBlank(input) {
+		return ""
+	}
+
+	files := createFilesDataWithEmptyDirectoryPath(t, input)
+
+	if len(files) == 0 {
+		return ""
+	}
+
+	directoryPath := tMustCreateTemporaryDirectory(t)
+
+	for _, file := range files {
+		joinAbsolutePaths(directoryPath, &file)
+	}
+
+	return directoryPath
+}
+
+func tMustCreateTemporaryDirectory(t *testing.T) string {
+	result, err := os.MkdirTemp("", "markus-tools go test")
+	return TMust(t, result, err)
+}
+
+func joinAbsolutePaths(directoryPath string, file *FileData) {
+	file.CompleteFileInfo.AbsoluteDirectoryPath =
+		filepath.Join(directoryPath, file.CompleteFileInfo.AbsoluteDirectoryPath)
+	file.CompleteFileInfo.AbsolutePath = filepath.Join(directoryPath, file.CompleteFileInfo.AbsolutePath)
+}
+
+func tMustWriteFile(t *testing.T, filePath string, content string) {
+	TMustErr(t, os.WriteFile(filePath, []byte(content), 0666))
+}
+
+// old
 func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine string) FileSystemFile {
 	t.Helper()
 
@@ -68,6 +132,7 @@ func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine stri
 	return CreateFileSystemFile(data, CreateFileMetadata(name, directoryPath, filePath, "", timeModified, 0, isDirectory))
 }
 
+// old
 func CreateSortedFileSystemFiles(t *testing.T, directoryPath, rawDelimitedSemicolonString string) []FileSystemFile {
 	t.Helper()
 
@@ -148,6 +213,7 @@ func TestingWriteFileWithContentAndIndex(t *testing.T, filePath string, index in
 	return writtenContent
 }
 
+// old
 // TODO: should only receive t and file?
 func TestingWriteFile(t *testing.T, filePath string, content string) {
 	t.Helper()
@@ -183,15 +249,6 @@ func testingIfFileWriteItAndAppendFileSystemNode(t *testing.T, file FileSystemFi
 
 func isInputEmpty(input string) bool {
 	return input == ""
-}
-
-func CreateTemporaryDirectory(t *testing.T) string {
-	t.Helper()
-	temporaryDirectory, err := os.MkdirTemp("", "markus-tools go test")
-	if err != nil {
-		t.Errorf("Failed to create a temporary directory: %v", err)
-	}
-	return temporaryDirectory
 }
 
 func toRootDirectoryPath(filePath string) string {
@@ -242,7 +299,7 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 	var previousDirectoryPath string
 
 	for _, group := range fileGroups {
-		directory := CreateTemporaryDirectory(t)
+		directory := tMustCreateTemporaryDirectory(t)
 		temporaryDirectories = append(temporaryDirectories, directory)
 		for i, file := range group {
 			file.FileMetadata.DirectoryPath = filepath.Join(directory, file.FileMetadata.DirectoryPath)
@@ -270,7 +327,7 @@ func TestingWriteFilesByOneInput(t *testing.T, input string) (string, []FileSyst
 
 	var nodes []FileSystemNode
 	var previousDirectoryPath string
-	directory := CreateTemporaryDirectory(t)
+	directory := tMustCreateTemporaryDirectory(t)
 	files := CreateSortedFileSystemFiles(t, directory, input)
 
 	for i := range files {
