@@ -42,12 +42,12 @@ func createFileData(directoryPath, inputLine string) (FileData, error) {
 }
 
 func tMustCreateFileData(t *testing.T, directoryPath, inputLine string) FileData {
-	fileData, err := createFileData(directoryPath, inputLine)
-	return TMust(t, fileData, err)
+	result, err := createFileData(directoryPath, inputLine)
+	return TMust(t, result, err)
 }
 
-func createFilesDataWithEmptyDirectoryPath(t *testing.T, rawDelimitedSemicolonString string) {
-	createFilesData(t, "", rawDelimitedSemicolonString)
+func createFilesDataWithEmptyDirectoryPath(t *testing.T, rawDelimitedSemicolonString string) []FileData {
+	return createFilesData(t, "", rawDelimitedSemicolonString)
 }
 
 func createFilesData(t *testing.T, directoryPath, rawDelimitedSemicolonString string) []FileData {
@@ -74,13 +74,23 @@ func createFilesData(t *testing.T, directoryPath, rawDelimitedSemicolonString st
 	return files
 }
 
-// func writeFilesBySingleInput(input string) string {
+// func writeFilesBySingleInput(t *testing.T, input string) string {
 // 	if IsBlank(input) {
 // 		return ""
 // 	}
+
+// 	files := createFilesDataWithEmptyDirectoryPath(t, input)
+
+// 	if len(files) == 0 {
+// 		return ""
+// 	}
+
 // }
 
-//
+func tMustCreateTemporaryDirectory(t *testing.T) string {
+	result, err := os.MkdirTemp("", "markus-tools go test")
+	return TMust(t, result, err)
+}
 
 // old
 func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine string) FileSystemFile {
@@ -223,15 +233,6 @@ func isInputEmpty(input string) bool {
 	return input == ""
 }
 
-func CreateTemporaryDirectory(t *testing.T) string {
-	t.Helper()
-	temporaryDirectory, err := os.MkdirTemp("", "markus-tools go test")
-	if err != nil {
-		t.Errorf("Failed to create a temporary directory: %v", err)
-	}
-	return temporaryDirectory
-}
-
 func toRootDirectoryPath(filePath string) string {
 	cleanPath := filepath.Clean(filePath)
 
@@ -280,7 +281,7 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 	var previousDirectoryPath string
 
 	for _, group := range fileGroups {
-		directory := CreateTemporaryDirectory(t)
+		directory := tMustCreateTemporaryDirectory(t)
 		temporaryDirectories = append(temporaryDirectories, directory)
 		for i, file := range group {
 			file.FileMetadata.DirectoryPath = filepath.Join(directory, file.FileMetadata.DirectoryPath)
@@ -308,7 +309,7 @@ func TestingWriteFilesByOneInput(t *testing.T, input string) (string, []FileSyst
 
 	var nodes []FileSystemNode
 	var previousDirectoryPath string
-	directory := CreateTemporaryDirectory(t)
+	directory := tMustCreateTemporaryDirectory(t)
 	files := CreateSortedFileSystemFiles(t, directory, input)
 
 	for i := range files {
