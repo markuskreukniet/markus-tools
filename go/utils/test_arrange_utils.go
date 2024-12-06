@@ -46,6 +46,43 @@ func tMustCreateFileData(t *testing.T, directoryPath, inputLine string) FileData
 	return TMust(t, fileData, err)
 }
 
+func createFilesDataWithEmptyDirectoryPath(t *testing.T, rawDelimitedSemicolonString string) {
+	createFilesData(t, "", rawDelimitedSemicolonString)
+}
+
+func createFilesData(t *testing.T, directoryPath, rawDelimitedSemicolonString string) []FileData {
+	var files []FileData
+	var inputLine []rune
+	isCreatingInputLine := false
+	rawDelimitedSemicolonString = strings.TrimSpace(rawDelimitedSemicolonString)
+
+	for _, r := range rawDelimitedSemicolonString {
+		if isCreatingInputLine {
+			if r != ';' {
+				inputLine = append(inputLine, r)
+			} else {
+				files = append(files, tMustCreateFileData(t, directoryPath, string(inputLine)))
+				inputLine = nil
+				isCreatingInputLine = false
+			}
+		} else if !unicode.IsSpace(r) {
+			inputLine = append(inputLine, r)
+			isCreatingInputLine = true
+		}
+	}
+
+	return files
+}
+
+// func writeFilesBySingleInput(input string) string {
+// 	if IsBlank(input) {
+// 		return ""
+// 	}
+// }
+
+//
+
+// old
 func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine string) FileSystemFile {
 	t.Helper()
 
@@ -68,6 +105,7 @@ func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine stri
 	return CreateFileSystemFile(data, CreateFileMetadata(name, directoryPath, filePath, "", timeModified, 0, isDirectory))
 }
 
+// old
 func CreateSortedFileSystemFiles(t *testing.T, directoryPath, rawDelimitedSemicolonString string) []FileSystemFile {
 	t.Helper()
 
