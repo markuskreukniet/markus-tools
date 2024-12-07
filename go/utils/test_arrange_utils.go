@@ -74,7 +74,7 @@ func createFilesData(t *testing.T, directoryPath, rawDelimitedSemicolonString st
 	return files
 }
 
-func writeFilesBySingleInput(t *testing.T, input string) string {
+func WriteFilesBySingleInput(t *testing.T, input string) string {
 	if IsBlank(input) {
 		return ""
 	}
@@ -89,6 +89,9 @@ func writeFilesBySingleInput(t *testing.T, input string) string {
 
 	for _, file := range files {
 		joinAbsolutePaths(directoryPath, &file)
+		if !file.CompleteFileInfo.IsDirectory {
+			tMustWriteFile(t, file.CompleteFileInfo.AbsolutePath, file.Content)
+		}
 	}
 
 	return directoryPath
@@ -105,8 +108,13 @@ func joinAbsolutePaths(directoryPath string, file *FileData) {
 	file.CompleteFileInfo.AbsolutePath = filepath.Join(directoryPath, file.CompleteFileInfo.AbsolutePath)
 }
 
+// TODO: should receive FileData?
 func tMustWriteFile(t *testing.T, filePath string, content string) {
 	TMustErr(t, os.WriteFile(filePath, []byte(content), 0666))
+}
+
+func tMustCreateDirectoryAll(t *testing.T, filePath string) {
+	TMustErr(t, os.MkdirAll(filePath, 0755))
 }
 
 // old
@@ -213,13 +221,6 @@ func TestingWriteFileWithContentAndIndex(t *testing.T, filePath string, index in
 	return writtenContent
 }
 
-func TestingCreateDirectoryAll(t *testing.T, filePath string) {
-	t.Helper()
-	if err := os.MkdirAll(filePath, 0755); err != nil {
-		t.Errorf("Failed to create a directory in the temporary directory: %v", err)
-	}
-}
-
 func testingIfFileWriteItAndAppendFileSystemNode(t *testing.T, file FileSystemFile, nodes *[]FileSystemNode) {
 	t.Helper()
 
@@ -236,10 +237,6 @@ func testingIfFileWriteItAndAppendFileSystemNode(t *testing.T, file FileSystemFi
 		Path:        file.FileMetadata.Path,
 		IsDirectory: file.FileMetadata.IsDirectory,
 	})
-}
-
-func isInputEmpty(input string) bool {
-	return input == ""
 }
 
 func toRootDirectoryPath(filePath string) string {
@@ -259,7 +256,7 @@ func toRootDirectoryPath(filePath string) string {
 func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []FileSystemNode) {
 	t.Helper()
 
-	if isInputEmpty(input) {
+	if IsBlank(input) {
 		return nil, nil
 	}
 
@@ -296,7 +293,7 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 			file.FileMetadata.DirectoryPath = filepath.Join(directory, file.FileMetadata.DirectoryPath)
 			file.FileMetadata.Path = filepath.Join(directory, file.FileMetadata.Path)
 			if i == 0 || file.FileMetadata.DirectoryPath != previousDirectoryPath {
-				TestingCreateDirectoryAll(t, file.FileMetadata.DirectoryPath)
+				tMustCreateDirectoryAll(t, file.FileMetadata.DirectoryPath)
 			}
 			previousDirectoryPath = file.FileMetadata.DirectoryPath
 			testingIfFileWriteItAndAppendFileSystemNode(t, file, &fileSystemNodes)
@@ -312,7 +309,7 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 func TestingWriteFilesByOneInput(t *testing.T, input string) (string, []FileSystemNode) {
 	t.Helper()
 
-	if isInputEmpty(input) {
+	if IsBlank(input) {
 		return "", nil
 	}
 
@@ -323,7 +320,7 @@ func TestingWriteFilesByOneInput(t *testing.T, input string) (string, []FileSyst
 
 	for i := range files {
 		if previousDirectoryPath != files[i].FileMetadata.DirectoryPath {
-			TestingCreateDirectoryAll(t, files[i].FileMetadata.DirectoryPath)
+			tMustCreateDirectoryAll(t, files[i].FileMetadata.DirectoryPath)
 			previousDirectoryPath = files[i].FileMetadata.DirectoryPath
 		}
 		testingIfFileWriteItAndAppendFileSystemNode(t, files[i], &nodes)
