@@ -74,22 +74,39 @@ func createFilesData(t *testing.T, directoryPath, rawDelimitedSemicolonString st
 	return files
 }
 
-// func writeFilesBySingleInput(t *testing.T, input string) string {
-// 	if IsBlank(input) {
-// 		return ""
-// 	}
+func writeFilesBySingleInput(t *testing.T, input string) string {
+	if IsBlank(input) {
+		return ""
+	}
 
-// 	files := createFilesDataWithEmptyDirectoryPath(t, input)
+	files := createFilesDataWithEmptyDirectoryPath(t, input)
 
-// 	if len(files) == 0 {
-// 		return ""
-// 	}
+	if len(files) == 0 {
+		return ""
+	}
 
-// }
+	directoryPath := tMustCreateTemporaryDirectory(t)
+
+	for _, file := range files {
+		joinAbsolutePaths(directoryPath, &file)
+	}
+
+	return directoryPath
+}
 
 func tMustCreateTemporaryDirectory(t *testing.T) string {
 	result, err := os.MkdirTemp("", "markus-tools go test")
 	return TMust(t, result, err)
+}
+
+func joinAbsolutePaths(directoryPath string, file *FileData) {
+	file.CompleteFileInfo.AbsoluteDirectoryPath =
+		filepath.Join(directoryPath, file.CompleteFileInfo.AbsoluteDirectoryPath)
+	file.CompleteFileInfo.AbsolutePath = filepath.Join(directoryPath, file.CompleteFileInfo.AbsolutePath)
+}
+
+func tMustWriteFile(t *testing.T, filePath string, content string) {
+	TMustErr(t, os.WriteFile(filePath, []byte(content), 0666))
 }
 
 // old
@@ -196,6 +213,7 @@ func TestingWriteFileWithContentAndIndex(t *testing.T, filePath string, index in
 	return writtenContent
 }
 
+// old
 // TODO: should only receive t and file?
 func TestingWriteFile(t *testing.T, filePath string, content string) {
 	t.Helper()
