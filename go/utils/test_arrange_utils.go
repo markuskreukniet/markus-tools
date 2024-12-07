@@ -32,7 +32,7 @@ func createFileData(directoryPath, inputLine string) (FileData, error) {
 		Content: content,
 		CompleteFileInfo: CompleteFileInfo{
 			Name:                  name,
-			AbsoluteDirectoryPath: directoryPath,
+			AbsoluteDirectoryPath: directoryPath, // TODO: here it is not an absolute path
 			AbsolutePath:          filePath,
 			TimeModified:          timeModified,
 			Size:                  0, // TODO: convert content to size?
@@ -85,10 +85,15 @@ func WriteFilesBySingleInput(t *testing.T, input string) string {
 		return ""
 	}
 
+	var previousDirectoryPath string
 	directoryPath := tMustCreateTemporaryDirectory(t)
 
 	for _, file := range files {
 		joinAbsolutePaths(directoryPath, &file)
+		if previousDirectoryPath != file.CompleteFileInfo.AbsoluteDirectoryPath {
+			tMustCreateDirectoryAll(t, file.CompleteFileInfo.AbsoluteDirectoryPath)
+			previousDirectoryPath = file.CompleteFileInfo.AbsoluteDirectoryPath
+		}
 		if !file.CompleteFileInfo.IsDirectory {
 			tMustWriteFile(t, file.CompleteFileInfo.AbsolutePath, file.Content)
 		}
@@ -213,9 +218,7 @@ func CreateTestCaseBasic(name, input, wantedOutcome string, wantErr bool) TestCa
 	}
 }
 
-// TODO: wrong naming
-func TestingWriteFileWithContentAndIndex(t *testing.T, filePath string, index int) string {
-	t.Helper()
+func WriteFileWithContentAndIndex(t *testing.T, filePath string, index int) string {
 	writtenContent := fmt.Sprintf("content %d", index)
 	tMustWriteFile(t, filePath, writtenContent)
 	return writtenContent
