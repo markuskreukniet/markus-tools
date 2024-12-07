@@ -209,17 +209,8 @@ func CreateTestCaseBasic(name, input, wantedOutcome string, wantErr bool) TestCa
 func TestingWriteFileWithContentAndIndex(t *testing.T, filePath string, index int) string {
 	t.Helper()
 	writtenContent := fmt.Sprintf("content %d", index)
-	TestingWriteFile(t, filePath, writtenContent)
+	tMustWriteFile(t, filePath, writtenContent)
 	return writtenContent
-}
-
-// old
-// TODO: should only receive t and file?
-func TestingWriteFile(t *testing.T, filePath string, content string) {
-	t.Helper()
-	if err := os.WriteFile(filePath, []byte(content), 0666); err != nil {
-		t.Errorf("Failed to write file content: %v", err)
-	}
 }
 
 func TestingCreateDirectoryAll(t *testing.T, filePath string) {
@@ -233,7 +224,7 @@ func testingIfFileWriteItAndAppendFileSystemNode(t *testing.T, file FileSystemFi
 	t.Helper()
 
 	if !file.FileMetadata.IsDirectory {
-		TestingWriteFile(t, file.FileMetadata.Path, file.Data)
+		tMustWriteFile(t, file.FileMetadata.Path, file.Data)
 		if !file.FileMetadata.TimeModified.IsZero() {
 			if err := os.Chtimes(file.FileMetadata.Path, time.Now(), file.FileMetadata.TimeModified); err != nil {
 				t.Errorf("Failed to change the access and modification times of the file: %v", err)
