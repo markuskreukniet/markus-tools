@@ -85,6 +85,7 @@ func WriteFilesBySingleInput(t *testing.T, input string) string {
 		return ""
 	}
 
+	// TODO: order files first, or create set, or check if directory exists?
 	var previousDirectoryPath string
 	directoryPath := tMustCreateTemporaryDirectory(t)
 
@@ -95,7 +96,7 @@ func WriteFilesBySingleInput(t *testing.T, input string) string {
 			previousDirectoryPath = file.CompleteFileInfo.AbsoluteDirectoryPath
 		}
 		if !file.CompleteFileInfo.IsDirectory {
-			tMustWriteFile(t, file.CompleteFileInfo.AbsolutePath, file.Content)
+			writeFileAndChangeFileTimes(t, file)
 		}
 	}
 
@@ -120,6 +121,19 @@ func tMustWriteFile(t *testing.T, filePath string, content string) {
 
 func tMustCreateDirectoryAll(t *testing.T, filePath string) {
 	TMustErr(t, os.MkdirAll(filePath, 0755))
+}
+
+func changeFileTimes(file FileData) error {
+	return os.Chtimes(file.CompleteFileInfo.AbsolutePath, time.Now(), file.CompleteFileInfo.TimeModified)
+}
+
+func tMustChangeFileTimes(t *testing.T, file FileData) {
+	TMustErr(t, changeFileTimes(file))
+}
+
+func writeFileAndChangeFileTimes(t *testing.T, file FileData) {
+	tMustWriteFile(t, file.CompleteFileInfo.AbsolutePath, file.Content)
+	tMustChangeFileTimes(t, file)
 }
 
 // old
