@@ -85,19 +85,16 @@ func WriteFilesBySingleInput(t *testing.T, input string) string {
 		return ""
 	}
 
-	// TODO: order files first, or create set, or check if directory exists?
-	var previousDirectoryPath string
-	directoryPath := tMustCreateTemporaryDirectory(t)
+	createdDirectoryPaths := make(map[string]struct{})
+	directoryPath := tMustCreateTemporaryDirectory(t) // TODO: should happen first so it can create FilesData with it?
 
 	for _, file := range files {
 		joinAbsolutePaths(directoryPath, &file)
-		if previousDirectoryPath != file.CompleteFileInfo.AbsoluteDirectoryPath {
+		if _, exists := createdDirectoryPaths[file.CompleteFileInfo.AbsoluteDirectoryPath]; !exists {
 			tMustCreateDirectoryAll(t, file.CompleteFileInfo.AbsoluteDirectoryPath)
-			previousDirectoryPath = file.CompleteFileInfo.AbsoluteDirectoryPath
+			createdDirectoryPaths[file.CompleteFileInfo.AbsoluteDirectoryPath] = struct{}{}
 		}
-		if !file.CompleteFileInfo.IsDirectory {
-			writeFileAndChangeFileTimes(t, file)
-		}
+		ifFileThenWriteAndChangeTimes(t, file)
 	}
 
 	return directoryPath
@@ -131,9 +128,11 @@ func tMustChangeFileTimes(t *testing.T, file FileData) {
 	TMustErr(t, changeFileTimes(file))
 }
 
-func writeFileAndChangeFileTimes(t *testing.T, file FileData) {
-	tMustWriteFile(t, file.CompleteFileInfo.AbsolutePath, file.Content)
-	tMustChangeFileTimes(t, file)
+func ifFileThenWriteAndChangeTimes(t *testing.T, file FileData) {
+	if !file.CompleteFileInfo.IsDirectory {
+		tMustWriteFile(t, file.CompleteFileInfo.AbsolutePath, file.Content)
+		tMustChangeFileTimes(t, file)
+	}
 }
 
 // old
@@ -318,30 +317,4 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 	}
 
 	return temporaryDirectories, fileSystemNodes
-}
-
-// When we add a prefix to all input lines so that TestingWriteFilesByMultipleInputs can be used, all the folders with that prefix are added to the destination directory when syncing.
-// It should not always have to return a slice, but it is fine for testing.
-// And disk I/O operations are significantly slower than in-memory operations.
-func TestingWriteFilesByOneInput(t *testing.T, input string) (string, []FileSystemNode) {
-	t.Helper()
-
-	if IsBlank(input) {
-		return "", nil
-	}
-
-	var nodes []FileSystemNode
-	var previousDirectoryPath string
-	directory := tMustCreateTemporaryDirectory(t)
-	files := CreateSortedFileSystemFiles(t, directory, input)
-
-	for i := range files {
-		if previousDirectoryPath != files[i].FileMetadata.DirectoryPath {
-			tMustCreateDirectoryAll(t, files[i].FileMetadata.DirectoryPath)
-			previousDirectoryPath = files[i].FileMetadata.DirectoryPath
-		}
-		testingIfFileWriteItAndAppendFileSystemNode(t, files[i], &nodes)
-	}
-
-	return directory, nodes
 }
