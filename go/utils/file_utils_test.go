@@ -65,7 +65,7 @@ func TestFileExists(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.TestCaseBasic.Name, func(t *testing.T) {
 			// arrange and tear down
-			directory, _ := TestingWriteFilesByOneInput(t, tc.TestCaseBasic.Input)
+			directory := WriteFilesBySingleInput(t, tc.TestCaseBasic.Input)
 			defer TestingRemoveDirectoryTree(t, directory)
 
 			files := CreateSortedFileSystemFiles(t, directory, tc.TestCaseBasic.Input)

@@ -37,9 +37,9 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.TestCaseBasic.Name, func(t *testing.T) {
 			// arrange and tear down
-			sourceDirectory, _ := utils.TestingWriteFilesByOneInput(t, tc.TestCaseBasic.Input)
+			sourceDirectory := utils.WriteFilesBySingleInput(t, tc.TestCaseBasic.Input)
 			defer utils.TestingRemoveDirectoryTree(t, sourceDirectory)
-			destinationDirectory, _ := utils.TestingWriteFilesByOneInput(t, tc.SecondInput)
+			destinationDirectory := utils.WriteFilesBySingleInput(t, tc.SecondInput)
 			defer utils.TestingRemoveDirectoryTree(t, destinationDirectory)
 
 			// act
