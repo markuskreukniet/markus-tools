@@ -29,7 +29,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			// arrange and tear down
 			directories, fileSystemNodes := utils.TestingWriteFilesByMultipleInputs(t, tc.Input)
-			defer utils.TestingRemoveDirectoryTrees(t, directories)
+			defer utils.RemoveDirectoryTrees(t, directories)
 			var builder strings.Builder
 			if len(directories) > 0 {
 				builder.WriteString(tc.WantedOutcome)
@@ -41,7 +41,8 @@ func TestPlainTextFilesToText(t *testing.T) {
 			//log.Println("outcome:", outcome) // TODO: shows a \n bug, but it is nog a bug?
 
 			// assert
-			utils.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.WantErr, builder, outcome)
+			utils.TMustAssertError(t, err, tc.WantErr)
+			utils.TMustAssertEqualStrings(t, builder.String(), outcome)
 		})
 	}
 }

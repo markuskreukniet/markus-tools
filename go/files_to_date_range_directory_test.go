@@ -182,13 +182,13 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 		t.Run(tc.TestCaseBasic.Name, func(t *testing.T) {
 			// arrange and tear down
 			directories, nodes := utils.TestingWriteFilesByMultipleInputs(t, tc.TestCaseBasic.Input)
-			defer utils.TestingRemoveDirectoryTrees(t, directories)
+			defer utils.RemoveDirectoryTrees(t, directories)
 
 			destination := utils.WriteFilesBySingleInput(t, tc.SecondInput)
-			defer utils.TestingRemoveDirectoryTree(t, destination)
+			defer utils.TMustRemoveAll(t, destination)
 
 			wantedOutcomeDestination := utils.WriteFilesBySingleInput(t, tc.TestCaseBasic.WantedOutcome)
-			defer utils.TestingRemoveDirectoryTree(t, wantedOutcomeDestination)
+			defer utils.TMustRemoveAll(t, wantedOutcomeDestination)
 
 			// act
 			err := filesToDateRangeDirectory(nodes, destination)
