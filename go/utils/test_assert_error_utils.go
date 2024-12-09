@@ -16,7 +16,7 @@ func appendFiles(filePath string, files *[]CompleteFileInfo) error {
 }
 
 func areFilesIdentical(fileI, fileJ CompleteFileInfo, filePathI, filePathJ string) (bool, error) {
-	// TODO: compare TimeModified
+	// TODO: compare TimeModified? Or is that part of the hash?
 	if fileI.IsDirectory != fileJ.IsDirectory ||
 		fileI.Name != fileJ.Name ||
 		fileI.Size != fileJ.Size {
@@ -56,18 +56,18 @@ func areFilesIdentical(fileI, fileJ CompleteFileInfo, filePathI, filePathJ strin
 	return true, nil
 }
 
-func sortFilesOnName(files *[]CompleteFileInfo) {
-	sort.Slice(*files, func(i, j int) bool {
-		return (*files)[i].Name < (*files)[j].Name
-	})
-}
-
 func AreFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) {
 	if filePathI == "" || filePathJ == "" {
 		return false, nil
 	}
 
 	var filesI, filesJ []CompleteFileInfo
+
+	sortFilesOnName := func(files *[]CompleteFileInfo) {
+		sort.Slice(*files, func(i, j int) bool {
+			return (*files)[i].Name < (*files)[j].Name
+		})
+	}
 
 	if err := appendFiles(filePathI, &filesI); err != nil {
 		return false, err
@@ -101,13 +101,13 @@ func AreFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) 
 	return true, nil
 }
 
-func TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t *testing.T, err error, wantErr bool, builder strings.Builder, got string) {
+func TestingAssertErrorAndOutcomeToBuilderString(t *testing.T, err error, wantErr bool, builder strings.Builder, got string) {
 	t.Helper()
-	TestingAssertErrorToWantError(t, err, wantErr)
+	AssertError(t, err, wantErr)
 	TestingAssertEqualStrings(t, builder.String(), got)
 }
 
-func TestingAssertErrorToWantError(t *testing.T, err error, wantErr bool) {
+func AssertError(t *testing.T, err error, wantErr bool) {
 	t.Helper()
 	if (err != nil) != wantErr {
 		t.Errorf("want error: %v, got error: %v", wantErr, err)

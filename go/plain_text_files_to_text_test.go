@@ -41,7 +41,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 			//log.Println("outcome:", outcome) // TODO: shows a \n bug, but it is nog a bug?
 
 			// assert
-			utils.TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t, err, tc.WantErr, builder, outcome)
+			utils.TestingAssertErrorAndOutcomeToBuilderString(t, err, tc.WantErr, builder, outcome)
 		})
 	}
 }
