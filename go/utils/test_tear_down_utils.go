@@ -5,16 +5,12 @@ import (
 	"testing"
 )
 
-func TestingRemoveDirectoryTree(t *testing.T, directory string) {
-	t.Helper()
-	if err := os.RemoveAll(directory); err != nil {
-		t.Errorf("Failed to remove the directory tree: %v", err)
-	}
+func TMustRemoveAll(t *testing.T, filePath string) {
+	TMustErr(t, os.RemoveAll(filePath))
 }
 
-func TestingRemoveDirectoryTrees(t *testing.T, directories []string) {
-	t.Helper()
-	for _, directory := range directories {
-		TestingRemoveDirectoryTree(t, directory)
+func RemoveDirectoryTrees(t *testing.T, directoryPaths []string) {
+	for _, path := range directoryPaths {
+		TMustRemoveAll(t, path)
 	}
 }
