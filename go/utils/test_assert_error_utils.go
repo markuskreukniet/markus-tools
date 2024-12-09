@@ -3,7 +3,6 @@ package utils
 import (
 	"path/filepath"
 	"sort"
-	"strings"
 	"testing"
 )
 
@@ -99,12 +98,6 @@ func AreFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) 
 	}
 
 	return true, nil
-}
-
-func TestingAssertErrorAndOutcomeToBuilderString(t *testing.T, err error, wantErr bool, builder strings.Builder, got string) {
-	t.Helper()
-	TMustAssertError(t, err, wantErr)
-	TMustAssertEqualStrings(t, builder.String(), got)
 }
 
 func TMustAssertError(t *testing.T, err error, wantErr bool) {
