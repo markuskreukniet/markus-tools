@@ -3,20 +3,11 @@ package utils
 import (
 	"path/filepath"
 	"sort"
-	"strings"
 	"testing"
 )
 
-func appendFiles(filePath string, files *[]CompleteFileInfo) error {
-	handler := func(file CompleteFileInfo) {
-		*files = append(*files, file)
-	}
-
-	return WalkFilterAndHandleFileInfoDirectory(filePath, NonZeroByteFilesAndDirectories, AllFiles, handler)
-}
-
 func areFilesIdentical(fileI, fileJ CompleteFileInfo, filePathI, filePathJ string) (bool, error) {
-	// TODO: compare TimeModified
+	// TODO: compare TimeModified? Or is that part of the hash?
 	if fileI.IsDirectory != fileJ.IsDirectory ||
 		fileI.Name != fileJ.Name ||
 		fileI.Size != fileJ.Size {
@@ -56,18 +47,26 @@ func areFilesIdentical(fileI, fileJ CompleteFileInfo, filePathI, filePathJ strin
 	return true, nil
 }
 
-func sortFilesOnName(files *[]CompleteFileInfo) {
-	sort.Slice(*files, func(i, j int) bool {
-		return (*files)[i].Name < (*files)[j].Name
-	})
-}
-
 func AreFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) {
 	if filePathI == "" || filePathJ == "" {
 		return false, nil
 	}
 
 	var filesI, filesJ []CompleteFileInfo
+
+	sortFilesOnName := func(files *[]CompleteFileInfo) {
+		sort.Slice(*files, func(i, j int) bool {
+			return (*files)[i].Name < (*files)[j].Name
+		})
+	}
+
+	appendFiles := func(filePath string, files *[]CompleteFileInfo) error {
+		handler := func(file CompleteFileInfo) {
+			*files = append(*files, file)
+		}
+
+		return WalkFilterAndHandleFileInfoDirectory(filePath, NonZeroByteFilesAndDirectories, AllFiles, handler)
+	}
 
 	if err := appendFiles(filePathI, &filesI); err != nil {
 		return false, err
@@ -101,22 +100,22 @@ func AreFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) 
 	return true, nil
 }
 
-func TestingAssertErrorToWantErrorAndOutcomeToBuilderString(t *testing.T, err error, wantErr bool, builder strings.Builder, got string) {
+func TMustAssertError(t *testing.T, err error, wantErr bool) {
 	t.Helper()
-	TestingAssertErrorToWantError(t, err, wantErr)
-	TestingAssertEqualStrings(t, builder.String(), got)
-}
 
-func TestingAssertErrorToWantError(t *testing.T, err error, wantErr bool) {
-	t.Helper()
 	if (err != nil) != wantErr {
-		t.Errorf("want error: %v, got error: %v", wantErr, err)
+		if wantErr {
+			t.Fatalf("want an error, but got nil")
+		} else {
+			t.Fatalf("did not want an error, but got: %v", err)
+		}
 	}
 }
 
-func TestingAssertEqualStrings(t *testing.T, want string, got string) {
+func TMustAssertEqualStrings(t *testing.T, want string, got string) {
 	t.Helper()
+
 	if want != got {
-		t.Errorf("want: %s, got: %s", want, got)
+		t.Fatalf("want: %s, got: %s", want, got)
 	}
 }
