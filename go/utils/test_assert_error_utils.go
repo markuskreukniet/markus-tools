@@ -6,14 +6,6 @@ import (
 	"testing"
 )
 
-func appendFiles(filePath string, files *[]CompleteFileInfo) error {
-	handler := func(file CompleteFileInfo) {
-		*files = append(*files, file)
-	}
-
-	return WalkFilterAndHandleFileInfoDirectory(filePath, NonZeroByteFilesAndDirectories, AllFiles, handler)
-}
-
 func areFilesIdentical(fileI, fileJ CompleteFileInfo, filePathI, filePathJ string) (bool, error) {
 	// TODO: compare TimeModified? Or is that part of the hash?
 	if fileI.IsDirectory != fileJ.IsDirectory ||
@@ -66,6 +58,14 @@ func AreFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) 
 		sort.Slice(*files, func(i, j int) bool {
 			return (*files)[i].Name < (*files)[j].Name
 		})
+	}
+
+	appendFiles := func(filePath string, files *[]CompleteFileInfo) error {
+		handler := func(file CompleteFileInfo) {
+			*files = append(*files, file)
+		}
+
+		return WalkFilterAndHandleFileInfoDirectory(filePath, NonZeroByteFilesAndDirectories, AllFiles, handler)
 	}
 
 	if err := appendFiles(filePathI, &filesI); err != nil {

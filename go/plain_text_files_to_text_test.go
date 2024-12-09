@@ -29,7 +29,7 @@ func TestPlainTextFilesToText(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			// arrange and tear down
 			directories, fileSystemNodes := utils.TestingWriteFilesByMultipleInputs(t, tc.Input)
-			defer utils.TestingRemoveDirectoryTrees(t, directories)
+			defer utils.RemoveDirectoryTrees(t, directories)
 			var builder strings.Builder
 			if len(directories) > 0 {
 				builder.WriteString(tc.WantedOutcome)
