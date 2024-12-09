@@ -103,20 +103,26 @@ func AreFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) 
 
 func TestingAssertErrorAndOutcomeToBuilderString(t *testing.T, err error, wantErr bool, builder strings.Builder, got string) {
 	t.Helper()
-	AssertError(t, err, wantErr)
-	TestingAssertEqualStrings(t, builder.String(), got)
+	TMustAssertError(t, err, wantErr)
+	TMustAssertEqualStrings(t, builder.String(), got)
 }
 
-func AssertError(t *testing.T, err error, wantErr bool) {
+func TMustAssertError(t *testing.T, err error, wantErr bool) {
 	t.Helper()
+
 	if (err != nil) != wantErr {
-		t.Errorf("want error: %v, got error: %v", wantErr, err)
+		if wantErr {
+			t.Fatalf("want an error, but got nil")
+		} else {
+			t.Fatalf("did not want an error, but got: %v", err)
+		}
 	}
 }
 
-func TestingAssertEqualStrings(t *testing.T, want string, got string) {
+func TMustAssertEqualStrings(t *testing.T, want string, got string) {
 	t.Helper()
+
 	if want != got {
-		t.Errorf("want: %s, got: %s", want, got)
+		t.Fatalf("want: %s, got: %s", want, got)
 	}
 }

@@ -78,7 +78,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 				wantedOutcome = strings.Replace(wantedOutcome, substring, "", 1)
 			}
 
-			utils.TestingAssertEqualStrings(t, strings.ReplaceAll(wantedOutcome, "\n\n", ""), "")
+			utils.TMustAssertEqualStrings(t, strings.ReplaceAll(wantedOutcome, "\n\n", ""), "")
 		})
 	}
 }
