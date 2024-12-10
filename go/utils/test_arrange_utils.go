@@ -46,10 +46,6 @@ func tMustCreateFileData(t *testing.T, directoryPath, inputLine string) FileData
 	return TMust(t, result, err)
 }
 
-func createFilesDataWithEmptyDirectoryPath(t *testing.T, rawDelimitedSemicolonString string) []FileData {
-	return createFilesData(t, "", rawDelimitedSemicolonString)
-}
-
 func createFilesData(t *testing.T, directoryPath, rawDelimitedSemicolonString string) []FileData {
 	var files []FileData
 	var inputLine []rune
@@ -79,17 +75,12 @@ func WriteFilesBySingleInput(t *testing.T, input string) string {
 		return ""
 	}
 
-	files := createFilesDataWithEmptyDirectoryPath(t, input)
-
-	if len(files) == 0 {
-		return ""
-	}
+	directoryPath := tMustCreateTemporaryDirectory(t) // TODO: also do it like this in Kotlin code
+	files := createFilesData(t, directoryPath, input)
 
 	createdDirectoryPaths := make(map[string]struct{})
-	directoryPath := tMustCreateTemporaryDirectory(t) // TODO: should happen first so it can create FilesData with it?
 
 	for _, file := range files {
-		joinAbsolutePaths(directoryPath, &file)
 		if _, exists := createdDirectoryPaths[file.CompleteFileInfo.AbsoluteDirectoryPath]; !exists {
 			tMustCreateDirectoryAll(t, file.CompleteFileInfo.AbsoluteDirectoryPath)
 			createdDirectoryPaths[file.CompleteFileInfo.AbsoluteDirectoryPath] = struct{}{}
@@ -103,12 +94,6 @@ func WriteFilesBySingleInput(t *testing.T, input string) string {
 func tMustCreateTemporaryDirectory(t *testing.T) string {
 	result, err := os.MkdirTemp("", "markus-tools go test")
 	return TMust(t, result, err)
-}
-
-func joinAbsolutePaths(directoryPath string, file *FileData) {
-	file.CompleteFileInfo.AbsoluteDirectoryPath =
-		filepath.Join(directoryPath, file.CompleteFileInfo.AbsoluteDirectoryPath)
-	file.CompleteFileInfo.AbsolutePath = filepath.Join(directoryPath, file.CompleteFileInfo.AbsolutePath)
 }
 
 // TODO: should receive FileData?
