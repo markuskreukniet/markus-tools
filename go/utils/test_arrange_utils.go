@@ -91,35 +91,41 @@ func WriteFilesBySingleInput(t *testing.T, input string) string {
 	return directoryPath
 }
 
-// func WriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []FileSystemNode) {
-// 	if IsBlank(input) {
-// 		return nil, nil
-// 	}
+func WriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []FileSystemNode) {
+	if IsBlank(input) {
+		return nil, nil
+	}
 
-// 	files := createFilesData(t, "", input)
+	files := createFilesData(t, "", input)
 
-// 	if len(files) == 0 {
-// 		return nil, nil
-// 	}
+	if len(files) == 0 {
+		return nil, nil
+	}
 
-// 	sort.Slice(files, func(i, j int) bool {
-// 		return files[i].CompleteFileInfo.AbsolutePath < files[j].CompleteFileInfo.AbsolutePath
-// 	})
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].CompleteFileInfo.AbsolutePath < files[j].CompleteFileInfo.AbsolutePath
+	})
 
-// 	previousDirectoryPath := toRootDirectoryPath(files[0].CompleteFileInfo.AbsoluteDirectoryPath)
-// 	fileGroups := [][]FileData{{files[0]}}
-// 	index := 0
+	previousSegment := getFirstPathSegment(files[0].CompleteFileInfo.AbsoluteDirectoryPath)
+	fileGroups := [][]FileData{{files[0]}}
+	index := 0
 
-// 	for _, file := range files[1:] {
+	for _, file := range files[1:] {
+		currentSegment := getFirstPathSegment(file.CompleteFileInfo.AbsoluteDirectoryPath)
+		if currentSegment == "." || currentSegment != previousSegment {
+			fileGroups = append(fileGroups, []FileData{file})
+			previousSegment = currentSegment
+			index++
+		} else {
+			fileGroups[index] = append(fileGroups[index], file)
+		}
+	}
 
-// 	}
+	var temporaryDirectoryPaths []string
+	var fileSystemNodes []FileSystemNode
 
-// 	previousDirectoryPath = ""
-// 	var temporaryDirectoryPaths []string
-// 	var fileSystemNodes []FileSystemNode
-
-// 	return temporaryDirectoryPaths, fileSystemNodes
-// }
+	return temporaryDirectoryPaths, fileSystemNodes
+}
 
 func tMustCreateTemporaryDirectory(t *testing.T) string {
 	result, err := os.MkdirTemp("", "markus-tools go test")
@@ -270,8 +276,8 @@ func testingIfFileWriteItAndAppendFileSystemNode(t *testing.T, file FileSystemFi
 	})
 }
 
-func toRootDirectoryPath(filePath string) string {
-	cleanPath := filepath.Clean(filePath)
+func getFirstPathSegment(filePath string) string {
+	cleanPath := filepath.Clean(filePath) // TODO: is needed?
 
 	for {
 		parentPath := filepath.Dir(cleanPath)
@@ -299,11 +305,11 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 	}
 
 	fileGroups := [][]FileSystemFile{{files[0]}}
-	previousRootDirectoryPath := toRootDirectoryPath(files[0].FileMetadata.DirectoryPath)
+	previousRootDirectoryPath := getFirstPathSegment(files[0].FileMetadata.DirectoryPath)
 	index := 0
 
 	for _, file := range files[1:] {
-		rootDirectoryPath := toRootDirectoryPath(file.FileMetadata.DirectoryPath)
+		rootDirectoryPath := getFirstPathSegment(file.FileMetadata.DirectoryPath)
 		if rootDirectoryPath == "." || rootDirectoryPath != previousRootDirectoryPath {
 			fileGroups = append(fileGroups, []FileSystemFile{file})
 			previousRootDirectoryPath = rootDirectoryPath
