@@ -32,7 +32,7 @@ func createFileData(directoryPath, inputLine string) (FileData, error) {
 		Content: content,
 		CompleteFileInfo: CompleteFileInfo{
 			Name:                  name,
-			AbsoluteDirectoryPath: directoryPath, // TODO: here it is not an absolute path
+			AbsoluteDirectoryPath: directoryPath, // TODO: here it is not an absolute path, also fix in Kotlin?
 			AbsolutePath:          filePath,
 			TimeModified:          timeModified,
 			Size:                  0, // TODO: convert content to size?
@@ -89,6 +89,62 @@ func WriteFilesBySingleInput(t *testing.T, input string) string {
 	}
 
 	return directoryPath
+}
+
+func WriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []FileSystemNode) {
+	if IsBlank(input) {
+		return nil, nil
+	}
+
+	files := createFilesData(t, "", input)
+
+	if len(files) == 0 {
+		return nil, nil
+	}
+
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].CompleteFileInfo.AbsolutePath < files[j].CompleteFileInfo.AbsolutePath
+	})
+
+	previousSegment := getFirstPathSegment(files[0].CompleteFileInfo.AbsoluteDirectoryPath)
+	fileGroups := [][]FileData{{files[0]}}
+	index := 0
+
+	for _, file := range files[1:] {
+		currentSegment := getFirstPathSegment(file.CompleteFileInfo.AbsoluteDirectoryPath)
+		if currentSegment == "." || currentSegment != previousSegment {
+			fileGroups = append(fileGroups, []FileData{file})
+			previousSegment = currentSegment
+			index++
+		} else {
+			fileGroups[index] = append(fileGroups[index], file)
+		}
+	}
+
+	previousSegment = "" // TODO: check if useless, also for Kotlin code
+	var temporaryDirectoryPaths []string
+	var fileSystemNodes []FileSystemNode
+
+	for _, group := range fileGroups {
+		directory := tMustCreateTemporaryDirectory(t)
+		temporaryDirectoryPaths = append(temporaryDirectoryPaths, directory)
+		for _, file := range group {
+			file.CompleteFileInfo.AbsoluteDirectoryPath = filepath.Join(directory, file.CompleteFileInfo.AbsoluteDirectoryPath)
+			file.CompleteFileInfo.AbsolutePath = filepath.Join(directory, file.CompleteFileInfo.AbsolutePath)
+			if file.CompleteFileInfo.AbsoluteDirectoryPath != previousSegment {
+				tMustCreateDirectoryAll(t, file.CompleteFileInfo.AbsoluteDirectoryPath)
+			}
+			previousSegment = file.CompleteFileInfo.AbsoluteDirectoryPath
+			ifFileThenWriteAndChangeTimes(t, file)
+			fileSystemNodes = append(fileSystemNodes, FileSystemNode{
+				Path:        file.CompleteFileInfo.AbsolutePath,
+				IsDirectory: file.CompleteFileInfo.IsDirectory,
+			})
+		}
+
+	}
+
+	return temporaryDirectoryPaths, fileSystemNodes
 }
 
 func tMustCreateTemporaryDirectory(t *testing.T) string {
@@ -240,8 +296,8 @@ func testingIfFileWriteItAndAppendFileSystemNode(t *testing.T, file FileSystemFi
 	})
 }
 
-func toRootDirectoryPath(filePath string) string {
-	cleanPath := filepath.Clean(filePath)
+func getFirstPathSegment(filePath string) string {
+	cleanPath := filepath.Clean(filePath) // TODO: is needed?
 
 	for {
 		parentPath := filepath.Dir(cleanPath)
@@ -269,11 +325,11 @@ func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []
 	}
 
 	fileGroups := [][]FileSystemFile{{files[0]}}
-	previousRootDirectoryPath := toRootDirectoryPath(files[0].FileMetadata.DirectoryPath)
+	previousRootDirectoryPath := getFirstPathSegment(files[0].FileMetadata.DirectoryPath)
 	index := 0
 
 	for _, file := range files[1:] {
-		rootDirectoryPath := toRootDirectoryPath(file.FileMetadata.DirectoryPath)
+		rootDirectoryPath := getFirstPathSegment(file.FileMetadata.DirectoryPath)
 		if rootDirectoryPath == "." || rootDirectoryPath != previousRootDirectoryPath {
 			fileGroups = append(fileGroups, []FileSystemFile{file})
 			previousRootDirectoryPath = rootDirectoryPath
