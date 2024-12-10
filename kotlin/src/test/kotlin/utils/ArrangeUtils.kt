@@ -136,13 +136,13 @@ fun writeFilesByMultipleInputs(input: String): Result<Pair<MutableList<Path>?, M
     }
   }
 
+  previousSegment = null
   val temporaryDirectories = mutableListOf<Path>()
   val inputPaths = mutableListOf<Path>()
 
   groups.forEach { group ->
     val directoryPath = createTemporaryDirectory().getOrThrow()
     temporaryDirectories.add(directoryPath)
-    previousSegment = group.first().completeFileInfo.absoluteDirectoryPath
     group.forEach { file ->
       resolveAbsolutePaths(directoryPath, file)
       if (file.completeFileInfo.absoluteDirectoryPath != previousSegment) {
