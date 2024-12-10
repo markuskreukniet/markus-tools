@@ -32,7 +32,7 @@ func createFileData(directoryPath, inputLine string) (FileData, error) {
 		Content: content,
 		CompleteFileInfo: CompleteFileInfo{
 			Name:                  name,
-			AbsoluteDirectoryPath: directoryPath, // TODO: here it is not an absolute path
+			AbsoluteDirectoryPath: directoryPath, // TODO: here it is not an absolute path, also fix in Kotlin?
 			AbsolutePath:          filePath,
 			TimeModified:          timeModified,
 			Size:                  0, // TODO: convert content to size?
@@ -90,6 +90,23 @@ func WriteFilesBySingleInput(t *testing.T, input string) string {
 
 	return directoryPath
 }
+
+// func WriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []FileData) {
+// 	if IsBlank(input) {
+// 		return nil, nil
+// 	}
+
+// 	files := createFilesData(t, "", input)
+
+// 	if len(files) == 0 {
+// 		return nil, nil
+// 	}
+
+// 	sort.Slice(files, func(i, j int) bool {
+// 		return files[i].CompleteFileInfo.AbsolutePath < files[j].CompleteFileInfo.AbsolutePath
+// 	})
+
+// }
 
 func tMustCreateTemporaryDirectory(t *testing.T) string {
 	result, err := os.MkdirTemp("", "markus-tools go test")
