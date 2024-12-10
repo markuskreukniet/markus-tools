@@ -91,7 +91,7 @@ func WriteFilesBySingleInput(t *testing.T, input string) string {
 	return directoryPath
 }
 
-// func WriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []FileData) {
+// func WriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []FileSystemNode) {
 // 	if IsBlank(input) {
 // 		return nil, nil
 // 	}
@@ -106,6 +106,19 @@ func WriteFilesBySingleInput(t *testing.T, input string) string {
 // 		return files[i].CompleteFileInfo.AbsolutePath < files[j].CompleteFileInfo.AbsolutePath
 // 	})
 
+// 	previousDirectoryPath := toRootDirectoryPath(files[0].CompleteFileInfo.AbsoluteDirectoryPath)
+// 	fileGroups := [][]FileData{{files[0]}}
+// 	index := 0
+
+// 	for _, file := range files[1:] {
+
+// 	}
+
+// 	previousDirectoryPath = ""
+// 	var temporaryDirectoryPaths []string
+// 	var fileSystemNodes []FileSystemNode
+
+// 	return temporaryDirectoryPaths, fileSystemNodes
 // }
 
 func tMustCreateTemporaryDirectory(t *testing.T) string {
