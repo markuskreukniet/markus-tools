@@ -63,8 +63,8 @@ fun createTemporaryDirectory(): Result<Path> = runCatching {
   Files.createTempDirectory("markus-tools kotlin test_")  // The prefix is optional
 }
 
-// Returns the top directory path or a null when it receives only a file name, such as jpg 0.jpg.
-fun getTopDirectoryPath(directoryPath: Path): Result<Path?> = runCatching {
+// Returns the first path segment or a null when it receives only a file name, such as jpg 0.jpg.
+fun getFirstPathSegment(directoryPath: Path): Result<Path?> = runCatching {
   if (directoryPath.nameCount > 0) directoryPath.getName(0) else null
 }
 
@@ -119,35 +119,35 @@ fun writeFilesByMultipleInputs(input: String): Result<Pair<MutableList<Path>?, M
   files.sortBy { it.completeFileInfo.absolutePath }
 
   val groups = mutableListOf(mutableListOf(files.first()))
-  var previousTopDirectoryPath = getTopDirectoryPath(
+  var previousSegment = getFirstPathSegment(
     files.first().completeFileInfo.absoluteDirectoryPath
   ).getOrThrow()
   var index = 0
 
   files.drop(1).forEach { file ->
-    val currentTopDirectoryPath = getTopDirectoryPath(file.completeFileInfo.absoluteDirectoryPath).getOrThrow()
+    val currentSegment = getFirstPathSegment(file.completeFileInfo.absoluteDirectoryPath).getOrThrow()
     // We can use '==' or '!=' for string-based comparison of the paths.
-    if (currentTopDirectoryPath == null || previousTopDirectoryPath != currentTopDirectoryPath) {
+    if (currentSegment == null || previousSegment != currentSegment) {
       groups.add(mutableListOf(file))
-      previousTopDirectoryPath = currentTopDirectoryPath
+      previousSegment = currentSegment
       index++
     } else {
       groups[index].add(file)
     }
   }
 
+  previousSegment = null
   val temporaryDirectories = mutableListOf<Path>()
   val inputPaths = mutableListOf<Path>()
 
   groups.forEach { group ->
     val directoryPath = createTemporaryDirectory().getOrThrow()
     temporaryDirectories.add(directoryPath)
-    var previousDirectoryPath = group.first().completeFileInfo.absoluteDirectoryPath
     group.forEach { file ->
       resolveAbsolutePaths(directoryPath, file)
-      if (file.completeFileInfo.absoluteDirectoryPath != previousDirectoryPath) {
+      if (file.completeFileInfo.absoluteDirectoryPath != previousSegment) {
         Files.createDirectories(file.completeFileInfo.absoluteDirectoryPath)
-        previousDirectoryPath = file.completeFileInfo.absoluteDirectoryPath
+        previousSegment = file.completeFileInfo.absoluteDirectoryPath
       }
       writeFile(file)
       inputPaths.add(file.completeFileInfo.absolutePath)
