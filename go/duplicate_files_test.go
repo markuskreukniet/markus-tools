@@ -8,7 +8,6 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
-// TODO: cleaning
 func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 	// arrange
 	// Two contents should have the same file size and one a different file size.
@@ -65,9 +64,7 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 
 			// act
 			outcome, err := getDuplicateFilesAsNewlineSeparatedString(fileSystemNodes)
-			if err != nil {
-				t.Errorf("getDuplicateFilesAsNewlineSeparatedString err: %v", err)
-			}
+			outcome = utils.TMust(t, outcome, err)
 
 			// assert
 			for _, directory := range directories {
