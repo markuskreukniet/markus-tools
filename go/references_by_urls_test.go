@@ -67,11 +67,11 @@ func TestReferencesByURLs(t *testing.T) {
 		titles, h1s := findTitleAndH1Elements(test.htmlDocument)
 
 		if !reflect.DeepEqual(titles, test.expectedTitles) {
-			t.Errorf("findTitleAndH1Elements(%q) titles = %v; want %v", test.htmlDocument, titles, test.expectedTitles)
+			t.Fatalf("findTitleAndH1Elements(%q) titles = %v; want %v", test.htmlDocument, titles, test.expectedTitles)
 		}
 
 		if !reflect.DeepEqual(h1s, test.expectedH1s) {
-			t.Errorf("findTitleAndH1Elements(%q) h1s = %v; want %v", test.htmlDocument, h1s, test.expectedH1s)
+			t.Fatalf("findTitleAndH1Elements(%q) h1s = %v; want %v", test.htmlDocument, h1s, test.expectedH1s)
 		}
 	}
 }
@@ -148,7 +148,7 @@ func TestFilterComments(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			actual := filterComments(tt.input)
 			if actual != tt.expected {
-				t.Errorf("filterComments() = %v, want %v", actual, tt.expected)
+				t.Fatalf("filterComments() = %v, want %v", actual, tt.expected)
 			}
 		})
 	}
@@ -172,7 +172,7 @@ func TestRemoveTagsFromElement(t *testing.T) {
 	for _, tt := range tests {
 		result := removeTagsFromElement(tt.input)
 		if result != tt.expected {
-			t.Errorf("removeTagsFromElement(%q) = %q; want %q", tt.input, result, tt.expected)
+			t.Fatalf("removeTagsFromElement(%q) = %q; want %q", tt.input, result, tt.expected)
 		}
 	}
 }
@@ -199,7 +199,7 @@ func TestRemoveTagsFromElements(t *testing.T) {
 	for _, tt := range tests {
 		result := removeTagsFromElements(tt.input)
 		if !reflect.DeepEqual(result, tt.expected) {
-			t.Errorf("removeTagsFromElements(%v) = %v; want %v", tt.input, result, tt.expected)
+			t.Fatalf("removeTagsFromElements(%v) = %v; want %v", tt.input, result, tt.expected)
 		}
 	}
 }
