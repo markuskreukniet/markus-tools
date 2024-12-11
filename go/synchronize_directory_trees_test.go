@@ -50,12 +50,12 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 
 			areIdentical, err := utils.AreFileTreeDescendantsIdentical(sourceDirectory, destinationDirectory)
 			if err != nil {
-				t.Errorf("AreFileTreeDescendantsIdentical error: %v", err)
+				t.Fatalf("AreFileTreeDescendantsIdentical error: %v", err)
 			}
 
 			if !areIdentical {
 				// TODO: message // TODO copied
-				t.Errorf("outcome and wanted outcome are different")
+				t.Fatalf("outcome and wanted outcome are different")
 			}
 		})
 	}

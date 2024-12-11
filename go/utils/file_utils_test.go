@@ -7,7 +7,7 @@ import (
 // func testingGetFileDetailLogIfError(t *testing.T, err error) {
 // 	t.Helper()
 // 	if err != nil {
-// 		t.Errorf("getFileDetail() error: %v", err)
+// 		t.Fatalf("getFileDetail() error: %v", err)
 // 	}
 // }
 
@@ -36,16 +36,16 @@ import (
 // 	TestingAssertEqualStrings(t, directory, dirDetail.Path)
 // 	TestingAssertEqualStrings(t, fullPath, fileDetail.Path)
 // 	if fileDetail.Size != int64(len(writtenContent)) {
-// 		t.Errorf("Want Size %v, got %v", len(writtenContent), fileDetail.Size)
+// 		t.Fatalf("Want Size %v, got %v", len(writtenContent), fileDetail.Size)
 // 	}
 // 	if err == nil {
-// 		t.Errorf("Want an error when trying to get details of a non-existent file, but got none")
+// 		t.Fatalf("Want an error when trying to get details of a non-existent file, but got none")
 // 	}
 
 // 	// Check if the file modification time is within the last minute, which is not optimal.
 // 	currentTime := time.Now()
 // 	if fileDetail.ModificationTime.Before(currentTime.Add(-time.Minute)) || fileDetail.ModificationTime.After(currentTime) {
-// 		t.Errorf("Modification time %v is not within the expected range.", fileDetail.ModificationTime)
+// 		t.Fatalf("Modification time %v is not within the expected range.", fileDetail.ModificationTime)
 // 	}
 // }
 
@@ -74,12 +74,12 @@ func TestFileExists(t *testing.T) {
 				// act
 				exists, err := FileExists(file.CompleteFileInfo.AbsolutePath)
 				if err != nil {
-					t.Errorf("FileExists error")
+					t.Fatalf("FileExists error")
 				}
 
 				// assert
 				if exists != tc.WriteInput {
-					t.Errorf("A file should exist, but it does not.")
+					t.Fatalf("A file should exist, but it does not.")
 				}
 			}
 		})
