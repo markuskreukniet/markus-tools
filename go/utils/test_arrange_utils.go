@@ -272,28 +272,11 @@ func CreateTestCaseBasic(name, input, wantedOutcome string, wantErr bool) TestCa
 	}
 }
 
+// TODO: obsolete?
 func WriteFileWithContentAndIndex(t *testing.T, filePath string, index int) string {
 	writtenContent := fmt.Sprintf("content %d", index)
 	tMustWriteFile(t, filePath, writtenContent)
 	return writtenContent
-}
-
-func testingIfFileWriteItAndAppendFileSystemNode(t *testing.T, file FileSystemFile, nodes *[]FileSystemNode) {
-	t.Helper()
-
-	if !file.FileMetadata.IsDirectory {
-		tMustWriteFile(t, file.FileMetadata.Path, file.Data)
-		if !file.FileMetadata.TimeModified.IsZero() {
-			if err := os.Chtimes(file.FileMetadata.Path, time.Now(), file.FileMetadata.TimeModified); err != nil {
-				t.Errorf("Failed to change the access and modification times of the file: %v", err)
-			}
-		}
-	}
-
-	*nodes = append(*nodes, FileSystemNode{
-		Path:        file.FileMetadata.Path,
-		IsDirectory: file.FileMetadata.IsDirectory,
-	})
 }
 
 func getFirstPathSegment(filePath string) string {
@@ -308,54 +291,4 @@ func getFirstPathSegment(filePath string) string {
 	}
 
 	return cleanPath
-}
-
-func TestingWriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []FileSystemNode) {
-	t.Helper()
-
-	if IsBlank(input) {
-		return nil, nil
-	}
-
-	files := CreateSortedFileSystemFiles(t, "", input)
-	length := len(files)
-
-	if length == 0 {
-		return nil, nil
-	}
-
-	fileGroups := [][]FileSystemFile{{files[0]}}
-	previousRootDirectoryPath := getFirstPathSegment(files[0].FileMetadata.DirectoryPath)
-	index := 0
-
-	for _, file := range files[1:] {
-		rootDirectoryPath := getFirstPathSegment(file.FileMetadata.DirectoryPath)
-		if rootDirectoryPath == "." || rootDirectoryPath != previousRootDirectoryPath {
-			fileGroups = append(fileGroups, []FileSystemFile{file})
-			previousRootDirectoryPath = rootDirectoryPath
-			index++
-		} else {
-			fileGroups[index] = append(fileGroups[index], file)
-		}
-	}
-
-	var temporaryDirectories []string
-	var fileSystemNodes []FileSystemNode
-	var previousDirectoryPath string
-
-	for _, group := range fileGroups {
-		directory := tMustCreateTemporaryDirectory(t)
-		temporaryDirectories = append(temporaryDirectories, directory)
-		for i, file := range group {
-			file.FileMetadata.DirectoryPath = filepath.Join(directory, file.FileMetadata.DirectoryPath)
-			file.FileMetadata.Path = filepath.Join(directory, file.FileMetadata.Path)
-			if i == 0 || file.FileMetadata.DirectoryPath != previousDirectoryPath {
-				tMustCreateDirectoryAll(t, file.FileMetadata.DirectoryPath)
-			}
-			previousDirectoryPath = file.FileMetadata.DirectoryPath
-			testingIfFileWriteItAndAppendFileSystemNode(t, file, &fileSystemNodes)
-		}
-	}
-
-	return temporaryDirectories, fileSystemNodes
 }
