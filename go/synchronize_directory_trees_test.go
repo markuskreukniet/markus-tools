@@ -48,11 +48,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 			// assert
 			utils.TMustAssertError(t, err, tc.TestCaseBasic.WantErr)
 
-			areIdentical, err := utils.AreFileTreeDescendantsIdentical(sourceDirectory, destinationDirectory)
-			if err != nil {
-				t.Fatalf("AreFileTreeDescendantsIdentical error: %v", err)
-			}
-
+			areIdentical := utils.TMustAreFileTreeDescendantsIdentical(t, sourceDirectory, destinationDirectory)
 			if !areIdentical {
 				// TODO: message // TODO copied
 				t.Fatalf("outcome and wanted outcome are different")
@@ -61,7 +57,6 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 	}
 }
 
-// TODO: use arrange utils?
 func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 	const inputBasePath string = "/home/user/source"
 	const inputFullPath string = "/home/user/source/directory/file.txt"
@@ -114,9 +109,7 @@ func TestJoinOutputBasePathWithRelativeInputPath(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			result, err := joinOutputBasePathWithRelativeInputPath(tc.inputBasePath, tc.inputFullPath, tc.outputBasePath)
 			utils.TMustAssertError(t, err, tc.wantErr)
-			if err == nil {
-				utils.TMustAssertEqualStrings(t, tc.want, result)
-			}
+			utils.TMustAssertEqualStrings(t, tc.want, result)
 		})
 	}
 }
