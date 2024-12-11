@@ -176,61 +176,6 @@ func ifFileThenWriteAndChangeTimes(t *testing.T, file FileData) {
 	}
 }
 
-// old
-func createFileSystemFileByInputLine(t *testing.T, directoryPath, inputLine string) FileSystemFile {
-	t.Helper()
-
-	fields := strings.Split(inputLine, ",")
-	directoryPath = filepath.Join(directoryPath, filepath.FromSlash(fields[0]))
-	data := fields[3]
-	name := fields[2]
-	filePath := filepath.Join(directoryPath, name)
-	isDirectory := name == ""
-
-	var timeModified time.Time
-	if fields[1] != "" {
-		var err error
-		timeModified, err = time.Parse(time.RFC3339, fields[1])
-		if err != nil {
-			t.Errorf("Failed to parse time: %v", err)
-		}
-	}
-
-	return CreateFileSystemFile(data, CreateFileMetadata(name, directoryPath, filePath, "", timeModified, 0, isDirectory))
-}
-
-// old
-func CreateSortedFileSystemFiles(t *testing.T, directoryPath, rawDelimitedSemicolonString string) []FileSystemFile {
-	t.Helper()
-
-	var files []FileSystemFile
-	var inputLine []rune
-	isCreatingInputLine := false
-
-	rawDelimitedSemicolonString = strings.TrimSpace(rawDelimitedSemicolonString)
-
-	for _, r := range rawDelimitedSemicolonString {
-		if isCreatingInputLine {
-			if r != ';' {
-				inputLine = append(inputLine, r)
-			} else {
-				files = append(files, createFileSystemFileByInputLine(t, directoryPath, string(inputLine)))
-				inputLine = nil
-				isCreatingInputLine = false
-			}
-		} else if !unicode.IsSpace(r) {
-			inputLine = append(inputLine, r)
-			isCreatingInputLine = true
-		}
-	}
-
-	sort.Slice(files, func(i, j int) bool {
-		return files[i].FileMetadata.Path < files[j].FileMetadata.Path
-	})
-
-	return files
-}
-
 type TestCaseBasicDoubleInput struct {
 	TestCaseBasic TestCaseBasic
 	SecondInput   string

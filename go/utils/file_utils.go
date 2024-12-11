@@ -64,37 +64,6 @@ type FileData struct {
 	CompleteFileInfo CompleteFileInfo
 }
 
-type FileSystemFile struct {
-	Data         string
-	FileMetadata FileMetadata
-}
-
-func CreateFileSystemFile(data string, metadata FileMetadata) FileSystemFile {
-	return FileSystemFile{
-		Data:         data,
-		FileMetadata: metadata,
-	}
-}
-
-type FileMetadata struct {
-	Name, DirectoryPath, Path, Hash string
-	TimeModified                    time.Time
-	Size                            int64
-	IsDirectory                     bool // It should be a file type, but there is no use case.
-}
-
-func CreateFileMetadata(name, directoryPath, path, hash string, timeModified time.Time, size int64, isDirectory bool) FileMetadata {
-	return FileMetadata{
-		Name:          name,
-		DirectoryPath: directoryPath, // TODO: absoluteDirectoryPath better naming?
-		Path:          path,          // TODO: absolutePath better naming?
-		TimeModified:  timeModified,
-		Size:          size,
-		IsDirectory:   isDirectory,
-		Hash:          hash,
-	}
-}
-
 type FileSystemNode struct {
 	Path        string
 	IsDirectory bool
