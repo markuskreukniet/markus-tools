@@ -121,16 +121,17 @@ func WriteFilesByMultipleInputs(t *testing.T, input string) ([]string, []FileSys
 		}
 	}
 
-	previousSegment = "" // TODO: check if useless, also for Kotlin code
+	// previousSegment = "" is unnecessary since the possible coming assignments are temporary directory paths,
+	// which they were not before.
 	var temporaryDirectoryPaths []string
 	var fileSystemNodes []FileSystemNode
 
 	for _, group := range fileGroups {
-		directory := tMustCreateTemporaryDirectory(t)
-		temporaryDirectoryPaths = append(temporaryDirectoryPaths, directory)
+		directoryPath := tMustCreateTemporaryDirectory(t)
+		temporaryDirectoryPaths = append(temporaryDirectoryPaths, directoryPath)
 		for _, file := range group {
-			file.CompleteFileInfo.AbsoluteDirectoryPath = filepath.Join(directory, file.CompleteFileInfo.AbsoluteDirectoryPath)
-			file.CompleteFileInfo.AbsolutePath = filepath.Join(directory, file.CompleteFileInfo.AbsolutePath)
+			file.CompleteFileInfo.AbsoluteDirectoryPath = filepath.Join(directoryPath, file.CompleteFileInfo.AbsoluteDirectoryPath)
+			file.CompleteFileInfo.AbsolutePath = filepath.Join(directoryPath, file.CompleteFileInfo.AbsolutePath)
 			if file.CompleteFileInfo.AbsoluteDirectoryPath != previousSegment {
 				tMustCreateDirectoryAll(t, file.CompleteFileInfo.AbsoluteDirectoryPath)
 			}
