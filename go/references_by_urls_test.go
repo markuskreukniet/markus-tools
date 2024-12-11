@@ -3,6 +3,8 @@ package main
 import (
 	"reflect"
 	"testing"
+
+	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
 func TestReferencesByURLs(t *testing.T) {
@@ -146,10 +148,7 @@ func TestFilterComments(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			actual := filterComments(tt.input)
-			if actual != tt.expected {
-				t.Fatalf("filterComments() = %v, want %v", actual, tt.expected)
-			}
+			utils.TMustAssertEqualStrings(t, tt.expected, filterComments(tt.input))
 		})
 	}
 }
@@ -170,10 +169,7 @@ func TestRemoveTagsFromElement(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		result := removeTagsFromElement(tt.input)
-		if result != tt.expected {
-			t.Fatalf("removeTagsFromElement(%q) = %q; want %q", tt.input, result, tt.expected)
-		}
+		utils.TMustAssertEqualStrings(t, tt.expected, removeTagsFromElement(tt.input))
 	}
 }
 
