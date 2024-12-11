@@ -68,11 +68,11 @@ func TestFileExists(t *testing.T) {
 			directory := WriteFilesBySingleInput(t, tc.TestCaseBasic.Input)
 			defer TMustRemoveAll(t, directory)
 
-			files := CreateSortedFileSystemFiles(t, directory, tc.TestCaseBasic.Input)
+			files := createFilesData(t, directory, tc.TestCaseBasic.Input)
 
 			for _, file := range files {
 				// act
-				exists, err := FileExists(file.FileMetadata.Path)
+				exists, err := FileExists(file.CompleteFileInfo.AbsolutePath)
 				if err != nil {
 					t.Errorf("FileExists error")
 				}
