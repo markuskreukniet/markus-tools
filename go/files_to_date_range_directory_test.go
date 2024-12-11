@@ -194,13 +194,9 @@ func TestFilesToDateRangeDirectory(t *testing.T) {
 			err := filesToDateRangeDirectory(nodes, destination)
 
 			// assert
-			// TODO: wantErr check
+			utils.TMustAssertError(t, err, tc.TestCaseBasic.WantErr)
 
-			areIdentical, err := utils.AreFileTreeDescendantsIdentical(destination, wantedOutcomeDestination)
-			if err != nil {
-				t.Fatalf("AreFileTreeDescendantsIdentical error: %v", err)
-			}
-
+			areIdentical := utils.TMustAreFileTreeDescendantsIdentical(t, destination, wantedOutcomeDestination)
 			if !areIdentical {
 				// TODO: message
 				t.Fatalf("outcome and wanted outcome are different")
