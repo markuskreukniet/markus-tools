@@ -75,7 +75,7 @@ func WriteFilesBySingleInput(t *testing.T, input string) string {
 		return ""
 	}
 
-	directoryPath := tMustCreateTemporaryDirectory(t) // TODO: also do it like this in Kotlin code
+	directoryPath := tMustCreateTemporaryDirectory(t)
 	files := createFilesData(t, directoryPath, input)
 
 	createdDirectoryPaths := make(map[string]struct{})
@@ -225,15 +225,13 @@ func WriteFileWithContentAndIndex(t *testing.T, filePath string, index int) stri
 }
 
 func getFirstPathSegment(filePath string) string {
-	cleanPath := filepath.Clean(filePath) // TODO: is needed?
-
 	for {
-		parentPath := filepath.Dir(cleanPath)
-		if parentPath == "." || parentPath == cleanPath {
+		parentPath := filepath.Dir(filePath)
+		if parentPath == "." || parentPath == filePath {
 			break
 		}
-		cleanPath = parentPath
+		filePath = parentPath
 	}
 
-	return cleanPath
+	return filePath
 }
