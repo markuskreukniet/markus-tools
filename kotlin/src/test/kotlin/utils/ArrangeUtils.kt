@@ -108,7 +108,8 @@ fun writeFilesByMultipleInputs(input: String): Result<Pair<MutableList<Path>?, M
     }
   }
 
-  previousSegment = null
+  // previousSegment = is unnecessary since the possible coming assignments are temporary directory paths,
+  // which they were not before.
   val temporaryDirectories = mutableListOf<Path>()
   val inputPaths = mutableListOf<Path>()
 
