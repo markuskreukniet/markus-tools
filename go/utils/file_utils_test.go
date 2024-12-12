@@ -73,14 +73,10 @@ func TestFileExists(t *testing.T) {
 			for _, file := range files {
 				// act
 				exists, err := FileExists(file.CompleteFileInfo.AbsolutePath)
-				if err != nil {
-					t.Fatalf("FileExists error")
-				}
 
 				// assert
-				if exists != tc.WriteInput {
-					t.Fatalf("A file should exist, but it does not.")
-				}
+				TMustAssertError(t, err, tc.TestCaseBasic.WantErr)
+				TMustAssertEqualBools(t, tc.WriteInput, exists)
 			}
 		})
 	}
