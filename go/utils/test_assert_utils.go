@@ -47,7 +47,7 @@ func areFilesIdentical(fileI, fileJ CompleteFileInfo, filePathI, filePathJ strin
 	return true, nil
 }
 
-func areFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) {
+func areDescendantsFileTreesIdentical(filePathI, filePathJ string) (bool, error) {
 	if filePathI == "" || filePathJ == "" {
 		return false, nil
 	}
@@ -100,11 +100,19 @@ func areFileTreeDescendantsIdentical(filePathI, filePathJ string) (bool, error) 
 	return true, nil
 }
 
-func TMustAreFileTreeDescendantsIdentical(t *testing.T, filePathI, filePathJ string) bool {
+func tMustAreDescendantsFileTreesIdentical(t *testing.T, filePathI, filePathJ string) bool {
 	t.Helper()
 
-	result, err := areFileTreeDescendantsIdentical(filePathI, filePathJ)
+	result, err := areDescendantsFileTreesIdentical(filePathI, filePathJ)
 	return TMust(t, result, err)
+}
+
+func TMustAssertIdenticalDescendantsFileTrees(t *testing.T, filePathI, filePathJ string) {
+	t.Helper()
+
+	if !tMustAreDescendantsFileTreesIdentical(t, filePathI, filePathJ) {
+		t.Fatalf("The descendants of the file trees are not identical.")
+	}
 }
 
 func TMustAssertError(t *testing.T, err error, wantErr bool) {
