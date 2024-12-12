@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"fmt"
 	"path/filepath"
+	"reflect"
 	"sort"
 	"testing"
 )
@@ -111,7 +113,7 @@ func TMustAssertIdenticalDescendantsFileTrees(t *testing.T, filePathI, filePathJ
 	t.Helper()
 
 	if !tMustAreDescendantsFileTreesIdentical(t, filePathI, filePathJ) {
-		t.Fatalf("The descendants of the file trees are not identical.")
+		t.Fatalf("The descendants of the file trees are not identical.") // TODO: format
 	}
 }
 
@@ -131,6 +133,18 @@ func TMustAssertEqualStrings(t *testing.T, want string, got string) {
 	t.Helper()
 
 	if want != got {
-		t.Fatalf("want: %s, got: %s", want, got)
+		t.Fatal(createWantGot(want, got)) // TODO: duplicate
 	}
+}
+
+func TMustAssertDeepEqual(t *testing.T, want, got any) {
+	t.Helper()
+
+	if !reflect.DeepEqual(want, got) {
+		t.Fatal(createWantGot(want, got))
+	}
+}
+
+func createWantGot(want, got any) string {
+	return fmt.Sprintf("want: %v, got: %v", want, got)
 }
