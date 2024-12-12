@@ -193,9 +193,6 @@ func TestRemoveTagsFromElements(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		result := removeTagsFromElements(tt.input)
-		if !reflect.DeepEqual(result, tt.expected) {
-			t.Fatalf("removeTagsFromElements(%v) = %v; want %v", tt.input, result, tt.expected)
-		}
+		utils.TMustAssertDeepEqual(t, tt.expected, removeTagsFromElements(tt.input))
 	}
 }
