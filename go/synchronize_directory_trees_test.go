@@ -47,12 +47,7 @@ func TestSynchronizeDirectoryTrees(t *testing.T) {
 
 			// assert
 			utils.TMustAssertError(t, err, tc.TestCaseBasic.WantErr)
-
-			areIdentical := utils.TMustAreFileTreeDescendantsIdentical(t, sourceDirectory, destinationDirectory)
-			if !areIdentical {
-				// TODO: message // TODO copied
-				t.Fatalf("outcome and wanted outcome are different")
-			}
+			utils.TMustAssertIdenticalDescendantsFileTrees(t, sourceDirectory, destinationDirectory)
 		})
 	}
 }
