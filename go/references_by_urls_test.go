@@ -1,7 +1,6 @@
 package main
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/markuskreukniet/markus-tools/go/utils"
@@ -68,13 +67,8 @@ func TestReferencesByURLs(t *testing.T) {
 	for _, test := range tests {
 		titles, h1s := findTitleAndH1Elements(test.htmlDocument)
 
-		if !reflect.DeepEqual(titles, test.expectedTitles) {
-			t.Fatalf("findTitleAndH1Elements(%q) titles = %v; want %v", test.htmlDocument, titles, test.expectedTitles)
-		}
-
-		if !reflect.DeepEqual(h1s, test.expectedH1s) {
-			t.Fatalf("findTitleAndH1Elements(%q) h1s = %v; want %v", test.htmlDocument, h1s, test.expectedH1s)
-		}
+		utils.TMustAssertDeepEqual(t, test.expectedTitles, titles)
+		utils.TMustAssertDeepEqual(t, test.expectedH1s, h1s)
 	}
 }
 
