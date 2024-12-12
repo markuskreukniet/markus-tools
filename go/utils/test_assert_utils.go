@@ -129,7 +129,15 @@ func TMustAssertError(t *testing.T, err error, wantErr bool) {
 	}
 }
 
-func TMustAssertEqualStrings(t *testing.T, want string, got string) {
+func TMustAssertEqualBools(t *testing.T, want, got bool) {
+	t.Helper()
+
+	if want != got {
+		t.Fatal(createWantGot(want, got)) // TODO: duplicate
+	}
+}
+
+func TMustAssertEqualStrings(t *testing.T, want, got string) {
 	t.Helper()
 
 	if want != got {
