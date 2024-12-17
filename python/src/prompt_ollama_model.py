@@ -1,11 +1,13 @@
 import http.client
 import json
+from io import StringIO
+from pathlib import Path
 
-file_name = "\"fileName\""
+FILE_NAME = "\"fileName\":"
 
 # TODO: error handling
-def prompt_ollama_model():
-    prompt = f"The content of a text file follows. Give a good file name for that file in a JSON format. The file name should be the property's {file_name} value as one string.\n\nThe cat (Felis catus), or domestic cat, is a small carnivorous mammal and the only domesticated species in the Felidae family. Domesticated around 7500 BC in the Near East, cats are valued as pets and for controlling vermin. They are agile hunters with retractable claws, sharp teeth, excellent night vision, and a keen sense of smell. Though social, cats hunt alone, often at dawn and dusk. They communicate through vocalizations (meowing, purring, hissing) and body language, can hear high-frequency sounds, and use pheromones for signaling."
+def prompt_ollama_model(content):
+    prompt = f"The content of a text file follows. Give a good file name for that file in a JSON format. The file name should be the property's {FILE_NAME} value as one string.\n\n{content}"
 
     connection = http.client.HTTPConnection("localhost:11434")
 
@@ -42,21 +44,73 @@ def prompt_ollama_model():
     response = connection.getresponse()
 
     if response.status == 200:
-        result = json.loads(response.read().decode('utf-8'))["response"]
+        result = json.loads(response.read().decode('utf-8')).get("response", "")
     else:
-        print("Error")
+      if connection:
+        connection.close()
+        raise Exception("no 200 status code") # TODO: Exception not specific
 
     connection.close()
 
     return result
 
-def create_file_name():
-  prompt_response = prompt_ollama_model()
-  index = prompt_response.find(file_name)
+def create_file_name_without_extension(content):
+  prompt_response = prompt_ollama_model(content)
+
+  if prompt_response == "":
+    return ""
+
+  index = prompt_response.find(FILE_NAME)
 
   if index == -1:
     return ""
 
-  return prompt_response[index:]
+  def slice_and_find_index(response, start_index):
+    response = response[start_index:]
+    return response, response.find("\"")
 
-print(create_file_name())
+  prompt_response, index = slice_and_find_index(prompt_response, index + len(FILE_NAME))
+  prompt_response, index = slice_and_find_index(prompt_response, index+1)
+
+  return prompt_response[:index]
+
+def change_file_name(file_path, content):
+  name = create_file_name_without_extension(content)
+
+  if is_blank(name):
+    return
+
+  path = Path(file_path)
+
+  new_file_name = name + ''.join(path.suffixes)
+
+  path.rename(path.parent / new_file_name)
+
+  # print(path.parent / new_file_name)
+
+# TODO: it should count tokens instead of white spaces
+def get_txt_content(file_path, max_white_space_count):
+  white_space_count = 0
+  string_builder = StringIO()
+
+  with open(file_path, "r") as lines:
+    for line in lines:
+      string_builder.write(line) # TODO: could add to much
+      white_space_count += sum(1 for char in line if char.isspace())
+      if white_space_count >= max_white_space_count:
+        break
+
+  return string_builder.getvalue()
+
+def is_blank(s):
+  return not s.strip()
+
+def change_file_name_by_content(file_path):
+  content = get_txt_content(file_path, 2048) # TODO:
+
+  if is_blank(content):
+    return
+
+  return change_file_name(file_path, content)
+
+change_file_name_by_content("C:\\Users\\testUser\\Desktop\\test\\test.txt")
