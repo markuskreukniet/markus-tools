@@ -1,11 +1,12 @@
 import http.client
 import json
+from pathlib import Path
 
-file_name = "\"fileName\""
+FILE_NAME = "\"fileName\":"
 
 # TODO: error handling
 def prompt_ollama_model():
-    prompt = f"The content of a text file follows. Give a good file name for that file in a JSON format. The file name should be the property's {file_name} value as one string.\n\nThe cat (Felis catus), or domestic cat, is a small carnivorous mammal and the only domesticated species in the Felidae family. Domesticated around 7500 BC in the Near East, cats are valued as pets and for controlling vermin. They are agile hunters with retractable claws, sharp teeth, excellent night vision, and a keen sense of smell. Though social, cats hunt alone, often at dawn and dusk. They communicate through vocalizations (meowing, purring, hissing) and body language, can hear high-frequency sounds, and use pheromones for signaling."
+    prompt = f"The content of a text file follows. Give a good file name for that file in a JSON format. The file name should be the property's {FILE_NAME} value as one string.\n\nThe cat (Felis catus), or domestic cat, is a small carnivorous mammal and the only domesticated species in the Felidae family. Domesticated around 7500 BC in the Near East, cats are valued as pets and for controlling vermin. They are agile hunters with retractable claws, sharp teeth, excellent night vision, and a keen sense of smell. Though social, cats hunt alone, often at dawn and dusk. They communicate through vocalizations (meowing, purring, hissing) and body language, can hear high-frequency sounds, and use pheromones for signaling."
 
     connection = http.client.HTTPConnection("localhost:11434")
 
@@ -42,21 +43,44 @@ def prompt_ollama_model():
     response = connection.getresponse()
 
     if response.status == 200:
-        result = json.loads(response.read().decode('utf-8'))["response"]
+        result = json.loads(response.read().decode('utf-8')).get("response", "")
     else:
-        print("Error")
+      if connection:
+        connection.close()
+        raise Exception("no 200 status code") # TODO: Exception not specific
 
     connection.close()
 
     return result
 
-def create_file_name():
+def create_file_name_without_extension():
   prompt_response = prompt_ollama_model()
-  index = prompt_response.find(file_name)
+
+  if prompt_response == "":
+    return ""
+
+  index = prompt_response.find(FILE_NAME)
 
   if index == -1:
     return ""
 
-  return prompt_response[index:]
+  def slice_and_find_index(response, start_index):
+    response = response[start_index:]
+    return response, response.find("\"")
 
-print(create_file_name())
+  prompt_response, index = slice_and_find_index(prompt_response, index + len(FILE_NAME))
+  prompt_response, index = slice_and_find_index(prompt_response, index+1)
+
+  return prompt_response[:index]
+
+def change_file_name(file_path):
+  path = Path(file_path)
+
+  # path.rename("")
+  new_file_name = create_file_name_without_extension() + ''.join(path.suffixes)
+
+  return path.parent / new_file_name
+
+# def get_txt_content():
+
+print(change_file_name("C:\\Users\\testUser\\Desktop\\test\\test.txt"))
