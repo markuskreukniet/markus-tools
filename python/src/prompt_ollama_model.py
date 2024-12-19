@@ -1,5 +1,6 @@
 import http.client
 import json
+from io import StringIO
 from pathlib import Path
 
 FILE_NAME = "\"fileName\":"
@@ -81,6 +82,19 @@ def change_file_name(file_path):
 
   return path.parent / new_file_name
 
-# def get_txt_content():
+# TODO: it should count tokens instead of white spaces
+def get_txt_content(file_path):
+  max_white_space_count = 2048 # TODO:
+  white_space_count = 0
+  string_builder = StringIO()
+
+  with open(file_path, "r") as lines:
+    for line in lines:
+      string_builder.write(line) # TODO: could add to much
+      white_space_count += sum(1 for char in line if char.isspace())
+      if white_space_count >= max_white_space_count:
+        break
+
+  return string_builder.getvalue()
 
 print(change_file_name("C:\\Users\\testUser\\Desktop\\test\\test.txt"))
