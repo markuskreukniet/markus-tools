@@ -4,10 +4,11 @@ from io import StringIO
 from pathlib import Path
 
 FILE_NAME = "\"fileName\":"
+INSTRUCTION = f"The content of a text file follows. Give a good file name for that file in a JSON format. The file name should be the property's {FILE_NAME} value as one string."
 
 # TODO: error handling
 def prompt_ollama_model(content):
-    prompt = f"The content of a text file follows. Give a good file name for that file in a JSON format. The file name should be the property's {FILE_NAME} value as one string.\n\n{content}"
+    prompt = f"{INSTRUCTION}\n\n{content}"
 
     connection = http.client.HTTPConnection("localhost:11434")
 
@@ -35,7 +36,7 @@ def prompt_ollama_model(content):
             "tfs_z": 1,
             "seed": 0,
             "top_k": 40,
-            "num_ctx": 2048,
+            "num_ctx": 2048, # token input limit
             "min_p": 0.0
         }),
     )
@@ -104,6 +105,22 @@ def get_txt_content(file_path, max_white_space_count):
 
 def is_blank(s):
   return not s.strip()
+
+# TODO:
+# words, whitespaces, and punctuations. It does not handle sub words such as unhappiness, which are two tokens, 'un' and 'happiness'. It does handle not non western languages such as Japanese.
+def approximate_western_token_count(text):
+  token_count = 0
+  index = 0
+  current_token = []
+
+  while index < len(text):
+    if text[index].isspace() or text[index] in {',', '.', '?', '!', ';', ':', '(', ')', '[', ']'}:
+      token_count += 1
+    else:
+      current_token.append(text[index])
+    index += 1
+
+  return token_count
 
 def change_file_name_by_content(file_path):
   content = get_txt_content(file_path, 2048) # TODO:
