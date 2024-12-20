@@ -4,10 +4,11 @@ from io import StringIO
 from pathlib import Path
 
 FILE_NAME = "\"fileName\":"
+INSTRUCTION = f"The content of a text file follows. Give a good file name for that file in a JSON format. The file name should be the property's {FILE_NAME} value as one string.\n\n"
 
 # TODO: error handling
 def prompt_ollama_model(content):
-    prompt = f"The content of a text file follows. Give a good file name for that file in a JSON format. The file name should be the property's {FILE_NAME} value as one string.\n\n{content}"
+    prompt = f"{INSTRUCTION}{content}"
 
     connection = http.client.HTTPConnection("localhost:11434")
 
@@ -35,7 +36,7 @@ def prompt_ollama_model(content):
             "tfs_z": 1,
             "seed": 0,
             "top_k": 40,
-            "num_ctx": 2048,
+            "num_ctx": 2048, # token input limit
             "min_p": 0.0
         }),
     )
@@ -86,18 +87,15 @@ def change_file_name(file_path, content):
 
   path.rename(path.parent / new_file_name)
 
-  # print(path.parent / new_file_name)
-
-# TODO: it should count tokens instead of white spaces
-def get_txt_content(file_path, max_white_space_count):
-  white_space_count = 0
+def get_txt_content(file_path, max_token_count):
+  token_count = 0
   string_builder = StringIO()
 
   with open(file_path, "r") as lines:
     for line in lines:
-      string_builder.write(line) # TODO: could add to much
-      white_space_count += sum(1 for char in line if char.isspace())
-      if white_space_count >= max_white_space_count:
+      string_builder.write(line) # TODO: could add to much tokens
+      token_count += approximate_western_token_count(line)
+      if token_count >= max_token_count:
         break
 
   return string_builder.getvalue()
@@ -105,8 +103,30 @@ def get_txt_content(file_path, max_white_space_count):
 def is_blank(s):
   return not s.strip()
 
+# This function estimates the number of tokens in Western text.
+# It counts words, whitespace characters, and punctuation marks as tokens.
+# Note: It does not handle sub-word tokenization.
+# For example, "unhappiness" is treated as one token, and not the two tokens, "un" and "happiness."
+def approximate_western_token_count(text):
+  token_count = 0
+  index = 0
+
+  def is_space_or_punctuation(c):
+    return c.isspace() or c in {',', '.', '?', '!', ';', ':', '(', ')', '[', ']'}
+
+  while index < len(text):
+    if is_space_or_punctuation(text[index]):
+      token_count += 1
+      index += 1
+    else:
+      token_count += 1
+      while index < len(text) and not is_space_or_punctuation(text[index]):
+        index += 1
+
+  return token_count
+
 def change_file_name_by_content(file_path):
-  content = get_txt_content(file_path, 2048) # TODO:
+  content = get_txt_content(file_path, 2048 - approximate_western_token_count(INSTRUCTION)) # TODO:
 
   if is_blank(content):
     return
