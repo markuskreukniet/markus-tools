@@ -106,8 +106,11 @@ def get_txt_content(file_path, max_white_space_count):
 def is_blank(s):
   return not s.strip()
 
-# TODO: comment and use it in get_txt_content
-# words, whitespaces, and punctuations. It does not handle sub words such as unhappiness, which are two tokens, 'un' and 'happiness'. It does handle not non western languages such as Japanese.
+# TODO: use it in get_txt_content
+# This function estimates the number of tokens in Western text.
+# It counts words, whitespace characters, and punctuation marks as tokens.
+# Note: It does not handle sub-word tokenization.
+# For example, unhappiness" is treated as one token, and not the two tokens, "un" and "happiness."
 def approximate_western_token_count(text):
   token_count = 0
   index = 0
