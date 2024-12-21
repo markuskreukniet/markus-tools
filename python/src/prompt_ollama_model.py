@@ -111,14 +111,18 @@ def is_blank(s):
 def approximate_western_token_count(text):
   token_count = 0
   index = 0
-  current_token = []
+
+  def is_space_or_punctuation(c):
+    return c.isspace() or c in {',', '.', '?', '!', ';', ':', '(', ')', '[', ']'}
 
   while index < len(text):
-    if text[index].isspace() or text[index] in {',', '.', '?', '!', ';', ':', '(', ')', '[', ']'}:
+    if is_space_or_punctuation(text[index]):
       token_count += 1
+      index += 1
     else:
-      current_token.append(text[index])
-    index += 1
+      token_count += 1
+      while index < len(text) and not is_space_or_punctuation(text[index]):
+        index += 1
 
   return token_count
 
