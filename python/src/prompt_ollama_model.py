@@ -1,12 +1,19 @@
 import http.client
 import json
+from http.client import HTTPException
 from io import StringIO
 from pathlib import Path
 
-FILE_NAME = "\"fileName\":"
-INSTRUCTION = f"The content of a text file follows. Give a good file name for that file in a JSON format. The file name should be the property's {FILE_NAME} value as one string.\n\n"
+from src.utils.utils import is_blank
 
-# TODO: error handling
+FILE_NAME = "\"fileName\":"
+SENTENCE1 = "The content of a text file follows."
+SENTENCE2 = "Give a good file name for that file in a JSON format."
+INSTRUCTION = f"{SENTENCE1} {SENTENCE2} The file name should be the property's {FILE_NAME} value as one string.\n\n"
+TOKEN_INPUT_LIMIT = 2048 # default
+
+# TODO: use python-docx
+
 def prompt_ollama_model(content):
     prompt = f"{INSTRUCTION}{content}"
 
@@ -36,7 +43,7 @@ def prompt_ollama_model(content):
             "tfs_z": 1,
             "seed": 0,
             "top_k": 40,
-            "num_ctx": 2048, # token input limit
+            "num_ctx": TOKEN_INPUT_LIMIT, # token input limit
             "min_p": 0.0
         }),
     )
@@ -45,11 +52,11 @@ def prompt_ollama_model(content):
     response = connection.getresponse()
 
     if response.status == 200:
-        result = json.loads(response.read().decode('utf-8')).get("response", "")
+        result = json.loads(response.read().decode("utf-8")).get("response", "")
     else:
       if connection:
         connection.close()
-        raise Exception("no 200 status code") # TODO: Exception not specific
+        raise HTTPException("no 200 status code")
 
     connection.close()
 
@@ -82,16 +89,15 @@ def change_file_name(file_path, content):
     return
 
   path = Path(file_path)
-
   new_file_name = name + ''.join(path.suffixes)
 
   path.rename(path.parent / new_file_name)
 
-# TODO: does not '\n' to the result since it is split on '\n'?
 def get_txt_content(file_path, max_token_count):
   token_count = 0
   string_builder = StringIO()
 
+  # Each line ends with the "\n" character, except the last line, if the file does not end with a newline.
   with open(file_path, "r") as lines:
     for line in lines:
       for token in basic_western_token_generator(line):
@@ -101,9 +107,6 @@ def get_txt_content(file_path, max_token_count):
           return string_builder.getvalue()
 
   return string_builder.getvalue()
-
-def is_blank(s):
-  return not s.strip()
 
 def approximate_western_token_count(text):
   token_count = 0
@@ -135,7 +138,7 @@ def basic_western_token_generator(text):
       yield string_builder.getvalue()
 
 def change_file_name_by_content(file_path):
-  content = get_txt_content(file_path, 2048 - approximate_western_token_count(INSTRUCTION)) # TODO:
+  content = get_txt_content(file_path, TOKEN_INPUT_LIMIT - approximate_western_token_count(INSTRUCTION))
 
   if is_blank(content):
     return
