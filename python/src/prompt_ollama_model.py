@@ -87,28 +87,37 @@ def change_file_name(file_path, content):
 
   path.rename(path.parent / new_file_name)
 
+# TODO: does not '\n' to the result since it is split on '\n'?
 def get_txt_content(file_path, max_token_count):
   token_count = 0
   string_builder = StringIO()
 
   with open(file_path, "r") as lines:
     for line in lines:
-      string_builder.write(line) # TODO: could add to much tokens
-      token_count += approximate_western_token_count(line)
-      if token_count >= max_token_count:
-        break
+      for token in basic_western_token_generator(line):
+        string_builder.write(token)
+        token_count += 1
+        if token_count == max_token_count:
+          return string_builder.getvalue()
 
   return string_builder.getvalue()
 
 def is_blank(s):
   return not s.strip()
 
-# This function estimates the number of tokens in Western text.
-# It counts words, whitespace characters, and punctuation marks as tokens.
-# Note: It does not handle sub-word tokenization.
-# For example, "unhappiness" is treated as one token, and not the two tokens, "un" and "happiness."
 def approximate_western_token_count(text):
   token_count = 0
+
+  for _ in basic_western_token_generator(text):
+    token_count += 1
+
+  return token_count
+
+# This function generates tokens from Western text.
+# It outputs tokens for words, whitespace characters, and punctuation marks.
+# Note: This function does not support sub-word tokenization.
+# For example, "unhappiness" is treated as a single token, not two tokens ("un" and "happiness").
+def basic_western_token_generator(text):
   index = 0
 
   def is_space_or_punctuation(c):
@@ -116,14 +125,14 @@ def approximate_western_token_count(text):
 
   while index < len(text):
     if is_space_or_punctuation(text[index]):
-      token_count += 1
+      yield text[index]
       index += 1
     else:
-      token_count += 1
+      string_builder = StringIO()
       while index < len(text) and not is_space_or_punctuation(text[index]):
+        string_builder.write(text[index])
         index += 1
-
-  return token_count
+      yield string_builder.getvalue()
 
 def change_file_name_by_content(file_path):
   content = get_txt_content(file_path, 2048 - approximate_western_token_count(INSTRUCTION)) # TODO:
