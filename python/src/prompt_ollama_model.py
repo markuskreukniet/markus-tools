@@ -12,8 +12,6 @@ SENTENCE2 = "Give a good file name for that file in a JSON format."
 INSTRUCTION = f"{SENTENCE1} {SENTENCE2} The file name should be the property's {FILE_NAME} value as one string.\n\n"
 TOKEN_INPUT_LIMIT = 2048 # default
 
-# TODO: use python-docx
-
 def prompt_ollama_model(content):
     prompt = f"{INSTRUCTION}{content}"
 
