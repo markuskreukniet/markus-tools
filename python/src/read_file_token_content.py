@@ -2,19 +2,37 @@ from io import StringIO
 
 import pdfplumber
 
-def read_pdf_with_pdfplumber(file_path):
-    content = []
+from src.utils.utils import is_blank
 
-    with pdfplumber.open(file_path) as pdf:
-        for page in pdf.pages:
-            content.append(page.extract_text())
+# TODO: duplicate code in get_pdf_content and get_txt_content
 
-    return "\n".join(content)
+def get_pdf_content(file_path, max_token_count):
+  token_count = 0
+  string_builder = StringIO()
 
-# Usage
-file_path = "C:\\Users\\testUser\\Desktop\\test\\test.pdf"
-text = read_pdf_with_pdfplumber(file_path)
-print(text)
+  with pdfplumber.open(file_path) as pdf:
+    for page in pdf.pages:
+
+      # Slicing lines costs O(n), which is why not to do that.
+      lines = page.extract_text_lines()
+      length_minus_one = len(lines) - 1
+      for i, line in enumerate(lines):
+        text = line.get("text", "").strip()
+        if is_blank(text):
+          continue
+
+        for token in basic_western_token_generator(text):
+          string_builder.write(token)
+          token_count += 1
+          if token_count == max_token_count:
+            return string_builder.getvalue()
+        if i < length_minus_one:
+          string_builder.write("\n")
+          token_count += 1
+          if token_count == max_token_count:
+            return string_builder.getvalue()
+
+  return string_builder.getvalue()
 
 def get_txt_content(file_path, max_token_count):
   token_count = 0
