@@ -1,10 +1,44 @@
+import zipfile
 from io import StringIO
 
 import pdfplumber
 
 from src.utils.utils import is_blank
 
+# TODO: use python-docx
+
 # TODO: duplicate code in get_pdf_content and get_txt_content
+
+# TODO: check functions: get_file_content, is_text_file, and is_pdf_file
+def get_file_content(file_path, max_token_count):
+  def is_docx_file(path):
+    try:
+      with zipfile.ZipFile(path, "r") as docx_zip:
+        return "word/document.xml" in docx_zip.namelist()
+    except zipfile.BadZipFile:
+      return False
+
+  def is_text_file(path, chunk_size=1024):
+    try:
+      with open(path, "rb") as file:
+        for chunk in iter(lambda: file.read(1024), b""):
+          chunk.decode("utf-8")
+      return True
+    except (UnicodeDecodeError, OSError):
+      return False
+
+  def is_pdf_file(path):
+    try:
+      with open(path, "rb") as file:
+        header = file.read(5)
+        return header == b"%PDF-"
+    except Exception:
+      return False
+
+  if is_text_file(file_path):
+    return get_txt_content(file_path, max_token_count)
+  elif is_pdf_file(file_path):
+    return get_pdf_content(file_path, max_token_count)
 
 def get_pdf_content(file_path, max_token_count):
   token_count = 0
