@@ -3,7 +3,7 @@ import json
 from http.client import HTTPException
 from pathlib import Path
 
-from src.read_file_token_content import basic_western_token_generator, get_txt_content
+from src.read_file_token_content import basic_western_token_generator, get_file_content
 from src.utils.utils import is_blank
 
 FILE_NAME = "\"fileName\":"
@@ -80,13 +80,12 @@ def create_file_name_without_extension(content):
 
   return prompt_response[:index]
 
-def change_file_name(file_path, content):
+def change_file_name(path, content):
   name = create_file_name_without_extension(content)
 
   if is_blank(name):
     return
 
-  path = Path(file_path)
   new_file_name = name + ''.join(path.suffixes)
 
   path.rename(path.parent / new_file_name)
@@ -100,11 +99,16 @@ def approximate_western_token_count(text):
   return token_count
 
 def change_file_name_by_content(file_path):
-  content = get_txt_content(file_path, TOKEN_INPUT_LIMIT - approximate_western_token_count(INSTRUCTION))
+  path = Path(file_path)
+
+  if not path.is_file() and path.stat().st_size > 0:
+    return
+
+  content = get_file_content(file_path, TOKEN_INPUT_LIMIT - approximate_western_token_count(INSTRUCTION))
 
   if is_blank(content):
     return
 
-  change_file_name(file_path, content)
+  change_file_name(path, content)
 
 change_file_name_by_content("C:\\Users\\testUser\\Desktop\\test\\test.txt")

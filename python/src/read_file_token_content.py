@@ -5,45 +5,51 @@ import pdfplumber
 
 from src.utils.utils import is_blank
 
+# TODO: type hinting
+
 # TODO: use python-docx
 
-# TODO: duplicate code in get_pdf_content and get_txt_content
-
-# TODO: check functions: get_file_content, is_text_file, and is_pdf_file
 def get_file_content(file_path, max_token_count):
   def is_docx_file(path):
-    try:
-      with zipfile.ZipFile(path, "r") as docx_zip:
-        return "word/document.xml" in docx_zip.namelist()
-    except zipfile.BadZipFile:
-      return False
+    with zipfile.ZipFile(path, "r") as docx_zip:
+      return "word/document.xml" in docx_zip.namelist()
 
-  def is_text_file(path, chunk_size=1024):
+  def is_text_file(path):
     try:
       with open(path, "rb") as file:
         for chunk in iter(lambda: file.read(1024), b""):
           chunk.decode("utf-8")
       return True
-    except (UnicodeDecodeError, OSError):
+    except UnicodeDecodeError:
       return False
 
   def is_pdf_file(path):
-    try:
-      with open(path, "rb") as file:
-        header = file.read(5)
-        return header == b"%PDF-"
-    except Exception:
-      return False
+    with open(path, "rb") as file:
+      header = file.read(5)
+      return header == b"%PDF-"
 
   if is_text_file(file_path):
-    return get_txt_content(file_path, max_token_count)
+    return get_processed_file_content(file_path, max_token_count, process_txt_content)
   elif is_pdf_file(file_path):
-    return get_pdf_content(file_path, max_token_count)
+    return get_processed_file_content(file_path, max_token_count, process_pdf_content)
 
-def get_pdf_content(file_path, max_token_count):
+def get_processed_file_content(file_path, max_token_count, process_file):
   token_count = 0
   string_builder = StringIO()
 
+  process_file(file_path, token_count, max_token_count, string_builder)
+
+  return string_builder.getvalue()
+
+def process_txt_content(file_path, token_count, max_token_count, string_builder):
+  # Each line ends with the "\n" character, except the last line, if the file does not end with a newline.
+  with open(file_path, "r") as lines:
+    for line in lines:
+      token_count, is_max_token_count = process_tokens(line, string_builder, token_count, max_token_count)
+      if is_max_token_count:
+        return
+
+def process_pdf_content(file_path, token_count, max_token_count, string_builder):
   with pdfplumber.open(file_path) as pdf:
     for page in pdf.pages:
 
@@ -51,37 +57,29 @@ def get_pdf_content(file_path, max_token_count):
       lines = page.extract_text_lines()
       length_minus_one = len(lines) - 1
       for i, line in enumerate(lines):
-        text = line.get("text", "").strip()
+        text = line.get("text", "")
+
+        # This check helps not to add a "\n" character for lines without text.
         if is_blank(text):
           continue
 
-        for token in basic_western_token_generator(text):
-          string_builder.write(token)
-          token_count += 1
-          if token_count == max_token_count:
-            return string_builder.getvalue()
+        token_count, is_max_token_count = process_tokens(text, string_builder, token_count, max_token_count)
+        if is_max_token_count:
+          return
         if i < length_minus_one:
           string_builder.write("\n")
           token_count += 1
           if token_count == max_token_count:
-            return string_builder.getvalue()
+            return
 
-  return string_builder.getvalue()
+def process_tokens(text, string_builder, token_count, max_token_count):
+  for token in basic_western_token_generator(text):
+    string_builder.write(token)
+    token_count += 1
+    if token_count == max_token_count:
+      return token_count, True
 
-def get_txt_content(file_path, max_token_count):
-  token_count = 0
-  string_builder = StringIO()
-
-  # Each line ends with the "\n" character, except the last line, if the file does not end with a newline.
-  with open(file_path, "r") as lines:
-    for line in lines:
-      for token in basic_western_token_generator(line):
-        string_builder.write(token)
-        token_count += 1
-        if token_count == max_token_count:
-          return string_builder.getvalue()
-
-  return string_builder.getvalue()
+  return token_count, False
 
 # This function generates tokens from Western text.
 # It outputs tokens for words, whitespace characters, and punctuation marks.
