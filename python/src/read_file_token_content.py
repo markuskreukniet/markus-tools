@@ -1,13 +1,14 @@
 import zipfile
 from io import StringIO
+from xml.etree import ElementTree
 
 import pdfplumber
 
 from src.utils.utils import is_blank
 
 # TODO: type hinting
-
-# TODO: use python-docx
+# TODO: all strings "" or ''?
+# TODO: add llama.cpp
 
 def get_file_content(file_path, max_token_count):
   def is_docx_file(path):
@@ -32,6 +33,10 @@ def get_file_content(file_path, max_token_count):
     return get_processed_file_content(file_path, max_token_count, process_txt_content)
   elif is_pdf_file(file_path):
     return get_processed_file_content(file_path, max_token_count, process_pdf_content)
+  elif is_docx_file(file_path):
+    return get_processed_file_content(file_path, max_token_count, process_docx_content)
+
+  return ""
 
 def get_processed_file_content(file_path, max_token_count, process_file):
   token_count = 0
@@ -67,16 +72,59 @@ def process_pdf_content(file_path, token_count, max_token_count, string_builder)
         if is_max_token_count:
           return
         if i < length_minus_one:
-          string_builder.write("\n")
-          token_count += 1
-          if token_count == max_token_count:
+          token_count, is_max_token_count = process_newline_token(string_builder, token_count, max_token_count)
+          if is_max_token_count:
             return
+
+# TODO: WIP and check if correct, also always an extra '\n' at the end of the text
+def process_docx_content(file_path, token_count, max_token_count, string_builder):
+  with zipfile.ZipFile(file_path, 'r') as docx_zip:
+    with docx_zip.open('word/document.xml') as document_xml:
+      root = ElementTree.parse(document_xml).getroot()
+      namespace = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+
+      for element in root.find('.//w:body', namespace):
+        if element.tag == f"{{{namespace['w']}}}p":
+          texts = element.findall('.//w:t', namespace)
+          for t in texts:
+            token_count, is_max_token_count = process_tokens(t.text, string_builder, token_count, max_token_count)
+            if is_max_token_count:
+              return
+          token_count, is_max_token_count = process_newline_token(string_builder, token_count, max_token_count)
+          if is_max_token_count:
+            return
+        elif element.tag == f"{{{namespace['w']}}}tbl":
+          for row in element.findall('.//w:tr', namespace):
+            for cell in row.findall('.//w:tc', namespace):
+              for t in cell.findall('.//w:t', namespace):
+                token_count, is_max_token_count = process_tokens(t.text, string_builder, token_count, max_token_count)
+                if is_max_token_count:
+                  return
+                token_count, is_max_token_count = process_token(
+                  '\t', string_builder, token_count, max_token_count
+                )
+                if is_max_token_count:
+                  return
+            token_count, is_max_token_count = process_newline_token(string_builder, token_count, max_token_count)
+            if is_max_token_count:
+              return
+
+def process_newline_token(string_builder, token_count, max_token_count):
+  return process_token('\n', string_builder, token_count, max_token_count)
+
+def process_token(token, string_builder, token_count, max_token_count):
+  string_builder.write(token)
+  token_count += 1
+
+  if token_count == max_token_count:
+    return token_count, True
+
+  return token_count, False
 
 def process_tokens(text, string_builder, token_count, max_token_count):
   for token in basic_western_token_generator(text):
-    string_builder.write(token)
-    token_count += 1
-    if token_count == max_token_count:
+    token_count, is_max_token_count = process_token(token, string_builder, token_count, max_token_count)
+    if is_max_token_count:
       return token_count, True
 
   return token_count, False
