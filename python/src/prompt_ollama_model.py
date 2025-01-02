@@ -10,7 +10,7 @@ FILE_NAME = "\"fileName\":"
 SENTENCE1 = "The content of a text file follows."
 SENTENCE2 = "Give a good file name for that file in a JSON format."
 INSTRUCTION = f"{SENTENCE1} {SENTENCE2} The file name should be the property's {FILE_NAME} value as one string.\n\n"
-TOKEN_INPUT_LIMIT = 2048 # default
+NUMBER_OF_CONTEXT_TOKENS = 2048 # default
 
 def prompt_ollama_model(content):
     prompt = f"{INSTRUCTION}{content}"
@@ -41,7 +41,7 @@ def prompt_ollama_model(content):
             "tfs_z": 1,
             "seed": 0,
             "top_k": 40,
-            "num_ctx": TOKEN_INPUT_LIMIT, # token input limit
+            "num_ctx": NUMBER_OF_CONTEXT_TOKENS,
             "min_p": 0.0
         }),
     )
@@ -104,7 +104,9 @@ def change_file_name_by_content(file_path):
   if not path.is_file() and path.stat().st_size > 0:
     return
 
-  content = get_file_content(file_path, TOKEN_INPUT_LIMIT - approximate_western_token_count(INSTRUCTION))
+  content = get_file_content(
+    file_path, round(NUMBER_OF_CONTEXT_TOKENS * 0.6) - approximate_western_token_count(INSTRUCTION)
+  )
 
   if is_blank(content):
     return
