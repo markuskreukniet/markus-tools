@@ -3,65 +3,62 @@ import json
 from http.client import HTTPException
 from pathlib import Path
 
+from src.prompt_llama_cpp_model import NUMBER_OF_CONTEXT_TOKENS
 from src.read_file_token_content import basic_western_token_generator, get_file_content
-from src.utils.utils import is_blank
+from src.utils.utils import is_blank, create_model_configuration, FILE_NAME, INSTRUCTION
 
-FILE_NAME = "\"fileName\":"
-SENTENCE1 = "The content of a text file follows."
-SENTENCE2 = "Give a good file name for that file in a JSON format."
-INSTRUCTION = f"{SENTENCE1} {SENTENCE2} The file name should be the property's {FILE_NAME} value as one string.\n\n"
-NUMBER_OF_CONTEXT_TOKENS = 2048 # default
+def prompt_ollama_model(content, number_of_input_tokens):
+  configuration = create_model_configuration(NUMBER_OF_CONTEXT_TOKENS, number_of_input_tokens)
+  connection = http.client.HTTPConnection("localhost:11434")
 
-def prompt_ollama_model(content):
-    prompt = f"{INSTRUCTION}{content}"
+  connection.request(
+    method="POST",
+    url="/api/generate",
+    headers={
+      "Content-Type": "application/json"
+    },
 
-    connection = http.client.HTTPConnection("localhost:11434")
+    body=json.dumps({
+      "model": "llama3.2:3B",
+      "prompt": f"{INSTRUCTION}{content}",
+      "stream": False,
 
-    connection.request(
-        method="POST",
-        url="/api/generate",
-        headers={
-            "Content-Type": "application/json"
-        },
+      "num_ctx": configuration.number_of_context_tokens,
+      "num_predict": configuration.max_output_tokens,
 
-        body=json.dumps({
-            "model": "llama3.2:3B",
-            "prompt": prompt,
-            "stream": False,
-            "temperature": 0.1,
-            "top_p": 0.6,
+      "seed": configuration.seed,
+      "tfs_z": configuration.tfs_z,
+      "temperature": configuration.temperature,
 
-            # defaults:
-            "mirostat": 0,
-            "mirostat_eta": 0.1,
-            "mirostat_tau": 0.5,
-            "repeat_last_n": 64,
-            "repeat_penalty": 1.1,
-            "num_predict": -1,
-            "tfs_z": 1,
-            "seed": 0,
-            "top_k": 40,
-            "num_ctx": NUMBER_OF_CONTEXT_TOKENS,
-            "min_p": 0.0
-        }),
-    )
+      "top_k": configuration.top_k,
+      "top_p": configuration.top_p,
+      "min_p": configuration.min_p,
 
-    result = ""
-    response = connection.getresponse()
+      "repeat_last_n": configuration.repeat_last_n,
+      "repeat_penalty": configuration.repeat_penalty,
 
-    if response.status == 200:
-        result = json.loads(response.read().decode("utf-8")).get("response", "")
-    else:
-      if connection:
-        connection.close()
-        raise HTTPException("no 200 status code")
+      "mirostat": configuration.mirostat_mode,
+      "mirostat_eta": configuration.mirostat_eta,
+      "mirostat_tau": configuration.mirostat_tau
+    }),
+  )
 
-    connection.close()
+  result = ""
+  response = connection.getresponse()
 
-    return result
+  if response.status == 200:
+      result = json.loads(response.read().decode("utf-8")).get("response", "")
+  else:
+    if connection:
+      connection.close()
+      raise HTTPException("no 200 status code")
 
-def create_file_name_without_extension(content):
-  prompt_response = prompt_ollama_model(content)
+  connection.close()
+
+  return result
+
+def create_file_name_without_extension(content, number_of_input_tokens):
+  prompt_response = prompt_ollama_model(content, number_of_input_tokens)
 
   if prompt_response == "":
     return ""
@@ -80,8 +77,8 @@ def create_file_name_without_extension(content):
 
   return prompt_response[:index]
 
-def change_file_name(path, content):
-  name = create_file_name_without_extension(content)
+def change_file_name(path, content, number_of_input_tokens):
+  name = create_file_name_without_extension(content, number_of_input_tokens)
 
   if is_blank(name):
     return
@@ -104,13 +101,12 @@ def change_file_name_by_content(file_path):
   if not path.is_file() and path.stat().st_size > 0:
     return
 
-  content = get_file_content(
-    file_path, round(NUMBER_OF_CONTEXT_TOKENS * 0.6) - approximate_western_token_count(INSTRUCTION)
-  )
+  number_of_input_tokens = round(NUMBER_OF_CONTEXT_TOKENS * 0.6)
+  content = get_file_content(file_path, number_of_input_tokens - approximate_western_token_count(INSTRUCTION))
 
   if is_blank(content):
     return
 
-  change_file_name(path, content)
+  change_file_name(path, content, number_of_input_tokens)
 
 change_file_name_by_content("C:\\Users\\testUser\\Desktop\\test\\test.txt")
