@@ -4,6 +4,9 @@ FILE_NAME = "\"fileName\":"
 SENTENCE1 = "The content of a text file follows."
 SENTENCE2 = "Give a good file name for that file in a JSON format."
 INSTRUCTION = f"{SENTENCE1} {SENTENCE2} The file name should be the property's {FILE_NAME} value as one string.\n\n"
+NUMBER_OF_CONTEXT_TOKENS = 2048 # default
+
+# TODO: " = " or "="
 
 # TODO: is useless? use instead? if not s. And .strip() should not be part of it?
 def is_blank(s):
@@ -30,7 +33,6 @@ class ModelConfiguration:
   mirostat_eta: float
   mirostat_tau: float
 
-# TODO: prompt should be part of model creation
 def create_model_configuration(number_of_context_tokens, number_of_input_tokens):
   return ModelConfiguration(
     number_of_context_tokens = number_of_context_tokens,
@@ -51,3 +53,6 @@ def create_model_configuration(number_of_context_tokens, number_of_input_tokens)
     mirostat_eta = 0.1,
     mirostat_tau = 0.5
   )
+
+def create_prompt(content):
+  return f"{INSTRUCTION}{content}"
