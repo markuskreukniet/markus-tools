@@ -25,8 +25,8 @@ import PageNavigator from './components/PageNavigator'
 // TODO: filePathObjects and filePaths to fileSystemNodes, also the non arrays
 // TODO: ResultObject or RO to either
 
-// TODO: bug imagesToDateRangeFolder: selecting same input and output folder , then it does not remove an empty folder
-// TODO: bug imagesToDateRangeFolder: Move images out of a date folder and the use the app again top create the same folder, then it wants to create the same folder, which it can't.
+// TODO: bug imagesToDateRangeFolder: selecting same input and output directory, then it does not remove an empty directory
+// TODO: bug imagesToDateRangeFolder: Move images out of a date directory and the use the app again top create the same directory, then it wants to create the same directory, which it can't.
 
 function App() {
   const [loading, setLoading] = createSignal(false)
