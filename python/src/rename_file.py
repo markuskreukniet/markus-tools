@@ -44,7 +44,7 @@ def change_file_name(path, prompt_model):
   if is_blank(name):
     return
 
-  new_file_name = name + ''.join(path.suffixes)
+  new_file_name = name + "".join(path.suffixes)
 
   path.rename(path.parent / new_file_name)
 

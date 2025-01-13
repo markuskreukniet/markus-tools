@@ -7,8 +7,6 @@ import pdfplumber
 from src.utils.utils import is_blank
 
 # TODO: type hinting
-# TODO: all strings "" or ''?
-# TODO: add llama.cpp
 
 def get_file_content(file_path, max_token_count):
   def is_docx_file(path):
@@ -76,16 +74,16 @@ def process_pdf_content(file_path, token_count, max_token_count, string_builder)
           if is_max_token_count:
             return
 
-# TODO: WIP and check if correct, also always an extra '\n' at the end of the text
+# TODO: WIP and check if correct, also always an extra "\n" at the end of the text
 def process_docx_content(file_path, token_count, max_token_count, string_builder):
-  with zipfile.ZipFile(file_path, 'r') as docx_zip:
-    with docx_zip.open('word/document.xml') as document_xml:
+  with zipfile.ZipFile(file_path, "r") as docx_zip:
+    with docx_zip.open("word/document.xml") as document_xml:
       root = ElementTree.parse(document_xml).getroot()
-      namespace = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+      namespace = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
 
-      for element in root.find('.//w:body', namespace):
-        if element.tag == f"{{{namespace['w']}}}p":
-          texts = element.findall('.//w:t', namespace)
+      for element in root.find(".//w:body", namespace):
+        if element.tag == f"{{{namespace["w"]}}}p":
+          texts = element.findall(".//w:t", namespace)
           for t in texts:
             token_count, is_max_token_count = process_tokens(t.text, string_builder, token_count, max_token_count)
             if is_max_token_count:
@@ -93,15 +91,15 @@ def process_docx_content(file_path, token_count, max_token_count, string_builder
           token_count, is_max_token_count = process_newline_token(string_builder, token_count, max_token_count)
           if is_max_token_count:
             return
-        elif element.tag == f"{{{namespace['w']}}}tbl":
-          for row in element.findall('.//w:tr', namespace):
-            for cell in row.findall('.//w:tc', namespace):
-              for t in cell.findall('.//w:t', namespace):
+        elif element.tag == f"{{{namespace["w"]}}}tbl":
+          for row in element.findall(".//w:tr", namespace):
+            for cell in row.findall(".//w:tc", namespace):
+              for t in cell.findall(".//w:t", namespace):
                 token_count, is_max_token_count = process_tokens(t.text, string_builder, token_count, max_token_count)
                 if is_max_token_count:
                   return
                 token_count, is_max_token_count = process_token(
-                  '\t', string_builder, token_count, max_token_count
+                  "\t", string_builder, token_count, max_token_count
                 )
                 if is_max_token_count:
                   return
@@ -110,7 +108,7 @@ def process_docx_content(file_path, token_count, max_token_count, string_builder
               return
 
 def process_newline_token(string_builder, token_count, max_token_count):
-  return process_token('\n', string_builder, token_count, max_token_count)
+  return process_token("\n", string_builder, token_count, max_token_count)
 
 def process_token(token, string_builder, token_count, max_token_count):
   string_builder.write(token)
@@ -137,7 +135,7 @@ def basic_western_token_generator(text):
   index = 0
 
   def is_space_or_punctuation(c):
-    return c.isspace() or c in {',', '.', '?', '!', ';', ':', '(', ')', '[', ']'}
+    return c.isspace() or c in {",", ".", "?", "!", ";", ":", "(", ")", "[", "]"}
 
   while index < len(text):
     if is_space_or_punctuation(text[index]):

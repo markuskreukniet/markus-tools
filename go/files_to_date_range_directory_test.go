@@ -12,16 +12,16 @@ func createTestContent(subContent string) string {
 
 func TestFilesToDateRangeDirectory(t *testing.T) {
 	// test:
-	//   removing empty folder in destination
-	//   renaming folder in destination from a name with - to a name without -, and the other way around. With adding/removing a file and without
-	//   removing a duplicate file that a folder in the destination folder already contains, and that a different folder already contains
-	//   adding one and two files from source to destination in every sub folder that is a duplicate so instead remove the source file
+	//   removing empty directory in destination
+	//   renaming directory in destination from a name with - to a name without -, and the other way around. With adding/removing a file and without
+	//   removing a duplicate file that a directory in the destination directory already contains, and that a different directory already contains
+	//   adding one and two files from source to destination in every sub directory that is a duplicate so instead remove the source file
 	// V add a file from source to destination
-	// V create a new destination folder
+	// V create a new destination directory
 
 	// TODO: should also remove 0 byte files
 
-	//   destination folder should also checks also its sub directory tree
+	//   destination directory should also checks also its sub directory tree
 
 	// add a file with the same file name, but first rename it with 2 postfix. Or replace file if newer
 	// Maximaal 255 tekens voor een bestandsnaam.
