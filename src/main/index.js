@@ -74,37 +74,37 @@ app.on('window-all-closed', () => {
 
 // self added with ipcMain import
 import duplicateFiles from './modules/duplicateFiles'
-async function duplicateFilesBE(e, fileSystemNodes) {
+async function duplicateFilesBE(_, fileSystemNodes) {
   return duplicateFiles(fileSystemNodes)
 }
 ipcMain.handle('duplicateFilesBE', duplicateFilesBE)
 
 import linesOfCode from './modules/linesOfCode'
-async function linesOfCodeBE(e, fileSystemNodes) {
+async function linesOfCodeBE(_, fileSystemNodes) {
   return linesOfCode(fileSystemNodes)
 }
 ipcMain.handle('linesOfCodeBE', linesOfCodeBE)
 
 import referencesByUrls from './modules/referencesByUrls'
-async function referencesByUrlsBE(e, urlsString) {
+async function referencesByUrlsBE(_, urlsString) {
   return referencesByUrls(urlsString)
 }
 ipcMain.handle('referencesByUrlsBE', referencesByUrlsBE)
 
 import imagesToDateRangeFolder from './modules/imagesToDateRangeFolder'
-async function imagesToDateRangeFolderBE(e, fileSystemNodes, filePath) {
+async function imagesToDateRangeFolderBE(_, fileSystemNodes, filePath) {
   return imagesToDateRangeFolder(fileSystemNodes, filePath)
 }
 ipcMain.handle('imagesToDateRangeFolderBE', imagesToDateRangeFolderBE)
 
 import goFunctionCall from './modules/goFunctionCall'
-async function goFunctionCallBE(e, functionName, argumentObject) {
+async function goFunctionCallBE(_, functionName, argumentObject) {
   return goFunctionCall(functionName, argumentObject)
 }
 ipcMain.handle('goFunctionCallBE', goFunctionCallBE)
 
 import selectFilePathDialog from './modules/selectFilePathDialog'
-async function selectFilePathDialogBE(e, selectFolder) {
+async function selectFilePathDialogBE(_, selectFolder) {
   return selectFilePathDialog(selectFolder)
 }
 ipcMain.handle('selectFilePathDialogBE', selectFilePathDialogBE)
