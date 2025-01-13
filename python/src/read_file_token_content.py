@@ -8,7 +8,6 @@ from src.utils.utils import is_blank
 
 # TODO: type hinting
 # TODO: all strings "" or ''?
-# TODO: add llama.cpp
 
 def get_file_content(file_path, max_token_count):
   def is_docx_file(path):

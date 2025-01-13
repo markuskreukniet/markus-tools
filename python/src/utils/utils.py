@@ -6,9 +6,6 @@ SENTENCE2 = "Give a good file name for that file in a JSON format."
 INSTRUCTION = f"{SENTENCE1} {SENTENCE2} The file name should be the property's {FILE_NAME} value as one string.\n\n"
 NUMBER_OF_CONTEXT_TOKENS = 2048 # default
 
-# TODO: " = " or "="
-
-# TODO: is useless? use instead? if not s. And .strip() should not be part of it?
 def is_blank(s):
   return not s.strip()
 
@@ -35,23 +32,23 @@ class ModelConfiguration:
 
 def create_model_configuration(number_of_context_tokens, number_of_input_tokens):
   return ModelConfiguration(
-    number_of_context_tokens = number_of_context_tokens,
-    max_output_tokens = number_of_context_tokens - number_of_input_tokens,
+    number_of_context_tokens=number_of_context_tokens,
+    max_output_tokens=number_of_context_tokens - number_of_input_tokens,
 
-    seed = 0, # TODO: should be configurable?
-    tfs_z = 1,
-    temperature = 0.1,
+    seed=0, # TODO: should be configurable?
+    tfs_z=1,
+    temperature=0.1,
 
-    top_k = 40,
-    top_p = 0.6,
-    min_p = 0.1,
+    top_k=40,
+    top_p=0.6,
+    min_p=0.1,
 
-    repeat_last_n = 64,
-    repeat_penalty = 1.1,
+    repeat_last_n=64,
+    repeat_penalty=1.1,
 
-    mirostat_mode = 0,
-    mirostat_eta = 0.1,
-    mirostat_tau = 0.5
+    mirostat_mode=0,
+    mirostat_eta=0.1,
+    mirostat_tau=0.5
   )
 
 def create_prompt(content):
