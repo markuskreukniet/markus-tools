@@ -4,7 +4,7 @@ import SubmittableFileSystemNodeInputs from '../filePathInput/SubmittableFileSys
 
 import { toEitherRightResult } from '../../../../preload/monads/either'
 
-export default function imagesToDateRangeFolder(props) {
+export default function imagesToDateRangeDirectory(props) {
   let inputFilePathObjects = []
   let outputFilePath = ''
   const [eitherResultOutput, setEitherResultOutput] = createSignal(null)
@@ -12,11 +12,8 @@ export default function imagesToDateRangeFolder(props) {
   const [hasValidInput, setHasValidInput] = createSignal(false)
 
   async function setStateWithBE(filePathObjects, filePath) {
-    const imagesToDateRangeFolderRO = await window.dateRangeFolder.imagesToDateRangeFolderBE(
-      filePathObjects,
-      filePath
-    )
     // TODO: imagesToDateRangeFolderBE should return eitherResult and should be setEitherResultOutput(result)
+    await window.dateRangeFolder.imagesToDateRangeFolderBE(filePathObjects, filePath)
     setEitherResultOutput(toEitherRightResult(null))
   }
 
