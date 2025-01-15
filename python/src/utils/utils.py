@@ -14,6 +14,8 @@ class ModelConfiguration:
   number_of_context_tokens: int # The model's maximum token limit includes input (prompt) and generated output.
   max_output_tokens: int
 
+  # In Ollama, 'seed=0' sets a random seed; in llama.cpp, omit the seed for randomness.
+  # However, when I omit the seed, llama.cpp gives unusable results.
   seed: int
   tfs_z: int
   temperature: float
@@ -35,7 +37,7 @@ def create_model_configuration(number_of_context_tokens, number_of_input_tokens)
     number_of_context_tokens=number_of_context_tokens,
     max_output_tokens=number_of_context_tokens - number_of_input_tokens,
 
-    seed=0, # TODO: should be configurable?
+    seed=0,
     tfs_z=1,
     temperature=0.1,
 
