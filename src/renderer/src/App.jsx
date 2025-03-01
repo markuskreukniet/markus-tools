@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js'
 import DuplicateFiles from './components/pages/DuplicateFiles'
-import ImagesToDateRangeFolder from './components/pages/ImagesToDateRangeFolder'
+import ImagesToDateRangeDirectory from './components/pages/ImagesToDateRangeDirectory'
 import LinesOfCode from './components/pages/LinesOfCode'
 import PlainTextFilesToText from './components/pages/PlainTextFilesToText'
 import ReferencesByUrls from './components/pages/ReferencesByUrls'
@@ -12,7 +12,7 @@ import PageNavigator from './components/PageNavigator'
 // TODO: check for error handling, createEffects, useless comments, useless changes (onChange) to parent element
 // TODO: In JavaScript, when a function modifies an array, it is also modified outside the function, refactor code with this logic.
 // TODO: use batch, untrack, on (with { defer: true }) from import { batch, on, untrack } from "solid-js";?
-// TODO: ImagesToDateRangeFolder: show how many files added/changed/removed
+// TODO: ImagesToDateRangeDirectory: show how many files added/changed/removed
 // TODO: use min-width: 0? https://www.youtube.com/watch?v=cH8VbLM1958&t=4s
 // TODO: fix font-size? https://www.youtube.com/watch?v=rg3zgQ3xBRc
 // TODO: when to use rem and when px(see description) https://www.youtube.com/watch?v=xCSw6bPXZks
@@ -25,8 +25,8 @@ import PageNavigator from './components/PageNavigator'
 // TODO: filePathObjects and filePaths to fileSystemNodes, also the non arrays
 // TODO: ResultObject or RO to either
 
-// TODO: bug imagesToDateRangeFolder: selecting same input and output directory, then it does not remove an empty directory
-// TODO: bug imagesToDateRangeFolder: Move images out of a date directory and the use the app again top create the same directory, then it wants to create the same directory, which it can't.
+// TODO: bug imagesToDateRangeDirectory: selecting same input and output directory, then it does not remove an empty directory
+// TODO: bug imagesToDateRangeDirectory: Move images out of a date directory and the use the app again top create the same directory, then it wants to create the same directory, which it can't.
 
 function App() {
   const [loading, setLoading] = createSignal(false)
@@ -34,7 +34,10 @@ function App() {
     createNavigationBarItemPageCombination(DuplicateFiles, 'Duplicate Files'),
     createNavigationBarItemPageCombination(LinesOfCode, 'Lines of Code (LOC)'),
     createNavigationBarItemPageCombination(ReferencesByUrls, 'References by URLs'),
-    createNavigationBarItemPageCombination(ImagesToDateRangeFolder, 'Images to Date Range Folder'),
+    createNavigationBarItemPageCombination(
+      ImagesToDateRangeDirectory,
+      'Images to Date Range Directory'
+    ),
     createNavigationBarItemPageCombination(
       SynchronizeDirectoryTrees,
       'Synchronize Directory Trees'
