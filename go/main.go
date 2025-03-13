@@ -8,10 +8,12 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
+// TODO: rename functionCall to something shorter
 const (
 	functionCallSynchronizeDirectoryTreesToJSON                 string = "synchronizeDirectoryTreesToJSON"
 	functionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON string = "getDuplicateFilesAsNewlineSeparatedStringToJSON"
 	functionCallPlainTextFilesToTextToJSON                      string = "plainTextFilesToTextToJSON"
+	functionCallFilesToDateRangeDirectoryToJSON                 string = "filesToDateRangeDirectoryToJSON"
 )
 
 type uniqueFileSystemNodes struct {
@@ -23,13 +25,20 @@ type synchronizeDirectoryTreesArguments struct {
 	DestinationDirectoryFilePath string `json:"destinationDirectoryFilePath"`
 }
 
+type filesToDateRangeDirectoryArguments struct {
+	UniqueFileSystemNodes        []utils.FileSystemNode `json:"uniqueFileSystemNodes"` // TODO: use uniqueFileSystemNodes struct?
+	DestinationDirectoryFilePath string                 `json:"destinationDirectoryFilePath"`
+}
+
 func toFunctionCall(functionCall, jsonArguments string) string {
 	var err error
 	switch functionCall {
 	case functionCallSynchronizeDirectoryTreesToJSON:
 		var arguments synchronizeDirectoryTreesArguments
 		if err = json.Unmarshal([]byte(jsonArguments), &arguments); err == nil {
-			return synchronizeDirectoryTreesToJSON(arguments.SourceDirectoryFilePath, arguments.DestinationDirectoryFilePath)
+			return synchronizeDirectoryTreesToJSON(
+				arguments.SourceDirectoryFilePath, arguments.DestinationDirectoryFilePath,
+			)
 		}
 	case functionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON:
 		var argument uniqueFileSystemNodes
@@ -40,6 +49,13 @@ func toFunctionCall(functionCall, jsonArguments string) string {
 		var argument uniqueFileSystemNodes
 		if err = json.Unmarshal([]byte(jsonArguments), &argument); err == nil {
 			return plainTextFilesToTextToJSON(argument.UniqueFileSystemNodes)
+		}
+	case functionCallFilesToDateRangeDirectoryToJSON:
+		var arguments filesToDateRangeDirectoryArguments
+		if err = json.Unmarshal([]byte(jsonArguments), &arguments); err == nil {
+			return filesToDateRangeDirectoryToJSON(
+				arguments.UniqueFileSystemNodes, arguments.DestinationDirectoryFilePath,
+			)
 		}
 	}
 	errorMessage := "did not receive a correct function call string"
