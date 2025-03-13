@@ -420,3 +420,12 @@ func filesToDateRangeDirectory(uniqueFileSystemNodes []utils.FileSystemNode, des
 
 	return nil
 }
+
+func filesToDateRangeDirectoryToJSON(
+	uniqueFileSystemNodes []utils.FileSystemNode, destinationDirectoryPath string,
+) string {
+	if err := filesToDateRangeDirectory(uniqueFileSystemNodes, destinationDirectoryPath); err != nil {
+		return errorToJSONFunctionResult(err)
+	}
+	return defaultJSONFunctionResult()
+}

@@ -32,11 +32,6 @@ contextBridge.exposeInMainWorld('references', {
   referencesByUrlsBE: (urlsString) => ipcRenderer.invoke('referencesByUrlsBE', urlsString)
 })
 
-contextBridge.exposeInMainWorld('dateRangeFolder', {
-  imagesToDateRangeFolderBE: (fileSystemNodes, filePath) =>
-    ipcRenderer.invoke('imagesToDateRangeFolderBE', fileSystemNodes, filePath)
-})
-
 contextBridge.exposeInMainWorld('goBackend', {
   goFunctionCallBE: (functionName, argumentObject) =>
     ipcRenderer.invoke('goFunctionCallBE', functionName, argumentObject)
