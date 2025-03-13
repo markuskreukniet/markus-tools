@@ -4,7 +4,7 @@ import SubmittableFileSystemNodeInputs from '../filePathInput/SubmittableFileSys
 
 import { toEitherRightResult } from '../../../../preload/monads/either'
 
-export default function imagesToDateRangeDirectory(props) {
+export default function filesToDateRangeDirectory(props) {
   let inputFilePathObjects = [] // TODO: correct naming?
   let outputFilePath = '' // TODO: correct naming?
   const [eitherResultOutput, setEitherResultOutput] = createSignal(null)

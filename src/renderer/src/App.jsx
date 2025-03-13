@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js'
 import DuplicateFiles from './components/pages/DuplicateFiles'
-import ImagesToDateRangeDirectory from './components/pages/ImagesToDateRangeDirectory'
+import FilesToDateRangeDirectory from './components/pages/FilesToDateRangeDirectory'
 import LinesOfCode from './components/pages/LinesOfCode'
 import PlainTextFilesToText from './components/pages/PlainTextFilesToText'
 import ReferencesByUrls from './components/pages/ReferencesByUrls'
@@ -9,26 +9,24 @@ import LoadingSpinner from './components/LoadingSpinner'
 import PageNavigator from './components/PageNavigator'
 // import logo from './assets/logo.svg'
 
-// TODO: rename imagesToDateRangeDirectory to filesToDateRangeDirectory
+// TODO: FilesToDateRangeDirectory: show how many files added/changed/removed
+
 // TODO: the naming of the params for goFunctionCall should be enums
 // TODO: check for error handling, createEffects, useless comments, useless changes (onChange) to parent element
 // TODO: In JavaScript, when a function modifies an array, it is also modified outside the function, refactor code with this logic.
 // TODO: use batch, untrack, on (with { defer: true }) from import { batch, on, untrack } from "solid-js";?
-// TODO: ImagesToDateRangeDirectory: show how many files added/changed/removed
 // TODO: use min-width: 0? https://www.youtube.com/watch?v=cH8VbLM1958&t=4s
 // TODO: fix font-size? https://www.youtube.com/watch?v=rg3zgQ3xBRc
 // TODO: when to use rem and when px(see description) https://www.youtube.com/watch?v=xCSw6bPXZks
 // TODO: use onMouseDown? https://www.youtube.com/watch?v=yaMGtiPckAQ
 
-// TODO: rename folder to directory
-// TODO: rename files.js to filePath.js
+// TODO: rename files.js in preload to filePath.js
 // TODO: No Symlink Handling, which results in bugs. Maybe is the right fix the use of symlinks (LStat)?
 
 // TODO: filePathObjects and filePaths to fileSystemNodes, also the non arrays
 // TODO: ResultObject or RO to either
 
-// TODO: bug imagesToDateRangeDirectory: selecting same input and output directory, then it does not remove an empty directory
-// TODO: bug imagesToDateRangeDirectory: Move images out of a date directory and the use the app again top create the same directory, then it wants to create the same directory, which it can't.
+// TODO: bug filesToDateRangeDirectory: selecting same input and output directory, then it does not remove an empty directory
 
 function App() {
   const [loading, setLoading] = createSignal(false)
@@ -37,7 +35,7 @@ function App() {
     createNavigationBarItemPageCombination(LinesOfCode, 'Lines of Code (LOC)'),
     createNavigationBarItemPageCombination(ReferencesByUrls, 'References by URLs'),
     createNavigationBarItemPageCombination(
-      ImagesToDateRangeDirectory,
+      FilesToDateRangeDirectory,
       'Images to Date Range Directory'
     ),
     createNavigationBarItemPageCombination(
