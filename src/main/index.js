@@ -73,12 +73,6 @@ app.on('window-all-closed', () => {
 // code. You can also put them in separate files and require them here.
 
 // self added with ipcMain import
-import duplicateFiles from './modules/duplicateFiles'
-async function duplicateFilesBE(_, fileSystemNodes) {
-  return duplicateFiles(fileSystemNodes)
-}
-ipcMain.handle('duplicateFilesBE', duplicateFilesBE)
-
 import linesOfCode from './modules/linesOfCode'
 async function linesOfCodeBE(_, fileSystemNodes) {
   return linesOfCode(fileSystemNodes)
@@ -98,7 +92,7 @@ async function goFunctionCallBE(_, functionName, argumentObject) {
 ipcMain.handle('goFunctionCallBE', goFunctionCallBE)
 
 import selectFilePathDialog from './modules/selectFilePathDialog'
-async function selectFilePathDialogBE(_, selectFolder) {
-  return selectFilePathDialog(selectFolder)
+async function selectFilePathDialogBE(_, selectDirectory) {
+  return selectFilePathDialog(selectDirectory)
 }
 ipcMain.handle('selectFilePathDialogBE', selectFilePathDialogBE)
