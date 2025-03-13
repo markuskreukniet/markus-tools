@@ -91,12 +91,6 @@ async function referencesByUrlsBE(_, urlsString) {
 }
 ipcMain.handle('referencesByUrlsBE', referencesByUrlsBE)
 
-import imagesToDateRangeFolder from './modules/imagesToDateRangeFolder'
-async function imagesToDateRangeFolderBE(_, fileSystemNodes, filePath) {
-  return imagesToDateRangeFolder(fileSystemNodes, filePath)
-}
-ipcMain.handle('imagesToDateRangeFolderBE', imagesToDateRangeFolderBE)
-
 import goFunctionCall from './modules/goFunctionCall'
 async function goFunctionCallBE(_, functionName, argumentObject) {
   return goFunctionCall(functionName, argumentObject)
