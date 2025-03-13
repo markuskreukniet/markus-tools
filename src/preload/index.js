@@ -20,10 +20,6 @@ if (process.contextIsolated) {
 }
 
 // self added with ipcRenderer import
-contextBridge.exposeInMainWorld('duplicateFiles', {
-  duplicateFilesBE: (fileSystemNodes) => ipcRenderer.invoke('duplicateFilesBE', fileSystemNodes)
-})
-
 contextBridge.exposeInMainWorld('codeQuality', {
   linesOfCodeBE: (fileSystemNodes) => ipcRenderer.invoke('linesOfCodeBE', fileSystemNodes)
 })
@@ -38,6 +34,6 @@ contextBridge.exposeInMainWorld('goBackend', {
 })
 
 contextBridge.exposeInMainWorld('dialog', {
-  selectFilePathDialogBE: (selectFolder) =>
-    ipcRenderer.invoke('selectFilePathDialogBE', selectFolder)
+  selectFilePathDialogBE: (selectDirectory) =>
+    ipcRenderer.invoke('selectFilePathDialogBE', selectDirectory)
 })
