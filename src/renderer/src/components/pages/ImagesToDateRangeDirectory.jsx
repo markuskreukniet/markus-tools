@@ -5,15 +5,19 @@ import SubmittableFileSystemNodeInputs from '../filePathInput/SubmittableFileSys
 import { toEitherRightResult } from '../../../../preload/monads/either'
 
 export default function imagesToDateRangeDirectory(props) {
-  let inputFilePathObjects = []
-  let outputFilePath = ''
+  let inputFilePathObjects = [] // TODO: correct naming?
+  let outputFilePath = '' // TODO: correct naming?
   const [eitherResultOutput, setEitherResultOutput] = createSignal(null)
   const [getOutput, setGetOutput] = createSignal(function () {})
   const [hasValidInput, setHasValidInput] = createSignal(false)
 
-  async function setStateWithBE(filePathObjects, filePath) {
-    // TODO: imagesToDateRangeFolderBE should return eitherResult and should be setEitherResultOutput(result)
-    await window.dateRangeFolder.imagesToDateRangeFolderBE(filePathObjects, filePath)
+  async function setStateWithBE(uniqueFileSystemNodes, destinationDirectoryFilePath) {
+    // TODO: result
+    await window.goBackend.goFunctionCallBE('filesToDateRangeDirectoryToJSON', {
+      uniqueFileSystemNodes,
+      destinationDirectoryFilePath
+    })
+
     setEitherResultOutput(toEitherRightResult(null))
   }
 
