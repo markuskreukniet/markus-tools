@@ -18,7 +18,7 @@ export default function DuplicateFiles(props) {
     setResult(textareaValue)
   }
 
-  // TODO: looks a lot like imagesToDateRangeDirectory handleInputFilePathsRO
+  // TODO: looks a lot like filesToDateRangeDirectory handleInputFilePathsRO
   function handleChange(result) {
     if (result.isRight()) {
       setGetOutput(setStateWithBE(result.value))
