@@ -1,8 +1,131 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"strings"
+	"sync"
+	"time"
 	"unicode"
+
+	"github.com/markuskreukniet/markus-tools/go/utils"
 )
+
+func referencesByUrls(rawUrls string) string {
+	hostNames, titles, errors, hasOnlyErrors := extractHostNamesAndTitlesOrdered(rawUrls)
+
+	if hasOnlyErrors {
+		return "No references found"
+	}
+
+	createSource := func(title, hostName string) string {
+		return fmt.Sprintf("\"%s\" by %s", title, hostName)
+	}
+
+	var builder strings.Builder
+	index := 0
+	for i, title := range titles {
+		if errors[i] == nil {
+			builder.WriteString(fmt.Sprintf("(sources: %s", createSource(title, hostNames[i])))
+			index = i + 1
+			break
+		}
+	}
+
+	for _, title := range titles[index:] {
+		builder.WriteString(fmt.Sprintf(", %s", createSource(title, hostNames[index])))
+		index++
+	}
+
+	builder.WriteString(")")
+
+	return builder.String()
+}
+
+func splitTrimmedNonEmptyLines(s string) []string {
+	var result []string
+	scanner := bufio.NewScanner(strings.NewReader(s))
+
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line != "" {
+			result = append(result, line)
+		}
+	}
+
+	return result
+}
+
+func extractHostNamesAndTitlesOrdered(rawUrls string) ([]string, []string, []error, bool) {
+	findTitle := func(elements []string) (string, bool) {
+		for _, element := range elements {
+			title := strings.TrimSpace(removeTagsFromElement(element))
+			if !utils.IsBlank(title) {
+				return title, true
+			}
+		}
+
+		return "", false
+	}
+
+	lines := splitTrimmedNonEmptyLines(rawUrls)
+	length := len(lines)
+	hostNames, titles, errors := make([]string, length), make([]string, length), make([]error, length) // TODO: use this multiple assign style also on other places
+	errorCount := 0
+	var group sync.WaitGroup
+
+	for i, line := range lines {
+		group.Add(1)
+
+		go func(index int, rawUrl string) {
+			defer group.Done()
+
+			parsedURL, err := url.Parse(rawUrl)
+			if err != nil {
+				errorCount++
+				return
+			}
+
+			page, err := downloadWebPage(rawUrl)
+			if err != nil {
+				errorCount++
+				return
+			}
+
+			titleElements, h1Elements := findTitleAndH1Elements(filterComments(page))
+
+			title, titleFound := findTitle(h1Elements)
+			if !titleFound {
+				title, _ = findTitle(titleElements)
+			}
+
+			hostNames[index], titles[index], errors[index] = parsedURL.Hostname(), title, err
+		}(i, line)
+	}
+
+	group.Wait()
+
+	return hostNames, titles, errors, length == errorCount
+}
+
+func downloadWebPage(url string) (string, error) {
+	client := http.Client{Timeout: 8 * time.Second}
+	response, err := client.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer response.Body.Close()
+
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(body), nil
+}
 
 func isPeriod(r rune) bool {
 	return r == '.'
