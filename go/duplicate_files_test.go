@@ -50,9 +50,8 @@ func TestGetDuplicateFilesAsNewlineSeparatedString(t *testing.T) {
 			directories, fileSystemNodes := utils.WriteFilesByMultipleInputs(t, tc.Input)
 			defer utils.RemoveDirectoryTrees(t, directories)
 
-			lines := strings.Split(wantedOutcome, "\n")
 			var trimmedLines []string
-			for _, line := range lines {
+			for _, line := range strings.Split(wantedOutcome, "\n") {
 				trimmed := strings.TrimSpace(line)
 				if trimmed != "" {
 					// 'filepath.FromSlash'
