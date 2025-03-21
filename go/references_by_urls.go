@@ -165,13 +165,11 @@ func isLetterDigitHyphenOrUnderscore(r rune) bool {
 
 // returns: tagPartLength, tagIsClosed, tagIsFound
 func finishCreatingStartTag(document []rune, documentLength, index int) (int, bool, bool) {
-	startTagEndPartLength := 0
 	closingTagPart := []rune("/>")
-	var quoteRune rune
-	inAttributeName := false
-	inAttributeValue := false
+	startTagEndPartLength, closingTagPartLength := 0, len(closingTagPart)
 
-	closingTagPartLength := len(closingTagPart)
+	var quoteRune rune
+	inAttributeName, inAttributeValue := false, false
 
 	for ; index < documentLength; index++ {
 		if inAttributeName {
@@ -276,8 +274,7 @@ func findHTMLElements(document, elementName string) []string {
 	startTagPartRunes := append([]rune("<"), []rune(elementName)...)
 	endTagPartRunes := append([]rune("</"), []rune(elementName)...)
 
-	documentLength := len(documentRunes)
-	startTagPartLength := len(startTagPartRunes)
+	documentLength, startTagPartLength := len(documentRunes), len(startTagPartRunes)
 
 	for i := 0; i < documentLength; i++ {
 		length, tagIsClosed, hasPrefix := hasOpenOrSelfClosingHTMLTagPrefix(documentRunes, startTagPartRunes, documentLength, startTagPartLength, i)
@@ -553,12 +550,9 @@ func filterComments(htmlDocument string) string {
 	jsBacktickInterpolationEnd := rune('}')
 
 	htmlDocumentRunes := []rune(htmlDocument)
-	htmlCommentStart := []rune("<!--")
-	htmlCommentEnd := []rune("-->")
-	jsCommentSingleLineStart := []rune("//")
-	jsCommentSingleLineEnd := []rune("\n")
-	commentMultiLineStart := []rune("/*")
-	commentMultiLineEnd := []rune("*/")
+	htmlCommentStart, htmlCommentEnd := []rune("<!--"), []rune("-->")
+	jsCommentSingleLineStart, jsCommentSingleLineEnd := []rune("//"), []rune("\n")
+	commentMultiLineStart, commentMultiLineEnd := []rune("/*"), []rune("*/")
 	jsBacktickInterpolationStart := []rune("${")
 
 	htmlDocumentRunesLength := len(htmlDocumentRunes)

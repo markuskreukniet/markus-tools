@@ -314,8 +314,7 @@ func moveFilesAndFilterGoodDirectories(
 	}
 
 	moveFilesToDirectory := func() error {
-		firstFile := group[0]
-		lastFile := group[len(group)-1]
+		firstFile, lastFile := group[0], group[len(group)-1]
 
 		directoryName := formatTimeModified(firstFile)
 		if lastFile.TimeModified.Sub(firstFile.TimeModified).Hours() >= 24 {
