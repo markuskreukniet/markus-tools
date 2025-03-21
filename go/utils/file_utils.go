@@ -128,8 +128,7 @@ func resolveDirectoryPath(filePath string, isDirectory bool) string {
 func FilterAndHandleFileInfo(
 	info os.FileInfo, mode fileFilterMode, fileType fileType, absoluteFilePath string, handler func(CompleteFileInfo),
 ) error {
-	isDir := info.IsDir()
-	isRegularFile := info.Mode().IsRegular()
+	isDir, isRegularFile := info.IsDir(), info.Mode().IsRegular()
 
 	var size int64
 	if isRegularFile {
