@@ -28,7 +28,7 @@ export default function ActivatableButton(props) {
 
   return (
     <button
-      onClick={() => props.onAction()}
+      onMouseDown={() => props.onAction()}
       disabled={!active()}
       {...getVariantAttribute(props.variant)}
     >
