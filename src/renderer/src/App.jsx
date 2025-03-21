@@ -18,7 +18,6 @@ import PageNavigator from './components/PageNavigator'
 // TODO: use min-width: 0? https://www.youtube.com/watch?v=cH8VbLM1958&t=4s
 // TODO: fix font-size? https://www.youtube.com/watch?v=rg3zgQ3xBRc
 // TODO: when to use rem and when px(see description) https://www.youtube.com/watch?v=xCSw6bPXZks
-// TODO: use onMouseDown? https://www.youtube.com/watch?v=yaMGtiPckAQ
 
 // TODO: rename files.js in preload to filePath.js
 // TODO: No Symlink Handling, which results in bugs. Maybe is the right fix the use of symlinks (LStat)?

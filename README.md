@@ -40,6 +40,7 @@ With `go test`, we can run unit test from 'markus-tools/go' to test the 'go' dir
 ### Rules
 
 - We should not use CSS margins. This [video](https://www.youtube.com/watch?v=KVQMoEFUee8) can explain why we should not use it.
+- We should not always use `click` on button elements, but instead prefer `mouseDown`. This [video](https://www.youtube.com/watch?v=yaMGtiPckAQ) can explain why we should not use it.
 
 ### Build
 

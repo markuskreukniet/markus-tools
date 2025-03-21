@@ -6,7 +6,7 @@ export default function NavigationBar(props) {
       <For each={props.items()}>
         {(item) => (
           <li
-            onClick={() => props.onChange(item.name)}
+            onMouseDown={() => props.onChange(item.name)}
             classList={{ 'navigation-bar__item--active': item.active }}
           >
             {item.name}
