@@ -14,6 +14,10 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
+func referencesByUrlsToJSON(rawUrls string) string {
+	return resultToJSONFunctionResult(referencesByUrls(rawUrls))
+}
+
 func referencesByUrls(rawUrls string) string {
 	hostNames, titles, errors, hasOnlyErrors := extractHostNamesAndTitlesOrdered(rawUrls)
 
