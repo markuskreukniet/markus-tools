@@ -79,12 +79,6 @@ async function linesOfCodeBE(_, fileSystemNodes) {
 }
 ipcMain.handle('linesOfCodeBE', linesOfCodeBE)
 
-import referencesByUrls from './modules/referencesByUrls'
-async function referencesByUrlsBE(_, urlsString) {
-  return referencesByUrls(urlsString)
-}
-ipcMain.handle('referencesByUrlsBE', referencesByUrlsBE)
-
 import goFunctionCall from './modules/goFunctionCall'
 async function goFunctionCallBE(_, functionName, argumentObject) {
   return goFunctionCall(functionName, argumentObject)

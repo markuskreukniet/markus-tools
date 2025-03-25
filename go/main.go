@@ -8,12 +8,13 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
-// TODO: rename functionCall to something shorter
+// TODO: rename functionCall to something shorter, to func?
 const (
 	functionCallSynchronizeDirectoryTreesToJSON                 string = "synchronizeDirectoryTreesToJSON"
 	functionCallGetDuplicateFilesAsNewlineSeparatedStringToJSON string = "getDuplicateFilesAsNewlineSeparatedStringToJSON"
 	functionCallPlainTextFilesToTextToJSON                      string = "plainTextFilesToTextToJSON"
 	functionCallFilesToDateRangeDirectoryToJSON                 string = "filesToDateRangeDirectoryToJSON"
+	functionCallReferencesByUrlsToJSON                          string = "referencesByUrlsToJSON"
 )
 
 type uniqueFileSystemNodes struct {
@@ -56,6 +57,11 @@ func toFunctionCall(functionCall, jsonArguments string) string {
 			return filesToDateRangeDirectoryToJSON(
 				arguments.UniqueFileSystemNodes, arguments.DestinationDirectoryFilePath,
 			)
+		}
+	case functionCallReferencesByUrlsToJSON:
+		var argument string
+		if err = json.Unmarshal([]byte(jsonArguments), &argument); err == nil {
+			return referencesByUrlsToJSON(argument)
 		}
 	}
 	errorMessage := "did not receive a correct function call string"
