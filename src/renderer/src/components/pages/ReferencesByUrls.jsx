@@ -27,7 +27,7 @@ export default function ReferencesByUrls(props) {
   async function setStateWithBE() {
     setEitherResultOutput(
       getEitherResultValueOrEitherResultToErrorString(
-        await window.references.referencesByUrlsBE(textAreaValue())
+        await window.goBackend.goFunctionCallBE('referencesByUrlsToJSON', textAreaValue())
       )
     )
   }

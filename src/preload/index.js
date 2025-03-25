@@ -24,10 +24,6 @@ contextBridge.exposeInMainWorld('codeQuality', {
   linesOfCodeBE: (fileSystemNodes) => ipcRenderer.invoke('linesOfCodeBE', fileSystemNodes)
 })
 
-contextBridge.exposeInMainWorld('references', {
-  referencesByUrlsBE: (urlsString) => ipcRenderer.invoke('referencesByUrlsBE', urlsString)
-})
-
 contextBridge.exposeInMainWorld('goBackend', {
   goFunctionCallBE: (functionName, argumentObject) =>
     ipcRenderer.invoke('goFunctionCallBE', functionName, argumentObject)
