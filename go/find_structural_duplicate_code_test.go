@@ -53,6 +53,7 @@ func areFunctionsStructurallyEqual(a, b *ast.FuncDecl) bool {
 	return reflect.DeepEqual(a, b)
 }
 
+// TODO: naming
 func stripAllPos(n ast.Node) ast.Node {
 	ast.Inspect(n, func(n ast.Node) bool {
 		if n == nil {
