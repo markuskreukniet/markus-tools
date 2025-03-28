@@ -58,8 +58,8 @@ func stripAllPos(n ast.Node) ast.Node {
 		if n == nil {
 			return false
 		}
-		// Use reflection to zero out all token.Pos fields
-		v := reflect.ValueOf(n).Elem()
+
+		v := reflect.ValueOf(n).Elem() // access the struct behind the interface and pointer
 		for i := 0; i < v.NumField(); i++ {
 			f := v.Field(i)
 			if f.Type() == reflect.TypeOf(token.Pos(0)) && f.CanSet() {
