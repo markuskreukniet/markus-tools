@@ -14,7 +14,8 @@ func tMustCreateAsts(t *testing.T, files map[string]string) map[string]*ast.File
 	return utils.TMust(t, result, err)
 }
 
-// Clear Obj to ignore symbol binding differences during structural comparison. // TODO: better comment
+// An Obj represents a reference to a declared symbol in the code.
+// Symbols include variables, parameters, functions, constants, types, and labels.
 func areFunctionsStructurallyEqual(a, b *ast.FuncDecl) bool {
 	a.Name = &ast.Ident{Name: ""}
 	b.Name = &ast.Ident{Name: ""}
