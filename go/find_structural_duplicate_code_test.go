@@ -33,7 +33,7 @@ func areFunctionsStructurallyEqual(a, b *ast.FuncDecl) bool {
 	// Clear parameter references in function bodies, but not function call names // TODO: comment // TODO: naming
 	iets := func(d *ast.FuncDecl) {
 		ast.Inspect(d, func(n ast.Node) bool {
-			if ident, ok := n.(*ast.Ident); ok && ident.Obj != nil {
+			if ident, ok := n.(*ast.Ident); ok && ident.Obj != nil { // TODO: is 'ident.Obj != nil' check needed?
 				ident.Name = ""
 				ident.Obj = nil
 			}
