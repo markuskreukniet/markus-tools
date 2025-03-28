@@ -30,10 +30,9 @@ func areFunctionsStructurallyEqual(a, b *ast.FuncDecl) bool {
 		}
 	}
 
-	// Clear parameter references in function bodies, but not function call names // TODO: comment // TODO: naming
-	iets := func(d *ast.FuncDecl) {
+	clearFunctionBodyBoundIdentifiers := func(d *ast.FuncDecl) {
 		ast.Inspect(d, func(n ast.Node) bool {
-			if ident, ok := n.(*ast.Ident); ok && ident.Obj != nil { // TODO: is 'ident.Obj != nil' check needed?
+			if ident, ok := n.(*ast.Ident); ok && ident.Obj != nil {
 				ident.Name = ""
 				ident.Obj = nil
 			}
@@ -44,8 +43,8 @@ func areFunctionsStructurallyEqual(a, b *ast.FuncDecl) bool {
 	clearParameterNamesAndObjects(a)
 	clearParameterNamesAndObjects(b)
 
-	iets(a)
-	iets(b)
+	clearFunctionBodyBoundIdentifiers(a)
+	clearFunctionBodyBoundIdentifiers(b)
 
 	a = stripAllPos(a).(*ast.FuncDecl)
 	b = stripAllPos(b).(*ast.FuncDecl)
