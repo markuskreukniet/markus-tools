@@ -65,12 +65,12 @@ func stripAllPos(n ast.Node) ast.Node {
 			return false
 		}
 
-		v := reflect.ValueOf(n).Elem() // access the struct behind the interface and pointer
-		for i := 0; i < v.NumField(); i++ {
-			f := v.Field(i)
+		elem := reflect.ValueOf(n).Elem() // access the struct behind the interface and pointer
+		for i := 0; i < elem.NumField(); i++ {
+			field := elem.Field(i)
 
-			if f.Type() == posType {
-				f.Set(posValue)
+			if field.Type() == posType {
+				field.Set(posValue)
 			}
 		}
 		return true
