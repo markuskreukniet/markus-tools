@@ -55,6 +55,9 @@ func areFunctionsStructurallyEqual(a, b *ast.FuncDecl) bool {
 
 // TODO: naming
 func stripAllPos(n ast.Node) ast.Node {
+	// token.Pos(0) is a Pos value with underlying integer value 0, representing an undefined position.
+	pos := token.Pos(0)
+
 	ast.Inspect(n, func(n ast.Node) bool {
 		if n == nil {
 			return false
@@ -63,8 +66,7 @@ func stripAllPos(n ast.Node) ast.Node {
 		v := reflect.ValueOf(n).Elem() // access the struct behind the interface and pointer
 		for i := 0; i < v.NumField(); i++ {
 			f := v.Field(i)
-			// token.Pos(0) is a Pos value with underlying integer value 0, representing an undefined position.
-			pos := token.Pos(0)
+
 			if f.Type() == reflect.TypeOf(pos) {
 				f.Set(reflect.ValueOf(pos))
 			}
