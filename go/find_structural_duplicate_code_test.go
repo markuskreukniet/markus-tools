@@ -63,8 +63,10 @@ func stripAllPos(n ast.Node) ast.Node {
 		v := reflect.ValueOf(n).Elem() // access the struct behind the interface and pointer
 		for i := 0; i < v.NumField(); i++ {
 			f := v.Field(i)
-			if f.Type() == reflect.TypeOf(token.Pos(0)) && f.CanSet() {
-				f.Set(reflect.ValueOf(token.Pos(0)))
+			// token.Pos(0) is a Pos value with underlying integer value 0, representing an undefined position.
+			pos := token.Pos(0)
+			if f.Type() == reflect.TypeOf(pos) {
+				f.Set(reflect.ValueOf(pos))
 			}
 		}
 		return true
