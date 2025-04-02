@@ -7,9 +7,7 @@ import (
 func TMust[T any](t *testing.T, v T, err error) T {
 	t.Helper()
 
-	if err != nil {
-		t.Fatalf("error: %v", err)
-	}
+	TMustErr(t, err)
 
 	return v
 }
