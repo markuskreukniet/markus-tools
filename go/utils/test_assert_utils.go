@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"path/filepath"
 	"reflect"
 	"sort"
@@ -113,7 +112,7 @@ func TMustAssertIdenticalDescendantsFileTrees(t *testing.T, filePathI, filePathJ
 	t.Helper()
 
 	if !tMustAreDescendantsFileTreesIdentical(t, filePathI, filePathJ) {
-		t.Fatalf("The descendants of the file trees are not identical.") // TODO: format
+		t.Fatalf("The descendants of the file trees '%s' and '%s' are not identical.", filePathI, filePathJ)
 	}
 }
 
@@ -132,27 +131,29 @@ func TMustAssertError(t *testing.T, err error, wantErr bool) {
 func TMustAssertEqualBools(t *testing.T, want, got bool) {
 	t.Helper()
 
-	if want != got {
-		t.Fatal(createWantGot(want, got)) // TODO: duplicate
-	}
+	mustAssertEqual(t, want, got)
 }
 
 func TMustAssertEqualStrings(t *testing.T, want, got string) {
 	t.Helper()
 
-	if want != got {
-		t.Fatal(createWantGot(want, got)) // TODO: duplicate
-	}
+	mustAssertEqual(t, want, got)
 }
 
 func TMustAssertDeepEqual(t *testing.T, want, got any) {
 	t.Helper()
 
 	if !reflect.DeepEqual(want, got) {
-		t.Fatal(createWantGot(want, got))
+		tFatalWantGot(t, want, got)
 	}
 }
 
-func createWantGot(want, got any) string {
-	return fmt.Sprintf("want: %v, got: %v", want, got)
+func mustAssertEqual(t *testing.T, want, got any) {
+	if want != got {
+		tFatalWantGot(t, want, got)
+	}
+}
+
+func tFatalWantGot(t *testing.T, want, got any) {
+	t.Fatalf("want: %v, got: %v", want, got)
 }
