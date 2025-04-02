@@ -18,8 +18,8 @@ func WriteNewlineString(builder *strings.Builder) (int, error) {
 	return bytesWritten, nil
 }
 
-func WriteTwoNewlineStrings(builder *strings.Builder) (int, error) {
-	bytesWritten, err := builder.WriteString("\n\n")
+func WriteTwoNewlineStrings(writer io.Writer) (int, error) {
+	bytesWritten, err := io.WriteString(writer, "\n\n")
 	if err != nil {
 		return bytesWritten, err
 	}

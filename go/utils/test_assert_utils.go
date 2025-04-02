@@ -131,13 +131,13 @@ func TMustAssertError(t *testing.T, err error, wantErr bool) {
 func TMustAssertEqualBools(t *testing.T, want, got bool) {
 	t.Helper()
 
-	mustAssertEqual(t, want, got)
+	tMustAssertEqual(t, want, got)
 }
 
 func TMustAssertEqualStrings(t *testing.T, want, got string) {
 	t.Helper()
 
-	mustAssertEqual(t, want, got)
+	tMustAssertEqual(t, want, got)
 }
 
 func TMustAssertDeepEqual(t *testing.T, want, got any) {
@@ -148,7 +148,7 @@ func TMustAssertDeepEqual(t *testing.T, want, got any) {
 	}
 }
 
-func mustAssertEqual(t *testing.T, want, got any) {
+func tMustAssertEqual(t *testing.T, want, got any) {
 	if want != got {
 		tFatalWantGot(t, want, got)
 	}
