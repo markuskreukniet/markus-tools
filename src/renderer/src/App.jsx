@@ -26,6 +26,7 @@ import PageNavigator from './components/PageNavigator'
 // TODO: ResultObject or RO to either
 
 // TODO: bug filesToDateRangeDirectory: selecting same input and output directory, then it does not remove an empty directory
+// TODO: rename LoadingSpinner to ProgressCircle
 
 function App() {
   const [loading, setLoading] = createSignal(false)
