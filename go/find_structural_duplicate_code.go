@@ -10,12 +10,17 @@ import (
 	"reflect"
 )
 
+// func printNode(label string, node ast.Node) {
+// 	println("======", label)
+// 	_ = printer.Fprint(os.Stdout, token.NewFileSet(), node)
+// 	println("\n======")
+// }
+
 func parseFileDefaultMode(set *token.FileSet, name, source string) (*ast.File, error) {
 	return parser.ParseFile(set, name, source, 0)
 }
 
-func createAsts(files map[string]string) (map[string]*ast.File, error) {
-	set := token.NewFileSet()
+func createAsts(set *token.FileSet, files map[string]string) (map[string]*ast.File, error) {
 	asts := make(map[string]*ast.File)
 
 	for name, source := range files {
@@ -29,46 +34,33 @@ func createAsts(files map[string]string) (map[string]*ast.File, error) {
 	return asts, nil
 }
 
-// An Obj represents a reference to a declared symbol in the code.
-// Symbols include variables, parameters, functions, constants, types, and labels.
-func areFunctionsStructurallyEqual(declI, declJ *ast.FuncDecl) bool {
-	declI.Name = &ast.Ident{Name: ""}
-	declJ.Name = &ast.Ident{Name: ""}
-
-	clearParameterNamesAndObjects := func(decl *ast.FuncDecl) {
-		if decl.Type != nil && decl.Type.Params != nil {
-			for _, field := range decl.Type.Params.List {
-				for _, name := range field.Names {
-					name.Name = ""
-					name.Obj = nil
-				}
-			}
-		}
+// TODO: check if other acronyms on other places are in all caps.
+// TODO: use this syntax on other places such as must..?
+func normalizeASTNodes(nodes ...ast.Node) {
+	for _, node := range nodes {
+		clearIdentifiers(node)
+		clearPositions(node)
 	}
-
-	clearFunctionBodyBoundIdentifiers := func(decl *ast.FuncDecl) {
-		ast.Inspect(decl, func(n ast.Node) bool {
-			if ident, ok := n.(*ast.Ident); ok && ident.Obj != nil {
-				ident.Name = ""
-				ident.Obj = nil
-			}
-			return true
-		})
-	}
-
-	clearParameterNamesAndObjects(declI)
-	clearParameterNamesAndObjects(declJ)
-
-	clearFunctionBodyBoundIdentifiers(declI)
-	clearFunctionBodyBoundIdentifiers(declJ)
-
-	declI = clearPositions(declI).(*ast.FuncDecl)
-	declJ = clearPositions(declJ).(*ast.FuncDecl)
-
-	return reflect.DeepEqual(declI, declJ)
 }
 
-func clearPositions(n ast.Node) ast.Node {
+func clearIdentifiers(n ast.Node) {
+	ast.Inspect(n, func(n ast.Node) bool {
+		// if expr, ok := n.(*ast.CallExpr); ok {
+		// 	if ident, ok := expr.Fun.(*ast.Ident); ok {
+		// 		ident.Obj = nil
+		// 		return true
+		// 	}
+		// }
+
+		if ident, ok := n.(*ast.Ident); ok {
+			ident.Name = ""
+			ident.Obj = nil
+		}
+		return true
+	})
+}
+
+func clearPositions(n ast.Node) {
 	// token.Pos(0) is a Pos value with underlying integer value 0, representing an undefined position.
 	undefinedPos := token.Pos(0)
 	posType := reflect.TypeOf(undefinedPos)            // runtime type of token.Pos
@@ -91,39 +83,61 @@ func clearPositions(n ast.Node) ast.Node {
 		}
 		return true
 	})
-
-	return n
 }
 
-// TODO: below here
+// An Obj represents a reference to a declared symbol in the code.
+// Symbols include variables, parameters, functions, constants, types, and labels.
+func areFunctionsStructurallyEqual(declI, declJ *ast.FuncDecl) bool {
+	declI.Name = &ast.Ident{Name: ""}
+	declJ.Name = &ast.Ident{Name: ""}
 
-type codeLocation struct {
-	StartLine   int
-	StartColumn int
-	EndLine     int
-	EndColumn   int
-}
-
-type duplicateCodeParts [][]codeLocation
-
-type duplicateStatements struct {
-	originalStatementIndex int
-	originalStatement      ast.Stmt
-	duplicateStatements    []ast.Stmt
-}
-
-func findStructuralDuplicateFunctionBodyParts(set *token.FileSet, declI, declJ *ast.FuncDecl) (duplicateCodeParts, error) {
-	if len(declI.Body.List) == 0 || len(declJ.Body.List) == 0 {
-		return nil, nil
+	clearParameterNamesAndObjects := func(decl *ast.FuncDecl) {
+		if decl.Type != nil && decl.Type.Params != nil {
+			for _, field := range decl.Type.Params.List {
+				for _, name := range field.Names {
+					name.Name = ""
+					name.Obj = nil
+				}
+			}
+		}
 	}
 
-	var parts duplicateCodeParts
-	var duplicateStatementsList []duplicateStatements
+	clearParameterNamesAndObjects(declI)
+	clearParameterNamesAndObjects(declJ)
+
+	normalizeASTNodes(declI, declJ)
+
+	return reflect.DeepEqual(declI, declJ)
+}
+
+type codeLocation struct {
+	startLine   int
+	startColumn int
+	endLine     int
+	endColumn   int
+}
+
+func createCodeLocation(start, end token.Position) codeLocation {
+	return codeLocation{
+		startLine:   start.Line,
+		startColumn: start.Column,
+		endLine:     end.Line,
+		endColumn:   end.Column,
+	}
+}
+
+type duplicateStatement struct {
+	originalIndex  int
+	duplicateIndex int
+	original       ast.Stmt
+	duplicate      ast.Stmt
+}
+
+func findStructuralDuplicateFunctionParts(set *token.FileSet, declI, declJ *ast.FuncDecl) ([][]codeLocation, error) {
+	var duplicateStatements []duplicateStatement
 
 	for i, stmtI := range declI.Body.List {
-		var foundStatements []ast.Stmt
-
-		for _, stmtJ := range declJ.Body.List {
+		for j, stmtJ := range declJ.Body.List {
 			cloneI, err := cloneStatement(stmtI)
 			if err != nil {
 				return nil, err
@@ -134,58 +148,48 @@ func findStructuralDuplicateFunctionBodyParts(set *token.FileSet, declI, declJ *
 				return nil, err
 			}
 
-			cloneI = clearPositions(cloneI).(ast.Stmt) // TODO: possible to skip this casting?
-			cloneJ = clearPositions(cloneJ).(ast.Stmt)
+			normalizeASTNodes(cloneI, cloneJ)
 
 			if reflect.DeepEqual(cloneI, cloneJ) {
-				foundStatements = append(foundStatements, stmtJ)
+				duplicateStatements = append(duplicateStatements, duplicateStatement{
+					originalIndex:  i,
+					duplicateIndex: j,
+					original:       stmtI,
+					duplicate:      stmtJ,
+				})
 			}
-		}
-
-		if len(foundStatements) > 0 {
-			duplicateStatementsList = append(duplicateStatementsList, duplicateStatements{
-				originalStatementIndex: i,
-				originalStatement:      stmtI,
-				duplicateStatements:    foundStatements,
-			})
-			foundStatements = foundStatements[:0] // TODO: search for " = nill", maybe use [:0] more?
 		}
 	}
 
-	var group []duplicateStatements
-	lastIndex := -2
-	for _, item := range duplicateStatementsList {
-		length := len(group)
+	var parts [][]codeLocation
+	var duplicateStatementGroup []duplicateStatement
+	lastOriginalIndex, lastDuplicateIndex := -1, -1
 
-		if lastIndex == item.originalStatementIndex-1 {
-			group = append(group, item)
-		} else if length > 0 {
-			start := set.Position(group[0].originalStatement.Pos())
-			end := set.Position(group[length-1].originalStatement.End())
+	appendPart := func(length int) {
+		parts = append(parts, []codeLocation{
+			createCodeLocation(
+				set.Position(duplicateStatementGroup[0].original.Pos()),
+				set.Position(duplicateStatementGroup[length-1].original.Pos()),
+			),
+			createCodeLocation(
+				set.Position(duplicateStatementGroup[0].duplicate.Pos()),
+				set.Position(duplicateStatementGroup[length-1].duplicate.Pos()),
+			),
+		})
+	}
 
-			locationI := codeLocation{
-				StartLine:   start.Line,
-				StartColumn: start.Column,
-				EndLine:     end.Line,
-				EndColumn:   end.Column,
-			}
-
-			start = set.Position(group[0].duplicateStatements[0].Pos())
-			end = set.Position(group[length-1].duplicateStatements[0].End())
-
-			locationJ := codeLocation{
-				StartLine:   start.Line,
-				StartColumn: start.Column,
-				EndLine:     end.Line,
-				EndColumn:   end.Column,
-			}
-
-			parts = append(parts, []codeLocation{locationI, locationJ})
-
-			group = group[:0]
+	for _, statement := range duplicateStatements {
+		if lastOriginalIndex+1 == statement.originalIndex && lastDuplicateIndex+1 == statement.duplicateIndex {
+			duplicateStatementGroup = append(duplicateStatementGroup, statement)
 		} else {
-			group = []duplicateStatements{item}
+			appendPart(len(duplicateStatementGroup))
+			duplicateStatementGroup = duplicateStatementGroup[:0]
 		}
+	}
+
+	length := len(duplicateStatementGroup)
+	if length > 0 {
+		appendPart(length)
 	}
 
 	return parts, nil
