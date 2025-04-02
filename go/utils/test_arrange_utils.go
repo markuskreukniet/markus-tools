@@ -46,6 +46,7 @@ func tMustCreateFileData(t *testing.T, directoryPath, inputLine string) FileData
 	return TMust(t, result, err)
 }
 
+// TODO: should be tCreateFilesData? Look for same problem on other places
 func createFilesData(t *testing.T, directoryPath, rawDelimitedSemicolonString string) []FileData {
 	var files []FileData
 	var inputLine []rune
