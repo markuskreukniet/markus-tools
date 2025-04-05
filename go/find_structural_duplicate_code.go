@@ -133,19 +133,22 @@ type duplicateStatement struct {
 	duplicate      ast.Stmt
 }
 
-func findStructuralDuplicateFunctionParts(set *token.FileSet, declI, declJ *ast.FuncDecl) ([][]codeLocation, error) {
+func findStructuralDuplicateFunctionParts(
+	set *token.FileSet, declI, declJ *ast.FuncDecl,
+) (bool, [][]codeLocation, error) {
 	var duplicateStatements []duplicateStatement
+	areBodiesTheSame := true
 
 	for i, stmtI := range declI.Body.List {
 		for j, stmtJ := range declJ.Body.List {
 			cloneI, err := cloneStatement(stmtI)
 			if err != nil {
-				return nil, err
+				return false, nil, err
 			}
 
 			cloneJ, err := cloneStatement(stmtJ)
 			if err != nil {
-				return nil, err
+				return false, nil, err
 			}
 
 			normalizeASTNodes(cloneI, cloneJ)
@@ -157,6 +160,8 @@ func findStructuralDuplicateFunctionParts(set *token.FileSet, declI, declJ *ast.
 					original:       stmtI,
 					duplicate:      stmtJ,
 				})
+			} else {
+				areBodiesTheSame = false // TODO: not efficient
 			}
 		}
 	}
@@ -192,7 +197,7 @@ func findStructuralDuplicateFunctionParts(set *token.FileSet, declI, declJ *ast.
 		appendPart(length)
 	}
 
-	return parts, nil
+	return areBodiesTheSame, parts, nil
 }
 
 func cloneStatement(stmt ast.Stmt) (ast.Stmt, error) {

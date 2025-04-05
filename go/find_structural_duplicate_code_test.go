@@ -15,9 +15,9 @@ func tMustCreateAsts(t *testing.T, set *token.FileSet, files map[string]string) 
 
 func tMustFindStructuralDuplicateFunctionParts(
 	t *testing.T, set *token.FileSet, declI, declJ *ast.FuncDecl,
-) [][]codeLocation {
-	result, err := findStructuralDuplicateFunctionParts(set, declI, declJ)
-	return utils.TMust(t, result, err)
+) (bool, [][]codeLocation) {
+	resultI, resultJ, err := findStructuralDuplicateFunctionParts(set, declI, declJ)
+	return utils.TMust2(t, resultI, resultJ, err)
 }
 
 // TODO: name with Must or is Must with err?
@@ -144,7 +144,7 @@ func TestFindStructuralDuplicateFunctionBodyParts(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			set := token.NewFileSet()
 			functionI, functionJ := getBothFunctions(t, tMustCreateAsts(t, set, tc.files))
-			parts := tMustFindStructuralDuplicateFunctionParts(t, set, functionI, functionJ)
+			_, parts := tMustFindStructuralDuplicateFunctionParts(t, set, functionI, functionJ)
 
 			if len(parts) != tc.numberOfDuplicates {
 				t.Errorf("fail test") // TODO: better fail?
