@@ -186,7 +186,7 @@ func normalizeAndCountParameterTypes(set *token.FileSet, decl *ast.FuncDecl) (ma
 			if err := countTypes(decl.Type.Results.List, &parameterTypeCount); err != nil {
 				return nil, nil, err
 			}
-			decl.Type.Results = nil
+			decl.Type.Results = nil // TODO: duplicate
 		}
 	}
 
