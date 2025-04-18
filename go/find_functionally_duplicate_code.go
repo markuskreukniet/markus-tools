@@ -110,6 +110,7 @@ type normalizedFunction struct {
 	function           *ast.FuncDecl
 	normalizedFunction *ast.FuncDecl
 	parameterTypeCount map[string]int
+	resultTypeCount    map[string]int
 }
 
 type normalizedFunctionFile struct {
@@ -129,8 +130,7 @@ func extractNormalizedFunctions(set *token.FileSet, asts map[string]*ast.File) (
 					return nil, err
 				}
 
-				// TODO: use _,
-				parameterTypeCount, _, err := normalizeAndCountParameterTypes(set, clone)
+				parameterTypeCount, resultTypeCount, err := normalizeAndCountParameterTypes(set, clone)
 				if err != nil {
 					return nil, err
 				}
@@ -139,6 +139,7 @@ func extractNormalizedFunctions(set *token.FileSet, asts map[string]*ast.File) (
 					function:           funcDecl,
 					normalizedFunction: clone,
 					parameterTypeCount: parameterTypeCount,
+					resultTypeCount:    resultTypeCount,
 				})
 			}
 		}
