@@ -154,8 +154,7 @@ func extractNormalizedFunctions(set *token.FileSet, asts map[string]*ast.File) (
 
 // TODO: naming
 func normalizeAndCountParameterTypes(set *token.FileSet, decl *ast.FuncDecl) (map[string]int, map[string]int, error) {
-	// TODO: naming
-	countTypes := func(fields []*ast.Field, typeCount *map[string]int, list **ast.FieldList) error {
+	countAndClearFieldListTypes := func(fields []*ast.Field, typeCount *map[string]int, list **ast.FieldList) error {
 		for _, field := range fields {
 			var buffer bytes.Buffer
 			if err := format.Node(&buffer, set, field.Type); err != nil {
@@ -181,12 +180,16 @@ func normalizeAndCountParameterTypes(set *token.FileSet, decl *ast.FuncDecl) (ma
 
 	if decl.Type != nil {
 		if decl.Type.Params != nil {
-			if err := countTypes(decl.Type.Params.List, &parameterTypeCount, &decl.Type.Params); err != nil {
+			if err := countAndClearFieldListTypes(
+				decl.Type.Params.List, &parameterTypeCount, &decl.Type.Params,
+			); err != nil {
 				return nil, nil, err
 			}
 		}
 		if decl.Type.Results != nil {
-			if err := countTypes(decl.Type.Results.List, &parameterTypeCount, &decl.Type.Results); err != nil {
+			if err := countAndClearFieldListTypes(
+				decl.Type.Results.List, &parameterTypeCount, &decl.Type.Results,
+			); err != nil {
 				return nil, nil, err
 			}
 		}
