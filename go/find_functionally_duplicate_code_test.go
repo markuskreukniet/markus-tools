@@ -9,6 +9,8 @@ import (
 	"github.com/markuskreukniet/markus-tools/go/utils"
 )
 
+const differentFunctionNamesAndPositions = "Different function names and positions"
+
 func tMustCreateASTs(t *testing.T, set *token.FileSet, files map[string]string) map[string]*ast.File {
 	result, err := createASTs(set, files)
 	return utils.TMust(t, result, err)
@@ -38,7 +40,7 @@ func TestFindDuplicateCodeRegions(t *testing.T) {
 		numberOfDuplicates int // TODO: should become a string
 	}{
 		{
-			name: "Different function names and positions",
+			name: differentFunctionNamesAndPositions,
 			files: map[string]string{
 				"i.go": `package main
 						func I() string {
@@ -149,7 +151,7 @@ func TestFindFunctionallyEqualFunctions(t *testing.T) {
 		areTheSame bool
 	}{
 		{
-			name: "a",
+			name: differentFunctionNamesAndPositions,
 			files: map[string]string{
 				"i.go": `package main
 						func I() {}`,
