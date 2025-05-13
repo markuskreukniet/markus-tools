@@ -9,6 +9,8 @@ import LoadingSpinner from './components/LoadingSpinner'
 import PageNavigator from './components/PageNavigator'
 // import logo from './assets/logo.svg'
 
+// TODO: rename fileSystemNode and fileSystemNodes to filePathEntry and filePathEntries
+
 // TODO: FilesToDateRangeDirectory: show how many files added/changed/removed
 
 // TODO: the naming of the params for goFunctionCall should be enums
