@@ -88,6 +88,10 @@ h1, h2, ul, .file-system-nodes-input__submission-buttons, .references-by-urls__i
   padding-bottom: var(--size-1);
 }
 
+button, textarea, .text-area__custom-placeholder {
+  border-radius: var(--size-1-s);
+}
+
 #navigation-bar > li, button:not(:disabled) {
   cursor: pointer;
 }
